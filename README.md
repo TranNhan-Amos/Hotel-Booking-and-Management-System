@@ -1,1 +1,4 @@
-# D-n-T-t-Nghi-p
+Dự án tốt nghiệp với đề tài "Thiết kế và xây dựng website quản lý đặt phòng khách sạn" nhằm xây dựng một hệ thống trực tuyến giúp khách hàng dễ dàng tìm kiếm, đặt phòng và quản lý thông tin đặt phòng tại khách sạn. Hệ thống cũng hỗ trợ quản trị viên trong việc quản lý phòng, dịch vụ và đơn đặt một cách hiệu quả. Dự án sử dụng các công nghệ web hiện đại nhằm mang lại trải nghiệm người dùng thân thiện, bảo mật và tiện lợi.
+
+The capstone project titled "Design and Development of a Hotel Booking Management Website" aims to build an online system that allows customers to easily search for, book, and manage hotel room reservations. The system also supports administrators in efficiently managing rooms, services, and bookings. The project applies modern web technologies to deliver a user-friendly, secure, and convenient experience.
+

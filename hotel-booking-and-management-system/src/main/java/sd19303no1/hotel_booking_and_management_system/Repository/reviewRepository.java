@@ -1,4 +1,9 @@
 package sd19303no1.hotel_booking_and_management_system.Repository;
 
-public interface reviewRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import sd19303no1.hotel_booking_and_management_system.Entity.reviewEntity;
+
+public interface reviewRepository extends JpaRepository<reviewEntity, Long> {
 }
+

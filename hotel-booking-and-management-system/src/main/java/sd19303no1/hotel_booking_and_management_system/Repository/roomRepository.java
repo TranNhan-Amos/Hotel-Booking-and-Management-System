@@ -1,4 +1,8 @@
 package sd19303no1.hotel_booking_and_management_system.Repository;
 
-public interface roomRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import sd19303no1.hotel_booking_and_management_system.Entity.roomEntity;
+
+public interface roomRepository extends JpaRepository<roomEntity, Long> {
 }

@@ -2,7 +2,7 @@ package sd19303no1.hotel_booking_and_management_system.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import sd19303no1.hotel_booking_and_management_system.Entity.bookingOrderEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 
-public interface bookingOrderRepository extends JpaRepository<bookingOrderEntity, Long> {
+public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Long> {
 }

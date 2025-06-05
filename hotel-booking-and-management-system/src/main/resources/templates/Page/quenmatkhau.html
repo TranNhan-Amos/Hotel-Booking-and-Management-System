@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quên Mật Khẩu - Khách Sạn Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #6c5ce7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .forgot-password-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        .forgot-password-container h2 {
+            font-size: 24px;
+            color: #6c5ce7;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            border-color: #6c5ce7;
+            outline: none;
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.3);
+        }
+        .form-group .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            transform: scale(1.05);
+        }
+        .back-to-login {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #6c5ce7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-to-login:hover {
+            color: #5b4cd5;
+        }
+        @media (max-width: 480px) {
+            .forgot-password-container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="forgot-password-container">
+        <h2>Quên Mật Khẩu</h2>
+        <p>Nhập email của bạn để nhận liên kết đặt lại mật khẩu.</p>
+        <form id="forgotPasswordForm">
+            <div class="form-group">
+                <label for="forgot-email">Email</label>
+                <input type="email" id="forgot-email" name="email" placeholder="Nhập email của bạn" required>
+                <span class="error" id="email-error">Email không hợp lệ</span>
+            </div>
+            <button type="submit" class="submit-btn">Gửi Yêu Cầu</button>
+            <a href="login.html" class="back-to-login">Quay lại Đăng Nhập</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Reset lỗi
+            const emailError = document.getElementById('email-error');
+            emailError.style.display = 'none';
+
+            const email = document.getElementById('forgot-email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Kiểm tra định dạng email
+            if (!emailRegex.test(email)) {
+                emailError.style.display = 'block';
+                return;
+            }
+
+            // Giả lập gửi yêu cầu đặt lại mật khẩu
+            alert('Liên kết đặt lại mật khẩu đã được gửi đến ' + email + '! (Giả lập)');
+            window.location.href = 'login.html'; // Quay lại trang đăng nhập
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán - Khách Sạn Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #e9ecef);
+            color: #333;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: auto;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        /* Navbar */
+        nav {
+            background: #fff;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #003580;
+            text-decoration: none;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+        }
+        nav .nav-links a {
+            color: #003580;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav .nav-links a:hover, nav .nav-links a.active {
+            background: #e6f0fa;
+            color: #003580;
+        }
+        nav .nav-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        nav .nav-options select {
+            border: none;
+            background: transparent;
+            color: #003580;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        nav .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        nav .auth-btn {
+            background: transparent;
+            color: #003580;
+            border: 1px solid #003580;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav .auth-btn.register {
+            background: #0071c2;
+            color: white;
+            border: none;
+        }
+        nav .auth-btn:hover {
+            background: #e6f0fa;
+            color: #003580;
+        }
+        nav .auth-btn.register:hover {
+            background: #0051a2;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #003580;
+        }
+        /* Payment Section */
+        .payment-section {
+            max-width: 1200px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: 40px auto;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        .hotel-info {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .hotel-info img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: transform 0.4s ease;
+        }
+        .hotel-info img:hover {
+            transform: scale(1.05);
+        }
+        .hotel-info h2 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .hotel-info p {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        .hotel-info .rating {
+            color: #6c5ce7;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .hotel-info .rating i {
+            margin-right: 5px;
+        }
+        .hotel-info .amenities {
+            margin-bottom: 15px;
+        }
+        .hotel-info .amenities ul {
+            list-style: none;
+            color: #7f8c8d;
+        }
+        .hotel-info .amenities ul li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+        .hotel-info .amenities ul li:before {
+            content: "✓";
+            color: #6c5ce7;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .summary-details {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #6c5ce7;
+        }
+        .summary-details .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .summary-details .summary-item span:first-child {
+            font-weight: 500;
+            color: #333;
+        }
+        .summary-details .summary-item.total-row {
+            font-weight: 600;
+            border-top: 1px solid #dfe6e9;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .summary-details .total {
+            font-size: 18px;
+            color: #e74c3c;
+            text-align: right;
+        }
+        .payment-form {
+            flex: 2;
+            min-width: 400px;
+            padding: 20px;
+        }
+        .payment-form h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .payment-form .form-group {
+            margin-bottom: 20px;
+        }
+        .payment-form label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .payment-form input, .payment-form select, .payment-form textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .payment-form input:focus, .payment-form select:focus, .payment-form textarea:focus {
+            border-color: #6c5ce7;
+            outline: none;
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.3);
+        }
+        .payment-form .card-details {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .payment-form .card-details .form-group {
+            flex: 1;
+        }
+        .payment-form .special-request textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        /* Payment Method Selection */
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .payment-method-card {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .payment-method-card:hover, .payment-method-card.selected {
+            border-color: #6c5ce7;
+            background: #f0eaff;
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+        }
+        .payment-method-card input {
+            display: none;
+        }
+        .payment-method-card i {
+            font-size: 20px;
+            color: #6c5ce7;
+        }
+        .payment-method-card span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        .payment-form button {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+            transition: all 0.4s ease;
+        }
+        .payment-form button:hover {
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            transform: scale(1.05);
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav .nav-links {
+                display: none;
+            }
+            nav .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+            }
+            nav .nav-links.active a {
+                margin: 10px 0;
+            }
+            .hamburger {
+                display: block;
+            }
+            .payment-section {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .hotel-info, .payment-form {
+                width: 100%;
+            }
+            .hotel-info img {
+                height: 200px;
+            }
+            .payment-form .card-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .payment-methods {
+                flex-direction: column;
+            }
+            .payment-method-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+       <nav>
+            <div class="nav-container">
+                <a href="#" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
+                <div class="hamburger" aria-label="Menu" role="button">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="active">Trang chủ</a></li>
+                    <li><a href="#">Danh sách phòng</a></li>
+                    <li><a href="#">Chuyến bay + Khách sạn</a></li>
+                    <li><a href="#">Địa điểm tham quan</a></li>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="about.html">Liên hệ</a></li>
+                </ul>
+                <div class="nav-options">
+                    <select aria-label="Ngôn ngữ">
+                        <option>Tiếng Việt</option>
+                        <option>English</option>
+                    </select>
+                </div>
+                <div class="auth-buttons">
+                    <button class="auth-btn" aria-label="Đăng nhập">Đăng nhập</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Payment Section -->
+        <div class="payment-section">
+            <!-- Hotel Information -->
+            <div class="hotel-info">
+               <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Sunrise">
+                <h2>Khách Sạn Grand Ocean</h2>
+                <p>Nằm ngay trung tâm thành phố biển Đà Nẵng, mang đến trải nghiệm nghỉ dưỡng đẳng cấp với view biển tuyệt đẹp.</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span>(4.5/5 - 320 đánh giá)</span>
+                </div>
+                <div class="amenities">
+                    <ul>
+                        <li>Wifi miễn phí</li>
+                        <li>Hồ bơi vô cực</li>
+                        <li>Nhà hàng cao cấp</li>
+                        <li>Phòng gym hiện đại</li>
+                    </ul>
+                </div>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <span>Khách Sạn</span>
+                        <span>Khách Sạn Grand Ocean</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Địa Chỉ</span>
+                        <span>123 Đường Biển, Phường 5, TP. Đà Nẵng</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Ngày Nhận Phòng</span>
+                        <span>27/05/2025</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Ngày Trả Phòng</span>
+                        <span>29/05/2025</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Số Đêm</span>
+                        <span>2 đêm</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Phòng & Khách</span>
+                        <span>1 phòng, 2 người lớn</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Giá Phòng</span>
+                        <span>1,600,000 ₫ / đêm</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Phí Dịch Vụ</span>
+                        <span>200,000 ₫</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Thuế VAT (10%)</span>
+                        <span>180,000 ₫</span>
+                    </div>
+                    <div class="summary-item total-row">
+                        <span>Tổng Cộng</span>
+                        <span class="total">3,580,000 ₫</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="payment-form">
+                <h2>Thông Tin Thanh Toán</h2>
+                <div class="form-group">
+                    <label for="fullName">Họ và Tên</label>
+                    <input type="text" id="fullName" placeholder="Nguyễn Văn A" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="example@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Số Điện Thoại</label>
+                    <input type="tel" id="phone" placeholder="0935123456" required>
+                </div>
+                <div class="form-group">
+                    <label for="idNumber">Số CMND/CCCD</label>
+                    <input type="text" id="idNumber" placeholder="123456789" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Địa Chỉ</label>
+                    <input type="text" id="address" placeholder="123 Đường ABC, TP. Đà Nẵng" required>
+                </div>
+                <div class="form-group special-request">
+                    <label for="specialRequest">Yêu Cầu Đặc Biệt</label>
+                    <textarea id="specialRequest" placeholder="Ví dụ: Nhờ chuẩn bị thêm giường phụ"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Phương Thức Thanh Toán</label>
+                    <div class="payment-methods">
+                        <label class="payment-method-card selected">
+                            <input type="radio" name="paymentMethod" value="creditCard" checked>
+                            <i class="fas fa-credit-card"></i>
+                            <span>Thẻ Tín Dụng</span>
+                        </label>
+                        <label class="payment-method-card">
+                            <input type="radio" name="paymentMethod" value="momo">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>MoMo</span>
+                        </label>
+                        <label class="payment-method-card">
+                            <input type="radio" name="paymentMethod" value="bankTransfer">
+                            <i class="fas fa-university"></i>
+                            <span>Chuyển Khoản</span>
+                        </label>
+                        <label class="payment-method-card">
+                            <input type="radio" name="paymentMethod" value="payOnArrival">
+                            <i class="fas fa-handshake"></i>
+                            <span>Thanh Toán Khi Nhận Phòng</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="cardFields" class="payment-fields">
+                    <div class="form-group">
+                        <label for="cardNumber">Số Thẻ</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                    <div class="card-details">
+                        <div class="form-group">
+                            <label for="expiryDate">Ngày Hết Hạn</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" placeholder="123" required>
+                        </div>
+                    </div>
+                </div>
+                <div id="momoFields" class="payment-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="momoNumber">Số Điện Thoại MoMo</label>
+                        <input type="tel" id="momoNumber" placeholder="0935123456" required>
+                    </div>
+                </div>
+                <div id="bankFields" class="payment-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="bankAccount">Số Tài Khoản Ngân Hàng</label>
+                        <input type="text" id="bankAccount" placeholder="1234567890" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bankName">Tên Ngân Hàng</label>
+                        <input type="text" id="bankName" placeholder="Vietcombank" required>
+                    </div>
+                </div>
+                <button onclick="confirmPayment()">Xác Nhận Thanh Toán</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Payment -->
+    <script>
+        // Toggle payment fields based on selected method
+        function togglePaymentFields() {
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const fields = document.querySelectorAll('.payment-fields');
+            fields.forEach(field => field.style.display = 'none');
+
+            if (method === 'creditCard') {
+                document.getElementById('cardFields').style.display = 'block';
+            } else if (method === 'momo') {
+                document.getElementById('momoFields').style.display = 'block';
+            } else if (method === 'bankTransfer') {
+                document.getElementById('bankFields').style.display = 'block';
+            }
+        }
+
+        // Add selected class to payment method cards
+        document.querySelectorAll('.payment-method-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                card.querySelector('input').checked = true;
+                togglePaymentFields();
+            });
+        });
+
+        // Confirm payment (simulated)
+        function confirmPayment() {
+            const requiredFields = document.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#e74c3c';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#dfe6e9';
+                }
+            });
+
+            if (isValid) {
+                alert('Thanh toán thành công! Cảm ơn bạn đã đặt phòng tại Khách Sạn Grand Ocean.');
+                // Here you can add API call or redirect to a confirmation page
+                // window.location.href = 'confirmation.html';
+            } else {
+                alert('Vui lòng điền đầy đủ thông tin!');
+            }
+        }
+
+        // Initial call to set default fields
+        togglePaymentFields();
+    </script>
+
+    <!-- JavaScript for Hamburger Menu -->
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class StatusEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ Thêm auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "status_id")
     private Integer statusId;
 
@@ -15,9 +15,26 @@ public class StatusEntity {
     private String statusName;
 
     public enum Status {
-    PENDING,
-    CONFIRMED,
-    CANCELLED,
-    COMPLETED
-}
+        PENDING,
+        CONFIRMED,
+        CANCELLED,
+        COMPLETED
+    }
+
+    // Getters and Setters
+    public Integer getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
 }

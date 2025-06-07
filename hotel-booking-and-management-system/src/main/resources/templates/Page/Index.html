@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Đặt phòng khách sạn, khám phá khu vui chơi và dịch vụ tại Đà Nẵng với ưu đãi độc quyền! Tận hưởng Mỹ Khê, cầu Rồng và hơn thế nữa!">
+    <meta name="description" content="Đặt phòng khách sạn, khám phá khu vui chơi và dịch vụ tại Đà Nẵng với ưu đãi độc quyền!">
     <title>Đặt Phòng Khách Sạn Đà Nẵng - Khám phá thành phố biển</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -355,6 +355,9 @@
             transition: transform 0.3s, box-shadow 0.3s;
             animation: slideIn 0.8s ease-out forwards;
             opacity: 0;
+            display: block; /* Added for <a> tag behavior */
+            text-decoration: none; /* Added for <a> tag behavior */
+            color: inherit; /* Added for <a> tag behavior */
         }
         .hotel-card:hover {
             transform: translateY(-4px);
@@ -393,7 +396,7 @@
             color: #003580;
             margin-bottom: 12px;
         }
-        .hotel-card button {
+        .hotel-card button.book-now { /* Made selector more specific */
             background: #0071c2;
             color: white;
             border: none;
@@ -405,7 +408,7 @@
             font-weight: 500;
             transition: background 0.3s, transform 0.3s;
         }
-        .hotel-card button:hover {
+        .hotel-card button.book-now:hover { /* Made selector more specific */
             background: #0051a2;
             transform: scale(1.05);
         }
@@ -517,16 +520,16 @@
         .carousel {
             overflow: hidden;
             position: relative;
-            user-select: none; /* Prevent text selection while dragging */
+            user-select: none;
         }
         .carousel-track {
             display: flex;
             transition: transform 0.5s ease-in-out;
-            cursor: grab; /* Indicate draggable area */
+            cursor: grab;
         }
         .carousel-track.dragging {
-            cursor: grabbing; /* Change cursor while dragging */
-            transition: none; /* Disable transition during drag for smooth movement */
+            cursor: grabbing;
+            transition: none;
         }
         .carousel-card {
             flex: 0 0 300px;
@@ -732,17 +735,17 @@
         <!-- Navbar -->
         <nav>
             <div class="nav-container">
-                <a href="#" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
+                <a href="/" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
                 <div class="hamburger" aria-label="Menu" role="button">
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul class="nav-links">
-                    <li><a href="#" class="active">Trang chủ</a></li>
-                    <li><a href="#">Khách sạn Đà Nẵng</a></li>
-                    <li><a href="#">Chuyến bay + Khách sạn</a></li>
-                    <li><a href="#">Tour tham quan</a></li>
-                    <li><a href="#">Giới thiệu</a></li>
-                    <li><a href="about.html">Liên hệ</a></li>
+                    <li><a href="/" class="active">Trang chủ</a></li>
+                    <li><a href="/rooms">Khách sạn Đà Nẵng</a></li>
+                    <li><a href="/bookings">Đặt phòng của tôi</a></li>
+                    <li><a href="/reviews">Đánh giá</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                    <li><a href="/contact">Liên hệ</a></li>
                 </ul>
                 <div class="nav-options">
                     <select aria-label="Ngôn ngữ">
@@ -770,70 +773,53 @@
                 <button>Chuyến bay + Khách sạn</button>
                 <button>Tour Đà Nẵng</button>
             </div>
-            <div class="search-bar" id="search-form">
+            <form class="search-bar" th:action="@{/search}" method="get" id="search-form">
                 <div class="input-group">
                     <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" value="Đà Nẵng" placeholder="Đà Nẵng, Hội An, Huế..." aria-label="Địa điểm" id="location">
+                    <input type="text" name="location" value="Đà Nẵng" placeholder="Đà Nẵng, Hội An, Huế..." aria-label="Địa điểm" id="location">
                 </div>
                 <div class="input-group">
                     <i class="fas fa-calendar-alt"></i>
-                    <input type="date" value="2025-05-29" aria-label="Ngày nhận phòng" id="check-in">
+                    <input type="date" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" aria-label="Ngày nhận phòng" id="check-in">
                 </div>
                 <div class="input-group">
                     <i class="fas fa-calendar-alt"></i>
-                    <input type="date" value="2025-05-31" aria-label="Ngày trả phòng" id="check-out">
+                    <input type="date" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" aria-label="Ngày trả phòng" id="check-out">
                 </div>
                 <div class="input-group">
                     <i class="fas fa-users"></i>
-                    <select aria-label="Số lượng khách" id="guests">
-                        <option>2 người lớn, 0 trẻ em, 1 phòng</option>
-                        <option>1 người lớn, 0 trẻ em, 1 phòng</option>
-                        <option>4 người lớn, 0 trẻ em, 2 phòng</option>
-                        <option>2 người lớn, 2 trẻ em, 1 phòng</option>
+                    <select name="guests" aria-label="Số lượng khách" id="guests">
+                        <option value="2">2 người lớn, 0 trẻ em, 1 phòng</option>
+                        <option value="1">1 người lớn, 0 trẻ em, 1 phòng</option>
+                        <option value="4">4 người lớn, 0 trẻ em, 2 phòng</option>
+                        <option value="3">2 người lớn, 2 trẻ em, 1 phòng</option>
                     </select>
                 </div>
                 <button type="submit">Tìm kiếm</button>
-            </div>
+            </form>
         </div>
 
         <!-- Booking Modal -->
         <div class="modal" id="booking-modal">
             <div class="modal-content">
                 <span class="close">×</span>
-                <h2>Đặt phòng, vé hoặc tour</h2>
-                <form id="booking-form">
-                    <input type="text" placeholder="Họ và tên" aria-label="Họ và tên" required>
-                    <input type="email" placeholder="Email" aria-label="Email" required>
-                    <input type="tel" placeholder="Số điện thoại" aria-label="Số điện thoại" required>
-                    <select aria-label="Chọn dịch vụ hoặc tour" id="service-select" required>
-                        <option value="">Chọn dịch vụ hoặc tour</option>
-                        <optgroup label="Khách sạn">
-                            <option>Ocean Breeze Hotel</option>
-                            <option>Sông Hàn Suites</option>
-                            <option>Non Nước Resort</option>
-                            <option>Golden Bay Villa</option>
-                            <option>Champa Homestay</option>
-                        </optgroup>
-                        <optgroup label="Khu vui chơi - Vé">
-                            <option>Bà Nà Hills - Vé</option>
-                            <option>Asia Park - Vé</option>
-                        </optgroup>
-                        <optgroup label="Khu vui chơi - Tour">
-                            <option>Bà Nà Hills - Tour</option>
-                            <option>Asia Park - Tour</option>
-                            <option>Ngũ Hành Sơn - Tour</option>
-                            <option>Cầu Rồng Show - Tour</option>
-                        </optgroup>
-                        <optgroup label="Dịch vụ">
-                            <option>Đưa đón sân bay</option>
-                            <option>Spa thư giãn</option>
-                            <option>Thuê xe máy</option>
-                        </optgroup>
-                        <optgroup label="Dịch vụ - Tour">
-                            <option>Tour ẩm thực</option>
-                        </optgroup>
+                <h2>Đặt phòng</h2>
+                <form th:action="@{/bookings}" method="post" id="booking-form">
+                    <input type="hidden" name="roomId" id="selected-room-id">
+                    <input type="text" name="customerName" placeholder="Họ và tên" aria-label="Họ và tên" required>
+                    <input type="email" name="email" placeholder="Email" aria-label="Email" required>
+                    <input type="tel" name="phone" placeholder="Số điện thoại" aria-label="Số điện thoại" required>
+                    <input type="text" name="address" placeholder="Địa chỉ" aria-label="Địa chỉ" required>
+                    <input type="date" name="checkInDate" aria-label="Ngày nhận phòng" required>
+                    <input type="date" name="checkOutDate" aria-label="Ngày trả phòng" required>
+                    <select name="voucherId" aria-label="Mã giảm giá">
+                        <option value="">Chọn mã giảm giá (nếu có)</option>
+                        <option th:each="voucher : ${vouchers}" 
+                                th:value="${voucher.voucherId}" 
+                                th:text="${voucher.code + ' - Giảm ' + voucher.discount + '%'}">
+                        </option>
                     </select>
-                    <button type="submit">Xác nhận đặt</button>
+                    <button type="submit">Xác nhận đặt phòng</button>
                 </form>
             </div>
         </div>
@@ -842,39 +828,11 @@
         <div class="property-types">
             <h2 class="section-title">Tìm loại hình lưu trú tại Đà Nẵng</h2>
             <div class="property-list">
-                <div class="property-card animate-slide" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Khách sạn biển">
+                <div class="property-card animate-slide" style="animation-delay: 0.2s;" th:each="type, iterStat : ${roomTypes}">
+                    <img th:src="${type.imageUrl}" th:alt="${type.name}" src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
                     <div class="content">
-                        <h3>Khách sạn biển</h3>
-                        <p>Thưởng thức tầm nhìn biển Mỹ Khê với tiện nghi 5 sao.</p>
-                    </div>
-                </div>
-                <div class="property-card animate-slide" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Căn hộ ven sông">
-                    <div class="content">
-                        <h3>Căn hộ ven sông</h3>
-                        <p>Không gian hiện đại bên sông Hàn, gần cầu Rồng.</p>
-                    </div>
-                </div>
-                <div class="property-card animate-slide" style="animation-delay: 0.6s;">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Resort Non Nước">
-                    <div class="content">
-                        <h3>Resort Non Nước</h3>
-                        <p>Thư giãn tại khu nghỉ dưỡng sang trọng gần Ngũ Hành Sơn.</p>
-                    </div>
-                </div>
-                <div class="property-card animate-slide" style="animation-delay: 0.8s;">
-                    <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2070&auto=format&fit=crop" alt="Villa biển">
-                    <div class="content">
-                        <h3>Villa biển</h3>
-                        <p>Không gian riêng tư với hồ bơi riêng, lý tưởng cho gia đình.</p>
-                    </div>
-                </div>
-                <div class="property-card animate-slide" style="animation-delay: 1s;">
-                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop" alt="Homestay văn hóa">
-                    <div class="content">
-                        <h3>Homestay văn hóa</h3>
-                        <p>Trải nghiệm đời sống địa phương với các món ăn Đà Nẵng.</p>
+                        <h3 th:text="${type.name}">Khách sạn biển</h3>
+                        <p th:text="${type.description}">Thưởng thức tầm nhìn biển Mỹ Khê với tiện nghi 5 sao.</p>
                     </div>
                 </div>
             </div>
@@ -884,56 +842,25 @@
         <div class="featured-hotels">
             <h2 class="section-title">Khách sạn nổi bật tại Đà Nẵng</h2>
             <div class="hotel-list">
-                <div class="hotel-card animate-slide" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Ocean Breeze Hotel">
+                <!-- MODIFIED hotel-card to be a link -->
+                <a th:each="room, iterStat : ${featuredRooms}" 
+                   th:href="@{/room/{id}(id=${room.roomId})}" 
+                   class="hotel-card animate-slide" 
+                   th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : '/placeholder.svg?height=180&width=280'}" 
+                         th:alt="${room.type}" 
+                         src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
                     <div class="content">
-                        <h3>Ocean Breeze Hotel</h3>
-                        <p>Mỹ Khê Beach - Gần cầu Rồng</p>
-                        <div class="rating">8.7</div>
-                        <p class="price">1,800,000 ₫ / đêm</p>
-                        <button class="book-now" data-service="Ocean Breeze Hotel">Đặt ngay</button>
+                        <h3 th:text="${room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${room.description}">Mỹ Khê Beach - Gần cầu Rồng</p>
+                        <div class="rating" th:if="${room.averageRating != null}" th:text="${room.averageRating}">8.7</div>
+                        <p class="price" th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫ / đêm'">1,800,000 ₫ / đêm</p>
+                        <button class="book-now" 
+                                th:data-room-id="${room.roomId}" 
+                                th:data-room-name="${room.type}" 
+                                th:attr="onclick='openBookingModal(this); event.stopPropagation(); return false;'">Đặt ngay</button>
                     </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Sông Hàn Suites">
-                    <div class="content">
-                        <h3>Sông Hàn Suites</h3>
-                        <p>Sông Hàn - Trung tâm thành phố</p>
-                        <div class="rating">8.4</div>
-                        <p class="price">1,500,000 ₫ / đêm</p>
-                        <button class="book-now" data-service="Sông Hàn Suites">Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.6s;">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Non Nước Resort">
-                    <div class="content">
-                        <h3>Non Nước Resort</h3>
-                        <p>Ngũ Hành Sơn - Bãi biển Non Nước</p>
-                        <div class="rating">9.0</div>
-                        <p class="price">2,200,000 ₫ / đêm</p>
-                        <button class="book-now" data-service="Non Nước Resort">Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.8s;">
-                    <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2070&auto=format&fit=crop" alt="Golden Bay Villa">
-                    <div class="content">
-                        <h3>Golden Bay Villa</h3>
-                        <p>Mỹ Khê Beach - Gần công viên Biển Đông</p>
-                        <div class="rating">8.9</div>
-                        <p class="price">2,500,000 ₫ / đêm</p>
-                        <button class="book-now" data-service="Golden Bay Villa">Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 1s;">
-                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop" alt="Champa Homestay">
-                    <div class="content">
-                        <h3>Champa Homestay</h3>
-                        <p>An Hải Bắc - Gần cầu Tình Yêu</p>
-                        <div class="rating">8.2</div>
-                        <p class="price">800,000 ₫ / đêm</p>
-                        <button class="book-now" data-service="Champa Homestay">Đặt ngay</button>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -941,219 +868,60 @@
         <div class="offers">
             <h2 class="section-title">Ưu đãi đặc biệt tại Đà Nẵng</h2>
             <div class="offer-list">
-                <div class="offer-card animate-slide" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Ưu đãi Mỹ Khê">
+                <div class="offer-card animate-slide" th:each="voucher, iterStat : ${activeVouchers}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Ưu đãi">
                     <div class="content">
-                        <h3>Thoát khỏi thành phố tại Mỹ Khê</h3>
-                        <p>Giảm 25% cho các khách sạn 4-5 sao tại bãi biển Mỹ Khê, bao gồm bữa sáng miễn phí.</p>
-                        <button>Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="offer-card animate-slide" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop" alt="Combo Bà Nà Hills">
-                    <div class="content">
-                        <h3>Combo Bà Nà Hills</h3>
-                        <p>3 ngày 2 đêm chỉ từ 2,800,000 ₫, bao gồm vé cáp treo Bà Nà Hills và tour Hội An.</p>
-                        <button>Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="offer-card animate-slide" style="animation-delay: 0.6s;">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Kỳ nghỉ sông Hàn">
-                    <div class="content">
-                        <h3>Kỳ nghỉ sông Hàn</h3>
-                        <p>Giảm 20% cho căn hộ ven sông, tặng voucher ăn tối món mì quảng 150,000 ₫.</p>
-                        <button>Đặt ngay</button>
-                    </div>
-                </div>
-                <div class="offer-card animate-slide" style="animation-delay: 0.8s;">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Non Nước sang trọng">
-                    <div class="content">
-                        <h3>Non Nước sang trọng</h3>
-                        <p>Giảm 15% cho resort 5 sao tại Non Nước, kèm spa miễn phí.</p>
-                        <button>Đặt ngay</button>
+                        <h3 th:text="'Giảm ' + ${#numbers.formatDecimal(voucher.discount, 0, 'COMMA', 0, 'POINT')} + '% với mã ' + ${voucher.code}">Thoát khỏi thành phố tại Mỹ Khê</h3>
+                        <p th:text="'Áp dụng từ ' + ${#temporals.format(voucher.startDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(voucher.endDate, 'dd/MM/yyyy')}">
+                            Giảm 25% cho các khách sạn 4-5 sao tại bãi biển Mỹ Khê, bao gồm bữa sáng miễn phí.
+                        </p>
+                        <button onclick="copyVoucherCode(this)" th:data-code="${voucher.code}">Sao chép mã</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Stay Ideas -->
-        <div class="stay-ideas">
-            <h2 class="section-title">Gợi ý kỳ nghỉ tại Đà Nẵng</h2>
-            <div class="idea-list">
-                <div class="idea-card animate-slide" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Thư giãn bên biển">
+        <!-- Recent Reviews -->
+        <div class="featured-hotels">
+            <h2 class="section-title">Đánh giá gần đây</h2>
+            <div class="hotel-list">
+                <div class="hotel-card animate-slide" th:each="review, iterStat : ${recentReviews}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
                     <div class="content">
-                        <h3>Thư giãn bên biển</h3>
-                        <p>Tận hưởng nắng vàng và cát trắng tại bãi biển Mỹ Khê.</p>
-                    </div>
-                </div>
-                <div class="idea-card animate-slide" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop" alt="Khám phá văn hóa">
-                    <div class="content">
-                        <h3>Khám phá văn hóa</h3>
-                        <p>Tham quan Ngũ Hành Sơn và thưởng thức ẩm thực địa phương.</p>
-                    </div>
-                </div>
-                <div class="idea-card animate-slide" style="animation-delay: 0.6s;">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Phiêu lưu Bà Nà">
-                    <div class="content">
-                        <h3>Phiêu lưu Bà Nà</h3>
-                        <p>Khám phá cầu Vàng và công viên Fantasy tại Bà Nà Hills.</p>
-                    </div>
-                </div>
-                <div class="idea-card animate-slide" style="animation-delay: 0.8s;">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Hội An lân cận">
-                    <div class="content">
-                        <h3>Hội An lân cận</h3>
-                        <p>Kết hợp kỳ nghỉ Đà Nẵng với chuyến đi phố cổ Hội An.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Entertainment Areas (Carousel) -->
-        <div class="entertainment-areas">
-            <h2 class="section-title">Khu vui chơi nổi bật tại Đà Nẵng</h2>
-            <div class="carousel">
-                <div class="carousel-track" id="entertainment-carousel">
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.2s;">
-                        <img src="https://images.unsplash.com/photo-1561643241-9abf82d76a68?q=80&w=2070&auto=format&fit=crop" alt="Bà Nà Hills">
-                        <div class="content">
-                            <h3>Bà Nà Hills</h3>
-                            <p>Khám phá cầu Vàng và công viên Fantasy với cảnh núi non hùng vĩ.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Hòa Vang, cách trung tâm 25km</p>
-                                <p><strong>Giờ mở cửa:</strong> 7:00 - 22:00</p>
-                                <p><strong>Giá vé:</strong> 750,000 - 1,200,000 ₫</p>
-                                <p><strong>Đặc biệt:</strong> Cáp treo dài nhất thế giới, thời tiết mát mẻ quanh năm</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="book-now" data-service="Bà Nà Hills - Vé">Đặt vé</button>
-                                <button class="tour-btn" data-service="Bà Nà Hills - Tour">Đặt tour</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.4s;">
-                        <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop" alt="Asia Park">
-                        <div class="content">
-                            <h3>Asia Park</h3>
-                            <p>Thỏa sức với các trò chơi cảm giác mạnh và khu văn hóa châu Á.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Quận Hải Châu, gần cầu Rồng</p>
-                                <p><strong>Giờ mở cửa:</strong> 15:30 - 22:00</p>
-                                <p><strong>Giá vé:</strong> 200,000 - 500,000 ₫</p>
-                                <p><strong>Đặc biệt:</strong> Tàu lượn cao nhất Việt Nam, vòng quay Sun Wheel</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="book-now" data-service="Asia Park - Vé">Đặt vé</button>
-                                <button class="tour-btn" data-service="Asia Park - Tour">Đặt tour</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.6s;">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Ngũ Hành Sơn">
-                        <div class="content">
-                            <h3>Ngũ Hành Sơn</h3>
-                            <p>Tham quan hang động huyền bí và chùa chiền cổ kính.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Ngũ Hành Sơn, cách trung tâm 8km</p>
-                                <p><strong>Giờ mở cửa:</strong> 6:00 - 18:00</p>
-                                <p><strong>Giá vé:</strong> Miễn phí, tour từ 300,000 ₫</p>
-                                <p><strong>Đặc biệt:</strong> Điêu khắc đá, không gian tâm linh</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="tour-btn" data-service="Ngũ Hành Sơn - Tour">Đặt tour</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.8s;">
-                        <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Cầu Rồng Show">
-                        <div class="content">
-                            <h3>Cầu Rồng Show</h3>
-                            <p>Trình diễn phun lửa và nước độc đáo vào cuối tuần.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Quận Hải Châu, trung tâm thành phố</p>
-                                <p><strong>Giờ mở cửa:</strong> 21:00 (Thứ 7, Chủ nhật)</p>
-                                <p><strong>Giá vé:</strong> Miễn phí, tour từ 200,000 ₫</p>
-                                <p><strong>Đặc biệt:</strong> Hình rồng phun lửa, không gian lễ hội</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="tour-btn" data-service="Cầu Rồng Show - Tour">Đặt tour</button>
-                            </div>
+                        <h3 th:text="${review.room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${review.customer.name}">Khách hàng</p>
+                        <div class="rating" th:text="${review.rating} + '/5'">8.7</div>
+                        <p th:text="${review.comment}">Phòng rất đẹp và sạch sẽ</p>
+                        <p style="font-size: 12px; color: #999;" th:text="${#temporals.format(review.reviewDate, 'dd/MM/yyyy')}">01/01/2025</p>
+                        <div th:if="${review.response != null}" style="background: #f5f5f5; padding: 8px; margin-top: 8px; border-radius: 4px;">
+                            <strong>Phản hồi từ khách sạn:</strong>
+                            <p th:text="${review.response}" style="margin: 4px 0 0 0; font-size: 13px;"></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Services (Carousel) -->
-        <div class="services">
-            <h2 class="section-title">Dịch vụ độc đáo tại Đà Nẵng</h2>
-            <div class="carousel">
-                <div class="carousel-track" id="services-carousel">
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.2s;">
-                        <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop" alt="Đưa đón sân bay">
-                        <div class="content">
-                            <h3>Đưa đón sân bay</h3>
-                            <p>Di chuyển tiện lợi từ sân bay Đà Nẵng đến khách sạn.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Sân bay Đà Nẵng (DAD)</p>
-                                <p><strong>Giờ hoạt động:</strong> 24/7</p>
-                                <p><strong>Giá dịch vụ:</strong> Từ 200,000 ₫/chuyến</p>
-                                <p><strong>Đặc biệt:</strong> Xe riêng, tài xế chuyên nghiệp</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="book-now" data-service="Đưa đón sân bay">Đặt ngay</button>
-                            </div>
+        <!-- Recent Bookings -->
+        <div class="featured-hotels">
+            <h2 class="section-title">Đặt phòng gần đây</h2>
+            <div class="hotel-list">
+                <div class="hotel-card animate-slide" th:each="booking, iterStat : ${recentBookings}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <div class="content">
+                        <h3 th:text="${booking.room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${booking.customer.name}">Khách hàng</p>
+                        <p th:text="'Từ ' + ${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">
+                            Từ 01/01/2025 đến 03/01/2025
+                        </p>
+                        <div class="rating" 
+                             th:text="${booking.status.statusName}"
+                             th:class="${booking.status.statusName == 'CONFIRMED' ? 'rating' : 'rating'}"
+                             th:style="${booking.status.statusName == 'CONFIRMED' ? 'background: #e6f0e6; color: #008009;' : 
+                                       booking.status.statusName == 'PENDING' ? 'background: #fff3cd; color: #856404;' : 
+                                       booking.status.statusName == 'CANCELLED' ? 'background: #f8d7da; color: #721c24;' : 
+                                       'background: #d1ecf1; color: #0c5460;'}">
+                            CONFIRMED
                         </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.4s;">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Tour ẩm thực">
-                        <div class="content">
-                            <h3>Tour ẩm thực</h3>
-                            <p>Thưởng thức mì quảng, bánh tráng cuốn thịt heo và đặc sản địa phương.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Trung tâm Đà Nẵng & Hội An</p>
-                                <p><strong>Giờ hoạt động:</strong> 9:00 - 21:00</p>
-                                <p><strong>Giá tour:</strong> Từ 400,000 ₫/người</p>
-                                <p><strong>Đặc biệt:</strong> Thử 5-7 món đặc sản, hướng dẫn viên nhiệt tình</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="tour-btn" data-service="Tour ẩm thực">Đặt tour</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.6s;">
-                        <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2070&auto=format&fit=crop" alt="Spa thư giãn">
-                        <div class="content">
-                            <h3>Spa thư giãn</h3>
-                            <p>Thư giãn với massage truyền thống tại spa cao cấp.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Gần bãi biển Mỹ Khê</p>
-                                <p><strong>Giờ hoạt động:</strong> 8:00 - 22:00</p>
-                                <p><strong>Giá dịch vụ:</strong> Từ 300,000 ₫/giờ</p>
-                                <p><strong>Đặc biệt:</strong> Dầu thơm tự nhiên, không gian yên tĩnh</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="book-now" data-service="Spa thư giãn">Đặt ngay</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-card animate-slide" style="animation-delay: 0.8s;">
-                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop" alt="Thuê xe máy">
-                        <div class="content">
-                            <h3>Thuê xe máy</h3>
-                            <p>Khám phá Đà Nẵng tự do với xe máy tiện lợi.</p>
-                            <div class="details">
-                                <p><strong>Địa điểm:</strong> Giao tại khách sạn</p>
-                                <p><strong>Giờ hoạt động:</strong> 7:00 - 20:00</p>
-                                <p><strong>Giá dịch vụ:</strong> Từ 100,000 ₫/ngày</p>
-                                <p><strong>Đặc biệt:</strong> Bảo hiểm, mũ bảo hiểm miễn phí</p>
-                            </div>
-                            <div class="button-group">
-                                <button class="book-now" data-service="Thuê xe máy">Đặt ngay</button>
-                            </div>
-                        </div>
+                        <p class="price" th:text="${#numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫ / đêm'">1,800,000 ₫ / đêm</p>
                     </div>
                 </div>
             </div>
@@ -1165,9 +933,9 @@
                 <div class="footer-column">
                     <h4>Về chúng tôi</h4>
                     <ul>
-                        <li><a href="about.html">Giới thiệu</a></li>
+                        <li><a href="/about">Giới thiệu</a></li>
                         <li><a href="#">Cách hoạt động</a></li>
-                        <li><a href="#">Tin tức du lịch Đà Nẵng</a></li>
+                        <li><a href="/posts">Tin tức du lịch Đà Nẵng</a></li>
                         <li><a href="#">Nghề nghiệp</a></li>
                     </ul>
                 </div>
@@ -1193,14 +961,16 @@
                     <h4>Liên hệ</h4>
                     <ul>
                         <li><a href="#">Trung tâm hỗ trợ</a></li>
-                        <li><a href="#">Liên hệ chúng tôi</a></li>
+                        <li><a href="/contact">Liên hệ chúng tôi</a></li>
                         <li><a href="#">0935123456</a></li>
                         <li><a href="#">support@datphong.com</a></li>
                     </ul>
                     <div class="newsletter">
                         <h4>Đăng ký nhận ưu đãi Đà Nẵng</h4>
-                        <input type="email" placeholder="Nhập email của bạn" aria-label="Email đăng ký nhận tin">
-                        <button>Đăng ký</button>
+                        <form th:action="@{/newsletter}" method="post">
+                            <input type="email" name="email" placeholder="Nhập email của bạn" aria-label="Email đăng ký nhận tin" required>
+                            <button type="submit">Đăng ký</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1216,7 +986,7 @@
     </div>
 
     <!-- JavaScript for Interactivity -->
-    <script>
+    <script th:inline="javascript">
         // Hamburger Menu
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
@@ -1245,40 +1015,69 @@
         // Search Form Validation
         const searchForm = document.getElementById('search-form');
         searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
             const location = document.getElementById('location').value;
             const checkIn = document.getElementById('check-in').value;
             const checkOut = document.getElementById('check-out').value;
 
             if (!location) {
                 alert('Vui lòng nhập địa điểm!');
+                e.preventDefault();
                 return;
             }
             if (!checkIn || !checkOut) {
                 alert('Vui lòng chọn ngày nhận và trả phòng!');
+                e.preventDefault();
                 return;
             }
             if (new Date(checkIn) >= new Date(checkOut)) {
                 alert('Ngày trả phòng phải sau ngày nhận phòng!');
+                e.preventDefault();
                 return;
             }
-            alert(`Tìm kiếm khách sạn tại ${location} từ ${checkIn} đến ${checkOut}`);
         });
 
         // Booking Modal
         const modal = document.getElementById('booking-modal');
         const closeModal = document.querySelector('.modal .close');
-        const bookingForm = document.getElementById('booking-form');
-        const bookButtons = document.querySelectorAll('.book-now, .tour-btn');
+        // const bookingForm = document.getElementById('booking-form'); // Not directly used here for opening
 
+        // NEW function to open booking modal
+        function openBookingModal(buttonElement) {
+            // event.stopPropagation(); // Handled inline to ensure it's called
+            // event.preventDefault(); // Handled by return false inline
+
+            const roomId = buttonElement.getAttribute('data-room-id');
+            document.getElementById('selected-room-id').value = roomId;
+
+            // Attempt to prefill dates from main search bar
+            const checkInDateFromSearch = document.getElementById('check-in').value;
+            const checkOutDateFromSearch = document.getElementById('check-out').value;
+            
+            const modalCheckInInput = modal.querySelector('input[name="checkInDate"]');
+            const modalCheckOutInput = modal.querySelector('input[name="checkOutDate"]');
+
+            if (modalCheckInInput && checkInDateFromSearch) {
+                modalCheckInInput.value = checkInDateFromSearch;
+            }
+            if (modalCheckOutInput && checkOutDateFromSearch) {
+                modalCheckOutInput.value = checkOutDateFromSearch;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // OLD event listener for bookButtons is no longer needed as it's inline now
+        /*
+        const bookButtons = document.querySelectorAll('.book-now');
         bookButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const service = button.getAttribute('data-service');
-                const select = bookingForm.querySelector('#service-select');
-                select.value = service;
+                const roomId = button.getAttribute('data-room-id');
+                const roomName = button.getAttribute('data-room-name');
+                document.getElementById('selected-room-id').value = roomId;
                 modal.style.display = 'flex';
             });
         });
+        */
 
         closeModal.addEventListener('click', () => {
             modal.style.display = 'none';
@@ -1290,128 +1089,17 @@
             }
         });
 
-        bookingForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = bookingForm.querySelector('input[type="text"]').value;
-            const email = bookingForm.querySelector('input[type="email"]').value;
-            const phone = bookingForm.querySelector('input[type="tel"]').value;
-            const service = bookingForm.querySelector('#service-select').value;
-
-            if (!name || !email || !phone || !service) {
-                alert('Vui lòng điền đầy đủ thông tin!');
-                return;
-            }
-            alert(`Đặt ${service} thành công cho ${name}!`);
-            modal.style.display = 'none';
-            bookingForm.reset();
-        });
-
-        // Carousel Functionality (with Drag Support)
-        function initializeCarousel(carouselId) {
-            const track = document.getElementById(carouselId);
-            const cards = track.children;
-            const cardWidth = cards[0].offsetWidth + 16; // Include margin
-            let currentIndex = 0;
-            const totalItems = cards.length;
-            const visibleItems = Math.floor(track.parentElement.offsetWidth / cardWidth);
-
-            // Drag variables
-            let isDragging = false;
-            let startPos = 0;
-            let currentTranslate = 0;
-            let prevTranslate = 0;
-            let animationID;
-
-            function updateCarousel() {
-                track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-                currentTranslate = -currentIndex * cardWidth;
-                prevTranslate = currentTranslate;
-            }
-
-            // Drag functionality
-            function setPositionByDrag() {
-                track.style.transform = `translateX(${currentTranslate}px)`;
-            }
-
-            function animation() {
-                setPositionByDrag();
-                if (isDragging) requestAnimationFrame(animation);
-            }
-
-            function startDragging(e) {
-                isDragging = true;
-                startPos = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-                prevTranslate = currentTranslate;
-                track.classList.add('dragging');
-                animationID = requestAnimationFrame(animation);
-            }
-
-            function dragging(e) {
-                if (!isDragging) return;
-                const currentPosition = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-                const diff = currentPosition - startPos;
-                currentTranslate = prevTranslate + diff;
-
-                // Boundary limits
-                const maxTranslate = 0;
-                const minTranslate = -((totalItems - visibleItems) * cardWidth);
-                if (currentTranslate > maxTranslate) currentTranslate = maxTranslate;
-                if (currentTranslate < minTranslate) currentTranslate = minTranslate;
-            }
-
-            function stopDragging() {
-                if (!isDragging) return;
-                isDragging = false;
-                cancelAnimationFrame(animationID);
-                track.classList.remove('dragging');
-
-                // Snap to nearest card
-                const movedBy = currentTranslate - prevTranslate;
-                if (Math.abs(movedBy) > cardWidth / 4) {
-                    if (movedBy < 0) {
-                        currentIndex = Math.min(currentIndex + 1, totalItems - visibleItems);
-                    } else {
-                        currentIndex = Math.max(currentIndex - 1, 0);
-                    }
-                }
-                updateCarousel();
-            }
-
-            // Mouse events
-            track.addEventListener('mousedown', startDragging);
-            track.addEventListener('mousemove', dragging);
-            track.addEventListener('mouseup', stopDragging);
-            track.addEventListener('mouseleave', stopDragging);
-
-            // Touch events for mobile
-            track.addEventListener('touchstart', startDragging);
-            track.addEventListener('touchmove', dragging);
-            track.addEventListener('touchend', stopDragging);
-
-            // Prevent click on buttons during drag
-            track.addEventListener('click', (e) => {
-                if (Math.abs(currentTranslate - prevTranslate) > 5) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }, true);
-
-            // Initial update
-            updateCarousel();
-
-            // Update on window resize
-            window.addEventListener('resize', () => {
-                const newVisibleItems = Math.floor(track.parentElement.offsetWidth / cardWidth);
-                if (currentIndex > totalItems - newVisibleItems) {
-                    currentIndex = Math.max(0, totalItems - newVisibleItems);
-                }
-                updateCarousel();
+        // Copy voucher code function
+        function copyVoucherCode(button) {
+            const code = button.getAttribute('data-code');
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Đã sao chép!';
+                setTimeout(() => {
+                    button.textContent = 'Sao chép mã';
+                }, 2000);
             });
         }
 
-        // Initialize carousels
-        initializeCarousel('entertainment-carousel');
-        initializeCarousel('services-carousel');
     </script>
 </body>
 </html>

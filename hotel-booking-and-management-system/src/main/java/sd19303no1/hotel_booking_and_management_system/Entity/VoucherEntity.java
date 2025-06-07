@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class VoucherEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ Thêm auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "voucher_id")
     private Integer voucherId;
 
@@ -31,5 +31,60 @@ public class VoucherEntity {
     @Column(name = "status", length = 50)
     private String status;
 
-    
+    // Getters and Setters
+    public Integer getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Integer voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public LocalDate getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

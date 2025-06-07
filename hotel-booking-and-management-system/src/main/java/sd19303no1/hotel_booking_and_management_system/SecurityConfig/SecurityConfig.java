@@ -9,10 +9,60 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // CSRF configuration
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // Optionally exclude certain endpoints from CSRF if needed
+                // .ignoringRequestMatchers("/register")
+            )
+            // Authorization rules
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/",                        // Trang chủ
+                    "/login",                   // Trang đăng nhập
+                    "/register",                // Trang đăng ký
+                    "/css/**",                  // Tài nguyên CSS
+                    "/js/**",                   // Tài nguyên JavaScript
+                    "/images/**",               // Tài nguyên hình ảnh
+                    "/room/**",                 // Chi tiết phòng (MỚI)
+                    "/search"                   // Kết quả tìm kiếm (MỚI)
+                ).permitAll()
+                .requestMatchers("/dashboard").hasRole("ADMIN") // Trang dashboard cho Admin
+                .anyRequest().authenticated() // Tất cả các request khác cần xác thực
+            )
+            // Form login configuration
+            .formLogin(form -> form
+                .loginPage("/login")
+                .usernameParameter("email") // Khớp với tham số 'email' của form
+                .passwordParameter("password") // Khớp với tham số 'password' của form
+                .defaultSuccessUrl("/", true) // Chuyển hướng đến trang chủ sau khi đăng nhập thành công
+                .failureHandler((request, response, exception) -> {
+                    request.setAttribute("error", exception.getMessage());
+                    request.setAttribute("action", "login");
+                    request.getRequestDispatcher("/login").forward(request, response);
+                })
+                .permitAll()
+            )
+            // Logout configuration
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            );
+
+        return http.build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -22,34 +72,5 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/","/login", "/register", "/resources/**", "/css/**", "/js/**", "/webjars/**", 
-                    "https://cdnjs.cloudflare.com/**", "https://fonts.googleapis.com/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .usernameParameter("username") // Matches login-username in HTML
-                .passwordParameter("password") // Matches login-password in HTML
-                .defaultSuccessUrl("/", true) // Redirect to home page after login
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-            )
-            .csrf(csrf -> csrf.disable()); // Disabled for simplicity, matching AuthController example
-
-        return http.build();
     }
 }

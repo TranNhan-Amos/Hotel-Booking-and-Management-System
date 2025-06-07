@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Khách Sạn - Vinpearl Resort & Spa Đà Nẵng</title>
+    <title th:text="${room.type + ' - Chi Tiết Khách Sạn'}">Chi Tiết Khách Sạn</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -293,96 +293,6 @@
             background: #0051a2;
             transform: scale(1.05);
         }
-        /* Room Types */
-        .room-types {
-            margin-top: 20px;
-        }
-        .room-types h2 {
-            font-size: 20px;
-            color: #003580;
-            margin-bottom: 15px;
-            animation: fadeIn 0.8s ease-out;
-        }
-        .room-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-        .room-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.3s;
-            animation: slideIn 0.8s ease-out forwards;
-            opacity: 0;
-        }
-        .room-card:hover {
-            transform: translateY(-4px);
-        }
-        .room-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        .room-card .content {
-            padding: 12px;
-        }
-        .room-card h3 {
-            font-size: 16px;
-            color: #003580;
-            margin-bottom: 8px;
-        }
-        .room-card p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-        .room-card .price {
-            font-size: 16px;
-            font-weight: 700;
-            color: #003580;
-            margin-bottom: 12px;
-        }
-        .room-card button {
-            background: #0071c2;
-            color: white;
-            border: none;
-            padding: 8px;
-            width: 100%;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s, transform 0.3s;
-        }
-        .room-card button:hover {
-            background: #0051a2;
-            transform: scale(1.05);
-        }
-        /* Policies */
-        .hotel-policies {
-            margin-top: 20px;
-        }
-        .hotel-policies h2 {
-            font-size: 20px;
-            color: #003580;
-            margin-bottom: 15px;
-            animation: fadeIn 0.8s ease-out;
-        }
-        .policy-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 10px;
-        }
-        .policy {
-            font-size: 14px;
-            color: #666;
-            animation: fadeIn 0.8s ease-out forwards;
-            opacity: 0;
-        }
-        .policy strong {
-            color: #333;
-        }
         /* Reviews */
         .hotel-reviews {
             margin-top: 20px;
@@ -424,25 +334,14 @@
             font-size: 14px;
             color: #666;
         }
-        /* Map */
-        .hotel-map {
-            margin-top: 20px;
+        .review .response {
+            background: #f5f5f5;
+            padding: 8px;
+            margin-top: 8px;
+            border-radius: 4px;
         }
-        .hotel-map h2 {
-            font-size: 20px;
+        .review .response strong {
             color: #003580;
-            margin-bottom: 15px;
-            animation: fadeIn 0.8s ease-out;
-        }
-        .hotel-map .map-placeholder {
-            background: #f5f6fa;
-            height: 300px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #666;
         }
         /* Related Hotels */
         .related-hotels {
@@ -523,7 +422,7 @@
             color: #003580;
             margin-bottom: 12px;
         }
-        .hotel-card button {
+        .hotel-card .view-detail-btn {
             background: #0071c2;
             color: white;
             border: none;
@@ -534,10 +433,15 @@
             font-size: 14px;
             font-weight: 500;
             transition: background 0.3s, transform 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
-        .hotel-card button:hover {
+        .hotel-card .view-detail-btn:hover {
             background: #0051a2;
             transform: scale(1.05);
+            color: white;
+            text-decoration: none;
         }
         /* Footer */
         footer {
@@ -628,9 +532,6 @@
             .hotel-booking {
                 position: static;
             }
-            .room-list {
-                grid-template-columns: 1fr;
-            }
             .hotel-list {
                 -webkit-overflow-scrolling: touch;
             }
@@ -646,17 +547,17 @@
         <!-- Navbar -->
         <nav>
             <div class="nav-container">
-                <a href="#" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
+                <a th:href="@{/}" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
                 <div class="hamburger" aria-label="Menu" role="button">
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul class="nav-links">
-                    <li><a href="#">Trang chủ</a></li>
-                    <li><a href="#" class="active">Danh sách phòng</a></li>
+                    <li><a th:href="@{/}">Trang chủ</a></li>
+                    <li><a href="#" class="active">Chi tiết phòng</a></li>
                     <li><a href="#">Chuyến bay + Khách sạn</a></li>
                     <li><a href="#">Địa điểm tham quan</a></li>
-                    <li><a href="#">Giới thiệu</a></li>
-                    <li><a href="about.html">Liên hệ</a></li>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="#">Liên hệ</a></li>
                 </ul>
                 <div class="nav-options">
                     <select aria-label="Ngôn ngữ">
@@ -673,100 +574,39 @@
         <!-- Hotel Details -->
         <div class="hotel-details">
             <div class="hotel-header">
-                <h1>Vinpearl Resort & Spa Đà Nẵng</h1>
+                <h1 th:text="${room.type}">Vinpearl Resort & Spa Đà Nẵng</h1>
                 <div class="info">
-                    <div class="rating">8.9</div>
-                    <div class="location"><i class="fas fa-map-marker-alt"></i> Bãi biển Non Nước, Đà Nẵng</div>
+                    <div class="rating" th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">8.9</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> <span th:text="${room.description}">Bãi biển Non Nước, Đà Nẵng</span></div>
                 </div>
             </div>
 
             <!-- Gallery -->
             <div class="hotel-gallery">
-                <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort Main" class="main-img">
-                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort Room">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort Pool">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort Pool">
-                 <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort Room">
+                <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : 'https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room.type}" class="main-img">
+                <img th:src="${room.imageUrls != null and room.imageUrls.size() > 1 ? room.imageUrls[1] : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room.type}">
+                <img th:src="${room.imageUrls != null and room.imageUrls.size() > 2 ? room.imageUrls[2] : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room.type}">
+                <img th:src="${room.imageUrls != null and room.imageUrls.size() > 3 ? room.imageUrls[3] : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room.type}">
+                <img th:src="${room.imageUrls != null and room.imageUrls.size() > 4 ? room.imageUrls[4] : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room.type}">
             </div>
 
             <!-- Hotel Info -->
             <div class="hotel-info">
                 <div class="hotel-description">
                     <h2>Giới thiệu</h2>
-                    <p>Vinpearl Resort & Spa Đà Nẵng tọa lạc bên bãi biển Non Nước xinh đẹp, là điểm đến lý tưởng cho kỳ nghỉ sang trọng. Với kiến trúc hiện đại kết hợp nét truyền thống Việt Nam, khách sạn mang đến không gian nghỉ dưỡng đẳng cấp với tầm nhìn hướng biển tuyệt đẹp.</p>
-                    <p>Khách sạn cung cấp các tiện nghi hiện đại như hồ bơi vô cực, spa thư giãn, nhà hàng phục vụ ẩm thực quốc tế và Việt Nam, cùng nhiều hoạt động giải trí phù hợp cho mọi lứa tuổi. Đây là nơi lý tưởng để thư giãn và tận hưởng kỳ nghỉ cùng gia đình hoặc bạn bè.</p>
-                    <p>Vị trí thuận lợi của khách sạn cũng giúp bạn dễ dàng khám phá các điểm tham quan nổi tiếng tại Đà Nẵng như Ngũ Hành Sơn, Bà Nà Hills, và phố cổ Hội An.</p>
+                    <p th:text="${room.description}">Mô tả phòng từ database</p>
 
                     <div class="hotel-amenities">
                         <h3>Tiện nghi</h3>
                         <div class="amenities-list">
-                            <div class="amenity animate-slide" style="animation-delay: 0.2s;"><i class="fas fa-wifi"></i> Wi-Fi miễn phí</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.3s;"><i class="fas fa-swimming-pool"></i> Hồ bơi vô cực</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.4s;"><i class="fas fa-spa"></i> Spa thư giãn</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.5s;"><i class="fas fa-parking"></i> Bãi đỗ xe miễn phí</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.6s;"><i class="fas fa-utensils"></i> Nhà hàng đa dạng</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.7s;"><i class="fas fa-dumbbell"></i> Phòng gym hiện đại</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.8s;"><i class="fas fa-child"></i> Khu vui chơi trẻ em</div>
-                            <div class="amenity animate-slide" style="animation-delay: 0.9s;"><i class="fas fa-concierge-bell"></i> Dịch vụ lễ tân 24/7</div>
-                            <div class="amenity animate-slide" style="animation-delay: 1.0s;"><i class="fas fa-shuttle-van"></i> Xe đưa đón sân bay</div>
-                        </div>
-                    </div>
-
-                    <!-- Room Types -->
-                    <div class="room-types">
-                        <h2>Các loại phòng</h2>
-                        <div class="room-list">
-                            <div class="room-card animate-slide" style="animation-delay: 0.2s;">
-                                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Phòng Deluxe Ocean View">
-                                <div class="content">
-                                    <h3>Phòng Deluxe Ocean View</h3>
-                                    <p>Diện tích: 40m² | 2 người lớn | View biển</p>
-                                    <p class="price">2,500,000 ₫/đêm</p>
-                                    <button>Chọn phòng</button>
-                                </div>
-                            </div>
-                            <div class="room-card animate-slide" style="animation-delay: 0.4s;">
-                                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop" alt="Phòng Suite Family">
-                                <div class="content">
-                                    <h3>Phòng Suite Family</h3>
-                                    <p>Diện tích: 60m² | 4 người lớn | 2 giường đôi</p>
-                                    <p class="price">4,000,000 ₫/đêm</p>
-                                    <button>Chọn phòng</button>
-                                </div>
-                            </div>
-                            <div class="room-card animate-slide" style="animation-delay: 0.6s;">
-                                <img src="https://images.unsplash.com/photo-1578683012567-c41c024b5d9c?q=80&w=2070&auto=format&fit=crop" alt="Phòng Executive Suite">
-                                <div class="content">
-                                    <h3>Phòng Executive Suite</h3>
-                                    <p>Diện tích: 80m² | 2 người lớn | View toàn cảnh</p>
-                                    <p class="price">5,500,000 ₫/đêm</p>
-                                    <button>Chọn phòng</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Policies -->
-                    <div class="hotel-policies">
-                        <h2>Chính sách khách sạn</h2>
-                        <div class="policy-list">
-                            <div class="policy animate-fade" style="animation-delay: 0.2s;">
-                                <strong>Nhận phòng:</strong> Từ 14:00
-                            </div>
-                            <div class="policy animate-fade" style="animation-delay: 0.3s;">
-                                <strong>Trả phòng:</strong> Trước 12:00
-                            </div>
-                            <div class="policy animate-fade" style="animation-delay: 0.4s;">
-                                <strong>Hủy đặt phòng:</strong> Miễn phí nếu hủy trước 48 giờ
-                            </div>
-                            <div class="policy animate-fade" style="animation-delay: 0.5s;">
-                                <strong>Trẻ em:</strong> Miễn phí cho trẻ dưới 6 tuổi, phụ thu 500,000 ₫/trẻ từ 6-12 tuổi
-                            </div>
-                            <div class="policy animate-fade" style="animation-delay: 0.6s;">
-                                <strong>Thú cưng:</strong> Không được phép mang theo
-                            </div>
-                            <div class="policy animate-fade" style="animation-delay: 0.7s;">
-                                <strong>Hút thuốc:</strong> Khu vực hút thuốc riêng
+                            <div class="amenity animate-slide" th:each="amenity, iterStat : ${room.amenities}" th:style="'animation-delay: ' + ${0.1 * (iterStat.index + 2)} + 's;'">
+                                <i class="fas fa-check"></i> 
+                                <span th:text="${amenity}">Tiện nghi</span>
                             </div>
                         </div>
                     </div>
@@ -774,104 +614,76 @@
                     <!-- Reviews -->
                     <div class="hotel-reviews">
                         <h2>Đánh giá từ khách hàng</h2>
-                        <div class="review animate-slide" style="animation-delay: 0.2s;">
+                        <div class="review animate-slide" th:each="review, iterStat : ${reviews}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
                             <div class="review-header">
-                                <span class="reviewer">Nguyễn Văn An</span>
-                                <div class="rating">9.2</div>
+                                <span class="reviewer" th:text="${review.customer.name}">Tên khách hàng</span>
+                                <div class="rating" th:text="${review.rating} + '/5'">9.2</div>
                             </div>
-                            <p>Khách sạn tuyệt vời! Dịch vụ chuyên nghiệp, phòng sạch sẽ và view biển rất đẹp. Tôi sẽ quay lại lần nữa.</p>
-                        </div>
-                        <div class="review animate-slide" style="animation-delay: 0.4s;">
-                            <div class="review-header">
-                                <span class="reviewer">Trần Thị Mai</span>
-                                <div class="rating">8.5</div>
+                            <p th:text="${review.comment}">Nội dung đánh giá</p>
+                            <div class="response" th:if="${review.response != null}">
+                                <strong>Phản hồi từ khách sạn:</strong>
+                                <p th:text="${review.response}" style="margin: 4px 0 0 0; font-size: 13px;"></p>
                             </div>
-                            <p>Hồ bơi rất đẹp, nhân viên thân thiện. Tuy nhiên giá đồ ăn trong nhà hàng hơi cao.</p>
-                        </div>
-                        <div class="review animate-slide" style="animation-delay: 0.6s;">
-                            <div class="review-header">
-                                <span class="reviewer">Lê Hoàng Nam</span>
-                                <div class="rating">9.0</div>
-                            </div>
-                            <p>Phòng rộng rãi, tiện nghi đầy đủ. Vị trí rất thuận tiện để đi tham quan các điểm du lịch ở Đà Nẵng.</p>
-                        </div>
-                    </div>
-
-                    <!-- Map -->
-                    <div class="hotel-map">
-                        <h2>Vị trí khách sạn</h2>
-                        <div class="map-placeholder">
-                            <p>Bản đồ sẽ được hiển thị tại đây (Google Maps Embed Placeholder)</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="hotel-booking">
                     <h3>Đặt phòng ngay</h3>
-                    <div class="price">Từ 2,500,000 ₫/đêm</div>
-                    <div class="input-group">
-                        <i class="fas fa-calendar-alt"></i>
-                        <input type="date" value="2025-06-03" aria-label="Ngày nhận phòng">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-calendar-alt"></i>
-                        <input type="date" value="2025-06-05" aria-label="Ngày trả phòng">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-users"></i>
-                        <select aria-label="Số lượng khách">
-                            <option>2 người lớn, 0 trẻ em, 1 phòng</option>
-                            <option>1 người lớn, 0 trẻ em, 1 phòng</option>
-                            <option>4 người lớn, 0 trẻ em, 2 phòng</option>
-                        </select>
-                    </div>
-                    <button>Đặt phòng</button>
+                    <div class="price" th:text="'Từ ' + ${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">Từ 2,500,000 ₫/đêm</div>
+                    
+                    <form th:action="@{/bookings}" method="post">
+                        <input type="hidden" name="roomId" th:value="${room.roomId}">
+                        
+                        <div class="input-group">
+                            <input type="text" name="customerName" placeholder="Họ và tên" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="tel" name="phone" placeholder="Số điện thoại" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="address" placeholder="Địa chỉ" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-calendar-alt"></i>
+                            <input type="date" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-calendar-alt"></i>
+                            <input type="date" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-tag"></i>
+                            <select name="voucherId">
+                                <option value="">Chọn mã giảm giá (nếu có)</option>
+                                <option th:each="voucher : ${vouchers}" 
+                                        th:value="${voucher.voucherId}" 
+                                        th:text="${voucher.code + ' - Giảm ' + voucher.discount + '%'}">
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit">Đặt phòng</button>
+                    </form>
                 </div>
             </div>
         </div>
 
         <!-- Related Hotels -->
         <div class="related-hotels">
-            <h2>Các khách sạn liên quan</h2>
+            <h2>Các phòng liên quan</h2>
             <div class="hotel-list">
-                <div class="hotel-card animate-slide" style="animation-delay: 0.2s;">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Sapphire tại Đà Nẵng">
+                <div class="hotel-card animate-slide" th:each="relatedRoom, iterStat : ${relatedRooms}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <img th:src="${relatedRoom.imageUrls != null and !relatedRoom.imageUrls.empty ? relatedRoom.imageUrls[0] : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop'}" 
+                         th:alt="${relatedRoom.type}">
                     <div class="content">
-                        <h3>Sapphire Hotel</h3>
-                        <p>Đà Nẵng</p>
-                        <div class="rating">8.5</div>
-                        <p class="price">1,800,000 ₫/đêm</p>
-                        <button>Xem phòng</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.4s;">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Sunrise tại Đà Nẵng">
-                    <div class="content">
-                        <h3>Sunrise Hotel</h3>
-                        <p>Đà Nẵng</p>
-                        <div class="rating">8.2</div>
-                        <p class="price">1,600,000 ₫/đêm</p>
-                        <button>Xem phòng</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.6s;">
-                    <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Ocean View tại Đà Nẵng">
-                    <div class="content">
-                        <h3>Ocean View Hotel</h3>
-                        <p>Đà Nẵng</p>
-                        <div class="rating">8.7</div>
-                        <p class="price">2,000,000 ₫/đêm</p>
-                        <button>Xem phòng</button>
-                    </div>
-                </div>
-                <div class="hotel-card animate-slide" style="animation-delay: 0.8s;">
-                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Paradise tại Đà Nẵng">
-                    <div class="content">
-                        <h3>Paradise Hotel</h3>
-                        <p>Đà Nẵng</p>
-                        <div class="rating">9.0</div>
-                        <p class="price">2,200,000 ₫/đêm</p>
-                        <button>Xem phòng</button>
+                        <h3 th:text="${relatedRoom.type}">Tên phòng</h3>
+                        <p th:text="${relatedRoom.description}">Mô tả phòng</p>
+                        <div class="rating" th:text="${#numbers.formatDecimal(relatedRoom.averageRating, 1, 1)}">8.5</div>
+                        <p class="price" th:text="${#numbers.formatDecimal(relatedRoom.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">1,800,000 ₫/đêm</p>
+                        <a th:href="@{/room/{id}(id=${relatedRoom.roomId})}" class="view-detail-btn">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
@@ -883,7 +695,7 @@
                 <div class="footer-column">
                     <h4>Về chúng tôi</h4>
                     <ul>
-                        <li><a href="about.html">Giới thiệu</a></li>
+                        <li><a href="#">Giới thiệu</a></li>
                         <li><a href="#">Cách hoạt động</a></li>
                         <li><a href="#">Tin tức</a></li>
                         <li><a href="#">Nghề nghiệp</a></li>
@@ -945,6 +757,11 @@
                 hamburger.setAttribute('aria-expanded', 'false');
             });
         });
+
+        // Show success/error messages
+        /*[# th:if="${message}"]*/
+        alert(/*[[${message}]]*/ 'Message');
+        /*[/]*/
     </script>
 </body>
 </html>

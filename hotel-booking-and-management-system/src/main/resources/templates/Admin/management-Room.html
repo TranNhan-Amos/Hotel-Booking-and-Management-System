@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Phòng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Phòng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* CSS vẫn giữ nguyên như bạn đã cung cấp */
+        /* ... (giữ nguyên toàn bộ CSS) ... */
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Admin KS</div>
+        <ul>
+            <li><a href="#" class="active"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
+            <li><a href="#"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
+            <li><a href="#"><i class="fas fa-star"></i> Quản Lý Đánh Giá</a></li>
+            <li><a href="#"><i class="fas fa-tags"></i> Quản Lý Voucher</a></li>
+            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hamburger" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="management-section">
+            <h2>Quản Lý Phòng Khách Sạn</h2>
+            <div class="management-header">
+                <div class="search-filter">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, loại phòng..." oninput="filterRooms()">
+                    <select id="statusFilter" onchange="filterRooms()">
+                        <option value="all">Tất Cả Trạng Thái</option>
+                        <option value="AVAILABLE">Còn Trống</option>
+                        <option value="BOOKED">Đã Đặt</option>
+                        <option value="MAINTENANCE">Bảo Trì</option>
+                    </select>
+                    <select id="typeFilter" onchange="filterRooms()">
+                        <option value="all">Tất Cả Loại Phòng</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Superior">Superior</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Standard">Standard</option>
+                    </select>
+                </div>
+                <button class="add-room-btn" onclick="openModal('add')"><i class="fas fa-plus"></i> Thêm Phòng Mới</button>
+            </div>
+            <div class="room-cards" id="roomCards">
+                <!-- Room cards will be dynamically generated from server -->
+                <div class="room-card" th:each="room : ${rooms}">
+                    <div class="rating-badge" th:if="${room.averageRating}">
+                        <i class="fas fa-star"></i> <span th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">4.5</span>
+                    </div>
+                    <img th:src="${room.imageUrls[0] ?: 'https://images.unsplash.com/photo-1611892440504-42a792e24c48?q=80&w=2070&auto=format&fit=crop'}" 
+                         alt="Room" class="room-image">
+                    <div class="room-info">
+                        <h3>Phòng <span th:text="${room.roomId}">101</span> - <span th:text="${room.type}">Deluxe</span></h3>
+                        <p><i class="fas fa-tag"></i> Giá: <span th:text="${#numbers.formatCurrency(room.price)}">1,600,000</span> ₫ / đêm</p>
+                        <p><i class="fas fa-user-friends"></i> Số khách tối đa: <span th:text="${room.maxGuests}">2</span></p>
+                        <p><i class="fas fa-align-left"></i> <span th:text="${room.description}">Mô tả phòng</span></p>
+                    </div>
+                    <span class="status" 
+                          th:classappend="${room.status == 'AVAILABLE'} ? 'available' : 
+                                         ${room.status == 'BOOKED'} ? 'booked' : 'maintenance'"
+                          th:text="${room.status == 'AVAILABLE'} ? 'Còn Trống' : 
+                                  ${room.status == 'BOOKED'} ? 'Đã Đặt' : 'Bảo Trì'">Còn Trống</span>
+                    <div class="amenities-list">
+                        <span class="amenity-tag" th:each="amenity : ${room.amenities}">
+                            <i class="fas fa-check-circle"></i> <span th:text="${amenity}">Wifi</span>
+                        </span>
+                    </div>
+                    <div class="actions">
+                        <button class="edit-btn" th:onclick="|openModal('edit', ${room.roomId})|">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="delete-btn" th:onclick="|deleteRoom(${room.roomId})|">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Add/Edit Room -->
+        <div class="modal" id="roomModal">
+            <div class="modal-content">
+                <h3 id="modalTitle">Thêm Phòng Mới</h3>
+                <form th:action="@{/admin/rooms/save}" method="post" th:object="${room}">
+                    <input type="hidden" th:field="*{roomId}" id="roomId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomType">Loại Phòng *</label>
+                            <select th:field="*{type}" id="roomType" required>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Superior">Superior</option>
+                                <option value="Suite">Suite</option>
+                                <option value="Standard">Standard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="roomStatus">Trạng Thái *</label>
+                            <select th:field="*{status}" id="roomStatus" required>
+                                <option value="AVAILABLE">Còn Trống</option>
+                                <option value="BOOKED">Đã Đặt</option>
+                                <option value="MAINTENANCE">Bảo Trì</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomPrice">Giá (/đêm) *</label>
+                            <input type="text" th:field="*{price}" id="roomPrice" placeholder="1,600,000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxGuests">Số Khách Tối Đa *</label>
+                            <input type="number" th:field="*{maxGuests}" id="maxGuests" placeholder="2" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomDescription">Mô Tả</label>
+                        <textarea th:field="*{description}" id="roomDescription" placeholder="Mô tả chi tiết về phòng..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomImage">URL Hình Ảnh</label>
+                        <input type="text" th:field="*{imageUrls[0]}" id="roomImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tiện Ích</label>
+                        <div class="amenities-container">
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Wifi"> Wifi miễn phí
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="TV"> TV màn hình phẳng
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="AC"> Điều hòa
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Minibar"> Minibar
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Safe"> Két an toàn
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Bathtub"> Bồn tắm
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Balcony"> Ban công
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Breakfast"> Bữa sáng
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeModal()"><i class="fas fa-times"></i> Hủy</button>
+                        <button type="submit" class="save-btn"><i class="fas fa-save"></i> Lưu Thông Tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Room Management -->
+    <script>
+        function openModal(mode, roomId = null) {
+            const modal = document.getElementById('roomModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const roomIdInput = document.getElementById('roomId');
+            
+            if (mode === 'add') {
+                modalTitle.textContent = 'Thêm Phòng Mới';
+                roomIdInput.value = '';
+                
+                // Reset form fields
+                document.getElementById('roomType').value = 'Deluxe';
+                document.getElementById('roomStatus').value = 'AVAILABLE';
+                document.getElementById('roomPrice').value = '';
+                document.getElementById('maxGuests').value = '';
+                document.getElementById('roomDescription').value = '';
+                document.getElementById('roomImage').value = '';
+                
+                // Reset amenities checkboxes
+                document.querySelectorAll('input[name="amenity"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            } else if (mode === 'edit' && roomId) {
+                // Fetch room data from server
+                fetch(`/admin/rooms/edit/${roomId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Create a temporary container
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Extract the room card
+                        const roomCard = doc.querySelector('.room-card');
+                        if (roomCard) {
+                            // Extract room data
+                            const roomId = roomCard.querySelector('[th\\:text="${room.roomId}"]')?.textContent;
+                            const roomType = roomCard.querySelector('[th\\:text="${room.type}"]')?.textContent;
+                            const roomStatus = roomCard.querySelector('.status').classList.contains('available') ? 'AVAILABLE' : 
+                                              roomCard.querySelector('.status').classList.contains('booked') ? 'BOOKED' : 'MAINTENANCE';
+                            const roomPrice = roomCard.querySelector('[th\\:text*="Giá:"]')?.textContent.replace('Giá: ', '').replace(' ₫ / đêm', '').replace(/,/g, '');
+                            const maxGuests = roomCard.querySelector('[th\\:text*="Số khách tối đa:"]')?.textContent.replace('Số khách tối đa: ', '');
+                            const description = roomCard.querySelector('[th\\:text="${room.description}"]')?.textContent;
+                            const imageUrl = roomCard.querySelector('.room-image').src;
+                            
+                            // Extract amenities
+                            const amenities = [];
+                            roomCard.querySelectorAll('.amenity-tag span').forEach(tag => {
+                                amenities.push(tag.textContent);
+                            });
+                            
+                            // Populate form
+                            modalTitle.textContent = 'Sửa Thông Tin Phòng';
+                            roomIdInput.value = roomId;
+                            document.getElementById('roomType').value = roomType;
+                            document.getElementById('roomStatus').value = roomStatus;
+                            document.getElementById('roomPrice').value = roomPrice;
+                            document.getElementById('maxGuests').value = maxGuests;
+                            document.getElementById('roomDescription').value = description;
+                            document.getElementById('roomImage').value = imageUrl;
+                            
+                            // Set amenities checkboxes
+                            document.querySelectorAll('input[name="amenity"]').forEach(checkbox => {
+                                checkbox.checked = amenities.includes(checkbox.value);
+                            });
+                            
+                            modal.style.display = 'flex';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching room data:', error));
+                return;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('roomModal').style.display = 'none';
+        }
+
+        function deleteRoom(roomId) {
+            if (confirm('Bạn có chắc muốn xóa phòng này?')) {
+                fetch(`/admin/rooms/delete/${roomId}`, { method: 'GET' })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra khi xóa phòng');
+                        }
+                    })
+                    .catch(error => console.error('Error deleting room:', error));
+            }
+        }
+
+        function filterRooms() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const roomCards = document.querySelectorAll('.room-card');
+
+            roomCards.forEach(card => {
+                const roomNumber = card.querySelector('h3').textContent.toLowerCase();
+                const roomType = card.querySelector('h3').textContent.toLowerCase();
+                const status = card.querySelector('.status').classList.contains('available') ? 'AVAILABLE' : 
+                              card.querySelector('.status').classList.contains('booked') ? 'BOOKED' : 'MAINTENANCE';
+                
+                const matchesSearch = roomNumber.includes(searchInput) || roomType.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesType = typeFilter === 'all' || roomType.includes(typeFilter.toLowerCase());
+
+                if (matchesSearch && matchesStatus && matchesType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Format currency input
+        document.getElementById('roomPrice').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value) {
+                value = parseInt(value, 10).toLocaleString('vi-VN');
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Admin KS</div>
+        <ul>
+            <li><a href="#" class="active"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
+            <li><a href="#"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
+            <li><a href="#"><i class="fas fa-star"></i> Quản Lý Đánh Giá</a></li>
+            <li><a href="#"><i class="fas fa-tags"></i> Quản Lý Voucher</a></li>
+            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hamburger" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="management-section">
+            <h2>Quản Lý Phòng Khách Sạn</h2>
+            <div class="management-header">
+                <div class="search-filter">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, loại phòng..." oninput="filterRooms()">
+                    <select id="statusFilter" onchange="filterRooms()">
+                        <option value="all">Tất Cả Trạng Thái</option>
+                        <option value="AVAILABLE">Còn Trống</option>
+                        <option value="BOOKED">Đã Đặt</option>
+                        <option value="MAINTENANCE">Bảo Trì</option>
+                    </select>
+                    <select id="typeFilter" onchange="filterRooms()">
+                        <option value="all">Tất Cả Loại Phòng</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Superior">Superior</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Standard">Standard</option>
+                    </select>
+                </div>
+                <button class="add-room-btn" onclick="openModal('add')"><i class="fas fa-plus"></i> Thêm Phòng Mới</button>
+            </div>
+            <div class="room-cards" id="roomCards">
+                <!-- Room cards will be dynamically generated from server -->
+                <div class="room-card" th:each="room : ${rooms}">
+                    <div class="rating-badge" th:if="${room.averageRating}">
+                        <i class="fas fa-star"></i> <span th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">4.5</span>
+                    </div>
+                    <img th:src="${room.imageUrls[0] ?: 'https://images.unsplash.com/photo-1611892440504-42a792e24c48?q=80&w=2070&auto=format&fit=crop'}" 
+                         alt="Room" class="room-image">
+                    <div class="room-info">
+                        <h3>Phòng <span th:text="${room.roomId}">101</span> - <span th:text="${room.type}">Deluxe</span></h3>
+                        <p><i class="fas fa-tag"></i> Giá: <span th:text="${#numbers.formatCurrency(room.price)}">1,600,000</span> ₫ / đêm</p>
+                        <p><i class="fas fa-user-friends"></i> Số khách tối đa: <span th:text="${room.maxGuests}">2</span></p>
+                        <p><i class="fas fa-align-left"></i> <span th:text="${room.description}">Mô tả phòng</span></p>
+                    </div>
+                    <span class="status" 
+                          th:classappend="${room.status == 'AVAILABLE'} ? 'available' : 
+                                         ${room.status == 'BOOKED'} ? 'booked' : 'maintenance'"
+                          th:text="${room.status == 'AVAILABLE'} ? 'Còn Trống' : 
+                                  ${room.status == 'BOOKED'} ? 'Đã Đặt' : 'Bảo Trì'">Còn Trống</span>
+                    <div class="amenities-list">
+                        <span class="amenity-tag" th:each="amenity : ${room.amenities}">
+                            <i class="fas fa-check-circle"></i> <span th:text="${amenity}">Wifi</span>
+                        </span>
+                    </div>
+                    <div class="actions">
+                        <button class="edit-btn" th:onclick="|openModal('edit', ${room.roomId})|">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="delete-btn" th:onclick="|deleteRoom(${room.roomId})|">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Add/Edit Room -->
+        <div class="modal" id="roomModal">
+            <div class="modal-content">
+                <h3 id="modalTitle">Thêm Phòng Mới</h3>
+                <form th:action="@{/admin/rooms/save}" method="post" th:object="${room}">
+                    <input type="hidden" th:field="*{roomId}" id="roomId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomType">Loại Phòng *</label>
+                            <select th:field="*{type}" id="roomType" required>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Superior">Superior</option>
+                                <option value="Suite">Suite</option>
+                                <option value="Standard">Standard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="roomStatus">Trạng Thái *</label>
+                            <select th:field="*{status}" id="roomStatus" required>
+                                <option value="AVAILABLE">Còn Trống</option>
+                                <option value="BOOKED">Đã Đặt</option>
+                                <option value="MAINTENANCE">Bảo Trì</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomPrice">Giá (/đêm) *</label>
+                            <input type="text" th:field="*{price}" id="roomPrice" placeholder="1,600,000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxGuests">Số Khách Tối Đa *</label>
+                            <input type="number" th:field="*{maxGuests}" id="maxGuests" placeholder="2" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomDescription">Mô Tả</label>
+                        <textarea th:field="*{description}" id="roomDescription" placeholder="Mô tả chi tiết về phòng..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomImage">URL Hình Ảnh</label>
+                        <input type="text" th:field="*{imageUrls[0]}" id="roomImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tiện Ích</label>
+                        <div class="amenities-container">
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Wifi"> Wifi miễn phí
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="TV"> TV màn hình phẳng
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="AC"> Điều hòa
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Minibar"> Minibar
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Safe"> Két an toàn
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Bathtub"> Bồn tắm
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Balcony"> Ban công
+                            </label>
+                            <label class="amenity-option">
+                                <input type="checkbox" name="amenity" value="Breakfast"> Bữa sáng
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeModal()"><i class="fas fa-times"></i> Hủy</button>
+                        <button type="submit" class="save-btn"><i class="fas fa-save"></i> Lưu Thông Tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Room Management -->
+    <script>
+        function openModal(mode, roomId = null) {
+            const modal = document.getElementById('roomModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const roomIdInput = document.getElementById('roomId');
+            
+            if (mode === 'add') {
+                modalTitle.textContent = 'Thêm Phòng Mới';
+                roomIdInput.value = '';
+                
+                // Reset form fields
+                document.getElementById('roomType').value = 'Deluxe';
+                document.getElementById('roomStatus').value = 'AVAILABLE';
+                document.getElementById('roomPrice').value = '';
+                document.getElementById('maxGuests').value = '';
+                document.getElementById('roomDescription').value = '';
+                document.getElementById('roomImage').value = '';
+                
+                // Reset amenities checkboxes
+                document.querySelectorAll('input[name="amenity"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            } else if (mode === 'edit' && roomId) {
+                // Fetch room data from server
+                fetch(`/admin/rooms/edit/${roomId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Create a temporary container
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Extract the room card
+                        const roomCard = doc.querySelector('.room-card');
+                        if (roomCard) {
+                            // Extract room data
+                            const roomId = roomCard.querySelector('[th\\:text="${room.roomId}"]')?.textContent;
+                            const roomType = roomCard.querySelector('[th\\:text="${room.type}"]')?.textContent;
+                            const roomStatus = roomCard.querySelector('.status').classList.contains('available') ? 'AVAILABLE' : 
+                                              roomCard.querySelector('.status').classList.contains('booked') ? 'BOOKED' : 'MAINTENANCE';
+                            const roomPrice = roomCard.querySelector('[th\\:text*="Giá:"]')?.textContent.replace('Giá: ', '').replace(' ₫ / đêm', '').replace(/,/g, '');
+                            const maxGuests = roomCard.querySelector('[th\\:text*="Số khách tối đa:"]')?.textContent.replace('Số khách tối đa: ', '');
+                            const description = roomCard.querySelector('[th\\:text="${room.description}"]')?.textContent;
+                            const imageUrl = roomCard.querySelector('.room-image').src;
+                            
+                            // Extract amenities
+                            const amenities = [];
+                            roomCard.querySelectorAll('.amenity-tag span').forEach(tag => {
+                                amenities.push(tag.textContent);
+                            });
+                            
+                            // Populate form
+                            modalTitle.textContent = 'Sửa Thông Tin Phòng';
+                            roomIdInput.value = roomId;
+                            document.getElementById('roomType').value = roomType;
+                            document.getElementById('roomStatus').value = roomStatus;
+                            document.getElementById('roomPrice').value = roomPrice;
+                            document.getElementById('maxGuests').value = maxGuests;
+                            document.getElementById('roomDescription').value = description;
+                            document.getElementById('roomImage').value = imageUrl;
+                            
+                            // Set amenities checkboxes
+                            document.querySelectorAll('input[name="amenity"]').forEach(checkbox => {
+                                checkbox.checked = amenities.includes(checkbox.value);
+                            });
+                            
+                            modal.style.display = 'flex';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching room data:', error));
+                return;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('roomModal').style.display = 'none';
+        }
+
+        function deleteRoom(roomId) {
+            if (confirm('Bạn có chắc muốn xóa phòng này?')) {
+                fetch(`/admin/rooms/delete/${roomId}`, { method: 'GET' })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra khi xóa phòng');
+                        }
+                    })
+                    .catch(error => console.error('Error deleting room:', error));
+            }
+        }
+
+        function filterRooms() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const roomCards = document.querySelectorAll('.room-card');
+
+            roomCards.forEach(card => {
+                const roomNumber = card.querySelector('h3').textContent.toLowerCase();
+                const roomType = card.querySelector('h3').textContent.toLowerCase();
+                const status = card.querySelector('.status').classList.contains('available') ? 'AVAILABLE' : 
+                              card.querySelector('.status').classList.contains('booked') ? 'BOOKED' : 'MAINTENANCE';
+                
+                const matchesSearch = roomNumber.includes(searchInput) || roomType.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesType = typeFilter === 'all' || roomType.includes(typeFilter.toLowerCase());
+
+                if (matchesSearch && matchesStatus && matchesType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Format currency input
+        document.getElementById('roomPrice').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value) {
+                value = parseInt(value, 10).toLocaleString('vi-VN');
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

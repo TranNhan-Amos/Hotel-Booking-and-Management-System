@@ -10,17 +10,15 @@ import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/rooms")
+
 public class AdminManagementRoomController {
 
     @Autowired
     private RoomService roomService;
 
-    @GetMapping
+    @GetMapping("/admin/rooms")
     public String viewRoomManagementPage(Model model) {
-        List<RoomEntity> rooms = roomService.getAllRooms();
-        model.addAttribute("rooms", rooms);
-        return "admin/room-management";
+        return "Admin/management-Room";
     }
 
     @PostMapping("/save")

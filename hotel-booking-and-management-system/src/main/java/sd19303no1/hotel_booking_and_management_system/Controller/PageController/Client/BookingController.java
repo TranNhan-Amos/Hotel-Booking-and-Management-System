@@ -1,4 +1,4 @@
-package sd19303no1.hotel_booking_and_management_system.Controller.PageController;
+package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Client;
 
 import java.time.LocalDate;
 

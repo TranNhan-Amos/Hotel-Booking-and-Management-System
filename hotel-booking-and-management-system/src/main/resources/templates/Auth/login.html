@@ -53,9 +53,27 @@
             position: relative;
             overflow: hidden;
         }
-         .social-login {
+
+        /* CSS cho hiệu ứng social login */
+        .social-login {
             margin-bottom: 20px;
+            overflow: hidden; /* Quan trọng cho max-height transition */
+            transition: opacity 0.4s ease-in-out, 
+                        max-height 0.4s ease-in-out, 
+                        transform 0.4s ease-in-out,
+                        margin-bottom 0.4s ease-in-out;
+            opacity: 1;
+            max-height: 300px; /* Đặt một giá trị đủ lớn cho nội dung */
+            transform: translateY(0);
         }
+        .social-login.hidden {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px); /* Hiệu ứng trượt nhẹ lên khi ẩn */
+            margin-bottom: 0; /* Loại bỏ khoảng trống khi ẩn */
+        }
+        /* Kết thúc CSS cho hiệu ứng social login */
+
         .social-btn {
             width: 100%;
             padding: 14px;
@@ -203,11 +221,14 @@
             <button class="tab-btn active" data-tab="login">Đăng Nhập</button>
             <button class="tab-btn" data-tab="register">Đăng Ký</button>
         </div>
-            <div class="social-login">
-                <button class="social-btn google"><i class="fab fa-google"></i> Đăng nhập với Google</button>
-                <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Đăng nhập với Facebook</button>
-                <button class="social-btn twitter"><i class="fab fa-twitter"></i> Đăng nhập với Twitter</button>
-            </div>  
+        
+        <!-- Phần đăng nhập bằng mạng xã hội -->
+        <div class="social-login">
+            <button class="social-btn google"><i class="fab fa-google"></i> Đăng nhập với Google</button>
+            <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Đăng nhập với Facebook</button>
+            <button class="social-btn twitter"><i class="fab fa-twitter"></i> Đăng nhập với Twitter</button>
+        </div>  
+        
         <!-- Tab Đăng Nhập -->
         <div id="login" class="tab-content active">
             <form id="loginForm" th:action="@{/login}" method="post">
@@ -255,29 +276,37 @@
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
             const tabSwitchElement = document.querySelector('.tab-switch');
+            const socialLoginDiv = document.querySelector('.social-login'); 
 
-            const loginTab = document.getElementById('login');
-            const registerTab = document.getElementById('register');
+            const loginTabContent = document.getElementById('login');
+            const registerTabContent = document.getElementById('register');
             const loginBtn = document.querySelector('.tab-btn[data-tab="login"]');
             const registerBtn = document.querySelector('.tab-btn[data-tab="register"]');
 
             function activateTab(tabName) {
                 if (tabName === 'login') {
-                    loginTab.style.display = 'block'; // Use style.display for simplicity
-                    registerTab.style.display = 'none';
+                    loginTabContent.style.display = 'block';
+                    registerTabContent.style.display = 'none';
+                    
                     loginBtn.classList.add('active');
                     registerBtn.classList.remove('active');
+                    
                     tabSwitchElement.classList.add('login-active');
                     tabSwitchElement.classList.remove('register-active');
+                    
+                    socialLoginDiv.classList.remove('hidden'); // Hiện social login
                 } else if (tabName === 'register') {
-                    registerTab.style.display = 'block';
-                    loginTab.style.display = 'none';
+                    registerTabContent.style.display = 'block';
+                    loginTabContent.style.display = 'none';
+                    
                     registerBtn.classList.add('active');
                     loginBtn.classList.remove('active');
+                    
                     tabSwitchElement.classList.add('register-active');
                     tabSwitchElement.classList.remove('login-active');
+                    
+                    socialLoginDiv.classList.add('hidden'); // Ẩn social login
                 }
             }
 
@@ -288,12 +317,17 @@
                 });
             });
 
-            // Check if we need to show the register tab due to a server-side error
-            const showRegisterOnError = /*[[${showRegister == true}]]*/ false;
+            const showRegisterOnError = /*[[${showRegister == true}]]*/ false; 
+            
             if (showRegisterOnError) {
                 activateTab('register');
             } else {
-                activateTab('login'); // Default to login tab
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('showRegister')) { 
+                     activateTab('register');
+                } else {
+                     activateTab('login'); 
+                }
             }
         });
     </script>

@@ -34,7 +34,8 @@ public class SecurityConfig {
                     "/js/**",                   // Tài nguyên JavaScript
                     "/images/**",               // Tài nguyên hình ảnh
                     "/room/**",                 // Chi tiết phòng (MỚI)
-                    "/search"                   // Kết quả tìm kiếm (MỚI)
+                    "/search"  ,                 // Kết quả tìm kiếm (MỚI)
+                     "/admin/customers/**"   
                 ).permitAll()
                 .requestMatchers("/dashboard").hasRole("ADMIN") // Trang dashboard cho Admin
                 .anyRequest().authenticated() // Tất cả các request khác cần xác thực

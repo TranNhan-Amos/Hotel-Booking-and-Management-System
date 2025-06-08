@@ -92,4 +92,8 @@ public class BookingOrderService {
     public List<BookingOrderEntity> getBookingsByCustomerEmail(String email) {
         return bookingOrderRepository.findByEmailOrderByCreatedAtDesc(email);
     }
+
+    public List<BookingOrderEntity> getAllBookings() {
+        return bookingOrderRepository.findAll();
+    }
 }

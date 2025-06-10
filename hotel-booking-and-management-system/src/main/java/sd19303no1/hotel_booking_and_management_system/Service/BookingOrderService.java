@@ -289,4 +289,9 @@ public class BookingOrderService {
         }
         return bookingOrderRepository.findByEmailOrderByCreatedAtDesc(email.toLowerCase());
     }
+
+    public List<CustomersEntity> findAllCustomersForAdmin() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findAllCustomersForAdmin'");
+    }
 }

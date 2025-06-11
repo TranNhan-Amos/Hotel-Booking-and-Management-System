@@ -1,7 +1,6 @@
 package sd19303no1.hotel_booking_and_management_system.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +10,13 @@ import sd19303no1.hotel_booking_and_management_system.Repository.CustomersReposi
 
 @Service
 public class CustomersService {
+
       @Autowired
     private CustomersRepository customerRepository;
+
+    public CustomersEntity getCustomerById(Integer id) {
+        return customerRepository.findById(id).orElse(null);
+    }
      
 
     public List<CustomersEntity> getAllCustomers() {
@@ -20,21 +24,15 @@ public class CustomersService {
         return customerRepository.findAll();
     }
 
-   public void saveCustomer(CustomersEntity customer){
-    customerRepository.save(customer);
-   }
-   
-   public void deleteCustomer(Integer id) {
+    public void deleteCustomer(Integer id) {
     customerRepository.deleteById(id);
    }
 
-   public  CustomersEntity getCustomerById(Integer id) {
-      Optional<CustomersEntity> customerfindById = customerRepository.findById(id);
-      return customerfindById.orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-    } 
-
-    public CustomersEntity findNameorCustomerId(String name ,Integer customerId){
-        Optional<CustomersEntity> findByNameOrCustomerId = customerRepository.findByNameOrCustomerId(name, customerId);
-        return findByNameOrCustomerId.orElseThrow(() -> new RuntimeException("Customer not found with name: " + name + " or customerId: " + customerId));
+   public void updateCustomer(CustomersEntity customer) {
+        if (customer.getCustomerId() != null && customerRepository.existsById(customer.getCustomerId())) {
+            customerRepository.save(customer); // Cập nhật nếu ID tồn tại
+        } else {
+            throw new IllegalArgumentException("Không tìm thấy khách hàng để cập nhật!");
+        }
     }
 }

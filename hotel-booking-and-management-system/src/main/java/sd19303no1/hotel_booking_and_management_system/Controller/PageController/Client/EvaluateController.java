@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class EvaluateController {
     
-     @GetMapping("/client/Evaluate")
+    @GetMapping("/client/Evaluate")
     public String viewEvaluatePage(Model model) {
         return "Client/Evaluate";
 }

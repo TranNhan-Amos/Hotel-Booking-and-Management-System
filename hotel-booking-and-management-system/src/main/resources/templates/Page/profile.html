@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Cá Nhân - Khách Sạn Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+     <link rel="stylesheet"  th:href="@{Css/Profile.css}">
+    <style>
+       
+    </style>
+</head>
+<body>
+    <div class="container">
+       <div th:replace="~{/Layout/narbar}"></div>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <i class="fas fa-user-circle profile-icon"></i>
+            <h1>Thông Tin Cá Nhân</h1>
+            <p>Xin chào! Dưới đây là thông tin cá nhân của bạn được sử dụng cho đặt phòng tại Khách Sạn Grand Ocean. Bạn có thể chỉnh sửa nếu cần.</p>
+            <div class="profile-details">
+                <div class="profile-item">
+                    <span><i class="fas fa-user"></i>Họ và Tên</span>
+                    <span id="fullName">Nguyễn Văn A</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-envelope"></i>Email</span>
+                    <span id="email">example@gmail.com</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-phone-alt"></i>Số Điện Thoại</span>
+                    <span id="phone">0935123456</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-id-card"></i>Số CMND/CCCD</span>
+                    <span id="idNumber">123456789</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-map-marker-alt"></i>Địa Chỉ</span>
+                    <span id="address">123 Đường ABC, TP. Đà Nẵng</span>
+                </div>
+                <div class="profile-item special-request">
+                    <span><i class="fas fa-comment-alt"></i>Yêu Cầu Đặc Biệt</span>
+                    <span id="specialRequest">Nhờ chuẩn bị thêm giường phụ</span>
+                </div>
+            </div>
+            <div class="contact-info">
+                <h3>Thông Tin Liên Hệ</h3>
+                <p><i class="fas fa-phone-alt"></i>Hotline: 0905 123 456</p>
+                <p><i class="fas fa-envelope"></i>Email: support@grandocean.com</p>
+                <p><i class="fas fa-globe"></i>Website: www.grandocean.com</p>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn" onclick="editProfile()">Chỉnh Sửa Thông Tin</button>
+                <button class="action-btn" onclick="window.location.href='index.html'">Quay Lại Trang Chủ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Hamburger Menu -->
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+
+    <!-- JavaScript to Populate Profile Details -->
+    <script>
+        // Simulate fetching data from localStorage
+        const profileData = JSON.parse(localStorage.getItem('bookingData')) || {
+            fullName: 'Nguyễn Văn A',
+            email: 'example@gmail.com',
+            phone: '0935123456',
+            idNumber: '123456789',
+            address: '123 Đường ABC, TP. Đà Nẵng',
+            specialRequest: 'Nhờ chuẩn bị thêm giường phụ'
+        };
+
+        document.getElementById('fullName').textContent = profileData.fullName;
+        document.getElementById('email').textContent = profileData.email;
+        document.getElementById('phone').textContent = profileData.phone;
+        document.getElementById('idNumber').textContent = profileData.idNumber;
+        document.getElementById('address').textContent = profileData.address;
+        document.getElementById('specialRequest').textContent = profileData.specialRequest || 'Không có yêu cầu đặc biệt';
+
+        // Clear localStorage after use
+        localStorage.removeItem('bookingData');
+
+        // Redirect to edit profile page (simulated)
+        function editProfile() {
+            alert('Chức năng chỉnh sửa đang được phát triển. Vui lòng liên hệ hỗ trợ để cập nhật thông tin!');
+            // In production, redirect to an edit form with pre-filled data
+            // window.location.href = 'edit-profile.html';
+        }
+    </script>
+</body>
+</html>

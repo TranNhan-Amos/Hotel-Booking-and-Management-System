@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"  th:href="@{Css/feedbackuser.css}">
+    <style>
+       
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{/Layout/narbar}"></div>
+        <!-- Header -->
+        <header class="reviews-header">
+            <h1>Đánh giá từ khách hàng</h1>
+            <p>Chia sẻ trải nghiệm của bạn hoặc đọc các đánh giá từ những khách hàng đã lưu trú tại Khách sạn Sang Trọng để biết thêm về dịch vụ của chúng tôi!</p>
+            <a href="#review-form" class="cta-button">Viết đánh giá</a>
+        </header>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h2 class="section-title">Thống kê đánh giá</h2>
+            <div class="stats-container">
+                <div class="stat-card animate-slide" style="animation-delay: 0.2s;">
+                    <i class="fas fa-star"></i>
+                    <h3>4.8/5</h3>
+                    <p>Điểm trung bình từ 1,200 đánh giá</p>
+                </div>
+                <div class="stat-card animate-slide" style="animation-delay: 0.4s;">
+                    <i class="fas fa-users"></i>
+                    <h3>1,200+</h3>
+                    <p>Khách hàng đã đánh giá</p>
+                </div>
+                <div class="stat-card animate-slide" style="animation-delay: 0.6s;">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Top 5</h3>
+                    <p>Khách sạn được yêu thích tại Đà Nẵng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form Section -->
+        <div class="review-form-section" id="review-form">
+            <h2 class="section-title">Gửi đánh giá của bạn</h2>
+            <div class="form-container animate-fade">
+                <form action="/submit-review" method="post" id="review-form">
+                    <div class="form-group">
+                        <label for="name">Họ và tên</label>
+                        <input type="text" id="name" name="name" placeholder="Nhập họ và tên" required aria-label="Họ và tên">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Nhập email" required aria-label="Email">
+                    </div>
+                    <div class="rating-group">
+                        <label>Điểm đánh giá</label>
+                        <div class="rating-stars" id="rating-stars">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Nhận xét</label>
+                        <textarea id="comment" name="comment" placeholder="Chia sẻ trải nghiệm của bạn" required aria-label="Nhận xét"></textarea>
+                    </div>
+                    <button type="submit" class="submit-button">Gửi đánh giá</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Reviews List Section -->
+        <div class="reviews-list-section">
+            <h2 class="section-title">Đánh giá từ khách hàng</h2>
+            <div class="filter-container">
+                <select id="sort-filter">
+                    <option value="newest">Mới nhất</option>
+                    <option value="highest">Điểm cao nhất</option>
+                    <option value="lowest">Điểm thấp nhất</option>
+                </select>
+                <select id="rating-filter">
+                    <option value="all">Tất cả điểm</option>
+                    <option value="5">5 sao</option>
+                    <option value="4">4 sao</option>
+                    <option value="3">3 sao</option>
+                    <option value="2">2 sao</option>
+                    <option value="1">1 sao</option>
+                </select>
+            </div>
+            <div class="reviews-container">
+                <div class="review-card animate-slide" style="animation-delay: 0.2s;">
+                    <div class="rating">4.8/5</div>
+                    <p>Phòng nghỉ rất đẹp, sạch sẽ và nhân viên cực kỳ thân thiện. Hồ bơi vô cực có tầm nhìn tuyệt vời, rất đáng để trải nghiệm!</p>
+                    <div class="review-author">Nguyễn Thị Mai</div>
+                    <div class="review-date">01/06/2025</div>
+                    <div class="review-response">
+                        <strong>Phản hồi từ khách sạn:</strong> Cảm ơn chị Mai đã dành thời gian chia sẻ trải nghiệm tuyệt vời! Chúng tôi rất mong được chào đón chị quay lại trong tương lai.
+                    </div>
+                </div>
+                <div class="review-card animate-slide" style="animation-delay: 0.4s;">
+                    <div class="rating">4.5/5</div>
+                    <p>Ẩm thực tại nhà hàng rất ngon, đặc biệt là các món hải sản. Tuy nhiên, wifi ở tầng cao hơi chập chờn.</p>
+                    <div class="review-author">Trần Văn Hùng</div>
+                    <div class="review-date">25/05/2025</div>
+                    <div class="review-response">
+                        <strong>Phản hồi từ khách sạn:</strong> Cảm ơn anh Hùng đã đánh giá. Chúng tôi đã ghi nhận ý kiến về wifi và sẽ cải thiện ngay. Hy vọng anh sẽ có trải nghiệm hoàn hảo hơn trong lần tới!
+                    </div>
+                </div>
+                <div class="review-card animate-slide" style="animation-delay: 0.6s;">
+                    <div class="rating">5.0/5</div>
+                    <p>Mọi thứ đều hoàn hảo! Dịch vụ spa thư giãn tuyệt vời, nhân viên luôn mỉm cười và hỗ trợ nhiệt tình.</p>
+                    <div class="review-author">Lê Minh Anh</div>
+                    <div class="review-date">15/05/2025</div>
+                </div>
+            </div>
+            <div class="pagination">
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">...</a>
+                <a href="#">10</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div th:replace="~{/Layout/footer}"></div>
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        // Rating Stars Interaction
+        const stars = document.querySelectorAll('#rating-stars i');
+        const ratingInput = document.getElementById('rating');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = star.getAttribute('data-value');
+                ratingInput.value = value;
+                stars.forEach(s => {
+                    s.classList.toggle('active', s.getAttribute('data-value') <= value);
+                });
+            });
+        });
+
+        // Form Validation
+        const reviewForm = document.getElementById('review-form');
+        reviewForm.addEventListener('submit', (e) => {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const rating = document.getElementById('rating').value;
+            const comment = document.getElementById('comment').value;
+
+            if (!name || !email || !rating || !comment) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                e.preventDefault();
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('Email không hợp lệ!');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        // Filter Reviews (Placeholder for client-side filtering)
+        const sortFilter = document.getElementById('sort-filter');
+        const ratingFilter = document.getElementById('rating-filter');
+        sortFilter.addEventListener('change', filterReviews);
+        ratingFilter.addEventListener('change', filterReviews);
+
+        function filterReviews() {
+            const sortValue = sortFilter.value;
+            const ratingValue = ratingFilter.value;
+            // Implement client-side or server-side filtering logic here
+            console.log(`Filtering reviews: Sort by ${sortValue}, Rating: ${ratingValue}`);
+        }
+    </script>
+</body>
+</html>

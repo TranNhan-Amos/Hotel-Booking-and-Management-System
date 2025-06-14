@@ -56,45 +56,20 @@
                     </tr>
                 </thead>
                 <tbody id="customerTableBody">
-                    <tr>
-                        <td data-label="Mã Khách">KH001</td>
-                        <td data-label="Tên Khách">Nguyễn Văn A</td>
-                        <td data-label="Số Điện Thoại">0901234567</td>
-                        <td data-label="Email">nguyenvana@example.com</td>
+                    <tr th:each="customer : ${customers}">
+                        <td data-label="Mã Khách"  th:text="${customer.customerId}">KH001</td>
+                        <td data-label="Tên Khách" th:text="${customer.name}">Nguyễn Văn A</td>
+                        <td data-label="Số Điện Thoại" th:text="${customer.phone}">0901234567</td>
+                        <td data-label="Email" th:text="${customer.email}">nguyenvana@example.com</td>
                         <td data-label="Số Lần Đặt Phòng">5</td>
-                        <td data-label="Ngày Đăng Ký">15/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status vip">Khách VIP</span></td>
+                        <td data-label="Ngày Đăng Ký" th:text="${#dates.format(customer.createdDate, 'dd/MM/yyyy')}">15/05/2025</td>
+                        <td data-label="Trạng Thái" ><span th:class="'status ' + (${customer.status} == 'regular' ? 'regular' : 'vip')" th:text="${customer.status == 'regular'} ? 'Khách Thường' : 'Khách VIP'">Khách VIP</span></td>
                         <td data-label="Hành Động" class="actions">
                             <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
                             <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
                         </td>
                     </tr>
-                    <tr>
-                        <td data-label="Mã Khách">KH002</td>
-                        <td data-label="Tên Khách">Trần Thị B</td>
-                        <td data-label="Số Điện Thoại">0912345678</td>
-                        <td data-label="Email">tranthib@example.com</td>
-                        <td data-label="Số Lần Đặt Phòng">2</td>
-                        <td data-label="Ngày Đăng Ký">20/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status regular">Khách Thường</span></td>
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                            <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="Mã Khách">KH003</td>
-                        <td data-label="Tên Khách">Lê Văn C</td>
-                        <td data-label="Số Điện Thoại">0923456789</td>
-                        <td data-label="Email">levanc@example.com</td>
-                        <td data-label="Số Lần Đặt Phòng">8</td>
-                        <td data-label="Ngày Đăng Ký">10/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status vip">Khách VIP</span></td>
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                            <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                        </td>
-                    </tr>
+            
                 </tbody>
             </table>
             <div class="chart-container">
@@ -104,46 +79,45 @@
         </div>
 
         <!-- Modal for Add/Edit Customer -->
-        <!-- <div class="modal" id="customerModal">
-            <div class="modal-content">
-                <h3 id="modalTitle">Thêm Khách Hàng</h3>
-                <div class="form-group">
-                    <label for="customerId">Mã Khách</label>
-                    <input type="text" id="customerId" placeholder="KH001" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerName">Tên Khách</label>
-                    <input type="text" id="customerName" placeholder="Nguyễn Văn A" required>
-                </div>
-                <div class="form-group">
-                    <label for="phoneNumber">Số Điện Thoại</label>
-                    <input type="text" id="phoneNumber" placeholder="0901234567" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="nguyenvana@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="bookingCount">Số Lần Đặt Phòng</label>
-                    <input type="number" id="bookingCount" placeholder="5" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerDate">Ngày Đăng Ký</label>
-                    <input type="date" id="registerDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerStatus">Trạng Thái</label>
-                    <select id="customerStatus" required>
-                        <option value="regular">Khách Thường</option>
-                        <option value="vip">Khách VIP</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button class="save-btn" onclick="saveCustomer()">Lưu</button>
-                    <button class="cancel-btn" onclick="closeModal()">Hủy</button>
-                </div>
+      <div class="modal" id="customerModal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Sửa Khách Hàng</h3>
+        <form id="customerForm" th:action="@{/admin/customers/update}" method="post">
+            <input type="hidden" id="customerId" name="customerId">
+            <div class="form-group">
+                <label for="customerName">Tên Khách</label>
+                <input type="text" id="customerName" name="name" placeholder="Nguyễn Văn A" required>
             </div>
-        </div> -->
+            <div class="form-group">
+                <label for="phoneNumber">Số Điện Thoại</label>
+                <input type="text" id="phoneNumber" name="phone" placeholder="0901234567" required pattern="[0-9]{10}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="nguyenvana@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="bookingCount">Số Lần Đặt Phòng</label>
+                <input type="number" id="bookingCount" name="bookingCount" placeholder="5" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="createdDate">Ngày Đăng Ký</label>
+                <input type="date" id="createdDate" name="createdDate" required>
+            </div>
+            <div class="form-group">
+                <label for="customerStatus">Trạng Thái</label>
+                <select id="customerStatus" name="status" required>
+                    <option value="regular">Khách Thường</option>
+                    <option value="vip">Khách VIP</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="save-btn">Lưu</button>
+                <button type="button" class="cancel-btn" onclick="closeModal()">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
     </div>
 
     <!-- JavaScript for Customer Management -->
@@ -158,7 +132,7 @@
             const phoneNumber = document.getElementById('phoneNumber');
             const email = document.getElementById('email');
             const bookingCount = document.getElementById('bookingCount');
-            const registerDate = document.getElementById('registerDate');
+            const registerDate = document.getElementById('createdDate');
             const customerStatus = document.getElementById('customerStatus');
 
             if (mode === 'add') {

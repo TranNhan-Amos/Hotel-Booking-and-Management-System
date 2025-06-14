@@ -1,6 +1,8 @@
     package sd19303no1.hotel_booking_and_management_system.Entity;
 
-    import jakarta.persistence.*;
+    import java.util.Date;
+
+import jakarta.persistence.*;
 
     @Entity
     @Table(name = "customers")
@@ -25,6 +27,13 @@
 
         @Column(name = "email", unique = true)
         private String email;
+
+         @Column(name = "created_date")
+        @Temporal(TemporalType.DATE)
+        private Date createdDate;
+
+        @Column(name = "status")
+        private String status;
 
         // Getters and Setters
         public Integer getCustomerId() {
@@ -74,4 +83,9 @@
         public void setEmail(String email) {
             this.email = email;
         }
+
+        public Date getCreatedDate() { return createdDate; }
+        public void setCreatedDate(Date createdDate) { this.createdDate = createdDate; }
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
     }

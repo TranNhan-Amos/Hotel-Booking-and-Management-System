@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Cá Nhân - Khách Sạn Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            background: linear-gradient(135deg, #d6e6ff, #f0f4f8);
+            color: #2d3436;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        /* Navbar */
+        nav {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        nav .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+        nav .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #5a67d8;
+            letter-spacing: 1px;
+        }
+        nav .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+        nav .nav-links a {
+            text-decoration: none;
+            color: #2d3436;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        nav .nav-links a:hover {
+            color: #5a67d8;
+            transform: translateY(-2px);
+        }
+        nav .auth-btn {
+            background: linear-gradient(45deg, #5a67d8, #9f7aea);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        nav .auth-btn:hover {
+            background: linear-gradient(45deg, #9f7aea, #5a67d8);
+            transform: scale(1.05);
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #2d3436;
+        }
+        
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            min-width: 300px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast.hide {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        .toast-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-left: 4px solid #047857;
+        }
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-left: 4px solid #b91c1c;
+        }
+        .toast-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-left: 4px solid #b45309;
+        }
+        .toast-info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-left: 4px solid #1d4ed8;
+        }
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .toast-content {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .toast-message {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        .toast-close:hover {
+            opacity: 1;
+        }
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 0 0 12px 12px;
+            animation: toastProgress 5s linear forwards;
+        }
+        @keyframes toastProgress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .profile-section .profile-icon {
+            font-size: 80px;
+            color: #5a67d8;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .profile-section h1 {
+            font-size: 32px;
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .profile-section p {
+            font-size: 16px;
+            color: #636e72;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .profile-details {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #5a67d8;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .profile-details .profile-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            color: #636e72;
+            padding: 10px 0;
+        }
+        .profile-details .profile-item i {
+            color: #5a67d8;
+            margin-right: 10px;
+        }
+        .profile-details .profile-item span:first-child {
+            font-weight: 500;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+        }
+        .profile-details .profile-item.full-width {
+            grid-column: span 2;
+        }
+        .contact-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            text-align: left;
+        }
+        .contact-info h3 {
+            font-size: 18px;
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+        .contact-info p {
+            font-size: 14px;
+            color: #636e72;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .contact-info p i {
+            color: #5a67d8;
+            margin-right: 10px;
+        }
+        .profile-section .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .profile-section .action-btn {
+            background: linear-gradient(45deg, #5a67d8, #9f7aea);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(90, 103, 216, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .profile-section .action-btn:hover {
+            background: linear-gradient(45deg, #9f7aea, #5a67d8);
+            transform: scale(1.05);
+        }
+        .profile-section .action-btn:active {
+            transform: scale(0.95);
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        .role-admin { background: #ff6b6b; color: white; }
+        .role-customer { background: #4ecdc4; color: white; }
+        .role-staff { background: #45b7d1; color: white; }
+        .role-partner { background: #f9ca24; color: #2d3436; }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+        .modal-header h2 {
+            color: #2d3436;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #636e72;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            background: #f1f3f4;
+            color: #2d3436;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3436;
+            font-size: 14px;
+        }
+        .form-group label i {
+            color: #5a67d8;
+            margin-right: 8px;
+            width: 16px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .password-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #5a67d8;
+        }
+        .password-section h4 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f3f4;
+        }
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #5a67d8, #9f7aea);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #9f7aea, #5a67d8);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .required {
+            color: #e74c3c;
+        }
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav .nav-links {
+                display: none;
+            }
+            nav .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+            }
+            nav .nav-links.active a {
+                margin: 10px 0;
+            }
+            .hamburger {
+                display: block;
+            }
+            .profile-section {
+                padding: 20px;
+            }
+            .profile-details {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+            .profile-details .profile-item.full-width {
+                grid-column: span 1;
+            }
+            .profile-section .btn-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .modal-footer {
+                flex-direction: column;
+            }
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+            .toast {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Navbar -->
+        <nav>
+            <div class="nav-container">
+                <div class="logo">Đặt Phòng KS</div>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/">Trang Chủ</a></li>
+                    <li><a href="/rooms">Loại Phòng</a></li>
+                    <li><a href="/offers">Ưu Đãi</a></li>
+                    <li><a href="/reviews">Đánh Giá</a></li>
+                    <li><a href="/contact">Liên Hệ</a></li>
+                </ul>
+                <div th:if="${isLoggedIn}">
+                    <a href="/logout" class="auth-btn">Đăng Xuất</a>
+                </div>
+                <div th:unless="${isLoggedIn}">
+                    <a href="/login" class="auth-btn">Đăng Nhập</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <i class="fas fa-user-circle profile-icon"></i>
+            <h1>
+                Thông Tin Cá Nhân
+                <span th:class="'role-badge role-' + ${#strings.toLowerCase(displayRole)}" 
+                      th:text="${displayRole}"></span>
+            </h1>
+            <p>Xin chào <strong id="welcome-name" th:text="${displayName}">Người dùng</strong>! Dưới đây là thông tin cá nhân của bạn được sử dụng cho đặt phòng tại Khách Sạn Grand Ocean.</p>
+            
+            <div class="profile-details">
+                <div class="profile-item">
+                    <span><i class="fas fa-user"></i>Họ và Tên</span>
+                    <span id="display-name" th:text="${displayName}">Chưa cập nhật</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-envelope"></i>Email</span>
+                    <span th:text="${displayEmail}">Chưa cập nhật</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-phone-alt"></i>Số Điện Thoại</span>
+                    <span id="display-phone" th:text="${displayPhone}">Chưa cập nhật</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-id-card"></i>Số CMND/CCCD</span>
+                    <span id="display-cccd" th:text="${displayCccd}">Chưa cập nhật</span>
+                </div>
+                <div class="profile-item">
+                    <span><i class="fas fa-shield-alt"></i>Vai Trò</span>
+                    <span th:text="${displayRole}">CUSTOMER</span>
+                </div>
+                <div class="profile-item full-width">
+                    <span><i class="fas fa-map-marker-alt"></i>Địa Chỉ</span>
+                    <span id="display-address" th:text="${displayAddress}">Chưa cập nhật</span>
+                </div>
+                <div class="profile-item full-width" th:if="${user != null}">
+                    <span><i class="fas fa-calendar-alt"></i>Ngày Tham Gia</span>
+                    <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">Chưa xác định</span>
+                </div>
+            </div>
+            
+            <div class="contact-info">
+                <h3>Thông Tin Liên Hệ Khách Sạn</h3>
+                <p><i class="fas fa-phone-alt"></i>Hotline: 0905 123 456</p>
+                <p><i class="fas fa-envelope"></i>Email: support@grandocean.com</p>
+                <p><i class="fas fa-globe"></i>Website: www.grandocean.com</p>
+            </div>
+            
+            <div class="btn-group">
+                <button class="action-btn" onclick="openEditModal()">Chỉnh Sửa Thông Tin</button>
+                <a href="/" class="action-btn">Quay Lại Trang Chủ</a>
+                <a href="/my-bookings" class="action-btn">Lịch Sử Đặt Phòng</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit"></i> Chỉnh Sửa Thông Tin</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="edit-name">
+                        <i class="fas fa-user"></i>Họ và Tên <span class="required">*</span>
+                    </label>
+                    <input type="text" id="edit-name" name="name" required 
+                           th:value="${customer != null ? customer.name : (user != null ? user.username : '')}"
+                           placeholder="Nhập họ và tên của bạn">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-email">
+                        <i class="fas fa-envelope"></i>Email
+                    </label>
+                    <input type="email" id="edit-email" readonly 
+                           th:value="${customer != null ? customer.email : (user != null ? user.email : '')}"
+                           style="background-color: #e9ecef; cursor: not-allowed;">
+                    <small style="color: #6c757d; font-size: 12px;">Email không thể thay đổi</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-phone">
+                        <i class="fas fa-phone-alt"></i>Số Điện Thoại
+                    </label>
+                    <input type="tel" id="edit-phone" name="phone" 
+                           th:value="${customer != null ? customer.phone : ''}"
+                           placeholder="Nhập số điện thoại (10-11 chữ số)" 
+                           pattern="[0-9]{10,11}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-cccd">
+                        <i class="fas fa-id-card"></i>Số CMND/CCCD
+                    </label>
+                    <input type="text" id="edit-cccd" name="cccd" 
+                           th:value="${customer != null ? customer.cccd : ''}"
+                           placeholder="Nhập số CCCD (12 chữ số)" 
+                           pattern="[0-9]{12}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-address">
+                        <i class="fas fa-map-marker-alt"></i>Địa Chỉ
+                    </label>
+                    <textarea id="edit-address" name="address" 
+                              th:text="${customer != null ? customer.address : ''}"
+                              placeholder="Nhập địa chỉ của bạn"></textarea>
+                </div>
+                
+                <div class="password-section">
+                    <h4><i class="fas fa-lock"></i> Thay Đổi Mật Khẩu (Tùy chọn)</h4>
+                    
+                    <div class="form-group">
+                        <label for="current-password">
+                            <i class="fas fa-key"></i>Mật Khẩu Hiện Tại
+                        </label>
+                        <input type="password" id="current-password" name="currentPassword" 
+                               placeholder="Nhập mật khẩu hiện tại">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new-password">
+                            <i class="fas fa-lock"></i>Mật Khẩu Mới
+                        </label>
+                        <input type="password" id="new-password" name="newPassword" 
+                               placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">
+                            <i class="fas fa-lock"></i>Xác Nhận Mật Khẩu Mới
+                        </label>
+                        <input type="password" id="confirm-password" name="confirmPassword" 
+                               placeholder="Nhập lại mật khẩu mới">
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> Hủy Bỏ
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu Thay Đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Hamburger menu
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'info', title = '', duration = 5000) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            const titles = {
+                success: title || 'Thành công!',
+                error: title || 'Lỗi!',
+                warning: title || 'Cảnh báo!',
+                info: title || 'Thông tin!'
+            };
+            
+            toast.innerHTML = `
+                <i class="toast-icon ${icons[type]}"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="removeToast(this.parentElement)">&times;</button>
+                <div class="toast-progress"></div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast with animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                removeToast(toast);
+            }, duration);
+            
+            return toast;
+        }
+        
+        function removeToast(toast) {
+            if (toast && toast.parentElement) {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.parentElement.removeChild(toast);
+                    }
+                }, 400);
+            }
+        }
+
+        // Modal functions
+        function openEditModal() {
+            editModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            editModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const currentPassword = document.getElementById('current-password').value;
+
+            if (newPassword && newPassword !== confirmPassword) {
+                showToast('Mật khẩu xác nhận không khớp!', 'error');
+                return false;
+            }
+
+            if (newPassword && !currentPassword) {
+                showToast('Vui lòng nhập mật khẩu hiện tại!', 'warning');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Form submission
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = editForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            submitBtn.disabled = true;
+            editForm.classList.add('loading');
+
+            try {
+                const formData = new FormData(editForm);
+                
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success', 'Cập nhật thành công!');
+                    
+                    // Update display data
+                    if (result.data) {
+                        document.getElementById('display-name').textContent = result.data.name;
+                        document.getElementById('welcome-name').textContent = result.data.name;
+                        document.getElementById('display-phone').textContent = result.data.phone;
+                        document.getElementById('display-address').textContent = result.data.address;
+                        document.getElementById('display-cccd').textContent = result.data.cccd;
+                    }
+                    
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        closeEditModal();
+                    }, 2000);
+                } else {
+                    showToast(result.message, 'error', 'Cập nhật thất bại!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại!', 'error', 'Lỗi hệ thống!');
+            } finally {
+                // Reset loading state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                editForm.classList.remove('loading');
+            }
+        });
+
+        // Password validation on input
+        const newPassword = document.getElementById('new-password');
+        const confirmPassword = document.getElementById('confirm-password');
+        const currentPassword = document.getElementById('current-password');
+
+        function validatePasswords() {
+            if (newPassword.value && newPassword.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Mật khẩu xác nhận không khớp');
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+            
+            if (newPassword.value && !currentPassword.value) {
+                currentPassword.setCustomValidity('Vui lòng nhập mật khẩu hiện tại');
+            } else {
+                currentPassword.setCustomValidity('');
+            }
+        }
+
+        newPassword.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+        currentPassword.addEventListener('input', validatePasswords);
+
+        // Test toast notifications (you can remove this)
+        // showToast('Chào mừng bạn đến với trang profile!', 'info', 'Thông báo!');
+    </script>
+</body>
+</html>

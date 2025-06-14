@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Đặt phòng khách sạn, khám phá khu vui chơi và dịch vụ tại Đà Nẵng với ưu đãi độc quyền!">
+    <title>Đặt Phòng Khách Sạn Đà Nẵng - Khám phá thành phố biển</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        body {
+            background-color: #f5f8ff;
+            color: #003580;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: auto;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fade {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .animate-slide {
+            opacity: 0;
+            animation: slideIn 0.8s ease-out forwards;
+        }
+        /* Navbar */
+        nav {
+            background: #fff;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #003580;
+            text-decoration: none;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+        }
+        nav .nav-links a {
+            color: #003580;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav .nav-links a:hover, nav .nav-links a.active {
+            background: #e6f0fa;
+            color: #003580;
+        }
+        nav .nav-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        nav .nav-options select {
+            border: none;
+            background: transparent;
+            color: #003580;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        nav .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        nav .auth-btn {
+            background: transparent;
+            color: #003580;
+            border: 1px solid #003580;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav .auth-btn.register {
+            background: #0071c2;
+            color: white;
+            border: none;
+        }
+        nav .auth-btn:hover {
+            background: #e6f0fa;
+            color: #003580;
+        }
+        nav .auth-btn.register:hover {
+            background: #0051a2;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #003580;
+        }
+        /* Header */
+        header {
+            position: relative;
+            height: 500px;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop') no-repeat center/cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            animation: fadeIn 1s ease-out;
+        }
+        header p {
+            font-size: 18px;
+            max-width: 600px;
+            animation: fadeIn 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+        /* Search Bar */
+        .search-bar-container {
+            background: #febb02;
+            padding: 16px;
+            margin: -60px auto 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 1000px;
+            position: relative;
+            z-index: 1;
+        }
+        .search-tabs {
+            display: flex;
+            background: #fff;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        .search-tabs button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #fff;
+            color: #003580;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-tabs button.active {
+            background: #e6f0fa;
+            font-weight: 700;
+        }
+        .search-tabs button:hover {
+            background: #f5f6fa;
+        }
+        .search-bar {
+            background: #fff;
+            padding: 13px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-radius: 0 0 8px 8px;
+        }
+        .search-bar .input-group {
+            flex: 1;
+            position: relative;
+        }
+        .search-bar input, .search-bar select {
+            width: 100%;
+            padding: 12px 12px 12px 36px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .search-bar input:focus, .search-bar select:focus {
+            border-color: #003580;
+            outline: none;
+        }
+        .search-bar .input-group i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .search-bar button {
+            background: #0071c2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .search-bar button:hover {
+            background: #0051a2;
+            transform: scale(1.05);
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        .modal-content h2 {
+            font-size: 20px;
+            color: #003580;
+            margin-bottom: 16px;
+        }
+        .modal-content .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-content input, .modal-content select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .modal-content button {
+            background: #0071c2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .modal-content button:hover {
+            background: #0051a2;
+        }
+        /* Property Types */
+        .property-types {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 16px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #003580;
+            margin-bottom: 16px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        .property-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .property-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .property-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .property-card .content {
+            padding: 12px;
+            text-align: center;
+        }
+        .property-card h3 {
+            font-size: 16px;
+            color: #003580;
+            margin-bottom: 8px;
+        }
+        .property-card p {
+            font-size: 14px;
+            color: #666;
+        }
+        /* Featured Hotels */
+        .featured-hotels {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 16px;
+        }
+        .hotel-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .hotel-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+            display: block; /* Added for <a> tag behavior */
+            text-decoration: none; /* Added for <a> tag behavior */
+            color: inherit; /* Added for <a> tag behavior */
+        }
+        .hotel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .hotel-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .hotel-card .content {
+            padding: 12px;
+        }
+        .hotel-card h3 {
+            font-size: 18px;
+            color: #003580;
+            margin-bottom: 8px;
+        }
+        .hotel-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .hotel-card .rating {
+            font-size: 14px;
+            color: #008009;
+            background: #e6f0e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .hotel-card .price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #003580;
+            margin-bottom: 12px;
+        }
+        .hotel-card button.book-now { /* Made selector more specific */
+            background: #0071c2;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .hotel-card button.book-now:hover { /* Made selector more specific */
+            background: #0051a2;
+            transform: scale(1.05);
+        }
+        /* Offers */
+        .offers {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 16px;
+        }
+        .offer-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .offer-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .offer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .offer-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .offer-card .content {
+            padding: 12px;
+        }
+        .offer-card h3 {
+            font-size: 18px;
+            color: #003580;
+            margin-bottom: 8px;
+        }
+        .offer-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        .offer-card button {
+            background: #0071c2;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .offer-card button:hover {
+            background: #0051a2;
+            transform: scale(1.05);
+        }
+        /* Stay Ideas */
+        .stay-ideas {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 16px;
+        }
+        .idea-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .idea-card {
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .idea-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .idea-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .idea-card .content {
+            padding: 12px;
+            background: #fff;
+        }
+        .idea-card h3 {
+            font-size: 18px;
+            color: #003580;
+            margin-bottom: 8px;
+        }
+        .idea-card p {
+            font-size: 14px;
+            color: #666;
+        }
+        /* Carousel for Entertainment Areas and Services */
+        .entertainment-areas, .services {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 16px;
+            position: relative;
+        }
+        .carousel {
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            cursor: grab;
+        }
+        .carousel-track.dragging {
+            cursor: grabbing;
+            transition: none;
+        }
+        .carousel-card {
+            flex: 0 0 300px;
+            margin-right: 16px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .carousel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .carousel-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .carousel-card .content {
+            padding: 12px;
+        }
+        .carousel-card h3 {
+            font-size: 18px;
+            color: #003580;
+            margin-bottom: 8px;
+        }
+        .carousel-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .carousel-card .details {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        .carousel-card .button-group {
+            display: flex;
+            gap: 8px;
+        }
+        .carousel-card button {
+            flex: 1;
+            background: #0071c2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .carousel-card button.tour-btn {
+            background: #febb02;
+            color: #003580;
+        }
+        .carousel-card button:hover {
+            background: #0051a2;
+            transform: scale(1.05);
+        }
+        .carousel-card button.tour-btn:hover {
+            background: #e6a602;
+        }
+        /* Footer */
+        footer {
+            background: #003580;
+            color: white;
+            padding: 40px 16px;
+        }
+        footer .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        footer .footer-column h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        footer .footer-column ul {
+            list-style: none;
+        }
+        footer .footer-column ul li {
+            margin-bottom: 8px;
+        }
+        footer .footer-column ul li a {
+            color: #e0e0e0;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        footer .footer-column ul li a:hover {
+            color: #febb02;
+        }
+        footer .newsletter {
+            margin-top: 20px;
+        }
+        footer .newsletter input {
+            padding: 10px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            width: 200px;
+        }
+        footer .newsletter button {
+            padding: 10px;
+            border: none;
+            background: #0071c2;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        footer .newsletter button:hover {
+            background: #0051a2;
+        }
+        footer .social-icons {
+            margin: 20px 0;
+            text-align: center;
+        }
+        footer .social-icons a {
+            color: white;
+            font-size: 20px;
+            margin: 0 12px;
+            transition: color 0.3s, transform 0.3s;
+        }
+        footer .social-icons a:hover {
+            color: #febb02;
+            transform: scale(1.2);
+        }
+        footer .footer-bottom {
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        footer .footer-bottom p {
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav .nav-links, nav .auth-buttons, nav .nav-options {
+                display: none;
+            }
+            nav .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                padding: 16px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .hamburger {
+                display: block;
+            }
+            header {
+                height: 400px;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+            header p {
+                font-size: 16px;
+            }
+            .search-bar-container {
+                margin: -40px 16px 20px;
+            }
+            .search-bar {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .search-tabs {
+                flex-wrap: wrap;
+            }
+            .search-tabs button {
+                flex: none;
+                width: 50%;
+            }
+            .property-list, .hotel-list, .offer-list, .idea-list {
+                grid-template-columns: 1fr;
+            }
+            .carousel-card {
+                flex: 0 0 280px;
+            }
+            .modal-content {
+                width: 95%;
+            }
+            .animate-slide, .animate-fade {
+                animation: none;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav>
+            <div class="nav-container">
+                <a href="/" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
+                <div class="hamburger" aria-label="Menu" role="button">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/" class="active">Trang chủ</a></li>
+                    <li><a href="/rooms">Khách sạn Đà Nẵng</a></li>
+                    <li><a href="/bookings">Đặt phòng của tôi</a></li>
+                    <li><a href="/reviews">Đánh giá</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                    <li><a href="/contact">Liên hệ</a></li>
+                </ul>
+                <div class="nav-options">
+                    <select aria-label="Ngôn ngữ">
+                        <option>Tiếng Việt</option>
+                        <option>English</option>
+                    </select>
+                </div>
+                <div class="auth-buttons">
+                    <button class="auth-btn" aria-label="Đăng nhập"><a style="text-decoration: none; color: #003580;" href="/login">Đăng Nhập</a></button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header>
+            <h1>Khám phá Đà Nẵng - Thành phố biển đáng sống</h1>
+            <p>Đặt chỗ nghỉ dưỡng, khám phá khu vui chơi và trải nghiệm dịch vụ độc đáo tại Đà Nẵng, từ bãi biển Mỹ Khê đến cầu Rồng huyền thoại!</p>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar-container">
+            <div class="search-tabs">
+                <button class="active">Lưu trú</button>
+                <button>Chuyến bay</button>
+                <button>Chuyến bay + Khách sạn</button>
+                <button>Tour Đà Nẵng</button>
+            </div>
+            <form class="search-bar" th:action="@{/search}" method="get" id="search-form">
+                <div class="input-group">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" name="location" value="Đà Nẵng" placeholder="Đà Nẵng, Hội An, Huế..." aria-label="Địa điểm" id="location">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" aria-label="Ngày nhận phòng" id="check-in">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" aria-label="Ngày trả phòng" id="check-out">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-users"></i>
+                    <select name="guests" aria-label="Số lượng khách" id="guests">
+                        <option value="2">2 người lớn, 0 trẻ em, 1 phòng</option>
+                        <option value="1">1 người lớn, 0 trẻ em, 1 phòng</option>
+                        <option value="4">4 người lớn, 0 trẻ em, 2 phòng</option>
+                        <option value="3">2 người lớn, 2 trẻ em, 1 phòng</option>
+                    </select>
+                </div>
+                <button type="submit">Tìm kiếm</button>
+            </form>
+        </div>
+
+        <!-- Booking Modal -->
+        <div class="modal" id="booking-modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Đặt phòng</h2>
+                <form th:action="@{/bookings}" method="post" id="booking-form">
+                    <input type="hidden" name="roomId" id="selected-room-id">
+                    <input type="text" name="customerName" placeholder="Họ và tên" aria-label="Họ và tên" required>
+                    <input type="email" name="email" placeholder="Email" aria-label="Email" required>
+                    <input type="tel" name="phone" placeholder="Số điện thoại" aria-label="Số điện thoại" required>
+                    <input type="text" name="address" placeholder="Địa chỉ" aria-label="Địa chỉ" required>
+                    <input type="date" name="checkInDate" aria-label="Ngày nhận phòng" required>
+                    <input type="date" name="checkOutDate" aria-label="Ngày trả phòng" required>
+                    <select name="voucherId" aria-label="Mã giảm giá">
+                        <option value="">Chọn mã giảm giá (nếu có)</option>
+                        <option th:each="voucher : ${vouchers}" 
+                                th:value="${voucher.voucherId}" 
+                                th:text="${voucher.code + ' - Giảm ' + voucher.discount + '%'}">
+                        </option>
+                    </select>
+                    <button type="submit">Xác nhận đặt phòng</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Property Types -->
+        <div class="property-types">
+            <h2 class="section-title">Tìm loại hình lưu trú tại Đà Nẵng</h2>
+            <div class="property-list">
+                <div class="property-card animate-slide" style="animation-delay: 0.2s;" th:each="type, iterStat : ${roomTypes}">
+                    <img th:src="${type.imageUrl}" th:alt="${type.name}" src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
+                    <div class="content">
+                        <h3 th:text="${type.name}">Khách sạn biển</h3>
+                        <p th:text="${type.description}">Thưởng thức tầm nhìn biển Mỹ Khê với tiện nghi 5 sao.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Hotels -->
+        <div class="featured-hotels">
+            <h2 class="section-title">Khách sạn nổi bật tại Đà Nẵng</h2>
+            <div class="hotel-list">
+                <!-- MODIFIED hotel-card to be a link -->
+                <a th:each="room, iterStat : ${featuredRooms}" 
+                   th:href="@{/room/{id}(id=${room.roomId})}" 
+                   class="hotel-card animate-slide" 
+                   th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : '/placeholder.svg?height=180&width=280'}" 
+                         th:alt="${room.type}" 
+                         src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
+                    <div class="content">
+                        <h3 th:text="${room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${room.description}">Mỹ Khê Beach - Gần cầu Rồng</p>
+                        <div class="rating" th:if="${room.averageRating != null}" th:text="${room.averageRating}">8.7</div>
+                        <p class="price" th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫ / đêm'">1,800,000 ₫ / đêm</p>
+                        <button class="book-now" 
+                                th:data-room-id="${room.roomId}" 
+                                th:data-room-name="${room.type}" 
+                                th:attr="onclick='openBookingModal(this); event.stopPropagation(); return false;'">Đặt ngay</button>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Offers -->
+        <div class="offers">
+            <h2 class="section-title">Ưu đãi đặc biệt tại Đà Nẵng</h2>
+            <div class="offer-list">
+                <div class="offer-card animate-slide" th:each="voucher, iterStat : ${activeVouchers}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Ưu đãi">
+                    <div class="content">
+                        <h3 th:text="'Giảm ' + ${#numbers.formatDecimal(voucher.discount, 0, 'COMMA', 0, 'POINT')} + '% với mã ' + ${voucher.code}">Thoát khỏi thành phố tại Mỹ Khê</h3>
+                        <p th:text="'Áp dụng từ ' + ${#temporals.format(voucher.startDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(voucher.endDate, 'dd/MM/yyyy')}">
+                            Giảm 25% cho các khách sạn 4-5 sao tại bãi biển Mỹ Khê, bao gồm bữa sáng miễn phí.
+                        </p>
+                        <button onclick="copyVoucherCode(this)" th:data-code="${voucher.code}">Sao chép mã</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="featured-hotels">
+            <h2 class="section-title">Đánh giá gần đây</h2>
+            <div class="hotel-list">
+                <div class="hotel-card animate-slide" th:each="review, iterStat : ${recentReviews}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <div class="content">
+                        <h3 th:text="${review.room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${review.customer.name}">Khách hàng</p>
+                        <div class="rating" th:text="${review.rating} + '/5'">8.7</div>
+                        <p th:text="${review.comment}">Phòng rất đẹp và sạch sẽ</p>
+                        <p style="font-size: 12px; color: #999;" th:text="${#temporals.format(review.reviewDate, 'dd/MM/yyyy')}">01/01/2025</p>
+                        <div th:if="${review.response != null}" style="background: #f5f5f5; padding: 8px; margin-top: 8px; border-radius: 4px;">
+                            <strong>Phản hồi từ khách sạn:</strong>
+                            <p th:text="${review.response}" style="margin: 4px 0 0 0; font-size: 13px;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="featured-hotels">
+            <h2 class="section-title">Đặt phòng gần đây</h2>
+            <div class="hotel-list">
+                <div class="hotel-card animate-slide" th:each="booking, iterStat : ${recentBookings}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                    <div class="content">
+                        <h3 th:text="${booking.room.type}">Ocean Breeze Hotel</h3>
+                        <p th:text="${booking.customer.name}">Khách hàng</p>
+                        <p th:text="'Từ ' + ${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">
+                            Từ 01/01/2025 đến 03/01/2025
+                        </p>
+                        <div class="rating" 
+                             th:text="${booking.status.statusName}"
+                             th:class="${booking.status.statusName == 'CONFIRMED' ? 'rating' : 'rating'}"
+                             th:style="${booking.status.statusName == 'CONFIRMED' ? 'background: #e6f0e6; color: #008009;' : 
+                                       booking.status.statusName == 'PENDING' ? 'background: #fff3cd; color: #856404;' : 
+                                       booking.status.statusName == 'CANCELLED' ? 'background: #f8d7da; color: #721c24;' : 
+                                       'background: #d1ecf1; color: #0c5460;'}">
+                            CONFIRMED
+                        </div>
+                        <p class="price" th:text="${#numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫ / đêm'">1,800,000 ₫ / đêm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-column">
+                    <h4>Về chúng tôi</h4>
+                    <ul>
+                        <li><a href="/about">Giới thiệu</a></li>
+                        <li><a href="#">Cách hoạt động</a></li>
+                        <li><a href="/posts">Tin tức du lịch Đà Nẵng</a></li>
+                        <li><a href="#">Nghề nghiệp</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Khách hàng</h4>
+                    <ul>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Hướng dẫn đặt phòng</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Đối tác</h4>
+                    <ul>
+                        <li><a href="#">Đăng ký chỗ nghỉ</a></li>
+                        <li><a href="#">Chương trình đối tác</a></li>
+                        <li><a href="#">Hỗ trợ đối tác</a></li>
+                        <li><a href="#">Quảng cáo tại Đà Nẵng</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Liên hệ</h4>
+                    <ul>
+                        <li><a href="#">Trung tâm hỗ trợ</a></li>
+                        <li><a href="/contact">Liên hệ chúng tôi</a></li>
+                        <li><a href="#">0935123456</a></li>
+                        <li><a href="#">support@datphong.com</a></li>
+                    </ul>
+                    <div class="newsletter">
+                        <h4>Đăng ký nhận ưu đãi Đà Nẵng</h4>
+                        <form th:action="@{/newsletter}" method="post">
+                            <input type="email" name="email" placeholder="Nhập email của bạn" aria-label="Email đăng ký nhận tin" required>
+                            <button type="submit">Đăng ký</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Đặt Phòng Khách Sạn Đà Nẵng. Mọi quyền được bảo lưu.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script th:inline="javascript">
+        // Hamburger Menu
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', navLinks.classList.contains('active'));
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        // Search Tabs
+        const tabs = document.querySelectorAll('.search-tabs button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Search Form Validation
+        const searchForm = document.getElementById('search-form');
+        searchForm.addEventListener('submit', (e) => {
+            const location = document.getElementById('location').value;
+            const checkIn = document.getElementById('check-in').value;
+            const checkOut = document.getElementById('check-out').value;
+
+            if (!location) {
+                alert('Vui lòng nhập địa điểm!');
+                e.preventDefault();
+                return;
+            }
+            if (!checkIn || !checkOut) {
+                alert('Vui lòng chọn ngày nhận và trả phòng!');
+                e.preventDefault();
+                return;
+            }
+            if (new Date(checkIn) >= new Date(checkOut)) {
+                alert('Ngày trả phòng phải sau ngày nhận phòng!');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        // Booking Modal
+        const modal = document.getElementById('booking-modal');
+        const closeModal = document.querySelector('.modal .close');
+        // const bookingForm = document.getElementById('booking-form'); // Not directly used here for opening
+
+        // NEW function to open booking modal
+        function openBookingModal(buttonElement) {
+            // event.stopPropagation(); // Handled inline to ensure it's called
+            // event.preventDefault(); // Handled by return false inline
+
+            const roomId = buttonElement.getAttribute('data-room-id');
+            document.getElementById('selected-room-id').value = roomId;
+
+            // Attempt to prefill dates from main search bar
+            const checkInDateFromSearch = document.getElementById('check-in').value;
+            const checkOutDateFromSearch = document.getElementById('check-out').value;
+            
+            const modalCheckInInput = modal.querySelector('input[name="checkInDate"]');
+            const modalCheckOutInput = modal.querySelector('input[name="checkOutDate"]');
+
+            if (modalCheckInInput && checkInDateFromSearch) {
+                modalCheckInInput.value = checkInDateFromSearch;
+            }
+            if (modalCheckOutInput && checkOutDateFromSearch) {
+                modalCheckOutInput.value = checkOutDateFromSearch;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // OLD event listener for bookButtons is no longer needed as it's inline now
+        /*
+        const bookButtons = document.querySelectorAll('.book-now');
+        bookButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const roomId = button.getAttribute('data-room-id');
+                const roomName = button.getAttribute('data-room-name');
+                document.getElementById('selected-room-id').value = roomId;
+                modal.style.display = 'flex';
+            });
+        });
+        */
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Copy voucher code function
+        function copyVoucherCode(button) {
+            const code = button.getAttribute('data-code');
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Đã sao chép!';
+                setTimeout(() => {
+                    button.textContent = 'Sao chép mã';
+                }, 2000);
+            });
+        }
+
+    </script>
+</body>
+</html>

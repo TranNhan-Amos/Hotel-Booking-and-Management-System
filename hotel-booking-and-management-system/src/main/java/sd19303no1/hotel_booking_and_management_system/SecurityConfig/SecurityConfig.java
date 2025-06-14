@@ -30,7 +30,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Tạm thời vô hiệu hóa CSRF để dễ test
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
-                    "/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/room/**", "/search"
+                    "/", "/login", "/register", "/css/**","/Css/**", "/js/**", "/images/**", "/room/**", "/search"
                 ).permitAll()
                 .requestMatchers("/dashboard/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

@@ -1,33 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet"  th:href="@{Css/Narbar.css}">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/narbar.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-     <nav>
+    <div th:fragment="narbar">
+        <nav>
             <div class="nav-container">
                 <a href="/" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
-                <div class="hamburger" aria-label="Menu" role="button">
+                <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul class="nav-links">
-                    <li><a href="/" class="active">Trang chủ</a></li>
-                    <li><a href="/ListRoom">Khách sạn Đà Nẵng</a></li>
+                    <li><a href="/" >Trang chủ</a></li>
+                    <li><a href="/ListRoom" >Khách sạn Đà Nẵng</a></li>
                     <li><a href="/bookings">Đặt phòng của tôi</a></li>
                     <li><a href="/feedbackuser">Đánh giá</a></li>
-                    <li><a href="/About">Giới thiệu</a></li>
-                    <li><a href="/Contact">Liên hệ</a></li>
+                    <li><a href="/About" >Giới thiệu</a></li>
+                    <li><a href="/Contact" >Liên hệ</a></li>
                 </ul>
                 <div class="nav-options">
                     <select aria-label="Ngôn ngữ">
-                        <option>Tiếng Việt</option>
-                        <option>English</option>
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="en">English</option>
                     </select>
                 </div>
                 <div class="auth-buttons">
-                    <button class="auth-btn" aria-label="Đăng nhập"><a style="text-decoration: none; color: #003580;" href="/login">Đăng Nhập</a></button>
+                    <a href="/login" class="auth-btn" aria-label="Đăng nhập">Đăng Nhập</a>
                 </div>
             </div>
         </nav>
+    </div>
 </body>
 </html>

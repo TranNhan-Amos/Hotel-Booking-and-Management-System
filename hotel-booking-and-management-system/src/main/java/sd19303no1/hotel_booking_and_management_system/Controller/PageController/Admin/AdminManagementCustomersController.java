@@ -3,9 +3,13 @@ package sd19303no1.hotel_booking_and_management_system.Controller.PageController
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Controller
 public class AdminManagementCustomersController {
-    
+     @GetMapping("/admin/customers")
+    public String viewCustomerManagementPage() {
+        return "Admin/management-Customers";
+    }
 }

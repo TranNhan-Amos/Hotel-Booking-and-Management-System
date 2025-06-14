@@ -60,7 +60,7 @@ public class IndexController {
         List<BookingOrderEntity> recentBookings = bookingOrderService.getRecentBookings(6);
         model.addAttribute("recentBookings", recentBookings);
 
-        return "Page/index";
+        return "Page/Index";
     }
 
     @GetMapping("/search")

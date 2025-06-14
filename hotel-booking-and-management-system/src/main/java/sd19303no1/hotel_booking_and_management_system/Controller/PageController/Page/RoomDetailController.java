@@ -34,7 +34,7 @@ public class RoomDetailController {
         if (room == null) {
             return "redirect:/"; // Redirect về trang chủ nếu không tìm thấy phòng
         }
-
+        
         // Tính rating trung bình cho phòng
         Double avgRating = reviewService.getAverageRatingByRoomId(id);
         room.setAverageRating(avgRating != null ? avgRating : 0.0);

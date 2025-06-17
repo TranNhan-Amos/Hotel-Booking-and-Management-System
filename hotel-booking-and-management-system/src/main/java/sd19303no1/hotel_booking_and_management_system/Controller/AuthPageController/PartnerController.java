@@ -165,10 +165,11 @@ public class PartnerController {
 public String RoomPartner(@PathVariable("partnerId") Long partnerId, Model model) {
     List<RoomPartnerEntity> roomPartners = roomPartnerService.findByPartnerId(partnerId);
    
-    
     RoomPartnerEntity roomPartner = new RoomPartnerEntity();
     roomPartner.setPartnerId(partnerId);
+
     model.addAttribute("roomPartners", roomPartners);
+    model.addAttribute("roomPartner", roomPartner);
     return "Partner/RoomPartner";
 }
 

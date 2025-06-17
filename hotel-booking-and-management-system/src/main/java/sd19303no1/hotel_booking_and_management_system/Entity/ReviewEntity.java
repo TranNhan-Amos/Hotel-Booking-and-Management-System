@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class ReviewEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Thêm dòng này
     @Column(name = "review_id")
     private Integer reviewId;
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -481,7 +481,7 @@
                         <tr>
                             <th>Hình ảnh</th>
                             <th>Tên phòng</th>
-                            <th>Loại phòng</th>
+                            <th>Loại giường</th>
                             <th>Giá (VND)</th>
                             <th>Sức chứa</th>
                             <th>Trạng thái</th>
@@ -489,37 +489,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr th:each="roomPartner : ${roomPartners}">
                             <td><img src="https://via.placeholder.com/60x40" alt="Room" class="room-image"></td>
-                            <td>Deluxe Ocean View</td>
-                            <td>Deluxe</td>
-                            <td>3.450.000</td>
-                            <td>2 người</td>
-                            <td><span class="room-status status-available">Còn trống</span></td>
-                            <td>
-                                <button class="action-btn">Chỉnh sửa</button>
-                                <button class="action-btn">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><img src="https://via.placeholder.com/60x40" alt="Room" class="room-image"></td>
-                            <td>Suite Family</td>
-                            <td>Suite</td>
-                            <td>5.200.000</td>
-                            <td>4 người</td>
-                            <td><span class="room-status status-unavailable">Đã đầy</span></td>
-                            <td>
-                                <button class="action-btn">Chỉnh sửa</button>
-                                <button class="action-btn">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><img src="https://via.placeholder.com/60x40" alt="Room" class="room-image"></td>
-                            <td>Standard Double</td>
-                            <td>Standard</td>
-                            <td>2.100.000</td>
-                            <td>2 người</td>
-                            <td><span class="room-status status-available">Còn trống</span></td>
+                            <td th:text="${roomPartner.bathroomType}" >Deluxe Ocean View</td>
+                            <td th:text="${roomPartner.bedType}">Deluxe</td>
+                            <td th:text="${roomPartner.price}"></td>
+                            <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
+                            <td th:text="${roomPartner.status}"><span class="room-status status-available">Còn trống</span></td>
                             <td>
                                 <button class="action-btn">Chỉnh sửa</button>
                                 <button class="action-btn">Xóa</button>

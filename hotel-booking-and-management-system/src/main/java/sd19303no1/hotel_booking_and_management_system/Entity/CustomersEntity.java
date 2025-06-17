@@ -37,7 +37,7 @@ public class CustomersEntity {
     @Column(name = "status")
     private String status;
 
-        @OneToOne
+    @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private SystemUserEntity systemUser;
 

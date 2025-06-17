@@ -1,22 +1,34 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.AuthPageController;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.PartnerService;
+import sd19303no1.hotel_booking_and_management_system.Service.RoomPartnerService;
 import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class PartnerController {
+
+    @Autowired
+    private RoomPartnerService roomPartnerService;
     
     @Autowired
     private PartnerService partnerService;
@@ -149,8 +161,30 @@ public class PartnerController {
     public String DashboardPartner(Model model ) {
         return ("Partner/DashboardPartner");
     }
-        @GetMapping("/room/partner")
-    public String RoomPartner(Model model ) {
-        return ("Partner/RoomPartner");
+    @GetMapping("/room/partner/{partnerId}")
+public String RoomPartner(@PathVariable("partnerId") Long partnerId, Model model) {
+    List<RoomPartnerEntity> roomPartners = roomPartnerService.findByPartnerId(partnerId);
+   
+    
+    RoomPartnerEntity roomPartner = new RoomPartnerEntity();
+    roomPartner.setPartnerId(partnerId);
+    model.addAttribute("roomPartners", roomPartners);
+    return "Partner/RoomPartner";
+}
+
+@PostMapping("/room/partner/{partnerId}/add")
+public String addRoomPartner(
+        @PathVariable("partnerId") Long partnerId,
+        @ModelAttribute("roomPartner") @Valid RoomPartnerEntity roomPartner,
+        BindingResult result,
+        RedirectAttributes redirectAttributes) {
+    if (result.hasErrors()) {
+        return "Partner/AddRoomPartner";
     }
+    roomPartner.setPartnerId(partnerId);
+    roomPartnerService.save(roomPartner);
+    redirectAttributes.addFlashAttribute("success", "Thêm phòng mới thành công!");
+    return "redirect:/room/partner/" + partnerId;
+}
+
 }

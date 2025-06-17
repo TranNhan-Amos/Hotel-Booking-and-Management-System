@@ -56,7 +56,7 @@ public class PartnerController {
             model.addAttribute("hasPartnerInfo", false);
         }
         
-        return "Auth/Partner";
+        return "Partner/DashboardPartner";
     }
 
     @GetMapping("/partner/register")
@@ -93,7 +93,7 @@ public class PartnerController {
             model.addAttribute("partner", partner);
         }
 
-        return "Auth/PartnerRegister";
+        return "Partner/PartnerRegister";
     }
 
     @PostMapping("/partner/register")
@@ -143,5 +143,14 @@ public class PartnerController {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi đăng ký thông tin đối tác: " + e.getMessage());
             return "redirect:/partner/register";
         }
+    }
+
+    @GetMapping("/dashboard/partner")
+    public String DashboardPartner(Model model ) {
+        return ("Partner/DashboardPartner");
+    }
+        @GetMapping("/room/partner")
+    public String RoomPartner(Model model ) {
+        return ("Partner/RoomPartner");
     }
 }

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"  th:href="@{Css/About.css}">
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{/Layout/narbar}"></div>
+        <!-- Header -->
+        <header class="about-header">
+            <h1>Về Khách sạn Sang Trọng</h1>
+            <p>Khám phá hành trình mang đến trải nghiệm nghỉ dưỡng đẳng cấp tại Đà Nẵng, nơi dịch vụ tận tâm và tiện nghi hiện đại hòa quyện.</p>
+            <a href="/booking" class="cta-button">Đặt phòng ngay</a>
+        </header>
+
+        <!-- About Section -->
+        <div class="about-section">
+            <h2 class="section-title">Giới thiệu về chúng tôi</h2>
+            <div class="about-content animate-fade">
+                <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Khách sạn Sang Trọng">
+                <div class="about-text">
+                    <p>Khách sạn Sang Trọng tọa lạc tại trung tâm thành phố Đà Nẵng, gần bãi biển Mỹ Khê và các điểm tham quan nổi tiếng như cầu Rồng, cầu Sông Hàn. Chúng tôi tự hào mang đến không gian nghỉ dưỡng hiện đại, tiện nghi và dịch vụ chuyên nghiệp, đáp ứng mọi nhu cầu của khách du lịch và khách công tác.</p>
+                    <p>Với hơn một thập kỷ hoạt động, chúng tôi cam kết mang lại trải nghiệm tuyệt vời nhất thông qua thiết kế phòng nghỉ sang trọng, nhà hàng ẩm thực đa dạng, và các tiện ích cao cấp như spa, hồ bơi vô cực, và phòng gym hiện đại.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <h2 class="section-title">Lịch sử hình thành</h2>
+            <div class="history-content animate-fade">
+                <img src="https://images.unsplash.com/photo-1578683012567-b936e2fee946?q=80&w=2070&auto=format&fit=crop" alt="Lịch sử khách sạn">
+                <div class="history-text">
+                    <p>Khách sạn Sang Trọng được thành lập vào năm 2010 với tầm nhìn trở thành điểm đến nghỉ dưỡng hàng đầu tại Đà Nẵng. Từ một khách sạn boutique nhỏ, chúng tôi đã không ngừng phát triển, mở rộng quy mô và nâng cấp cơ sở vật chất để đáp ứng tiêu chuẩn quốc tế.</p>
+                    <p>Hiện nay, chúng tôi tự hào là một trong những khách sạn được yêu thích nhất tại Đà Nẵng, chào đón hàng ngàn du khách từ khắp nơi trên thế giới với dịch vụ tận tâm và chất lượng vượt trội.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vision & Mission Section -->
+        <div class="vision-mission-section animate-fade">
+            <h2 class="section-title">Tầm nhìn & Sứ mệnh</h2>
+            <div class="vision-mission-content">
+                <div class="vision-mission-card">
+                    <i class="fas fa-eye"></i>
+                    <h3>Tầm nhìn</h3>
+                    <p>Trở thành chuỗi khách sạn hàng đầu khu vực Đông Nam Á, mang đến trải nghiệm nghỉ dưỡng đẳng cấp và bền vững.</p>
+                </div>
+                <div class="vision-mission-card">
+                    <i class="fas fa-heart"></i>
+                    <h3>Sứ mệnh</h3>
+                    <p>Cung cấp dịch vụ tận tâm, tạo nên những kỷ niệm đáng nhớ cho khách hàng thông qua không gian sang trọng và chất lượng vượt trội.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Values Section -->
+        <div class="values-section">
+            <h2 class="section-title">Giá trị cốt lõi</h2>
+            <div class="values-list">
+                <div class="value-card animate-slide" style="animation-delay: 0.2s;">
+                    <i class="fas fa-heart"></i>
+                    <h3>Khách hàng là trung tâm</h3>
+                    <p>Chúng tôi luôn đặt sự hài lòng của khách hàng lên hàng đầu, mang đến trải nghiệm cá nhân hóa và dịch vụ tận tâm.</p>
+                </div>
+                <div class="value-card animate-slide" style="animation-delay: 0.4s;">
+                    <i class="fas fa-star"></i>
+                    <h3>Chất lượng vượt trội</h3>
+                    <p>Mọi chi tiết, từ thiết kế phòng nghỉ đến ẩm thực, đều được chăm chút để đạt tiêu chuẩn 5 sao.</p>
+                </div>
+                <div class="value-card animate-slide" style="animation-delay: 0.6s;">
+                    <i class="fas fa-leaf"></i>
+                    <h3>Bền vững và thân thiện</h3>
+                    <p>Cam kết bảo vệ môi trường thông qua vận hành bền vững và sử dụng tài nguyên hợp lý.</p>
+                </div>
+                <div class="value-card animate-slide" style="animation-delay: 0.8s;">
+                    <i class="fas fa-globe"></i>
+                    <h3>Đổi mới và toàn cầu hóa</h3>
+                    <p>Không ngừng đổi mới để đáp ứng xu hướng quốc tế và mang đến trải nghiệm đa dạng.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amenities Section -->
+        <div class="amenities-section">
+            <h2 class="section-title">Tiện ích nổi bật</h2>
+            <div class="amenities-list">
+                <div class="amenity-card animate-slide" style="animation-delay: 0.2s;">
+                    <img src="https://images.unsplash.com/photo-1519449556859-b63d5f741c88?q=80&w=2070&auto=format&fit=crop" alt="Hồ bơi vô cực">
+                    <div class="content">
+                        <h3>Hồ bơi vô cực</h3>
+                    </div>
+                </div>
+                <div class="amenity-card animate-slide" style="animation-delay: 0.4s;">
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Spa thư giãn">
+                    <div class="content">
+                        <h3>Spa thư giãn</h3>
+                    </div>
+                </div>
+                <div class="amenity-card animate-slide" style="animation-delay: 0.6s;">
+                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2070&auto=format&fit=crop" alt="Nhà hàng ẩm thực">
+                    <div class="content">
+                        <h3>Nhà hàng ẩm thực</h3>
+                    </div>
+                </div>
+                <div class="amenity-card animate-slide" style="animation-delay: 0.8s;">
+                    <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=2070&auto=format&fit=crop" alt="Phòng gym hiện đại">
+                    <div class="content">
+                        <h3>Phòng gym hiện đại</h3>
+                    </div>
+                </div>
+                <div class="amenity-card animate-slide" style="animation-delay: 1.0s;">
+                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop" alt="Phòng hội nghị">
+                    <div class="content">
+                        <h3>Phòng hội nghị</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partners Section -->
+        <div class="partners-section">
+            <h2 class="section-title">Đối tác của chúng tôi</h2>
+            <div class="partners-list">
+                <div class="partner-card animate-slide" style="animation-delay: 0.2s;">
+                    <img src="https://via.placeholder.com/150x100?text=TravelLux" alt="TravelLux">
+                    <h3>TravelLux</h3>
+                    <p>Cung cấp các tour du lịch độc quyền tại Đà Nẵng và miền Trung.</p>
+                </div>
+                <div class="partner-card animate-slide" style="animation-delay: 0.4s;">
+                    <img src="https://via.placeholder.com/150x100?text=AsiaSpa" alt="AsiaSpa">
+                    <h3>AsiaSpa</h3>
+                    <p>Đối tác cung cấp dịch vụ spa và chăm sóc sức khỏe cao cấp.</p>
+                </div>
+                <div class="partner-card animate-slide" style="animation-delay: 0.6s;">
+                    <img src="https://via.placeholder.com/150x100?text=FoodieHub" alt="FoodieHub">
+                    <h3>FoodieHub</h3>
+                    <p>Hợp tác cung cấp trải nghiệm ẩm thực độc đáo từ địa phương đến quốc tế.</p>
+                </div>
+                <div class="partner-card animate-slide" style="animation-delay: 0.8s;">
+                    <img src="https://via.placeholder.com/150x100?text=EcoTours" alt="EcoTours">
+                    <h3>EcoTours</h3>
+                    <p>Đồng hành trong các hoạt động du lịch bền vững và thân thiện với môi trường.</p>
+                </div>
+                <div class="partner-card animate-slide" style="animation-delay: 1.0s;">
+                    <img src="https://via.placeholder.com/150x100?text=GlobalEvents" alt="GlobalEvents">
+                    <h3>GlobalEvents</h3>
+                    <p>Tổ chức hội nghị và sự kiện chuyên nghiệp tại khách sạn.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Awards Section -->
+        <div class="awards-section">
+            <h2 class="section-title">Giải thưởng & Chứng nhận</h2>
+            <div class="awards-list">
+                <div class="award-card animate-slide" style="animation-delay: 0.2s;">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Khách sạn 5 sao</h3>
+                    <p>Được công nhận bởi Hiệp hội Du lịch Việt Nam, 2023.</p>
+                </div>
+                <div class="award-card animate-slide" style="animation-delay: 0.4s;">
+                    <i class="fas fa-medal"></i>
+                    <h3>Dịch vụ xuất sắc</h3>
+                    <p>Giải thưởng TripAdvisor Traveler’s Choice, 2022 & 2024.</p>
+                </div>
+                <div class="award-card animate-slide" style="animation-delay: 0.6s;">
+                    <i class="fas fa-leaf"></i>
+                    <h3>Du lịch bền vững</h3>
+                    <p>Chứng nhận Green Globe cho vận hành thân thiện môi trường, 2024.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sustainability Section -->
+        <div class="sustainability-section">
+            <h2 class="section-title">Cam kết bền vững</h2>
+            <div class="sustainability-content animate-fade">
+                <p>Chúng tôi cam kết vận hành theo các tiêu chuẩn bền vững, giảm thiểu tác động đến môi trường và hỗ trợ cộng đồng địa phương. Các sáng kiến của chúng tôi bao gồm sử dụng năng lượng tái tạo, giảm nhựa sử dụng một lần, và hợp tác với các nhà cung cấp địa phương.</p>
+                <div class="sustainability-list">
+                    <div class="sustainability-card animate-slide" style="animation-delay: 0.2s;">
+                        <i class="fas fa-solar-panel"></i>
+                        <p>Năng lượng tái tạo</p>
+                    </div>
+                    <div class="sustainability-card animate-slide" style="animation-delay: 0.4s;">
+                        <i class="fas fa-recycle"></i>
+                        <p>Giảm nhựa một lần</p>
+                    </div>
+                    <div class="sustainability-card animate-slide" style="animation-delay: 0.6s;">
+                        <i class="fas fa-hands-helping"></i>
+                        <p>Hỗ trợ cộng đồng</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Stories Section -->
+        <div class="stories-section">
+            <h2 class="section-title">Câu chuyện khách hàng</h2>
+            <div class="stories-container">
+                <div class="story-card animate-slide" style="animation-delay: 0.2s;">
+                    <p>"Kỳ nghỉ tại Khách sạn Sang Trọng là một trải nghiệm tuyệt vời! Phòng nghỉ sang trọng, dịch vụ tận tâm, và hồ bơi vô cực với tầm nhìn biển là điểm nhấn khó quên."</p>
+                    <div class="story-author">Nguyễn Thị Mai</div>
+                </div>
+                <div class="story-card animate-slide" style="animation-delay: 0.4s;">
+                    <p>"Tôi đã tổ chức hội nghị tại đây và mọi thứ đều hoàn hảo. Đội ngũ chuyên nghiệp, không gian hiện đại, và ẩm thực tuyệt ngon."</p>
+                    <div class="story-author">Trần Văn Hùng</div>
+                </div>
+                <div class="story-card animate-slide" style="animation-delay: 0.6s;">
+                    <p>"Gia đình tôi đã có một kỳ nghỉ tuyệt vời nhờ sự chăm sóc chu đáo của nhân viên khách sạn. Chắc chắn sẽ quay lại!"</p>
+                    <div class="story-author">Lê Minh Anh</div>
+                </div>
+            </div>
+        </div>
+        <div th:replace="~{/Layout/footer}"></div>
+    </div>
+</body>
+</html>

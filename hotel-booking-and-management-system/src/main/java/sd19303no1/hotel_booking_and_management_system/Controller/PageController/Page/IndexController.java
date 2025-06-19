@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.ReviewEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
@@ -62,6 +63,7 @@ public class IndexController {
 
         return "Page/Index";
     }
+    
 
     @GetMapping("/search")
     public String searchRooms(

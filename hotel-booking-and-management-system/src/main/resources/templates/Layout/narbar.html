@@ -1,37 +1,454 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/narbar.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet"  th:href="@{Css/Narbar.css}">
+    <style>
+       
+    </style>
 </head>
 <body>
-    <div th:fragment="narbar">
-        <nav>
-            <div class="nav-container">
-                <a href="/" class="logo" aria-label="Trang chủ Đặt Phòng KS">Đặt Phòng KS</a>
-                <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
-                    <i class="fas fa-bars"></i>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Logo -->
+            <a href="#" class="nav-brand">DaNang Travel</a>
+
+            <!-- Desktop Navigation Links -->
+            <div class="nav-links">
+                <a href="/">Trang chủ </a>
+                <a href="/ListRoom">Khách sạn tại đà nẵng </a>
+                <a href="/feedbackuser">Đánh giá</a>
+                <a href="/About">Giới thiệu</a>
+                <a href="/Contact">Liên hệ </a>
+
+            </div>
+
+
+            <!-- User Menu Container -->
+            <div class="user-menu-container">
+                <!-- User Menu (when logged in) -->
+                <div id="user-menu" class="user-menu" style="display: none;">
+                    <!-- Notification Bell -->
+                    <button class="notification-btn" onclick="handleNotificationClick()">
+                        <i data-lucide="bell" style="width: 1.25rem; height: 1.25rem;"></i>
+                        <span class="notification-badge" id="notification-badge">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="user-dropdown" style="position: relative;">
+                        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()">
+                            <div class="user-avatar" id="user-avatar">NA</div>
+                            <div class="user-info">
+                                <span class="user-name" id="user-name">Nguyễn Văn An</span>
+                                <div class="user-role">
+                                    <span id="user-role-text">Khách hàng</span>
+                                    <div class="admin-badge" id="admin-badge" style="display: none;">
+                                        <i data-lucide="shield" style="width: 0.75rem; height: 0.75rem;"></i>
+                                        Admin
+                                    </div>
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-down" class="chevron-icon"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <div class="dropdown-header">
+                                <div class="dropdown-user-name" id="dropdown-user-name">Nguyễn Văn An</div>
+                                <div class="dropdown-user-email" id="dropdown-user-email">nguyenvanan@example.com</div>
+                            </div>
+
+                            <div class="dropdown-section">
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="user" class="dropdown-icon"></i>
+                                    Thông tin cá nhân
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="book-open" class="dropdown-icon"></i>
+                                    Lịch sử đặt phòng
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="heart" class="dropdown-icon"></i>
+                                    Danh sách yêu thích
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="credit-card" class="dropdown-icon"></i>
+                                    Phương thức thanh toán
+                                </a>
+                            </div>
+
+                            <div class="dropdown-separator"></div>
+
+                            <div class="dropdown-section">
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="calendar" class="dropdown-icon"></i>
+                                    Đặt phòng sắp tới
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="map-pin" class="dropdown-icon"></i>
+                                    Địa điểm đã lưu
+                                </a>
+                            </div>
+
+                            <div class="dropdown-separator"></div>
+
+                            <!-- Admin Section (hidden by default) -->
+                            <div class="dropdown-section" id="admin-section" style="display: none;">
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="shield" class="dropdown-icon"></i>
+                                    Bảng điều khiển Admin
+                                </a>
+                                <div class="dropdown-separator"></div>
+                            </div>
+
+                            <div class="dropdown-section">
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="settings" class="dropdown-icon"></i>
+                                    Cài đặt
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i data-lucide="bell" class="dropdown-icon"></i>
+                                    Thông báo
+                                    <span class="notification-count" id="dropdown-notification-count">3</span>
+                                </a>
+                            </div>
+
+                            <div class="dropdown-separator"></div>
+
+                            <div class="dropdown-section">
+                                <button class="dropdown-item danger" onclick="handleLogout()">
+                                    <i data-lucide="log-out" class="dropdown-icon"></i>
+                                    Đăng xuất
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="/" >Trang chủ</a></li>
-                    <li><a href="/ListRoom" >Khách sạn Đà Nẵng</a></li>
-                    <li><a href="/bookings">Đặt phòng của tôi</a></li>
-                    <li><a href="/feedbackuser">Đánh giá</a></li>
-                    <li><a href="/About" >Giới thiệu</a></li>
-                    <li><a href="/Contact" >Liên hệ</a></li>
-                </ul>
-                <div class="nav-options">
-                    <select aria-label="Ngôn ngữ">
-                        <option value="vi">Tiếng Việt</option>
-                        <option value="en">English</option>
-                    </select>
+
+                <!-- Auth Buttons (when not logged in) -->
+                <div id="auth-buttons" class="auth-buttons">
+                    <a th:href="@{/login}" class="btn btn-ghost">Đăng nhập</a>
                 </div>
-                <div class="auth-buttons">
-                    <a href="/login" class="auth-btn" aria-label="Đăng nhập">Đăng Nhập</a>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu" onclick="closeMobileMenu(event)">
+        <div class="mobile-menu-content" onclick="event.stopPropagation()">
+            <div class="mobile-menu-header">
+                <span class="mobile-menu-title">Menu</span>
+                <button class="mobile-menu-close" onclick="closeMobileMenu()">
+                    <i data-lucide="x" style="width: 1.25rem; height: 1.25rem;"></i>
+                </button>
+            </div>
+            <div class="mobile-menu-body">
+                <!-- Mobile Search -->
+                <div class="mobile-search">
+                    <div style="position: relative;">
+                        <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af; width: 1rem; height: 1rem;"></i>
+                        <input type="text" class="search-input" placeholder="Tìm kiếm..." style="padding-left: 2.5rem;">
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Links -->
+                <div class="mobile-nav-links">
+                    <a href="#hotels">Khách sạn</a>
+                    <a href="#tours">Tour</a>
+                    <a href="#offers">Ưu đãi</a>
+                </div>
+
+                <!-- Mobile Auth Buttons (when not logged in) -->
+                <div id="mobile-auth-buttons" class="auth-buttons" style="flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="handleLogin()">
+                        <i data-lucide="user" style="width: 1rem; height: 1rem;"></i>
+                        Đăng nhập
+                    </button>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleRegister()">
+                        Đăng ký
+                    </button>
                 </div>
             </div>
-        </nav>
+        </div>
     </div>
+
+    <!-- Demo Content -->
+    <!-- <div class="demo-content">
+        <div class="demo-card">
+            <h1 class="demo-title">Demo Menu User cho Navbar</h1>
+            <p class="demo-description">
+                Menu user đã được tích hợp vào navbar với đầy đủ tính năng cho hệ thống đặt phòng khách sạn DaNang Travel
+            </p> -->
+
+            <!-- Toggle Demo Button -->
+            <!-- <div class="demo-toggle">
+                <button class="toggle-btn" onclick="toggleUserState()">
+                    <span id="toggle-text">Đăng nhập (Demo)</span>
+                </button>
+            </div> -->
+
+            <!-- Feature Grid -->
+            <!-- <div class="feature-grid">
+                <div class="feature-item">
+                    <h3 class="feature-title">Khi chưa đăng nhập:</h3>
+                    <ul class="feature-list">
+                        <li>Hiển thị nút "Đăng nhập" và "Đăng ký"</li>
+                        <li>Menu mobile responsive</li>
+                        <li>Chuyển hướng đến trang login</li>
+                        <li>Giao diện tối giản</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <h3 class="feature-title">Khi đã đăng nhập:</h3>
+                    <ul class="feature-list">
+                        <li>Avatar với fallback chữ cái đầu</li>
+                        <li>Hiển thị tên và email người dùng</li>
+                        <li>Badge phân biệt Admin/Customer</li>
+                        <li>Thông báo với số lượng chưa đọc</li>
+                        <li>Menu dropdown đầy đủ tính năng</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <h3 class="feature-title">Menu dropdown bao gồm:</h3>
+                    <ul class="feature-list">
+                        <li>Quản lý tài khoản cá nhân</li>
+                        <li>Lịch sử và quản lý đặt phòng</li>
+                        <li>Danh sách yêu thích</li>
+                        <li>Cài đặt và thông báo</li>
+                        <li>Quyền Admin (nếu có)</li>
+                        <li>Đăng xuất</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <h3 class="feature-title">Responsive Design:</h3>
+                    <ul class="feature-list">
+                        <li>Desktop: Menu dropdown đầy đủ</li>
+                        <li>Mobile: Menu overlay với navigation</li>
+                        <li>Tablet: Tối ưu cho màn hình trung bình</li>
+                        <li>Touch-friendly trên mobile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <script>
+        // Thêm vào script hiện tại
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserInfo();
+});
+
+function loadUserInfo() {
+    fetch('/api/user/current')
+        .then(response => response.json())
+        .then(data => {
+            if (data.username && data.role) {
+                updateUserDisplay(data.username, data.role);
+            }
+        })
+        .catch(error => {
+            console.log('Error loading user info:', error);
+        });
+}
+
+function updateUserDisplay(username, role) {
+    document.querySelector('.user-name').textContent = username;
+    document.querySelector('.user-role').textContent = getRoleDisplayName(role);
+}
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // User state management
+        let isLoggedIn = false;
+        let currentUser = {
+            name: "Nguyễn Văn An",
+            email: "nguyenvanan@example.com",
+            role: "CUSTOMER", // or "ADMIN"
+            avatar: null,
+            notifications: 3
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserInterface();
+        });
+
+        // Toggle user state for demo
+        function toggleUserState() {
+            isLoggedIn = !isLoggedIn;
+            
+            if (isLoggedIn) {
+                // Randomly assign role for demo
+                currentUser.role = Math.random() > 0.5 ? "ADMIN" : "CUSTOMER";
+            }
+            
+            updateUserInterface();
+        }
+
+        // Update UI based on login state
+        function updateUserInterface() {
+            const userMenu = document.getElementById('user-menu');
+            const authButtons = document.getElementById('auth-buttons');
+            const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+            const toggleText = document.getElementById('toggle-text');
+
+            if (isLoggedIn) {
+                userMenu.style.display = 'flex';
+                authButtons.style.display = 'none';
+                mobileAuthButtons.style.display = 'none';
+                toggleText.textContent = 'Đăng xuất (Demo)';
+                
+                updateUserInfo();
+            } else {
+                userMenu.style.display = 'none';
+                authButtons.style.display = 'flex';
+                mobileAuthButtons.style.display = 'flex';
+                toggleText.textContent = 'Đăng nhập (Demo)';
+            }
+        }
+
+        // Update user information in UI
+        function updateUserInfo() {
+            const initials = getInitials(currentUser.name);
+            
+            // Update avatar
+            document.getElementById('user-avatar').textContent = initials;
+            
+            // Update user info
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('dropdown-user-name').textContent = currentUser.name;
+            document.getElementById('dropdown-user-email').textContent = currentUser.email;
+            
+            // Update role
+            const roleText = document.getElementById('user-role-text');
+            const adminBadge = document.getElementById('admin-badge');
+            const adminSection = document.getElementById('admin-section');
+            
+            if (currentUser.role === 'ADMIN') {
+                roleText.style.display = 'none';
+                adminBadge.style.display = 'flex';
+                adminSection.style.display = 'block';
+            } else {
+                roleText.style.display = 'block';
+                roleText.textContent = 'Khách hàng';
+                adminBadge.style.display = 'none';
+                adminSection.style.display = 'none';
+            }
+            
+            // Update notification count
+            const notificationBadge = document.getElementById('notification-badge');
+            const dropdownNotificationCount = document.getElementById('dropdown-notification-count');
+            
+            if (currentUser.notifications > 0) {
+                notificationBadge.textContent = currentUser.notifications > 9 ? '9+' : currentUser.notifications;
+                notificationBadge.style.display = 'flex';
+                dropdownNotificationCount.textContent = currentUser.notifications;
+                dropdownNotificationCount.style.display = 'flex';
+            } else {
+                notificationBadge.style.display = 'none';
+                dropdownNotificationCount.style.display = 'none';
+            }
+        }
+
+        // Get initials from name
+        function getInitials(name) {
+            return name.split(' ')
+                      .map(word => word[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2);
+        }
+
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            const avatarBtn = document.getElementById('user-avatar-btn');
+            
+            dropdownMenu.classList.toggle('active');
+            avatarBtn.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userDropdown = document.querySelector('.user-dropdown');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            const avatarBtn = document.getElementById('user-avatar-btn');
+            
+            if (!userDropdown.contains(event.target)) {
+                dropdownMenu.classList.remove('active');
+                avatarBtn.classList.remove('active');
+            }
+        });
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        function closeMobileMenu(event) {
+            if (!event || event.target === event.currentTarget) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.remove('active');
+            }
+        }
+
+        // Handler functions
+        function handleLogin() {
+            console.log('Chuyển hướng đến trang đăng nhập');
+            // window.location.href = '/login';
+            alert('Chuyển hướng đến trang đăng nhập');
+        }
+
+        function handleRegister() {
+            console.log('Chuyển hướng đến trang đăng ký');
+            // window.location.href = '/register';
+            alert('Chuyển hướng đến trang đăng ký');
+        }
+
+        function handleLogout() {
+            console.log('Đăng xuất');
+            isLoggedIn = false;
+            updateUserInterface();
+            
+            // Close dropdown
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            const avatarBtn = document.getElementById('user-avatar-btn');
+            dropdownMenu.classList.remove('active');
+            avatarBtn.classList.remove('active');
+            
+            alert('Đã đăng xuất thành công!');
+        }
+
+        function handleNotificationClick() {
+            console.log('Mở trang thông báo');
+            alert('Mở trang thông báo');
+        }
+
+        // Close mobile menu when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside
+        document.getElementById('dropdown-menu').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    </script>
 </body>
 </html>

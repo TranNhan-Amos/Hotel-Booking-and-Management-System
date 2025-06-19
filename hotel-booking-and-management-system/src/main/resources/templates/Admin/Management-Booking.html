@@ -4,332 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Đặt Phòng - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="Css/Management-Booking.css"  th:href="@{/Css/Management-Booking.css}">
-    <style>
-        
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/Management-Booking.css}">
+
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo">Admin KS</div>
-        <ul>
-            <li><a href="/admin/rooms"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
-            <li><a href="/admin/bookings" class="active"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
-            <li><a href="/admin/customers"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
-            <li><a href="/client/Evaluate"><i class="fas fa-star"></i> Bình Luận & Đánh Giá</a></li>
-            <li><a href="/admin/vouchers"><i class="fas fa-ticket-alt"></i> Quản Lý Voucher</a></li>
-            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
-            <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
-        </ul>
-    </div>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="hamburger" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </div>
         <div class="management-section">
-            <h2>Quản Lý Đặt Phòng</h2>
-            <div class="management-header">
-                <div class="search-filter">
-                    <input type="text" id="searchInput" placeholder="Tìm kiếm mã đặt phòng, tên khách, email..." oninput="filterBookings()">
-                    <select id="statusFilter" onchange="filterBookings()">
-                        <option value="all">Tất Cả Trạng Thái</option>
-                        <option value="PENDING">Chờ Xác Nhận</option>
-                        <option value="CONFIRMED">Đã Xác Nhận</option>
-                        <option value="CANCELLED">Đã Hủy</option>
-                        <option value="COMPLETED">Đã Hoàn Thành</option>
-                    </select>
-                </div>
-                <button class="add-booking-btn" onclick="openModal('add')">Thêm Đặt Phòng</button>
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</h2>
             </div>
-            <table class="booking-table">
-                <thead>
-                    <tr>
-                        <th>Mã Đặt Phòng</th>
-                        <th>Tên Khách</th>
-                        <th>Email Khách</th>
-                        <th>Phòng</th>
-                        <th>Ngày Nhận</th>
-                        <th>Ngày Trả</th>
-                        <th>Ngày Đặt</th>
-                        <th>Trạng Thái</th>
-                        <th>Voucher</th>
-                        <th>Tổng Tiền</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody id="bookingTableBody">
-                    <tr th:each="booking : ${bookings}">
-                        <td data-label="Mã Đặt Phòng" th:text="${booking.bookingId}">BK001</td>
-                        <td data-label="Tên Khách" th:text="${booking.customer?.name ?: 'N/A'}">Nguyễn Văn A</td>
-                        <td data-label="Email Khách" th:text="${booking.email}">email@example.com</td>
-                        <td data-label="Phòng" th:text="${booking.room?.type + ' (ID: ' + booking.room?.roomId + ')' ?: 'N/A'}">Phòng 101</td>
-                        <td data-label="Ngày Nhận" th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">27/05/2025</td>
-                        <td data-label="Ngày Trả" th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">29/05/2025</td>
-                        <td data-label="Ngày Đặt" th:text="${#temporals.format(booking.bookingDate, 'dd/MM/yyyy')}">25/05/2025</td>
-                        <td data-label="Trạng Thái">
-                            <span class="status"
-                                  th:text="${booking.status?.statusName ?: 'N/A'}"
-                                  th:classappend="${#strings.toLowerCase(booking.status?.statusName ?: '')}">
-                                Chờ Xác Nhận
-                            </span>
-                        </td>
-                        <td data-label="Voucher" th:text="${booking.voucher?.code ?: 'Không có'}">VC001</td>
-                        <td data-label="Tổng Tiền">N/A</td> <!-- Sẽ cần tính toán -->
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" th:attr="onclick=|openModal('edit', this, ${booking.bookingId})|">Sửa</button>
-                            <button class="delete-btn" th:attr="onclick=|deleteBooking(${booking.bookingId})|">Xóa</button>
-                            <!-- Các nút confirm/cancel sẽ cần logic backend -->
-                            <th:block th:if="${booking.status?.statusName == 'PENDING'}">
-                                <button class="confirm-btn" th:attr="onclick=|updateBookingStatus(${booking.bookingId}, 'CONFIRMED')|">Xác Nhận</button>
-                                <button class="cancel-btn" th:attr="onclick=|updateBookingStatus(${booking.bookingId}, 'CANCELLED')|">Hủy Đơn</button>
-                            </th:block>
-                            <th:block th:if="${booking.status?.statusName == 'CONFIRMED'}">
-                                <button class="cancel-btn" th:attr="onclick=|updateBookingStatus(${booking.bookingId}, 'CANCELLED')|">Hủy Đơn</button>
-                                <button class="complete-btn" th:attr="onclick=|updateBookingStatus(${booking.bookingId}, 'COMPLETED')|">Hoàn Thành</button>
-                            </th:block>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(bookings)}">
-                        <td colspan="11" style="text-align: center;">Không có đơn đặt phòng nào.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            
+            <div class="section-body">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Tổng Đặt Phòng</div>
+                            <div class="stat-icon total">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">156</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đã Xác Nhận</div>
+                            <div class="stat-icon confirmed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">89</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Chờ Xác Nhận</div>
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">23</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đã Hủy</div>
+                            <div class="stat-icon cancelled">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">44</div>
+                    </div>
+                </div>
 
-        <!-- Modal for Add/Edit Booking -->
-        <div class="modal" id="bookingModal">
-            <div class="modal-content">
-                <h3 id="modalTitle">Thêm Đặt Phòng</h3>
-                <form id="bookingForm"> <!-- Added form tag -->
-                    <input type="hidden" id="modalBookingId" name="bookingId">
-
-                    <div class="form-group">
-                        <label for="customerName">Tên Khách Hàng</label>
-                        <input type="text" id="customerName" name="customerName" placeholder="Nguyễn Văn A" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerEmail">Email Khách Hàng</label>
-                        <input type="email" id="customerEmail" name="customerEmail" placeholder="email@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerPhone">Số Điện Thoại</label>
-                        <input type="tel" id="customerPhone" name="customerPhone" placeholder="09xxxxxxxx">
-                    </div>
-                     <div class="form-group">
-                        <label for="customerAddress">Địa Chỉ</label>
-                        <textarea id="customerAddress" name="customerAddress" rows="2" placeholder="Địa chỉ khách hàng"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="roomId">ID Phòng</label>
-                        <!-- TODO: Nên thay bằng dropdown lấy danh sách phòng -->
-                        <input type="number" id="roomId" name="roomId" placeholder="Nhập ID phòng" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="checkInDate">Ngày Nhận Phòng</label>
-                        <input type="date" id="checkInDate" name="checkInDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="checkOutDate">Ngày Trả Phòng</label>
-                        <input type="date" id="checkOutDate" name="checkOutDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="voucherId">ID Voucher (Nếu có)</label>
-                        <input type="number" id="voucherId" name="voucherId" placeholder="Nhập ID voucher">
-                    </div>
-                    <div class="form-group" id="statusGroup"> <!-- Only show status for edit mode -->
-                        <label for="bookingStatus">Trạng Thái</label>
-                        <select id="bookingStatus" name="bookingStatus" required>
-                            <!-- Options will be populated by JS or could be hardcoded if statuses are fixed -->
-                             <option value="PENDING">Chờ Xác Nhận</option>
-                             <option value="CONFIRMED">Đã Xác Nhận</option>
-                             <option value="CANCELLED">Đã Hủy</option>
-                             <option value="COMPLETED">Đã Hoàn Thành</option>
+                <div class="management-header">
+                    <div class="search-filter">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterBookings()">
+                        <select id="statusFilter" onchange="filterBookings()">
+                            <option value="all">Tất Cả Trạng Thái</option>
+                            <option value="confirmed">Đã Xác Nhận</option>
+                            <option value="pending">Chờ Xác Nhận</option>
+                            <option value="cancelled">Đã Hủy</option>
                         </select>
+                        <input type="date" id="dateFilter" onchange="filterBookings()">
                     </div>
-                    <!-- Tổng tiền sẽ được tính ở backend -->
-                    <div class="modal-actions">
-                        <button type="button" class="save-btn" onclick="saveBooking()">Lưu</button>
-                        <button type="button" class="cancel-modal-btn" onclick="closeModal()">Hủy</button>
+                </div>
+
+                <div class="booking-table">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã Đặt Phòng</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Phòng</th>
+                                    <th>Ngày Đặt</th>
+                                    <th>Giá</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingTableBody">
+                                <tr data-status="pending">
+                                    <td class="booking-id">#BK001</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Nguyễn Văn A</div>
+                                            <div class="customer-email">nguyen.van.a@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Deluxe 101</div>
+                                            <div class="room-type">Deluxe</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 25/05/2025</div>
+                                            <div class="check-out">Trả: 27/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">3,000,000 ₫</td>
+                                    <td><span class="status pending">Chờ Xác Nhận</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                            <button class="confirm-btn" onclick="confirmBooking(this)">
+                                                <i class="fas fa-check"></i> Xác Nhận
+                                            </button>
+                                            <button class="cancel-btn" onclick="cancelBooking(this)">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr data-status="confirmed">
+                                    <td class="booking-id">#BK002</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Trần Thị B</div>
+                                            <div class="customer-email">tran.thi.b@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Suite 201</div>
+                                            <div class="room-type">Suite</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 28/05/2025</div>
+                                            <div class="check-out">Trả: 30/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">5,000,000 ₫</td>
+                                    <td><span class="status confirmed">Đã Xác Nhận</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                            <button class="cancel-btn" onclick="cancelBooking(this)">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr data-status="cancelled">
+                                    <td class="booking-id">#BK003</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Lê Văn C</div>
+                                            <div class="customer-email">le.van.c@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Superior 102</div>
+                                            <div class="room-type">Superior</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 22/05/2025</div>
+                                            <div class="check-out">Trả: 24/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">2,400,000 ₫</td>
+                                    <td><span class="status cancelled">Đã Hủy</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        let currentEditBookingId = null;
-        const allBookings = /*[[${bookings}]]*/ []; // Get bookings from model
-
-        function openModal(mode, buttonOrNull, bookingIdToEdit) {
-            const modal = document.getElementById('bookingModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const form = document.getElementById('bookingForm');
-            form.reset(); // Reset form fields
-            document.getElementById('modalBookingId').value = '';
-            currentEditBookingId = null;
-
-            const statusGroup = document.getElementById('statusGroup');
-
-            if (mode === 'add') {
-                modalTitle.textContent = 'Thêm Đặt Phòng';
-                statusGroup.style.display = 'none'; // Hide status for new bookings (defaults to PENDING on backend)
-            } else if (mode === 'edit' && bookingIdToEdit) {
-                modalTitle.textContent = 'Sửa Đặt Phòng';
-                currentEditBookingId = bookingIdToEdit;
-                document.getElementById('modalBookingId').value = bookingIdToEdit;
-                statusGroup.style.display = 'block'; // Show status for editing
-
-                // Find the booking data from the allBookings array
-                const booking = allBookings.find(b => b.bookingId === bookingIdToEdit);
-                if (booking) {
-                    document.getElementById('customerName').value = booking.customer?.name || '';
-                    document.getElementById('customerEmail').value = booking.email || '';
-                    document.getElementById('customerPhone').value = booking.customer?.phone || '';
-                    document.getElementById('customerAddress').value = booking.customer?.address || '';
-                    document.getElementById('roomId').value = booking.room?.roomId || '';
-                    document.getElementById('checkInDate').value = booking.checkInDate; // Assumes YYYY-MM-DD format from backend
-                    document.getElementById('checkOutDate').value = booking.checkOutDate; // Assumes YYYY-MM-DD format from backend
-                    document.getElementById('voucherId').value = booking.voucher?.voucherId || '';
-                    document.getElementById('bookingStatus').value = booking.status?.statusName || 'PENDING';
-                } else {
-                    alert('Không tìm thấy thông tin đặt phòng!');
-                    return;
-                }
-            }
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('bookingModal').style.display = 'none';
-            currentEditBookingId = null;
-        }
-
-        // IMPORTANT: The saveBooking, deleteBooking, and updateBookingStatus functions
-        // below will need to be implemented with AJAX calls to your Spring Boot backend.
-        // The current JavaScript only manipulates the frontend.
-
-        async function saveBooking() {
-            const form = document.getElementById('bookingForm');
-            const formData = new FormData(form);
-            const bookingData = Object.fromEntries(formData.entries());
-
-            // Basic client-side validation (enhance as needed)
-            if (!bookingData.customerName || !bookingData.customerEmail || !bookingData.roomId || !bookingData.checkInDate || !bookingData.checkOutDate) {
-                alert('Vui lòng điền đầy đủ các trường bắt buộc!');
-                return;
-            }
-            if (new Date(bookingData.checkInDate) >= new Date(bookingData.checkOutDate)) {
-                alert('Ngày nhận phòng phải trước ngày trả phòng.');
-                return;
-            }
-
-            const url = currentEditBookingId ? `/api/admin/bookings/${currentEditBookingId}` : '/api/admin/bookings';
-            const method = currentEditBookingId ? 'PUT' : 'POST';
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Include CSRF token if enabled and needed
-                        // 'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(bookingData)
-                });
-
-                if (response.ok) {
-                    alert('Lưu đặt phòng thành công!');
-                    closeModal();
-                    window.location.reload(); // Reload to see changes
-                } else {
-                    const errorData = await response.json();
-                    alert('Lỗi khi lưu đặt phòng: ' + (errorData.message || response.statusText));
-                }
-            } catch (error) {
-                console.error('Error saving booking:', error);
-                alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+</div>
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle i');
+            
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                toggleBtn.className = 'fas fa-times';
+            } else {
+                toggleBtn.className = 'fas fa-bars';
             }
         }
 
-        async function deleteBooking(bookingId) {
-            if (confirm('Bạn có chắc muốn xóa đặt phòng này? Mã: ' + bookingId)) {
-                 try {
-                    const response = await fetch(`/api/admin/bookings/${bookingId}`, {
-                        method: 'DELETE',
-                        // headers: { 'X-CSRF-TOKEN': csrfToken } // If CSRF enabled
-                    });
-                    if (response.ok) {
-                        alert('Xóa đặt phòng thành công!');
-                        window.location.reload();
-                    } else {
-                        alert('Lỗi khi xóa đặt phòng: ' + response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error deleting booking:', error);
-                    alert('Đã xảy ra lỗi khi xóa.');
-                }
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
             }
-        }
+        });
 
-        async function updateBookingStatus(bookingId, newStatus) {
-            if (confirm(`Bạn có chắc muốn cập nhật trạng thái đặt phòng ${bookingId} thành ${newStatus}?`)) {
-                try {
-                    const response = await fetch(`/api/admin/bookings/${bookingId}/status`, {
-                        method: 'PATCH', // Or PUT
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // 'X-CSRF-TOKEN': csrfToken // If CSRF enabled
-                        },
-                        body: JSON.stringify({ status: newStatus })
-                    });
-                    if (response.ok) {
-                        alert('Cập nhật trạng thái thành công!');
-                        window.location.reload();
-                    } else {
-                        const errorData = await response.json();
-                        alert('Lỗi cập nhật trạng thái: ' + (errorData.message || response.statusText));
-                    }
-                } catch (error) {
-                    console.error('Error updating status:', error);
-                    alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
-                }
-            }
-        }
-
-
+        // Filter Bookings
         function filterBookings() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value; // This will be 'PENDING', 'CONFIRMED', etc.
-            const rows = document.querySelectorAll('#bookingTableBody tr[th\\:each]'); // Select only data rows
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const rows = document.querySelectorAll('#bookingTableBody tr');
 
             rows.forEach(row => {
-                const bookingIdCell = row.cells[0];
-                const customerNameCell = row.cells[1];
-                const emailCell = row.cells[2];
-                const statusCell = row.cells[7].querySelector('.status');
+                const customerName = row.querySelector('.customer-name').textContent.toLowerCase();
+                const status = row.getAttribute('data-status');
+                const checkInDate = row.querySelector('.check-in').textContent;
 
-                if (!bookingIdCell || !customerNameCell || !emailCell || !statusCell) return; // Skip header or empty rows
+                const matchesSearch = customerName.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesDate = !dateFilter || checkInDate.includes(dateFilter);
 
-                const bookingId = bookingIdCell.textContent.toLowerCase();
-                const customerName = customerNameCell.textContent.toLowerCase();
-                const email = emailCell.textContent.toLowerCase();
-
-                // Extract status from class or text. Using text is more reliable with th:text
-                const statusText = statusCell.textContent.trim().toUpperCase(); // PENDING, CONFIRMED, ...
-
-                const matchesSearch = bookingId.includes(searchInput) ||
-                                      customerName.includes(searchInput) ||
-                                      email.includes(searchInput);
-                const matchesStatus = statusFilter === 'all' || statusText === statusFilter;
-
-                if (matchesSearch && matchesStatus) {
+                if (matchesSearch && matchesStatus && matchesDate) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -337,14 +250,69 @@
             });
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
+        // Booking Actions
+        function viewBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            alert(`Xem chi tiết đặt phòng ${bookingId}`);
         }
 
-        // Initialize filters on page load if needed
-        // document.addEventListener('DOMContentLoaded', filterBookings);
-        /*]]>*/
+        function confirmBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            
+            if (confirm(`Xác nhận đặt phòng ${bookingId}?`)) {
+                const statusSpan = row.querySelector('.status');
+                statusSpan.className = 'status confirmed';
+                statusSpan.textContent = 'Đã Xác Nhận';
+                row.setAttribute('data-status', 'confirmed');
+                
+                // Remove confirm button
+                button.remove();
+                
+                alert(`Đã xác nhận đặt phòng ${bookingId}`);
+            }
+        }
+
+        function cancelBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            
+            if (confirm(`Hủy đặt phòng ${bookingId}?`)) {
+                const statusSpan = row.querySelector('.status');
+                statusSpan.className = 'status cancelled';
+                statusSpan.textContent = 'Đã Hủy';
+                row.setAttribute('data-status', 'cancelled');
+                
+                // Remove action buttons except view
+                const actions = row.querySelector('.actions');
+                const viewBtn = actions.querySelector('.view-btn');
+                actions.innerHTML = '';
+                actions.appendChild(viewBtn);
+                
+                alert(`Đã hủy đặt phòng ${bookingId}`);
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (window.innerWidth > 992) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
     </script>
 </body>
 </html>

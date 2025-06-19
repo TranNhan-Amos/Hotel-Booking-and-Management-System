@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Bình Luận & Đánh Giá - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/Evaluate.css}">
+
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="management-section">
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> Quản Lý Bình Luận & Đánh Giá</h2>
+            </div>
+            
+            <div class="section-body">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Tổng Đánh Giá</div>
+                            <div class="stat-icon total">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">342</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đánh Giá Tích Cực</div>
+                            <div class="stat-icon positive">
+                                <i class="fas fa-thumbs-up"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">289</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đánh Giá Tiêu Cực</div>
+                            <div class="stat-icon negative">
+                                <i class="fas fa-thumbs-down"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">28</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Chờ Duyệt</div>
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">25</div>
+                    </div>
+                </div>
+
+                <div class="management-header">
+                    <div class="search-filter">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm đánh giá..." oninput="filterReviews()">
+                        <select id="statusFilter" onchange="filterReviews()">
+                            <option value="all">Tất Cả Trạng Thái</option>
+                            <option value="approved">Đã Duyệt</option>
+                            <option value="pending">Chờ Duyệt</option>
+                            <option value="rejected">Đã Từ Chối</option>
+                        </select>
+                        <select id="ratingFilter" onchange="filterReviews()">
+                            <option value="all">Tất Cả Đánh Giá</option>
+                            <option value="5">5 Sao</option>
+                            <option value="4">4 Sao</option>
+                            <option value="3">3 Sao</option>
+                            <option value="2">2 Sao</option>
+                            <option value="1">1 Sao</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="review-cards" id="reviewCards">
+                    <div class="review-card pending" data-status="pending" data-rating="5">
+                        <div class="review-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">N</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">Nguyễn Văn A</div>
+                                    <div class="review-date">25/05/2025</div>
+                                </div>
+                            </div>
+                            <div class="review-status pending">Chờ Duyệt</div>
+                        </div>
+                        
+                        <div class="rating-section">
+                            <div class="stars">
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                            </div>
+                            <div class="rating-text">5.0/5</div>
+                        </div>
+                        
+                        <div class="room-info">
+                            <div class="room-name">Phòng Deluxe 101</div>
+                            <div class="booking-id">Mã đặt phòng: #BK001</div>
+                        </div>
+                        
+                        <div class="review-content">
+                            <div class="review-text">
+                                Phòng rất sạch sẽ và thoải mái. Nhân viên phục vụ rất chu đáo và nhiệt tình. 
+                                View từ phòng rất đẹp, có thể nhìn ra biển. Tôi sẽ quay lại lần sau.
+                            </div>
+                            <div class="review-images">
+                                <div class="review-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="review-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="review-actions">
+                            <button class="approve-btn" onclick="approveReview(this)">
+                                <i class="fas fa-check"></i> Duyệt
+                            </button>
+                            <button class="reject-btn" onclick="rejectReview(this)">
+                                <i class="fas fa-times"></i> Từ Chối
+                            </button>
+                            <button class="reply-btn" onclick="replyReview(this)">
+                                <i class="fas fa-reply"></i> Trả Lời
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="review-card positive" data-status="approved" data-rating="4">
+                        <div class="review-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">T</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">Trần Thị B</div>
+                                    <div class="review-date">23/05/2025</div>
+                                </div>
+                            </div>
+                            <div class="review-status approved">Đã Duyệt</div>
+                        </div>
+                        
+                        <div class="rating-section">
+                            <div class="stars">
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star empty"></i>
+                            </div>
+                            <div class="rating-text">4.0/5</div>
+                        </div>
+                        
+                        <div class="room-info">
+                            <div class="room-name">Phòng Suite 201</div>
+                            <div class="booking-id">Mã đặt phòng: #BK002</div>
+                        </div>
+                        
+                        <div class="review-content">
+                            <div class="review-text">
+                                Khách sạn tốt, phòng rộng rãi. Dịch vụ ăn uống ngon. 
+                                Chỉ có điều wifi hơi chậm một chút. Nhìn chung rất hài lòng.
+                            </div>
+                        </div>
+                        
+                        <div class="review-actions">
+                            <button class="reply-btn" onclick="replyReview(this)">
+                                <i class="fas fa-reply"></i> Trả Lời
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="review-card negative" data-status="approved" data-rating="2">
+                        <div class="review-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">L</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">Lê Văn C</div>
+                                    <div class="review-date">20/05/2025</div>
+                                </div>
+                            </div>
+                            <div class="review-status approved">Đã Duyệt</div>
+                        </div>
+                        
+                        <div class="rating-section">
+                            <div class="stars">
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star empty"></i>
+                                <i class="fas fa-star star empty"></i>
+                                <i class="fas fa-star star empty"></i>
+                            </div>
+                            <div class="rating-text">2.0/5</div>
+                        </div>
+                        
+                        <div class="room-info">
+                            <div class="room-name">Phòng Superior 102</div>
+                            <div class="booking-id">Mã đặt phòng: #BK003</div>
+                        </div>
+                        
+                        <div class="review-content">
+                            <div class="review-text">
+                                Phòng không được sạch sẽ lắm. Điều hòa không hoạt động tốt. 
+                                Nhân viên phục vụ chưa được nhiệt tình. Cần cải thiện chất lượng dịch vụ.
+                            </div>
+                        </div>
+                        
+                        <div class="review-actions">
+                            <button class="reply-btn" onclick="replyReview(this)">
+                                <i class="fas fa-reply"></i> Trả Lời
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle i');
+            
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                toggleBtn.className = 'fas fa-times';
+            } else {
+                toggleBtn.className = 'fas fa-bars';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Filter Reviews
+        function filterReviews() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            const reviewCards = document.querySelectorAll('.review-card');
+
+            reviewCards.forEach(card => {
+                const customerName = card.querySelector('.customer-name').textContent.toLowerCase();
+                const reviewText = card.querySelector('.review-text').textContent.toLowerCase();
+                const status = card.getAttribute('data-status');
+                const rating = card.getAttribute('data-rating');
+
+                const matchesSearch = customerName.includes(searchInput) || reviewText.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesRating = ratingFilter === 'all' || rating === ratingFilter;
+
+                if (matchesSearch && matchesStatus && matchesRating) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Review Actions
+        function approveReview(button) {
+            const card = button.closest('.review-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            
+            if (confirm(`Duyệt đánh giá của ${customerName}?`)) {
+                const statusSpan = card.querySelector('.review-status');
+                statusSpan.className = 'review-status approved';
+                statusSpan.textContent = 'Đã Duyệt';
+                card.setAttribute('data-status', 'approved');
+                card.className = 'review-card positive';
+                
+                // Update actions
+                const actions = card.querySelector('.review-actions');
+                actions.innerHTML = `
+                    <button class="reply-btn" onclick="replyReview(this)">
+                        <i class="fas fa-reply"></i> Trả Lời
+                    </button>
+                `;
+                
+                alert(`Đã duyệt đánh giá của ${customerName}`);
+            }
+        }
+
+        function rejectReview(button) {
+            const card = button.closest('.review-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            
+            if (confirm(`Từ chối đánh giá của ${customerName}?`)) {
+                const statusSpan = card.querySelector('.review-status');
+                statusSpan.className = 'review-status rejected';
+                statusSpan.textContent = 'Đã Từ Chối';
+                card.setAttribute('data-status', 'rejected');
+                card.className = 'review-card negative';
+                
+                // Update actions
+                const actions = card.querySelector('.review-actions');
+                actions.innerHTML = `
+                    <button class="reply-btn" onclick="replyReview(this)">
+                        <i class="fas fa-reply"></i> Trả Lời
+                    </button>
+                `;
+                
+                alert(`Đã từ chối đánh giá của ${customerName}`);
+            }
+        }
+
+        function replyReview(button) {
+            const card = button.closest('.review-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            alert(`Trả lời đánh giá của ${customerName}`);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (window.innerWidth > 992) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

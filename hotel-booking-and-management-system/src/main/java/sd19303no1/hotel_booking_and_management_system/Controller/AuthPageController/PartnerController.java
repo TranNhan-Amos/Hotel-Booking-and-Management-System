@@ -188,4 +188,83 @@ public String addRoomPartner(
     return "redirect:/room/partner/" + partnerId;
 }
 
+    @GetMapping("/partner/bookings")
+    public String viewPartnerBookings() {
+        // Logic to retrieve and display partner bookings information can be added here
+        return "Partner/BookingsPartner"; // Path to your Thymeleaf template for partner bookings
+    }
+    
+
+    @GetMapping("/partner/reports")
+    public String viewPartnerReports() {
+        // Logic to retrieve and display partner reports information can be added here
+        return "Partner/ReportsPartner"; // Path to your Thymeleaf template for partner reports
+    }
+
+    @GetMapping("/partner/reviews")
+    public String viewPartnerReviews() {
+        // Logic to retrieve and display partner reviews information can be added here
+        return "Partner/ReviewsPartner"; // Path to your Thymeleaf template for partner reviews
+    }
+
+    @GetMapping("/partner/payments")
+    public String viewPartnerPayments() {
+        // Logic to retrieve and display partner payments information can be added here
+        return "Partner/PaymentsPartner"; // Path to your Thymeleaf template for partner payments
+    }
+
+    @GetMapping("/partner/settings")
+    public String viewPartnerSettings(Model model) {
+        try {
+            // Get current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName(); // Assuming email is used as username
+            
+            // Find system user by email
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+            
+            if (systemUser != null && systemUser.isPartner()) {
+                // Find partner information
+                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+                
+                if (partner != null) {
+                    model.addAttribute("partner", partner);
+                    model.addAttribute("systemUser", systemUser);
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                }
+            } else {
+                return "redirect:/login";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Có lỗi xảy ra khi tải thông tin cài đặt đối tác");
+        }
+        
+        return "Partner/SettingsPartner";
+    }
+    @PostMapping("/partner/settings/update")
+    public String updatePartnerSettings(
+            @ModelAttribute("partner") @Valid PartnerEntity partner,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "Partner/SettingsPartner"; // Return to settings page if there are validation errors
+        }
+        
+        try {
+            // Save updated partner information
+            partnerService.save(partner);
+            redirectAttributes.addFlashAttribute("success", "Cài đặt đối tác đã được cập nhật thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật cài đặt đối tác: " + e.getMessage());
+        }
+        
+        return "redirect:/partner/settings";
+    }
+
+    @GetMapping("/partner/support")
+    public String viewPartnerSupport() {
+        // Logic to retrieve and display partner support information can be added here
+        return "Partner/SupportPartner"; // Path to your Thymeleaf template for partner support
+    }
 }

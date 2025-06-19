@@ -6,456 +6,15 @@
     <title>Quản lý phòng - Grand Ocean</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/partner/RoomPartner.css}">
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #1a2980, #26d0ce);
-            --secondary-gradient: linear-gradient(135deg, #6b48ff, #1a2980);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --sidebar-bg: #1a2980;
-            --text-dark: #333;
-            --text-light: #fff;
-            --text-gray: #666;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
-            --border-radius: 16px;
-            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            min-height: 100vh;
-            display: flex;
-            color: var(--text-dark);
-        }
-
-        .dashboard-container {
-            display: flex;
-            width: 100%;
-            max-width: 1600px;
-            margin: 20px auto;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            color: var(--text-light);
-            padding: 25px 0;
-            transition: var(--transition);
-        }
-
-        .sidebar-header {
-            padding: 0 25px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .logo-icon {
-            font-size: 28px;
-            color: #26d0ce;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .partner-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .partner-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #6b48ff, #26d0ce);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .partner-name {
-            font-weight: 500;
-            font-size: 15px;
-            margin-bottom: 3px;
-        }
-
-        .partner-status {
-            font-size: 12px;
-            color: #26d0ce;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .partner-status::before {
-            content: "";
-            display: block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #26d0ce;
-        }
-
-        .nav-menu {
-            padding: 25px 0;
-        }
-
-        .nav-item {
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid #26d0ce;
-        }
-
-        .nav-item i {
-            width: 24px;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background: rgba(248, 249, 255, 0.85);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .page-title h1 {
-            font-size: 28px;
-            color: #1a2980;
-            font-weight: 700;
-        }
-
-        .page-title p {
-            color: var(--text-gray);
-            font-size: 15px;
-            margin-top: 5px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .action-btn {
-            padding: 8px 15px;
-            background: #f1f3f5;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #1a2980;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .action-btn:hover {
-            background: #e6e9ff;
-        }
-
-        /* Room Management */
-        .room-management {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--box-shadow);
-            margin-bottom: 30px;
-        }
-
-        .room-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .room-table th {
-            text-align: left;
-            padding: 15px 10px;
-            font-size: 13px;
-            color: var(--text-gray);
-            font-weight: 500;
-            border-bottom: 1px solid #eee;
-        }
-
-        .room-table td {
-            padding: 15px 10px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .room-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .room-table tr:hover td {
-            background: #f8f9ff;
-        }
-
-        .room-image {
-            width: 60px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .room-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-available {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .status-unavailable {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        /* Add Room Form */
-        .add-room-form {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--box-shadow);
-            margin-bottom: 30px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-dark);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #1a2980;
-            box-shadow: 0 0 0 3px rgba(26, 41, 128, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .image-upload {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .image-preview {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .image-preview img {
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-            }
-
-            .logo-text, .partner-info-text, .nav-item span {
-                display: none;
-            }
-
-            .sidebar-header {
-                padding: 25px 15px;
-            }
-
-            .nav-item {
-                justify-content: center;
-                padding: 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                padding: 15px;
-            }
-
-            .nav-menu {
-                display: flex;
-                overflow-x: auto;
-                padding: 15px 0;
-            }
-
-            .nav-item {
-                flex-direction: column;
-                gap: 5px;
-                padding: 10px 15px;
-                font-size: 12px;
-            }
-
-            .nav-item span {
-                display: block;
-            }
-
-            .logo-text, .partner-info-text {
-                display: block;
-            }
-
-            .partner-info {
-                display: none;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
+        
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-water"></i>
-                    </div>
-                    <div class="logo-text">Grand Ocean</div>
-                </div>
-                <div class="partner-info">
-                    <div class="partner-avatar">KH</div>
-                    <div class="partner-info-text">
-                        <div class="partner-name">Khách sạn Hải Âu</div>
-                        <div class="partner-status">Đang hoạt động</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="nav-menu">
-                <div class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </div>
-                <div class="nav-item active">
-                    <i class="fas fa-bed"></i>
-                    <span>Quản lý phòng</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Đặt phòng</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Báo cáo</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-star"></i>
-                    <span>Đánh giá</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-wallet"></i>
-                    <span>Thanh toán</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Cài đặt</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Hỗ trợ</span>
-                </div>
-            </div>
-        </div>
+        <div th:replace="~{/Layout/NavbarPartner}"></div>
+        
 
         <!-- Main Content -->
         <div class="main-content">
@@ -465,7 +24,7 @@
                     <p>Quản lý thông tin phòng và đăng tải phòng lên hệ thống</p>
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="document.getElementById('add-room-form').scrollIntoView()">Thêm phòng mới</button>
+                    <button class="action-btn" onclick="document.getElementById('add-room-form').scrollIntoView({ behavior: 'smooth' })">Thêm phòng mới</button>
                 </div>
             </div>
 
@@ -473,116 +32,140 @@
             <div class="room-management">
                 <div class="card-header">
                     <div class="card-title">Danh sách phòng</div>
-                    <button class="action-btn">Xem tất cả</button>
+                    <button class="action-btn btn-secondary">Xem tất cả</button>
                 </div>
 
-                <table class="room-table">
-                    <thead>
-                        <tr>
-                            <th>Hình ảnh</th>
-                            <th>Tên phòng</th>
-                            <th>Loại giường</th>
-                            <th>Giá (VND)</th>
-                            <th>Sức chứa</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="roomPartner : ${roomPartners}">
-                            <td><img src="https://via.placeholder.com/60x40" alt="Room" class="room-image"></td>
-                            <td th:text="${roomPartner.bathroomType}" >Deluxe Ocean View</td>
-                            <td th:text="${roomPartner.bedType}">Deluxe</td>
-                            <td th:text="${roomPartner.price}"></td>
-                            <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
-                            <td th:text="${roomPartner.status}"><span class="room-status status-available">Còn trống</span></td>
-                            <td>
-                                <button class="action-btn">Chỉnh sửa</button>
-                                <button class="action-btn">Xóa</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="room-table">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên phòng</th>
+                                <th>Loại giường</th>
+                                <th>Giá (VND)</th>
+                                <th>Sức chứa</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="roomPartner : ${roomPartners}">
+                                <td><img th:src="${roomPartner.imageUrl ?: 'https://via.placeholder.com/60x40'}" alt="Room" class="room-image"></td>
+                                <td th:text="${roomPartner.type}">Deluxe Ocean View</td>
+                                <td th:text="${roomPartner.bedType}">King</td>
+                                <td th:text="${#numbers.formatDecimal(roomPartner.price, 0, 0)}"></td>
+                                <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
+                                <td>
+                                    <span th:classappend="${roomPartner.status == 'Available' ? 'status-available' : 'status-unavailable'}" class="room-status" th:text="${roomPartner.status == 'Available' ? 'Còn trống' : 'Đã đặt'}">Còn trống</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn btn-secondary">Chỉnh sửa</button>
+                                        <button class="action-btn btn-danger">Xóa</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Add Room Form -->
-          <!-- ...existing code... -->
-<div class="add-room-form" id="add-room-form">
-    <div class="card-header">
-        <div class="card-title">Thêm phòng mới</div>
-    </div>
-    <form th:action="@{'/room/partner/' + ${roomPartner.partnerId} + '/add'}" th:object="${roomPartner}" method="post">
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Mã phòng</label>
-                <input type="text" th:field="*{roomNumber}" placeholder="Nhập mã phòng" required>
+            <div class="add-room-form" id="add-room-form">
+                <div class="card-header">
+                    <div class="card-title">Thêm phòng mới</div>
+                </div>
+                <form th:action="@{'/room/partner/' + ${roomPartner.partnerId} + '/add'}" th:object="${roomPartner}" method="post">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Mã phòng</label>
+                            <input type="text" th:field="*{roomNumber}" placeholder="Nhập mã phòng" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại phòng</label>
+                            <select th:field="*{type}">
+                                <option value="Standard">Standard</option>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Suite">Suite</option>
+                                <option value="Premium">Premium</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Giá (VND)</label>
+                            <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sức chứa</label>
+                            <input type="number" th:field="*{capacity}" placeholder="Số người" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại giường</label>
+                            <input type="text" th:field="*{bedType}" placeholder="Loại giường">
+                        </div>
+                        <div class="form-group">
+                            <label>Số lượng giường</label>
+                            <input type="number" th:field="*{bedCount}" placeholder="Số lượng giường">
+                        </div>
+                        <div class="form-group">
+                            <label>Tầng</label>
+                            <input type="number" th:field="*{floor}" placeholder="Tầng">
+                        </div>
+                        <div class="form-group">
+                            <label>Hút thuốc</label>
+                            <select th:field="*{isSmoking}">
+                                <option th:value="false">Không</option>
+                                <option th:value="true">Có</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại phòng tắm</label>
+                            <input type="text" th:field="*{bathroomType}" placeholder="Loại phòng tắm">
+                        </div>
+                        <div class="form-group">
+                            <label>View</label>
+                            <input type="text" th:field="*{view}" placeholder="View">
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <select th:field="*{status}">
+                                <option value="Available">Còn trống</option>
+                                <option value="Unavailable">Đã đặt</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Mô tả phòng</label>
+                            <textarea th:field="*{description}" placeholder="Nhập mô tả phòng"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Hình ảnh phòng</label>
+                            <input type="file" multiple accept="image/*" id="room-images">
+                            <div class="image-preview"></div>
+                        </div>
+                        <div class="form-group full-width">
+                            <button class="action-btn" type="submit">Đăng tải phòng</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label>Loại phòng</label>
-                <select th:field="*{type}">
-                    <option value="Standard">Standard</option>
-                    <option value="Deluxe">Deluxe</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Premium">Premium</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Giá (VND)</label>
-                <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required>
-            </div>
-            <div class="form-group">
-                <label>Sức chứa</label>
-                <input type="number" th:field="*{capacity}" placeholder="Số người" required>
-            </div>
-            <div class="form-group">
-                <label>Loại giường</label>
-                <input type="text" th:field="*{bedType}" placeholder="Loại giường">
-            </div>
-            <div class="form-group">
-                <label>Số lượng giường</label>
-                <input type="number" th:field="*{bedCount}" placeholder="Số lượng giường">
-            </div>
-            <div class="form-group">
-                <label>Tầng</label>
-                <input type="number" th:field="*{floor}" placeholder="Tầng">
-            </div>
-            <div class="form-group">
-                <label>Hút thuốc</label>
-                <select th:field="*{isSmoking}">
-                    <option th:value="false">Không</option>
-                    <option th:value="true">Có</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Loại phòng tắm</label>
-                <input type="text" th:field="*{bathroomType}" placeholder="Loại phòng tắm">
-            </div>
-            <div class="form-group">
-                <label>View</label>
-                <input type="text" th:field="*{view}" placeholder="View">
-            </div>
-            <div class="form-group">
-                <label>Trạng thái</label>
-                <input type="text" th:field="*{status}" placeholder="Trạng thái">
-            </div>
-            <div class="form-group full-width">
-                <label>Mô tả phòng</label>
-                <textarea th:field="*{description}" placeholder="Nhập mô tả phòng"></textarea>
-            </div>
-            <div class="form-group full-width">
-                <button class="action-btn" type="submit" style="padding: 12px 20px; width: 100%;">Đăng tải phòng</button>
-            </div>
-        </div>
-    </form>
-</div>
-<!-- ...existing code... -->
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Navbar toggle
+            document.querySelector('.hamburger').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Close navbar when clicking a nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelector('.nav-menu').classList.remove('active');
+                });
+            });
+
             // Image preview for file upload
-            const fileInput = document.querySelector('input[type="file"]');
+            const fileInput = document.querySelector('#room-images');
             const imagePreview = document.querySelector('.image-preview');
 
             fileInput.addEventListener('change', function(e) {
@@ -591,6 +174,11 @@
                 for (let file of files) {
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(file);
+                    img.style.width = '100px';
+                    img.style.height = '60px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '6px';
+                    img.style.margin = '5px';
                     imagePreview.appendChild(img);
                 }
             });
@@ -611,3 +199,5 @@
             });
         });
     </script>
+</body>
+</html>

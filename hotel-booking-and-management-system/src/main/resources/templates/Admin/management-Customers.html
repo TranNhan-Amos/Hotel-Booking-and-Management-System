@@ -1,324 +1,360 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Khách Hàng - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="Css/Management-Customers.css" th:href="@{/Css/Management-Customers.css}">
-    <style>
-        
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/management-Customers.css}">
+
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo">Admin KS</div>
-        <ul>
-            <li><a href="/admin/rooms"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
-            <li><a href="/admin/booking"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
-            <li><a href="/admin/customers" class="active"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
-            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
-        </ul>
-    </div>
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="hamburger" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </div>
-        <div class="management-section">
-            <h2>Quản Lý Khách Hàng</h2>
-            <div class="management-header">
-                <div class="search-filter">
-                    <input type="text" id="searchInput" placeholder="Tìm kiếm tên hoặc mã khách..." oninput="filterCustomers()">
-                    <select id="statusFilter" onchange="filterCustomers()">
-                        <option value="all">Tất Cả Trạng Thái</option>
-                        <option value="regular">Khách Thường</option>
-                        <option value="vip">Khách VIP</option>
-                    </select>
-                </div>
-                <!-- <button class="add-customer-btn" onclick="openModal('add')">Thêm Khách Hàng</button> -->
-            </div>
-            <table class="customer-table">
-                <thead>
-                    <tr>
-                        <th>Mã Khách</th>
-                        <th>Tên Khách</th>
-                        <th>Số Điện Thoại</th>
-                        <th>Email</th>
-                        <th>Số Lần Đặt Phòng</th>
-                        <th>Ngày Đăng Ký</th>
-                        <th>Trạng Thái</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody id="customerTableBody">
-                    <tr>
-                        <td data-label="Mã Khách">KH001</td>
-                        <td data-label="Tên Khách">Nguyễn Văn A</td>
-                        <td data-label="Số Điện Thoại">0901234567</td>
-                        <td data-label="Email">nguyenvana@example.com</td>
-                        <td data-label="Số Lần Đặt Phòng">5</td>
-                        <td data-label="Ngày Đăng Ký">15/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status vip">Khách VIP</span></td>
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                            <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="Mã Khách">KH002</td>
-                        <td data-label="Tên Khách">Trần Thị B</td>
-                        <td data-label="Số Điện Thoại">0912345678</td>
-                        <td data-label="Email">tranthib@example.com</td>
-                        <td data-label="Số Lần Đặt Phòng">2</td>
-                        <td data-label="Ngày Đăng Ký">20/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status regular">Khách Thường</span></td>
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                            <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="Mã Khách">KH003</td>
-                        <td data-label="Tên Khách">Lê Văn C</td>
-                        <td data-label="Số Điện Thoại">0923456789</td>
-                        <td data-label="Email">levanc@example.com</td>
-                        <td data-label="Số Lần Đặt Phòng">8</td>
-                        <td data-label="Ngày Đăng Ký">10/05/2025</td>
-                        <td data-label="Trạng Thái"><span class="status vip">Khách VIP</span></td>
-                        <td data-label="Hành Động" class="actions">
-                            <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                            <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="chart-container">
-                <h3>Thống Kê Số Lần Đặt Phòng</h3>
-                <canvas id="bookingChart" width="400" height="200"></canvas>
-            </div>
-        </div>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
 
-        <!-- Modal for Add/Edit Customer -->
-        <!-- <div class="modal" id="customerModal">
-            <div class="modal-content">
-                <h3 id="modalTitle">Thêm Khách Hàng</h3>
-                <div class="form-group">
-                    <label for="customerId">Mã Khách</label>
-                    <input type="text" id="customerId" placeholder="KH001" required>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Quản Lý Khách Hàng</h2>
                 </div>
-                <div class="form-group">
-                    <label for="customerName">Tên Khách</label>
-                    <input type="text" id="customerName" placeholder="Nguyễn Văn A" required>
-                </div>
-                <div class="form-group">
-                    <label for="phoneNumber">Số Điện Thoại</label>
-                    <input type="text" id="phoneNumber" placeholder="0901234567" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="nguyenvana@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="bookingCount">Số Lần Đặt Phòng</label>
-                    <input type="number" id="bookingCount" placeholder="5" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerDate">Ngày Đăng Ký</label>
-                    <input type="date" id="registerDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerStatus">Trạng Thái</label>
-                    <select id="customerStatus" required>
-                        <option value="regular">Khách Thường</option>
-                        <option value="vip">Khách VIP</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button class="save-btn" onclick="saveCustomer()">Lưu</button>
-                    <button class="cancel-btn" onclick="closeModal()">Hủy</button>
+                
+                <div class="section-body">
+                    <!-- Stats Overview -->
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Tổng Khách Hàng</div>
+                                <div class="stat-icon total">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">1,247</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Đang Hoạt Động</div>
+                                <div class="stat-icon active">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">892</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Khách VIP</div>
+                                <div class="stat-icon vip">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">156</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Khách Mới</div>
+                                <div class="stat-icon new">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value">89</div>
+                        </div>
+                    </div>
+
+                    <div class="management-header">
+                        <div class="search-filter">
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterCustomers()">
+                            <select id="statusFilter" onchange="filterCustomers()">
+                                <option value="all">Tất Cả Loại</option>
+                                <option value="vip">Khách VIP</option>
+                                <option value="regular">Khách Thường</option>
+                                <option value="new">Khách Mới</option>
+                            </select>
+                            <select id="sortFilter" onchange="sortCustomers()">
+                                <option value="name">Sắp Xếp Theo Tên</option>
+                                <option value="bookings">Số Lần Đặt</option>
+                                <option value="spending">Chi Tiêu</option>
+                                <option value="date">Ngày Tham Gia</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="customer-cards" id="customerCards">
+                        <div class="customer-card vip" data-type="vip">
+                            <div class="customer-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="customer-avatar">N</div>
+                                    <div class="customer-info">
+                                        <div class="customer-name">Nguyễn Văn A</div>
+                                        <div class="customer-email">nguyen.van.a@example.com</div>
+                                        <div class="customer-phone">0123 456 789</div>
+                                    </div>
+                                </div>
+                                <div class="customer-badge vip">VIP</div>
+                            </div>
+                            
+                            <div class="customer-details">
+                                <div class="customer-detail">
+                                    <div class="detail-label">Ngày Tham Gia</div>
+                                    <div class="detail-value">15/01/2024</div>
+                                </div>
+                                <div class="customer-detail">
+                                    <div class="detail-label">Địa Chỉ</div>
+                                    <div class="detail-value">Hà Nội</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">23</div>
+                                    <div class="stat-label">Lần Đặt</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">45M</div>
+                                    <div class="stat-label">Chi Tiêu</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">4.8</div>
+                                    <div class="stat-label">Đánh Giá</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-actions">
+                                <button class="view-btn" onclick="viewCustomer(this)">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="edit-btn" onclick="editCustomer(this)">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </button>
+                                <button class="message-btn" onclick="messageCustomer(this)">
+                                    <i class="fas fa-envelope"></i> Nhắn
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="customer-card new" data-type="new">
+                            <div class="customer-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="customer-avatar">T</div>
+                                    <div class="customer-info">
+                                        <div class="customer-name">Trần Thị B</div>
+                                        <div class="customer-email">tran.thi.b@example.com</div>
+                                        <div class="customer-phone">0987 654 321</div>
+                                    </div>
+                                </div>
+                                <div class="customer-badge new">Mới</div>
+                            </div>
+                            
+                            <div class="customer-details">
+                                <div class="customer-detail">
+                                    <div class="detail-label">Ngày Tham Gia</div>
+                                    <div class="detail-value">20/05/2025</div>
+                                </div>
+                                <div class="customer-detail">
+                                    <div class="detail-label">Địa Chỉ</div>
+                                    <div class="detail-value">TP.HCM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">2</div>
+                                    <div class="stat-label">Lần Đặt</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">3.5M</div>
+                                    <div class="stat-label">Chi Tiêu</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">5.0</div>
+                                    <div class="stat-label">Đánh Giá</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-actions">
+                                <button class="view-btn" onclick="viewCustomer(this)">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="edit-btn" onclick="editCustomer(this)">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </button>
+                                <button class="message-btn" onclick="messageCustomer(this)">
+                                    <i class="fas fa-envelope"></i> Nhắn
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="customer-card" data-type="regular">
+                            <div class="customer-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="customer-avatar">L</div>
+                                    <div class="customer-info">
+                                        <div class="customer-name">Lê Văn C</div>
+                                        <div class="customer-email">le.van.c@example.com</div>
+                                        <div class="customer-phone">0369 258 147</div>
+                                    </div>
+                                </div>
+                                <div class="customer-badge regular">Thường</div>
+                            </div>
+                            
+                            <div class="customer-details">
+                                <div class="customer-detail">
+                                    <div class="detail-label">Ngày Tham Gia</div>
+                                    <div class="detail-value">10/03/2024</div>
+                                </div>
+                                <div class="customer-detail">
+                                    <div class="detail-label">Địa Chỉ</div>
+                                    <div class="detail-value">Đà Nẵng</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">8</div>
+                                    <div class="stat-label">Lần Đặt</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">12M</div>
+                                    <div class="stat-label">Chi Tiêu</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">4.2</div>
+                                    <div class="stat-label">Đánh Giá</div>
+                                </div>
+                            </div>
+                            
+                            <div class="customer-actions">
+                                <button class="view-btn" onclick="viewCustomer(this)">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+                                <button class="edit-btn" onclick="editCustomer(this)">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </button>
+                                <button class="message-btn" onclick="messageCustomer(this)">
+                                    <i class="fas fa-envelope"></i> Nhắn
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
-
-    <!-- JavaScript for Customer Management -->
     <script>
-        let editRow = null;
-
-        function openModal(mode, row) {
-            const modal = document.getElementById('customerModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const customerId = document.getElementById('customerId');
-            const customerName = document.getElementById('customerName');
-            const phoneNumber = document.getElementById('phoneNumber');
-            const email = document.getElementById('email');
-            const bookingCount = document.getElementById('bookingCount');
-            const registerDate = document.getElementById('registerDate');
-            const customerStatus = document.getElementById('customerStatus');
-
-            if (mode === 'add') {
-                modalTitle.textContent = 'Thêm Khách Hàng';
-                customerId.value = '';
-                customerName.value = '';
-                phoneNumber.value = '';
-                email.value = '';
-                bookingCount.value = '';
-                registerDate.value = '';
-                customerStatus.value = 'regular';
-                editRow = null;
-            } else if (mode === 'edit') {
-                modalTitle.textContent = 'Sửa Khách Hàng';
-                editRow = row.parentElement.parentElement;
-                customerId.value = editRow.cells[0].textContent;
-                customerName.value = editRow.cells[1].textContent;
-                phoneNumber.value = editRow.cells[2].textContent;
-                email.value = editRow.cells[3].textContent;
-                bookingCount.value = editRow.cells[4].textContent;
-                const registerParts = editRow.cells[5].textContent.split('/');
-                registerDate.value = `${registerParts[2]}-${registerParts[1].padStart(2, '0')}-${registerParts[0].padStart(2, '0')}`;
-                customerStatus.value = editRow.cells[6].querySelector('.status').classList.contains('regular') ? 'regular' : 'vip';
-            }
-
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('customerModal').style.display = 'none';
-            editRow = null;
-        }
-
-        function saveCustomer() {
-            const customerId = document.getElementById('customerId').value;
-            const customerName = document.getElementById('customerName').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const email = document.getElementById('email').value;
-            const bookingCount = document.getElementById('bookingCount').value;
-            const registerDate = document.getElementById('registerDate').value;
-            const customerStatus = document.getElementById('customerStatus').value;
-
-            if (!customerId || !customerName || !phoneNumber || !email || !bookingCount || !registerDate) {
-                alert('Vui lòng điền đầy đủ thông tin!');
-                return;
-            }
-
-            const statusClass = customerStatus === 'regular' ? 'regular' : 'vip';
-            const statusText = customerStatus === 'regular' ? 'Khách Thường' : 'Khách VIP';
-            const registerFormatted = registerDate.split('-').reverse().join('/');
-
-            if (editRow) {
-                // Edit existing row
-                editRow.cells[0].textContent = customerId;
-                editRow.cells[1].textContent = customerName;
-                editRow.cells[2].textContent = phoneNumber;
-                editRow.cells[3].textContent = email;
-                editRow.cells[4].textContent = bookingCount;
-                editRow.cells[5].textContent = registerFormatted;
-                editRow.cells[6].innerHTML = `<span class="status ${statusClass}">${statusText}</span>`;
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle i');
+            
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                toggleBtn.className = 'fas fa-times';
             } else {
-                // Add new row
-                const tableBody = document.getElementById('customerTableBody');
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td data-label="Mã Khách">${customerId}</td>
-                    <td data-label="Tên Khách">${customerName}</td>
-                    <td data-label="Số Điện Thoại">${phoneNumber}</td>
-                    <td data-label="Email">${email}</td>
-                    <td data-label="Số Lần Đặt Phòng">${bookingCount}</td>
-                    <td data-label="Ngày Đăng Ký">${registerFormatted}</td>
-                    <td data-label="Trạng Thái"><span class="status ${statusClass}">${statusText}</span></td>
-                    <td data-label="Hành Động" class="actions">
-                        <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                        <button class="delete-btn" onclick="deleteCustomer(this)">Xóa</button>
-                    </td>
-                `;
-                tableBody.appendChild(newRow);
-            }
-
-            closeModal();
-            filterCustomers();
-            updateChart();
-        }
-
-        function deleteCustomer(button) {
-            if (confirm('Bạn có chắc muốn xóa khách hàng này?')) {
-                button.parentElement.parentElement.remove();
-                updateChart();
+                toggleBtn.className = 'fas fa-bars';
             }
         }
 
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Filter Customers
         function filterCustomers() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
-            const rows = document.querySelectorAll('#customerTableBody tr');
+            const customerCards = document.querySelectorAll('.customer-card');
 
-            rows.forEach(row => {
-                const customerName = row.cells[1].textContent.toLowerCase();
-                const customerId = row.cells[0].textContent.toLowerCase();
-                const status = row.cells[6].querySelector('.status').classList.contains('regular') ? 'regular' : 'vip';
+            customerCards.forEach(card => {
+                const name = card.querySelector('.customer-name').textContent.toLowerCase();
+                const email = card.querySelector('.customer-email').textContent.toLowerCase();
+                const type = card.getAttribute('data-type');
 
-                const matchesSearch = customerName.includes(searchInput) || customerId.includes(searchInput);
-                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesSearch = name.includes(searchInput) || email.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || type === statusFilter;
 
                 if (matchesSearch && matchesStatus) {
-                    row.style.display = '';
+                    card.style.display = 'block';
                 } else {
-                    row.style.display = 'none';
+                    card.style.display = 'none';
                 }
             });
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
+        // Sort Customers
+        function sortCustomers() {
+            const sortBy = document.getElementById('sortFilter').value;
+            const container = document.getElementById('customerCards');
+            const cards = Array.from(container.children);
 
-        // Chart Functions
-        function updateChart() {
-            const ctx = document.getElementById('bookingChart').getContext('2d');
-            const rows = document.querySelectorAll('#customerTableBody tr');
-            const labels = [];
-            const data = [];
-
-            rows.forEach(row => {
-                labels.push(row.cells[1].textContent); // Tên khách
-                data.push(parseInt(row.cells[4].textContent)); // Số lần đặt phòng
-            });
-
-            if (window.myChart) window.myChart.destroy();
-
-            window.myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Số Lần Đặt Phòng',
-                        data: data,
-                        backgroundColor: '#6c5ce7',
-                        borderColor: '#5b4cd5',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Số Lần' }
-                        },
-                        x: {
-                            title: { display: true, text: 'Tên Khách Hàng' }
-                        }
-                    }
+            cards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'name':
+                        return a.querySelector('.customer-name').textContent.localeCompare(
+                            b.querySelector('.customer-name').textContent
+                        );
+                    case 'bookings':
+                        return parseInt(b.querySelector('.stat-number').textContent) - 
+                               parseInt(a.querySelector('.stat-number').textContent);
+                    case 'spending':
+                        const aSpending = parseFloat(a.querySelectorAll('.stat-number')[1].textContent);
+                        const bSpending = parseFloat(b.querySelectorAll('.stat-number')[1].textContent);
+                        return bSpending - aSpending;
+                    default:
+                        return 0;
                 }
             });
+
+            cards.forEach(card => container.appendChild(card));
         }
 
-        // Initialize chart
-        window.onload = updateChart;
+        // Customer Actions
+        function viewCustomer(button) {
+            const card = button.closest('.customer-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            alert(`Xem chi tiết khách hàng: ${customerName}`);
+        }
+
+        function editCustomer(button) {
+            const card = button.closest('.customer-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            alert(`Chỉnh sửa thông tin: ${customerName}`);
+        }
+
+        function messageCustomer(button) {
+            const card = button.closest('.customer-card');
+            const customerName = card.querySelector('.customer-name').textContent;
+            alert(`Gửi tin nhắn cho: ${customerName}`);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (window.innerWidth > 992) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
     </script>
 </body>
 </html>

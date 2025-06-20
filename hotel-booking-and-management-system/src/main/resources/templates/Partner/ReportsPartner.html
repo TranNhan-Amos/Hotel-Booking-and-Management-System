@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/partner/ReportsPartner.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div th:replace="~{/Layout/NavbarPartner}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="page-title">
+                    <h1>Báo cáo</h1>
+                    <p>Phân tích hiệu suất kinh doanh và thống kê chi tiết</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="date-picker">
+                        <i class="fas fa-calendar"></i>
+                        <input type="date" value="2024-06-01">
+                        <span>đến</span>
+                        <input type="date" value="2024-06-30">
+                    </div>
+                    
+                    <button class="action-btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Xuất báo cáo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tổng doanh thu</div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">186.5tr</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>22% so với tháng trước</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tổng đặt phòng</div>
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>18% so với tháng trước</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tỷ lệ lấp đầy</div>
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">78.5%</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>2.1% so với tháng trước</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Đánh giá trung bình</div>
+                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">4.7</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.2 so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Doanh thu theo tháng</div>
+                        <select class="action-btn btn-secondary">
+                            <option>Năm 2024</option>
+                            <option>Năm 2023</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Loại phòng phổ biến</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="roomTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Table -->
+            <div class="reports-section">
+                <div class="card-header">
+                    <div class="card-title">Báo cáo chi tiết theo ngày</div>
+                    <button class="action-btn btn-secondary">Xem tất cả</button>
+                </div>
+
+                <!-- Desktop Table -->
+                <div class="table-container">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Số đặt phòng</th>
+                                <th>Doanh thu</th>
+                                <th>Tỷ lệ lấp đầy</th>
+                                <th>Đánh giá TB</th>
+                                <th>Hủy phòng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>20/06/2024</td>
+                                <td>24</td>
+                                <td>18.500.000đ</td>
+                                <td>85.7%</td>
+                                <td>4.8</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>19/06/2024</td>
+                                <td>22</td>
+                                <td>16.800.000đ</td>
+                                <td>78.6%</td>
+                                <td>4.7</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>18/06/2024</td>
+                                <td>28</td>
+                                <td>21.200.000đ</td>
+                                <td>92.9%</td>
+                                <td>4.9</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>17/06/2024</td>
+                                <td>19</td>
+                                <td>14.300.000đ</td>
+                                <td>67.9%</td>
+                                <td>4.6</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>16/06/2024</td>
+                                <td>26</td>
+                                <td>19.600.000đ</td>
+                                <td>89.3%</td>
+                                <td>4.8</td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="report-cards">
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <div class="report-card-title">20/06/2024</div>
+                        </div>
+                        <div class="report-card-content">
+                            <div class="report-card-item">
+                                <div class="report-card-label">Số đặt phòng</div>
+                                <div class="report-card-value">24</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Doanh thu</div>
+                                <div class="report-card-value">18.500.000đ</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
+                                <div class="report-card-value">85.7%</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Đánh giá TB</div>
+                                <div class="report-card-value">4.8</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <div class="report-card-title">19/06/2024</div>
+                        </div>
+                        <div class="report-card-content">
+                            <div class="report-card-item">
+                                <div class="report-card-label">Số đặt phòng</div>
+                                <div class="report-card-value">22</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Doanh thu</div>
+                                <div class="report-card-value">16.800.000đ</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
+                                <div class="report-card-value">78.6%</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Đánh giá TB</div>
+                                <div class="report-card-value">4.7</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <div class="report-card-title">18/06/2024</div>
+                        </div>
+                        <div class="report-card-content">
+                            <div class="report-card-item">
+                                <div class="report-card-label">Số đặt phòng</div>
+                                <div class="report-card-value">28</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Doanh thu</div>
+                                <div class="report-card-value">21.200.000đ</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
+                                <div class="report-card-value">92.9%</div>
+                            </div>
+                            <div class="report-card-item">
+                                <div class="report-card-label">Đánh giá TB</div>
+                                <div class="report-card-value">4.9</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6'],
+                    datasets: [{
+                        label: 'Doanh thu (triệu đồng)',
+                        data: [85, 110, 98, 120, 145, 186],
+                        borderColor: '#1a2980',
+                        backgroundColor: 'rgba(26, 41, 128, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 3,
+                        pointRadius: 5,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Room Type Chart
+            const roomTypeCtx = document.getElementById('roomTypeChart').getContext('2d');
+            const roomTypeChart = new Chart(roomTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Deluxe', 'Suite', 'Standard', 'Premium'],
+                    datasets: [{
+                        data: [35, 25, 25, 15],
+                        backgroundColor: [
+                            'rgba(26, 41, 128, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Add hover effects
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-3px)';
+                    card.style.boxShadow = '0 12px 25px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

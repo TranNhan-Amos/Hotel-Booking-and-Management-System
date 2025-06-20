@@ -1,260 +1,239 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>Add commentMore actions
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Phòng - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="Css/Management-Rooms.css" th:href="@{/Css/Management-Rooms.css}">
-    <style>
-        
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/management-Room.css}">
+
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo">Admin KS</div>
-        <ul>
-            <li><a href="/admin/rooms" class="active"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
-            <li><a href="/admin/booking"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
-            <li><a href="/admin/customers"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
-            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
-        </ul>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-bed"></i> Quản Lý Phòng</h2>
+                </div>
+                
+                <div class="section-body">
+                    <div class="management-header">
+                        <div class="search-filter">
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm phòng..." oninput="filterRooms()">
+                            <select id="statusFilter" onchange="filterRooms()">
+                                <option value="all">Tất Cả Trạng Thái</option>
+                                <option value="available">Có Sẵn</option>
+                                <option value="occupied">Đã Đặt</option>
+                                <option value="maintenance">Bảo Trì</option>
+                            </select>
+                            <select id="typeFilter" onchange="filterRooms()">
+                                <option value="all">Tất Cả Loại</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="superior">Superior</option>
+                                <option value="suite">Suite</option>
+                            </select>
+                        </div>
+                        <button class="add-btn" onclick="openModal('add')">
+                            <i class="fas fa-plus"></i>
+                            Thêm Phòng Mới
+                        </button>
+                    </div>
+
+                    <div class="room-cards" id="roomCards">
+                        <div class="room-card" data-status="available" data-type="deluxe">
+                            <div class="room-image">
+                                <i class="fas fa-bed"></i>
+                                <div class="room-status available">Có Sẵn</div>
+                            </div>
+                            <div class="room-info">
+                                <div class="room-header">
+                                    <div>
+                                        <div class="room-title">Phòng 101</div>
+                                        <div class="room-type">Deluxe</div>
+                                    </div>
+                                    <div class="room-price">
+                                        1,500,000 ₫
+                                        <div class="room-price-unit">/đêm</div>
+                                    </div>
+                                </div>
+                                <div class="room-details">
+                                    <div class="room-detail">
+                                        <i class="fas fa-users"></i>
+                                        <span>2 Người</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        <span>35 m²</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-wifi"></i>
+                                        <span>WiFi Miễn Phí</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-snowflake"></i>
+                                        <span>Điều Hòa</span>
+                                    </div>
+                                </div>
+                                <div class="room-actions">
+                                    <button class="view-btn" onclick="viewRoom(this)">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    <button class="edit-btn" onclick="editRoom(this)">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteRoom(this)">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="room-card" data-status="occupied" data-type="suite">
+                            <div class="room-image">
+                                <i class="fas fa-bed"></i>
+                                <div class="room-status occupied">Đã Đặt</div>
+                            </div>
+                            <div class="room-info">
+                                <div class="room-header">
+                                    <div>
+                                        <div class="room-title">Phòng 201</div>
+                                        <div class="room-type">Suite</div>
+                                    </div>
+                                    <div class="room-price">
+                                        2,500,000 ₫
+                                        <div class="room-price-unit">/đêm</div>
+                                    </div>
+                                </div>
+                                <div class="room-details">
+                                    <div class="room-detail">
+                                        <i class="fas fa-users"></i>
+                                        <span>4 Người</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        <span>65 m²</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-hot-tub"></i>
+                                        <span>Bồn Tắm</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-mountain"></i>
+                                        <span>View Biển</span>
+                                    </div>
+                                </div>
+                                <div class="room-actions">
+                                    <button class="view-btn" onclick="viewRoom(this)">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    <button class="edit-btn" onclick="editRoom(this)">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteRoom(this)">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="room-card" data-status="maintenance" data-type="superior">
+                            <div class="room-image">
+                                <i class="fas fa-bed"></i>
+                                <div class="room-status maintenance">Bảo Trì</div>
+                            </div>
+                            <div class="room-info">
+                                <div class="room-header">
+                                    <div>
+                                        <div class="room-title">Phòng 102</div>
+                                        <div class="room-type">Superior</div>
+                                    </div>
+                                    <div class="room-price">
+                                        1,200,000 ₫
+                                        <div class="room-price-unit">/đêm</div>
+                                    </div>
+                                </div>
+                                <div class="room-details">
+                                    <div class="room-detail">
+                                        <i class="fas fa-users"></i>
+                                        <span>2 Người</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        <span>28 m²</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-tv"></i>
+                                        <span>Smart TV</span>
+                                    </div>
+                                    <div class="room-detail">
+                                        <i class="fas fa-coffee"></i>
+                                        <span>Minibar</span>
+                                    </div>
+                                </div>
+                                <div class="room-actions">
+                                    <button class="view-btn" onclick="viewRoom(this)">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    <button class="edit-btn" onclick="editRoom(this)">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteRoom(this)">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="hamburger" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </div>
-        <div class="management-section">
-            <h2>Quản Lý Phòng</h2>
-            <div class="management-header">
-                <div class="search-filter">
-                    <input type="text" id="searchInput" placeholder="Tìm kiếm số phòng..." oninput="filterRooms()">
-                    <select id="statusFilter" onchange="filterRooms()">
-                        <option value="all">Tất Cả Trạng Thái</option>
-                        <option value="available">Còn Trống</option>
-                        <option value="booked">Đã Đặt</option>
-                    </select>
-                </div>
-                <button class="add-room-btn" onclick="openModal('add')">Thêm Phòng</button>
-            </div>
-            <div class="room-cards" id="roomCards">
-                <div class="room-card">
-                    <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Room 101" class="room-image">
-                    <div class="room-info">
-                        <h3>Phòng 101 - Deluxe</h3>
-                        <p>Giá: 1,600,000 ₫ / đêm</p>
-                        <p>Số Khách Tối Đa: 2</p>
-                        <p>Mô Tả: Phòng sang trọng với view biển</p>
-                    </div>
-                    <span class="status available">Còn Trống</span>
-                    <div class="actions">
-                        <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                        <button class="delete-btn" onclick="deleteRoom(this)">Xóa</button>
-                    </div>
-                </div>
-                <div class="room-card">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Room 102" class="room-image">
-                    <div class="room-info">
-                        <h3>Phòng 102 - Superior</h3>
-                        <p>Giá: 1,200,000 ₫ / đêm</p>
-                        <p>Số Khách Tối Đa: 3</p>
-                        <p>Mô Tả: Phòng thoải mái với ban công</p>
-                    </div>
-                    <span class="status booked">Đã Đặt</span>
-                    <div class="actions">
-                        <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                        <button class="delete-btn" onclick="deleteRoom(this)">Xóa</button>
-                    </div>
-                </div>
-                <div class="room-card">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Room 103" class="room-image">
-                    <div class="room-info">
-                        <h3>Phòng 103 - Suite</h3>
-                        <p>Giá: 2,500,000 ₫ / đêm</p>
-                        <p>Số Khách Tối Đa: 4</p>
-                        <p>Mô Tả: Phòng cao cấp với bồn tắm</p>
-                    </div>
-                    <span class="status available">Còn Trống</span>
-                    <div class="actions">
-                        <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                        <button class="delete-btn" onclick="deleteRoom(this)">Xóa</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Add/Edit Room -->
-        <div class="modal" id="roomModal">
-            <div class="modal-content">
-                <h3 id="modalTitle">Thêm Phòng</h3>
-                <div class="form-group">
-                    <label for="roomNumber">Số Phòng</label>
-                    <input type="text" id="roomNumber" placeholder="101" required>
-                </div>
-                <div class="form-group">
-                    <label for="roomType">Loại Phòng</label>
-                    <select id="roomType" required>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="Superior">Superior</option>
-                        <option value="Suite">Suite</option>
-                        <option value="Standard">Standard</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="roomStatus">Trạng Thái</label>
-                    <select id="roomStatus" required>
-                        <option value="available">Còn Trống</option>
-                        <option value="booked">Đã Đặt</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="roomPrice">Giá (/đêm)</label>
-                    <input type="text" id="roomPrice" placeholder="1,600,000" required>
-                </div>
-                <div class="form-group">
-                    <label for="maxGuests">Số Khách Tối Đa</label>
-                    <input type="number" id="maxGuests" placeholder="2" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="roomDescription">Mô Tả</label>
-                    <textarea id="roomDescription" placeholder="Phòng sang trọng với view biển"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="roomImage">URL Hình Ảnh</label>
-                    <input type="text" id="roomImage" placeholder="https://example.com/image.jpg">
-                </div>
-                <div class="modal-actions">
-                    <button class="save-btn" onclick="saveRoom()">Lưu</button>
-                    <button class="cancel-btn" onclick="closeModal()">Hủy</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript for Room Management -->
     <script>
-        let editCard = null;
-
-        function openModal(mode, button) {
-            const modal = document.getElementById('roomModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const roomNumber = document.getElementById('roomNumber');
-            const roomType = document.getElementById('roomType');
-            const roomStatus = document.getElementById('roomStatus');
-            const roomPrice = document.getElementById('roomPrice');
-            const maxGuests = document.getElementById('maxGuests');
-            const roomDescription = document.getElementById('roomDescription');
-            const roomImage = document.getElementById('roomImage');
-
-            if (mode === 'add') {
-                modalTitle.textContent = 'Thêm Phòng';
-                roomNumber.value = '';
-                roomType.value = 'Deluxe';
-                roomStatus.value = 'available';
-                roomPrice.value = '';
-                maxGuests.value = '';
-                roomDescription.value = '';
-                roomImage.value = '';
-                editCard = null;
-            } else if (mode === 'edit') {
-                modalTitle.textContent = 'Sửa Phòng';
-                editCard = button.parentElement.parentElement;
-                const info = editCard.querySelector('.room-info');
-                const title = info.querySelector('h3').textContent.split(' - ');
-                roomNumber.value = title[0].replace('Phòng ', '');
-                roomType.value = title[1];
-                roomStatus.value = editCard.querySelector('.status').classList.contains('available') ? 'available' : 'booked';
-                roomPrice.value = info.querySelector('p:nth-child(2)').textContent.replace('Giá: ', '').replace(' ₫ / đêm', '').replace(/,/g, '');
-                maxGuests.value = info.querySelector('p:nth-child(3)').textContent.replace('Số Khách Tối Đa: ', '');
-                roomDescription.value = info.querySelector('p:nth-child(4)').textContent.replace('Mô Tả: ', '');
-                roomImage.value = editCard.querySelector('.room-image').src;
-            }
-
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('roomModal').style.display = 'none';
-            editCard = null;
-        }
-
-        function saveRoom() {
-            const roomNumber = document.getElementById('roomNumber').value;
-            const roomType = document.getElementById('roomType').value;
-            const roomStatus = document.getElementById('roomStatus').value;
-            const roomPrice = document.getElementById('roomPrice').value;
-            const maxGuests = document.getElementById('maxGuests').value;
-            const roomDescription = document.getElementById('roomDescription').value;
-            const roomImage = document.getElementById('roomImage').value || 'https://images.unsplash.com/photo-1611892440504-42a792e24c48?q=80&w=2070&auto=format&fit=crop';
-
-            if (!roomNumber || !roomPrice || !maxGuests) {
-                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-                return;
-            }
-
-            const formattedPrice = parseInt(roomPrice).toLocaleString('vi-VN') + ' ₫';
-            const statusClass = roomStatus === 'available' ? 'available' : 'booked';
-            const statusText = roomStatus === 'available' ? 'Còn Trống' : 'Đã Đặt';
-
-            if (editCard) {
-                // Edit existing card
-                editCard.querySelector('.room-image').src = roomImage;
-                editCard.querySelector('.room-info h3').textContent = `Phòng ${roomNumber} - ${roomType}`;
-                editCard.querySelector('.room-info p:nth-child(2)').textContent = `Giá: ${formattedPrice} / đêm`;
-                editCard.querySelector('.room-info p:nth-child(3)').textContent = `Số Khách Tối Đa: ${maxGuests}`;
-                editCard.querySelector('.room-info p:nth-child(4)').textContent = `Mô Tả: ${roomDescription || 'Không có mô tả'}`;
-                editCard.querySelector('.status').className = `status ${statusClass}`;
-                editCard.querySelector('.status').textContent = statusText;
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle i');
+            
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                toggleBtn.className = 'fas fa-times';
             } else {
-                // Add new card
-                const roomCards = document.getElementById('roomCards');
-                const newCard = document.createElement('div');
-                newCard.className = 'room-card';
-                newCard.innerHTML = `
-                    <img src="${roomImage}" alt="Room ${roomNumber}" class="room-image">
-                    <div class="room-info">
-                        <h3>Phòng ${roomNumber} - ${roomType}</h3>
-                        <p>Giá: ${formattedPrice} / đêm</p>
-                        <p>Số Khách Tối Đa: ${maxGuests}</p>
-                        <p>Mô Tả: ${roomDescription || 'Không có mô tả'}</p>
-                    </div>
-                    <span class="status ${statusClass}">${statusText}</span>
-                    <div class="actions">
-                        <button class="edit-btn" onclick="openModal('edit', this)">Sửa</button>
-                        <button class="delete-btn" onclick="deleteRoom(this)">Xóa</button>
-                    </div>
-                `;
-                roomCards.appendChild(newCard);
-            }
-
-            closeModal();
-            filterRooms(); // Re-apply filters after saving
-        }
-
-        function deleteRoom(button) {
-            if (confirm('Bạn có chắc muốn xóa phòng này?')) {
-                button.parentElement.parentElement.remove();
+                toggleBtn.className = 'fas fa-bars';
             }
         }
 
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Filter Rooms
         function filterRooms() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
             const roomCards = document.querySelectorAll('.room-card');
 
             roomCards.forEach(card => {
-                const roomNumber = card.querySelector('.room-info h3').textContent.toLowerCase();
-                const status = card.querySelector('.status').classList.contains('available') ? 'available' : 'booked';
+                const title = card.querySelector('.room-title').textContent.toLowerCase();
+                const status = card.getAttribute('data-status');
+                const type = card.getAttribute('data-type');
 
-                const matchesSearch = roomNumber.includes(searchInput);
+                const matchesSearch = title.includes(searchInput);
                 const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesType = typeFilter === 'all' || type === typeFilter;
 
-                if (matchesSearch && matchesStatus) {
+                if (matchesSearch && matchesStatus && matchesType) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -262,10 +241,52 @@
             });
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
+        // Room Actions
+        function viewRoom(button) {
+            const card = button.closest('.room-card');
+            const roomTitle = card.querySelector('.room-title').textContent;
+            alert(`Xem chi tiết ${roomTitle}`);
         }
+
+        function editRoom(button) {
+            const card = button.closest('.room-card');
+            const roomTitle = card.querySelector('.room-title').textContent;
+            alert(`Chỉnh sửa ${roomTitle}`);
+        }
+
+        function deleteRoom(button) {
+            const card = button.closest('.room-card');
+            const roomTitle = card.querySelector('.room-title').textContent;
+            
+            if (confirm(`Bạn có chắc muốn xóa ${roomTitle}?`)) {
+                card.remove();
+                alert(`Đã xóa ${roomTitle}`);
+            }
+        }
+
+        function openModal(mode) {
+            alert(`Mở modal ${mode === 'add' ? 'thêm phòng mới' : 'chỉnh sửa phòng'}`);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (window.innerWidth > 992) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
     </script>
 </body>
 </html>

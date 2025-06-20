@@ -32,7 +32,31 @@ public class SystemUserEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // Getters and Setters
+    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL)
+    private PartnerEntity partner;
+
+    // Thêm quan hệ 1-1 với CustomersEntity
+    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL)
+    private CustomersEntity customer;
+
+    public CustomersEntity getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(CustomersEntity customer) {
+        this.customer = customer;
+    }
+
+
+
+    // Cập nhật getter/setter
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
     public Long getId() {
         return id;
     }
@@ -79,5 +103,21 @@ public class SystemUserEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+        public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
+    
+    public boolean isPartner() {
+        return this.role == Role.PARTNER;
+    }
+    
+    public boolean isStaff() {
+        return this.role == Role.STAFF;
+    }
+    
+    public boolean isCustomer() {
+        return this.role == Role.CUSTOMER;
     }
 }

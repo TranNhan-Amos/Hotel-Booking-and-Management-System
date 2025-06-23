@@ -19,7 +19,13 @@ public class RoomPartnerService {
     }
 
     public RoomPartnerEntity save(RoomPartnerEntity roomPartner) {
-    return roomPartnerRepository.save(roomPartner);
-}
+    return roomPartnerRepository.save(roomPartner);   
+    }
+
+    public long countRoomsByPartnerId(Long partnerId) {
+    return roomPartnerRepository.countRoomsByPartnerId(partnerId);
+    }
+
+    
     
 }

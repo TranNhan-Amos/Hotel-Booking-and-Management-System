@@ -19,7 +19,7 @@
                 <div class="logo-icon">
                     <i class="fas fa-water"></i>
                 </div>
-                <div class="logo-text">Grand Ocean</div>
+                <div class="logo-text" >Dashboard</div>
             </div>
 
             <button class="hamburger">
@@ -29,11 +29,11 @@
             <div class="nav-menu">
                 <a href="/partner" class="nav-item">
                     <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+                    <span>Trang chủ</span>
                 </a>    
-                <a href="/room/partner/{partnerId}/add" class="nav-item">
+                <a th:href="@{/room/partner}" class="nav-item">
                     <i class="fas fa-bed"></i>
-                    <span>Quản lý phòng</span>
+                    <span >Quản lý phòng</span>
                 </a>
                 <a href="/partner/bookings" class="nav-item ">
                     <i class="fas fa-calendar-alt"></i>
@@ -47,10 +47,10 @@
                     <i class="fas fa-star"></i>
                     <span>Đánh giá</span>
                 </a>
-                <a href="/partner/payments" class="nav-item">
+                <!-- <a href="/partner/payments" class="nav-item">
                     <i class="fas fa-wallet"></i>
                     <span>Thanh toán</span>
-                </a>
+                </a> -->
                 <a href="/partner/settings" class="nav-item">
                     <i class="fas fa-cog"></i>
                     <span>Cài đặt</span>
@@ -59,13 +59,15 @@
                     <i class="fas fa-question-circle"></i>
                     <span>Hỗ trợ</span>
                 </a>
-                <div class="partner-info">
+                <!-- <div class="partner-info">
                     <div class="partner-avatar">KH</div>
-                    <div class="partner-name">Khách sạn Hải Âu</div>
-                </div>
+                    <div class="partner-name" >Khách sạn Hải Âu</div>
+                </div> -->
             </div>
         </nav>
 </div>
+
         
 </body>
+
 </html>

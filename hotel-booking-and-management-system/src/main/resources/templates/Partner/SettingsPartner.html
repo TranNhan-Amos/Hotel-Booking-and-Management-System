@@ -33,9 +33,6 @@
                 <div class="settings-tab" data-tab="hotel">
                     <i class="fas fa-building"></i> Khách sạn
                 </div>
-                <div class="settings-tab" data-tab="payment">
-                    <i class="fas fa-credit-card"></i> Thanh toán
-                </div>
                 <div class="settings-tab" data-tab="notifications">
                     <i class="fas fa-bell"></i> Thông báo
                 </div>
@@ -47,64 +44,7 @@
             <!-- Settings Content -->
             <div class="settings-content">
                 <!-- Profile Settings -->
-                <div class="settings-section active" id="profile">
-                    <div class="section-title">
-                        <i class="fas fa-user"></i>
-                        Thông tin cá nhân
-                    </div>
-                    
-                    <div class="profile-upload">
-                        <div class="profile-image">KH</div>
-                        <div>
-                            <button class="upload-btn">
-                                <i class="fas fa-camera"></i>
-                                Thay đổi ảnh đại diện
-                            </button>
-                            <p style="font-size: 12px; color: var(--text-gray); margin-top: 5px;">
-                                JPG, PNG tối đa 2MB
-                            </p>
-                        </div>
-                    </div>
-
-                    <form class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Họ và tên *</label>
-                            <input type="text" class="form-input" value="Nguyễn Văn Khải" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-input" value="khai.nguyen@haiauhotel.com" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Số điện thoại *</label>
-                            <input type="tel" class="form-input" value="0987654321" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Chức vụ</label>
-                            <input type="text" class="form-input" value="Giám đốc điều hành">
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label">Địa chỉ</label>
-                            <input type="text" class="form-input" value="123 Đường Trần Phú, Phường 5, TP. Vũng Tàu">
-                        </div>
-                    </form>
-
-                    <div class="action-buttons">
-                        <button class="action-btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Lưu thay đổi
-                        </button>
-                        <button class="action-btn btn-secondary">
-                            <i class="fas fa-undo"></i>
-                            Hủy bỏ
-                        </button>
-                    </div>
-                </div>
-
+               
                 <!-- Hotel Settings -->
                 <div class="settings-section" id="hotel">
                     <div class="section-title">
@@ -115,17 +55,27 @@
                     <form class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Tên khách sạn *</label>
-                            <input type="text" class="form-input" value="Khách sạn Hải Âu" required>
+                            <input type="text" class="form-input" th:value="${partner.companyName}" required>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Loại hình</label>
-                            <select class="form-select">
-                                <option>Khách sạn</option>
-                                <option>Resort</option>
-                                <option>Homestay</option>
-                                <option>Villa</option>
-                            </select>
+                            <input type="text" class="form-input" th:value="${partner.businessmodel}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Người đại diện</label>
+                            <input type="text" class="form-input" th:value="${partner.contactPerson}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email khách sạn</label>
+                            <input type="text" class="form-input" th:value="${partner.email}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tiện nghi khách sạn</label>
+                            <input type="text" class="form-input" th:value="${partner.hotelamenities}" required>
                         </div>
                         
                         <div class="form-group">
@@ -146,28 +96,14 @@
                         
                         <div class="form-group full-width">
                             <label class="form-label">Địa chỉ khách sạn *</label>
-                            <input type="text" class="form-input" value="456 Đường Thùy Vân, Phường 8, TP. Vũng Tàu" required>
+                            <input type="text" class="form-input" th:value="${partner.address}" required>
                         </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label">Mô tả</label>
-                            <textarea class="form-input form-textarea" placeholder="Mô tả về khách sạn của bạn...">Khách sạn Hải Âu là một khách sạn 4 sao nằm ngay trung tâm thành phố Vũng Tàu, cách bãi biển chỉ 2 phút đi bộ. Với 120 phòng được thiết kế hiện đại và đầy đủ tiện nghi, chúng tôi cam kết mang đến cho quý khách những trải nghiệm tuyệt vời nhất.</textarea>
-                        </div>
-                        
+                                        
                         <div class="form-group">
                             <label class="form-label">Website</label>
                             <input type="url" class="form-input" value="https://haiauhotel.com">
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Giờ nhận phòng</label>
-                            <input type="time" class="form-input" value="14:00">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Giờ trả phòng</label>
-                            <input type="time" class="form-input" value="12:00">
-                        </div>
                     </form>
 
                     <div class="action-buttons">
@@ -175,84 +111,9 @@
                             <i class="fas fa-save"></i>
                             Cập nhật thông tin
                         </button>
-                        <button class="action-btn btn-secondary">
-                            <i class="fas fa-eye"></i>
-                            Xem trước
-                        </button>
                     </div>
                 </div>
-
-                <!-- Payment Settings -->
-                <div class="settings-section" id="payment">
-                    <div class="section-title">
-                        <i class="fas fa-credit-card"></i>
-                        Thông tin thanh toán
-                    </div>
-
-                    <div class="bank-card">
-                        <div class="bank-card-header">
-                            <div class="bank-name">Vietcombank</div>
-                            <div class="bank-logo">
-                                <i class="fas fa-university"></i>
-                            </div>
-                        </div>
-                        <div class="account-number">1234 5678 9012 3456</div>
-                        <div class="account-holder">NGUYEN VAN KHAI</div>
-                    </div>
-
-                    <form class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Tên ngân hàng *</label>
-                            <select class="form-select" required>
-                                <option>Vietcombank</option>
-                                <option>Techcombank</option>
-                                <option>BIDV</option>
-                                <option>VietinBank</option>
-                                <option>Agribank</option>
-                                <option>MB Bank</option>
-                                <option>ACB</option>
-                                <option>Sacombank</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Chi nhánh</label>
-                            <input type="text" class="form-input" value="Chi nhánh Vũng Tàu">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Số tài khoản *</label>
-                            <input type="text" class="form-input" value="1234567890123456" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Tên chủ tài khoản *</label>
-                            <input type="text" class="form-input" value="NGUYEN VAN KHAI" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Mã số thuế</label>
-                            <input type="text" class="form-input" value="0123456789">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Địa chỉ xuất hóa đơn</label>
-                            <input type="text" class="form-input" value="123 Đường Trần Phú, Phường 5, TP. Vũng Tàu">
-                        </div>
-                    </form>
-
-                    <div class="action-buttons">
-                        <button class="action-btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Cập nhật thông tin
-                        </button>
-                        <button class="action-btn btn-secondary">
-                            <i class="fas fa-plus"></i>
-                            Thêm tài khoản
-                        </button>
-                    </div>
-                </div>
-
+           
                 <!-- Notification Settings -->
                 <div class="settings-section" id="notifications">
                     <div class="section-title">

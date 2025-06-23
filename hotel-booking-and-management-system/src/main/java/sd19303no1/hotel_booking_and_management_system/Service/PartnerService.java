@@ -1,5 +1,7 @@
 package sd19303no1.hotel_booking_and_management_system.Service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
@@ -23,4 +25,6 @@ public class PartnerService {
     public PartnerEntity save(PartnerEntity partner) {
         return partnerRepository.save(partner);
     }
+
+  
 }

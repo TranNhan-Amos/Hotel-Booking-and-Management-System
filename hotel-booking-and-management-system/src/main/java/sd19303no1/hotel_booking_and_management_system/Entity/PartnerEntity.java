@@ -1,7 +1,9 @@
 package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "partners")
 public class PartnerEntity {
@@ -35,8 +37,7 @@ public class PartnerEntity {
     private String businessmodel; // mô hình kinh doanh
 
     @Column(name = "hotelamenities")
-    private String hotelamenities; // mô hình kinh doanh
-
+    private String hotelamenities; 
     // Quan hệ 1-1 với SystemUserEntity
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

@@ -1,12 +1,17 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Page;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.ReviewEntity;
@@ -18,6 +23,8 @@ import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
 @Controller
 public class RoomDetailController {
 
+    private static final Logger logger = LoggerFactory.getLogger(RoomDetailController.class);
+
     @Autowired
     private RoomService roomService;
 
@@ -28,36 +35,68 @@ public class RoomDetailController {
     private VoucherService voucherService;
 
     @GetMapping("/room/{id}")
-    public String roomDetail(@PathVariable Integer id, Model model) {
-        // Lấy thông tin phòng
-        RoomEntity room = roomService.findById(id);
-        if (room == null) {
-            return "redirect:/"; // Redirect về trang chủ nếu không tìm thấy phòng
+    public String roomDetail(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            logger.info("Fetching room details for id: {}", id);
+
+            // Lấy thông tin phòng
+            RoomEntity room = roomService.findById(id);
+            if (room == null || !room.getStatus().equals(RoomEntity.RoomStatus.AVAILABLE.name())) {
+                logger.warn("Room not found or not available for id: {}", id);
+                redirectAttributes.addFlashAttribute("error", "Phòng không tồn tại hoặc không khả dụng.");
+                return "redirect:/";
+            }
+
+            // Khởi tạo amenities để tránh lỗi lazy loading
+            Hibernate.initialize(room.getAmenities());
+            List<String> amenities = room.getAmenities() != null ? 
+                room.getAmenities().stream().collect(Collectors.toList()) : List.of();
+            room.setAmenities(amenities);
+
+            // Tính rating trung bình cho phòng
+            Double avgRating = reviewService.getAverageRatingByRoomId(id);
+            room.setAverageRating(avgRating != null ? avgRating : 0.0);
+            model.addAttribute("room", room);
+
+            // Thêm thông tin đối tác (nếu có)
+            model.addAttribute("partner", room.getPartner());
+
+            // Lấy các đánh giá cho phòng này
+            List<ReviewEntity> reviews = reviewService.getReviewsByRoomId(id);
+            model.addAttribute("reviews", reviews);
+
+            // Lấy các phòng liên quan
+            List<RoomEntity> relatedRooms = roomService.getRelatedRooms(room.getType(), id, 4)
+                    .stream()
+                    .filter(r -> r.getStatus().equals(RoomEntity.RoomStatus.AVAILABLE.name()))
+                    .peek(r -> {
+                        // Khởi tạo amenities cho phòng liên quan
+                        Hibernate.initialize(r.getAmenities());
+                        List<String> relatedAmenities = r.getAmenities() != null ? 
+                            r.getAmenities().stream().collect(Collectors.toList()) : List.of();
+                        r.setAmenities(relatedAmenities);
+                        // Tính rating trung bình
+                        Double relatedAvgRating = reviewService.getAverageRatingByRoomId(r.getRoomId());
+                        r.setAverageRating(relatedAvgRating != null ? relatedAvgRating : 0.0);
+                    })
+                    .collect(Collectors.toList());
+            model.addAttribute("relatedRooms", relatedRooms);
+
+            // Lấy vouchers hoạt động
+            List<VoucherEntity> vouchers = voucherService.getAllActiveVouchers()
+                    .stream()
+                    .filter(v -> v.getStatus().equals("ACTIVE") && 
+                                 v.getStartDate().isBefore(java.time.LocalDate.now()) && 
+                                 v.getEndDate().isAfter(java.time.LocalDate.now()))
+                    .collect(Collectors.toList());
+            model.addAttribute("vouchers", vouchers);
+
+            logger.info("Successfully fetched room details for id: {}", id);
+            return "Page/Details";
+        } catch (Exception e) {
+            logger.error("Error fetching room details for id: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Đã xảy ra lỗi khi tải thông tin phòng: " + e.getMessage());
+            return "redirect:/";
         }
-        
-        // Tính rating trung bình cho phòng
-        Double avgRating = reviewService.getAverageRatingByRoomId(id);
-        room.setAverageRating(avgRating != null ? avgRating : 0.0);
-
-        model.addAttribute("room", room);
-
-        // Lấy các đánh giá cho phòng này
-        List<ReviewEntity> reviews = reviewService.getReviewsByRoomId(id);
-        model.addAttribute("reviews", reviews);
-
-        // Lấy các phòng liên quan (cùng loại)
-        List<RoomEntity> relatedRooms = roomService.getRelatedRooms(room.getType(), id, 4);
-        // Tính rating cho các phòng liên quan
-        relatedRooms.forEach(relatedRoom -> {
-            Double relatedAvgRating = reviewService.getAverageRatingByRoomId(relatedRoom.getRoomId());
-            relatedRoom.setAverageRating(relatedAvgRating != null ? relatedAvgRating : 0.0);
-        });
-        model.addAttribute("relatedRooms", relatedRooms);
-
-        // Lấy vouchers cho form đặt phòng
-        List<VoucherEntity> vouchers = voucherService.getAllActiveVouchers();
-        model.addAttribute("vouchers", vouchers);
-
-        return "Page/Details";
     }
 }

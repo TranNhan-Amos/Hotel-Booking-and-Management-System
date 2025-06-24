@@ -79,9 +79,7 @@
         }
 
         .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            padding: 25px 0;
         }
 
         .nav-item {

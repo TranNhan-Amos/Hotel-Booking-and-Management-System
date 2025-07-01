@@ -5,75 +5,55 @@
      <link rel="stylesheet"  th:href="@{Css/footer.css}">
 </head>
 <body>
-   <footer>
-        <div class="footer-container">
-            <div class="footer-column animate-footer">
-                <h4>Về chúng tôi</h4>
-                <ul>
-                    <li><a href="/about">Giới thiệu</a></li>
-                    <li><a href="/contact">Liên hệ</a></li>
-                    <li><a href="/careers">Tuyển dụng</a></li>
-                    <li><a href="/terms">Điều khoản & Điều kiện</a></li>
-                </ul>
-            </div>
-            <div class="footer-column animate-footer" style="animation-delay: 0.2s;">
-                <h4>Hỗ trợ khách hàng</h4>
-                <ul>
-                    <li><a href="/faq">Câu hỏi thường gặp</a></li>
-                    <li><a href="/support">Hỗ trợ đặt phòng</a></li>
-                    <li><a href="/policy">Chính sách hoàn tiền</a></li>
-                    <li><a href="/privacy">Chính sách bảo mật</a></li>
-                </ul>
-            </div>
-            <div class="footer-column animate-footer" style="animation-delay: 0.4s;">
-                <h4>Khám phá Đà Nẵng</h4>
-                <ul>
-                    <li><a href="/destinations">Địa điểm nổi bật</a></li>
-                    <li><a href="/tours">Tour du lịch</a></li>
-                    <li><a href="/activities">Hoạt động giải trí</a></li>
-                    <li><a href="/events">Sự kiện địa phương</a></li>
-                </ul>
-            </div>
-            <div class="footer-column newsletter animate-footer" style="animation-delay: 0.6s;">
-                <h4>Đăng ký nhận ưu đãi</h4>
-                <p>Nhận thông tin về các ưu đãi độc quyền tại Đà Nẵng!</p>
-                <form class="newsletter-form" action="/subscribe" method="post">
-                    <input type="email" name="email" placeholder="Nhập email của bạn" aria-label="Email đăng ký" required>
-                    <button type="submit">Đăng ký</button>
-                </form>
-                <div class="social-icons">
-                    <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="https://youtube.com" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    
+   <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">DaNang Travel</div>
+                    <p class="footer-description">Khám phá vẻ đẹp Đà Nẵng cùng chúng tôi</p>
+                    <div class="footer-contact">
+                        <i data-lucide="phone" class="footer-contact-icon"></i>
+                        <span class="footer-contact-text">+84 236 123 456</span>
+                    </div>
+                    <div class="footer-contact">
+                        <i data-lucide="mail" class="footer-contact-icon"></i>
+                        <span class="footer-contact-text">info@danangtravel.com</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-section-title">Dịch vụ</h4>
+                    <ul class="footer-links">
+                        <li><a href="#hotels">Đặt phòng khách sạn</a></li>
+                        <li><a href="#tours">Tour du lịch</a></li>
+                        <li><a href="#">Vé máy bay</a></li>
+                        <li><a href="#">Thuê xe</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-section-title">Điểm đến</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Bãi biển Mỹ Khê</a></li>
+                        <li><a href="#">Cầu Rồng</a></li>
+                        <li><a href="#">Bà Nà Hills</a></li>
+                        <li><a href="#">Hội An</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-section-title">Hỗ trợ</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Chính sách hủy</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
                 </div>
             </div>
-        </div>
-        <div class="footer-bottom animate-footer" style="animation-delay: 0.8s;">
-            <p>&copy; 2025 Đặt Phòng Đà Nẵng. Mọi quyền được bảo lưu.</p>
+            <div class="footer-bottom">
+                <p>© 2025 DaNang Travel. Tất cả quyền được bảo lưu.</p>
+            </div>
         </div>
     </footer>
-
-    <script>
-        // Simple script to add some interactive elements
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add a class to body when page is loaded
-            document.body.classList.add('loaded');
-            
-            // Animate social icons on scroll
-            const socialIcons = document.querySelectorAll('.social-icon');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.5 });
-            
-            socialIcons.forEach(icon => {
-                observer.observe(icon);
-            });
-        });
-    </script>
 </body>
 </html>

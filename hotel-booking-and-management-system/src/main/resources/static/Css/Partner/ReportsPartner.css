@@ -144,6 +144,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
+            margin-top: 70px;
             padding: 30px;
             overflow-y: auto;
             background: rgba(248, 249, 255, 0.85);

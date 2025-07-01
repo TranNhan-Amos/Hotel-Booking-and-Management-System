@@ -41,6 +41,8 @@ public class BookingOrderService {
     public BookingOrderEntity createBooking(String customerName, String email, String phone, String address,
                                             Integer roomId, LocalDate checkInDate, LocalDate checkOutDate,
                                             Integer voucherId) {
+        System.out.println("=== SERVICE DEBUG: createBooking started ===");
+        
         // Validate đầu vào cơ bản
         if (checkInDate == null || checkOutDate == null ||
             checkInDate.isAfter(checkOutDate) || checkInDate.isEqual(checkOutDate)) {
@@ -56,9 +58,12 @@ public class BookingOrderService {
             throw new IllegalArgumentException("Tên khách hàng không được để trống.");
         }
 
+        System.out.println("=== SERVICE DEBUG: Validation passed ===");
+
         // 1. Tìm hoặc tạo customer
         CustomersEntity customer = customersRepository.findByEmail(email.toLowerCase())
                 .orElseGet(() -> {
+                    System.out.println("=== SERVICE DEBUG: Creating new customer ===");
                     CustomersEntity newCustomer = new CustomersEntity();
                     newCustomer.setName(customerName);
                     newCustomer.setEmail(email.toLowerCase());
@@ -68,9 +73,13 @@ public class BookingOrderService {
                     return customersRepository.save(newCustomer);
                 });
 
+        System.out.println("=== SERVICE DEBUG: Customer found/created: " + customer.getCustomerId() + " ===");
+
         // 2. Lấy room
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + roomId));
+
+        System.out.println("=== SERVICE DEBUG: Room found: " + room.getRoomId() + " ===");
 
         // TODO: Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không? (QUAN TRỌNG)
         // boolean isRoomAvailable = checkRoomAvailability(roomId, checkInDate, checkOutDate);
@@ -93,11 +102,14 @@ public class BookingOrderService {
         final String PENDING_STATUS_NAME = "PENDING";
         StatusEntity status = statusRepository.findByStatusNameIgnoreCase(PENDING_STATUS_NAME);
         if (status == null) {
+            System.out.println("=== SERVICE DEBUG: Creating new PENDING status ===");
             // Nếu trạng thái PENDING chưa có trong DB (nên được seed sẵn)
             StatusEntity newStatus = new StatusEntity();
             newStatus.setStatusName(PENDING_STATUS_NAME);
             status = statusRepository.save(newStatus);
         }
+
+        System.out.println("=== SERVICE DEBUG: Status found/created: " + status.getStatusId() + " ===");
 
         // 5. Tạo đối tượng BookingOrderEntity
         BookingOrderEntity booking = new BookingOrderEntity();
@@ -112,11 +124,16 @@ public class BookingOrderService {
         booking.setVoucher(voucherEntity);
         booking.setStatus(status);
 
+        System.out.println("=== SERVICE DEBUG: Booking object created, saving... ===");
+
         // TODO: Tính toán tổng tiền (totalPrice) cho đơn đặt hàng
         // BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), checkInDate, checkOutDate, voucherEntity);
         // booking.setTotalPrice(totalPrice);
 
-        return bookingOrderRepository.save(booking);
+        BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
+        System.out.println("=== SERVICE DEBUG: Booking saved successfully with ID: " + savedBooking.getBookingId() + " ===");
+        
+        return savedBooking;
     }
 
     // --- PHƯƠNG THỨC CHO ADMIN QUẢN LÝ CRUD (Sử dụng bởi AdminBookingApiController) ---

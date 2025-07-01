@@ -3,224 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán - Khách Sạn Grand Ocean</title>
+    <title th:text="${room != null ? room.type + ' - Chi tiết đặt phòng' : 'Chi tiết đặt phòng'}">Chi tiết đặt phòng</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-     <link rel="stylesheet"  th:href="@{Css/Booking.css}">
-    <style>
-    </style>
+    <link rel="stylesheet" th:href="@{/css/Booking.css}">
 </head>
 <body>
     <div class="container">
         <div th:replace="~{/Layout/narbar}"></div>
 
-        <!-- Payment Section -->
-        <div class="payment-section">
-            <!-- Hotel Information -->
-            <div class="hotel-info">
-               <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Khách Sạn Sunrise">
-                <h2>Khách Sạn Grand Ocean</h2>
-                <p>Nằm ngay trung tâm thành phố biển Đà Nẵng, mang đến trải nghiệm nghỉ dưỡng đẳng cấp với view biển tuyệt đẹp.</p>
-                <div class="rating">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                    <span>(4.5/5 - 320 đánh giá)</span>
-                </div>
-                <div class="amenities">
-                    <ul>
-                        <li>Wifi miễn phí</li>
-                        <li>Hồ bơi vô cực</li>
-                        <li>Nhà hàng cao cấp</li>
-                        <li>Phòng gym hiện đại</li>
-                    </ul>
-                </div>
-                <div class="summary-details">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Trang chủ</a> > 
+            <a href="/rooms">Danh sách phòng</a> > 
+            <span th:if="${room != null}" th:text="${room.type}">Tên phòng</span> > 
+            <span>Chi tiết đặt phòng</span>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Lỗi</span>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Thành công</span>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="booking-section">
+            <!-- Room Information -->
+            <div class="room-info">
+                <img th:src="${room != null and room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop'}" 
+                     th:alt="${room != null ? room.type : 'Khách sạn'}">
+                <h2 th:text="${room != null ? room.type : 'Khách Sạn Grand Ocean'}">Khách Sạn Grand Ocean</h2>
+                <p th:text="${room != null ? room.description : 'Mô tả khách sạn'}">Mô tả khách sạn</p>
+                
+                <div class="booking-summary">
+                    <h3>Thông tin đặt phòng</h3>
                     <div class="summary-item">
-                        <span>Khách Sạn</span>
-                        <span>Khách Sạn Grand Ocean</span>
+                        <span>Ngày nhận phòng:</span>
+                        <span th:text="${checkInDate != null ? checkInDate : 'Chưa chọn'}">Ngày nhận</span>
                     </div>
                     <div class="summary-item">
-                        <span>Địa Chỉ</span>
-                        <span>123 Đường Biển, Phường 5, TP. Đà Nẵng</span>
+                        <span>Ngày trả phòng:</span>
+                        <span th:text="${checkOutDate != null ? checkOutDate : 'Chưa chọn'}">Ngày trả</span>
                     </div>
                     <div class="summary-item">
-                        <span>Ngày Nhận Phòng</span>
-                        <span>27/05/2025</span>
+                        <span>Số đêm:</span>
+                        <span th:text="${nights != null ? nights + ' đêm' : 'Chưa tính'}">Số đêm</span>
                     </div>
                     <div class="summary-item">
-                        <span>Ngày Trả Phòng</span>
-                        <span>29/05/2025</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Số Đêm</span>
-                        <span>2 đêm</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Phòng & Khách</span>
-                        <span>1 phòng, 2 người lớn</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Giá Phòng</span>
-                        <span>1,600,000 ₫ / đêm</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Phí Dịch Vụ</span>
-                        <span>200,000 ₫</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Thuế VAT (10%)</span>
-                        <span>180,000 ₫</span>
-                    </div>
-                    <div class="summary-item total-row">
-                        <span>Tổng Cộng</span>
-                        <span class="total">3,580,000 ₫</span>
+                        <span>Giá phòng:</span>
+                        <span th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫/đêm' : 'Chưa có'}">Giá phòng</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Payment Form -->
-            <div class="payment-form">
-                <h2>Thông Tin Thanh Toán</h2>
-                <div class="form-group">
-                    <label for="fullName">Họ và Tên</label>
-                    <input type="text" id="fullName" placeholder="Nguyễn Văn A" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="example@gmail.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Số Điện Thoại</label>
-                    <input type="tel" id="phone" placeholder="0935123456" required>
-                </div>
-                <div class="form-group">
-                    <label for="idNumber">Số CMND/CCCD</label>
-                    <input type="text" id="idNumber" placeholder="123456789" required>
-                </div>
-                <div class="form-group">
-                    <label for="address">Địa Chỉ</label>
-                    <input type="text" id="address" placeholder="123 Đường ABC, TP. Đà Nẵng" required>
-                </div>
-                <div class="form-group special-request">
-                    <label for="specialRequest">Yêu Cầu Đặc Biệt</label>
-                    <textarea id="specialRequest" placeholder="Ví dụ: Nhờ chuẩn bị thêm giường phụ"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Phương Thức Thanh Toán</label>
-                    <div class="payment-methods">
-                        <label class="payment-method-card selected">
-                            <input type="radio" name="paymentMethod" value="creditCard" checked>
-                            <i class="fas fa-credit-card"></i>
-                            <span>Thẻ Tín Dụng</span>
-                        </label>
-                        <label class="payment-method-card">
-                            <input type="radio" name="paymentMethod" value="momo">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>MoMo</span>
-                        </label>
-                        <label class="payment-method-card">
-                            <input type="radio" name="paymentMethod" value="bankTransfer">
-                            <i class="fas fa-university"></i>
-                            <span>Chuyển Khoản</span>
-                        </label>
-                        <label class="payment-method-card">
-                            <input type="radio" name="paymentMethod" value="payOnArrival">
-                            <i class="fas fa-handshake"></i>
-                            <span>Thanh Toán Khi Nhận Phòng</span>
-                        </label>
-                    </div>
-                </div>
-                <div id="cardFields" class="payment-fields">
-                    <div class="form-group">
-                        <label for="cardNumber">Số Thẻ</label>
-                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
-                    </div>
-                    <div class="card-details">
+            <!-- Detailed Booking Form -->
+            <div class="booking-form">
+                <h2>Thông tin chi tiết</h2>
+                <form th:action="@{/bookings}" method="post" id="detailedBookingForm">
+                    <!-- Hidden fields for room data -->
+                    <input type="hidden" name="roomId" th:value="${room != null ? room.roomId : ''}">
+                    <input type="hidden" name="checkInDate" th:value="${checkInDate}">
+                    <input type="hidden" name="checkOutDate" th:value="${checkOutDate}">
+                    
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                        <h3>Thông tin khách hàng</h3>
                         <div class="form-group">
-                            <label for="expiryDate">Ngày Hết Hạn</label>
-                            <input type="text" id="expiryDate" placeholder="MM/YY" required>
+                            <label for="customerName">Họ và Tên *</label>
+                            <input type="text" id="customerName" name="customerName" 
+                                   th:value="${customerName}" placeholder="Nguyễn Văn A" required>
                         </div>
                         <div class="form-group">
-                            <label for="cvv">CVV</label>
-                            <input type="text" id="cvv" placeholder="123" required>
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" 
+                                   th:value="${email}" placeholder="example@gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Số Điện Thoại *</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   th:value="${phone}" placeholder="0935123456" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Địa Chỉ *</label>
+                            <input type="text" id="address" name="address" 
+                                   placeholder="123 Đường ABC, TP. Đà Nẵng" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="idNumber">Số CMND/CCCD</label>
+                            <input type="text" id="idNumber" name="idNumber" 
+                                   placeholder="123456789">
                         </div>
                     </div>
-                </div>
-                <div id="momoFields" class="payment-fields" style="display: none;">
-                    <div class="form-group">
-                        <label for="momoNumber">Số Điện Thoại MoMo</label>
-                        <input type="tel" id="momoNumber" placeholder="0935123456" required>
+
+                    <!-- Special Requests -->
+                    <div class="form-section">
+                        <h3>Yêu cầu đặc biệt</h3>
+                        <div class="form-group">
+                            <label for="specialRequest">Ghi chú</label>
+                            <textarea id="specialRequest" name="specialRequest" 
+                                      placeholder="Ví dụ: Nhờ chuẩn bị thêm giường phụ, yêu cầu phòng tầng cao..."></textarea>
+                        </div>
                     </div>
-                </div>
-                <div id="bankFields" class="payment-fields" style="display: none;">
-                    <div class="form-group">
-                        <label for="bankAccount">Số Tài Khoản Ngân Hàng</label>
-                        <input type="text" id="bankAccount" placeholder="1234567890" required>
+
+                    <!-- Voucher Section -->
+                    <div class="form-section">
+                        <h3>Mã giảm giá</h3>
+                        <div class="form-group">
+                            <label for="voucherCode">Mã giảm giá</label>
+                            <div class="voucher-input">
+                                <input type="text" id="voucherCode" name="voucherCode" 
+                                       placeholder="Nhập mã giảm giá">
+                                <button type="button" onclick="applyVoucher()" class="btn-apply">Áp dụng</button>
+                            </div>
+                        </div>
+                        <div id="voucherMessage" class="voucher-message"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="bankName">Tên Ngân Hàng</label>
-                        <input type="text" id="bankName" placeholder="Vietcombank" required>
+
+                    <!-- Price Calculation -->
+                    <div class="price-calculation">
+                        <h3>Tính toán giá</h3>
+                        <div class="price-item">
+                            <span>Giá gốc:</span>
+                            <span id="basePrice" th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
+                        </div>
+                        <div class="price-item" id="discountRow" style="display: none;">
+                            <span>Giảm giá:</span>
+                            <span id="discountAmount" style="color: #e74c3c;">-0 ₫</span>
+                        </div>
+                        <div class="price-item">
+                            <span>Phí dịch vụ (10%):</span>
+                            <span id="serviceFee" th:text="${room != null ? #numbers.formatDecimal(room.price.doubleValue() * 0.1, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
+                        </div>
+                        <div class="price-item">
+                            <span>Thuế VAT (10%):</span>
+                            <span id="vat" th:text="${room != null ? #numbers.formatDecimal(room.price.doubleValue() * 0.1, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
+                        </div>
+                        <div class="price-item total">
+                            <span>Tổng cộng:</span>
+                            <span id="totalPrice" th:text="${room != null ? #numbers.formatDecimal(room.price.doubleValue() * 1.2, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
+                        </div>
                     </div>
-                </div>
-                <button onclick="confirmPayment()">Xác Nhận Thanh Toán</button>
+
+                    <button type="submit" class="btn-continue">Tiếp tục thanh toán</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript for Payment -->
+    <!-- JavaScript for Booking -->
     <script>
-        // Toggle payment fields based on selected method
-        function togglePaymentFields() {
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const fields = document.querySelectorAll('.payment-fields');
-            fields.forEach(field => field.style.display = 'none');
-
-            if (method === 'creditCard') {
-                document.getElementById('cardFields').style.display = 'block';
-            } else if (method === 'momo') {
-                document.getElementById('momoFields').style.display = 'block';
-            } else if (method === 'bankTransfer') {
-                document.getElementById('bankFields').style.display = 'block';
+        // Calculate price based on nights
+        function calculatePrice() {
+            const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
+            const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
+            const basePricePerNight = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
+            
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const basePrice = basePricePerNight * nights;
+                const serviceFee = basePrice * 0.1;
+                const vat = (basePrice + serviceFee) * 0.1;
+                const total = basePrice + serviceFee + vat;
+                
+                document.getElementById('basePrice').textContent = basePrice.toLocaleString() + ' ₫';
+                document.getElementById('serviceFee').textContent = serviceFee.toLocaleString() + ' ₫';
+                document.getElementById('vat').textContent = vat.toLocaleString() + ' ₫';
+                document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
             }
         }
 
-        // Add selected class to payment method cards
-        document.querySelectorAll('.payment-method-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                card.querySelector('input').checked = true;
-                togglePaymentFields();
-            });
-        });
+        // Apply voucher
+        function applyVoucher() {
+            const voucherCode = document.getElementById('voucherCode').value;
+            const messageDiv = document.getElementById('voucherMessage');
+            
+            if (!voucherCode) {
+                messageDiv.innerHTML = '<span style="color: #e74c3c;">Vui lòng nhập mã giảm giá</span>';
+                return;
+            }
+            
+            // Simulate voucher validation
+            if (voucherCode.toUpperCase() === 'WELCOME10') {
+                messageDiv.innerHTML = '<span style="color: #27ae60;">Mã giảm giá hợp lệ! Giảm 10%</span>';
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountAmount').textContent = '-100,000 ₫';
+                // Recalculate total with discount
+                calculatePriceWithDiscount();
+            } else {
+                messageDiv.innerHTML = '<span style="color: #e74c3c;">Mã giảm giá không hợp lệ</span>';
+                document.getElementById('discountRow').style.display = 'none';
+            }
+        }
 
-        // Confirm payment (simulated)
-        function confirmPayment() {
-            const requiredFields = document.querySelectorAll('input[required], select[required]');
+        function calculatePriceWithDiscount() {
+            const basePrice = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
+            const discount = basePrice * 0.1;
+            const serviceFee = basePrice * 0.1;
+            const vat = (basePrice + serviceFee) * 0.1;
+            const total = basePrice + serviceFee + vat - discount;
+            
+            document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString() + ' ₫';
+            document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
+        }
+
+        // Form validation
+        document.getElementById('detailedBookingForm').addEventListener('submit', function(e) {
+            const requiredFields = document.querySelectorAll('input[required]');
             let isValid = true;
-
+            
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     field.style.borderColor = '#e74c3c';
                     isValid = false;
                 } else {
-                    field.style.borderColor = '#dfe6e9';
+                    field.style.borderColor = '#ddd';
                 }
             });
-
-            if (isValid) {
-                alert('Thanh toán thành công! Cảm ơn bạn đã đặt phòng tại Khách Sạn Grand Ocean.');
-                // Here you can add API call or redirect to a confirmation page
-                // window.location.href = 'confirmation.html';
-            } else {
-                alert('Vui lòng điền đầy đủ thông tin!');
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
             }
-        }
+        });
 
-        // Initial call to set default fields
-        togglePaymentFields();
+        // Initial price calculation
+        calculatePrice();
     </script>
 
     <!-- JavaScript for Hamburger Menu -->

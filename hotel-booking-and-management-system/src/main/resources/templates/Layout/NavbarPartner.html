@@ -12,60 +12,176 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="navbar-brand">
-                <div class="logo-icon">
-                    <i class="fas fa-water"></i>
-                </div>
-                <div class="logo-text">Grand Ocean</div>
-            </div>
+    <div>
+<nav class="navbar">
+    <div class="navbar-brand">
+        <div class="logo-icon">
+            <i class="fas fa-water"></i>
+        </div>
+        <div class="logo-text">Dashboard</div>
+    </div>
 
-            <button class="hamburger">
-                <i class="fas fa-bars"></i>
-            </button>
+    <button class="hamburger">
+        <i class="fas fa-bars"></i>
+    </button>
 
-            <div class="nav-menu">
-                <a href="/partner" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>    
-                <a href="/room/partner/{partnerId}/add" class="nav-item">
-                    <i class="fas fa-bed"></i>
-                    <span>Quản lý phòng</span>
-                </a>
-                <a href="/partner/bookings" class="nav-item ">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Đặt phòng</span>
-                </a>
-                <a href="/partner/reports" class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Báo cáo</span>
-                </a>
-                <a href="/partner/reviews" class="nav-item">
-                    <i class="fas fa-star"></i>
-                    <span>Đánh giá</span>
-                </a>
-                <a href="/partner/payments" class="nav-item">
-                    <i class="fas fa-wallet"></i>
-                    <span>Thanh toán</span>
-                </a>
-                <a href="/partner/settings" class="nav-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Cài đặt</span>
-                </a>
-                <a href="/partner/support" class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Hỗ trợ</span>
-                </a>
-                <div class="partner-info">
-                    <div class="partner-avatar">KH</div>
-                    <div class="partner-name">Khách sạn Hải Âu</div>
-                </div>
-            </div>
-        </nav>
+    <div class="nav-menu">
+        <a href="/partner" class="nav-item" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>Trang chủ</span>
+        </a>    
+        <a href="/room/partner" class="nav-item" data-page="rooms">
+            <i class="fas fa-bed"></i>
+            <span>Quản lý phòng</span>
+        </a>
+        <a href="/partner/bookings" class="nav-item" data-page="bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Đặt phòng</span>
+        </a>
+        <a href="/partner/reports" class="nav-item" data-page="reports">
+            <i class="fas fa-chart-line"></i>
+            <span>Báo cáo</span>
+        </a>
+        <a href="/partner/reviews" class="nav-item" data-page="reviews">
+            <i class="fas fa-star"></i>
+            <span>Đánh giá</span>
+        </a>
+        <a href="/partner/settings" class="nav-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Cài đặt</span>
+        </a>
+        <a href="/partner/support" class="nav-item" data-page="support">
+            <i class="fas fa-question-circle"></i>
+            <span>Hỗ trợ</span>
+        </a>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-nav-item">
+            <a href="/partner" class="mobile-nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/room/partner" class="mobile-nav-link" data-page="rooms">
+                <i class="fas fa-bed"></i>
+                <span>Quản lý phòng</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/bookings" class="mobile-nav-link" data-page="bookings">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Đặt phòng</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/reports" class="mobile-nav-link" data-page="reports">
+                <i class="fas fa-chart-line"></i>
+                <span>Báo cáo</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/reviews" class="mobile-nav-link" data-page="reviews">
+                <i class="fas fa-star"></i>
+                <span>Đánh giá</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/settings" class="mobile-nav-link" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/support" class="mobile-nav-link" data-page="support">
+                <i class="fas fa-question-circle"></i>
+                <span>Hỗ trợ</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item" style="border-bottom: none;">
+            <a href="/logout" class="mobile-nav-link" data-page="logout" style="color: var(--danger-color);">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng Xuất</span>
+            </a>
+        </div>
+    </div>
+</nav>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('active');
+    }
+
+    // Add event listener to hamburger button
+    document.querySelector('.hamburger').addEventListener('click', toggleMobileMenu);
+
+    // Handle active state for nav items
+    const navItems = document.querySelectorAll('.nav-item, .mobile-nav-link');
+    const desktopNavItems = document.querySelectorAll('.nav-item');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Remove active class from all desktop nav items and mobile nav links
+            desktopNavItems.forEach(i => i.classList.remove('active'));
+            mobileNavLinks.forEach(i => i.classList.remove('active'));
+
+            // Add active class to clicked desktop nav item
+            const page = this.getAttribute('data-page');
+            if (this.classList.contains('nav-item')) {
+                this.classList.add('active');
+            } else if (this.classList.contains('mobile-nav-link')) {
+                // For mobile menu, sync active state to corresponding desktop nav item
+                desktopNavItems.forEach(i => {
+                    if (i.getAttribute('data-page') === page) {
+                        i.classList.add('active');
+                    }
+                });
+                // Close the mobile menu
+                toggleMobileMenu();
+            }
+
+            // Store the active page in localStorage
+            localStorage.setItem('activePage', page);
+        });
+    });
+
+    // Restore active state from localStorage or current URL
+    const activePage = localStorage.getItem('activePage') || getPageFromUrl();
+    if (activePage) {
+        desktopNavItems.forEach(item => {
+            if (item.getAttribute('data-page') === activePage) {
+                item.classList.add('active');
+            }
+        });
+        // Xóa active từ mobile nav links để tránh màu xanh
+        mobileNavLinks.forEach(item => item.classList.remove('active'));
+    }
+
+    // Helper function to extract page from URL
+    function getPageFromUrl() {
+        const path = window.location.pathname;
+        const pageMap = {
+            '/partner': 'home',
+            '/room/partner': 'rooms',
+            '/partner/bookings': 'bookings',
+            '/partner/reports': 'reports',
+            '/partner/reviews': 'reviews',
+            '/partner/settings': 'settings',
+            '/partner/support': 'support',
+            '/logout': 'logout'
+        };
+        return pageMap[path] || 'home';
+    }
+});
+</script>
         
 </body>
+
 </html>

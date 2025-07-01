@@ -14,4 +14,6 @@ public interface RoomPartnerRepository extends JpaRepository<RoomPartnerEntity, 
     @Query("SELECT COUNT(r.roomId) FROM RoomPartnerEntity r WHERE r.partnerId = :partnerId")
     long countRoomsByPartnerId(@Param("partnerId") Long partnerId);
 
+    boolean existsByRoomNumberAndPartnerId(String roomNumber, Long partnerId);
+
 }

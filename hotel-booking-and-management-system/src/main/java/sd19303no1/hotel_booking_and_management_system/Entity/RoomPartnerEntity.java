@@ -21,7 +21,7 @@ public class RoomPartnerEntity {
     private Long  roomId;
 
     @Column(name = "bathroom_type")
-    private String bathroomType;
+    private int bathroomType;
 
     @Column(name = "bed_count")
     private Integer bedCount;
@@ -36,13 +36,13 @@ public class RoomPartnerEntity {
     private String description;
 
     @Column(name = "floor")
-    private Integer floor;
+    private int  floor;
 
     @Column(name = "is_smoking")
     private Boolean isSmoking;
 
     @Column(name = "price")
-    private Double price;
+    private int price;
 
     @Column(name = "room_number", unique = true)
     private String roomNumber;

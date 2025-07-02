@@ -1,9 +1,11 @@
 package sd19303no1.hotel_booking_and_management_system.Repository;
 
-import org.springframework.data.domain.Pageable; // Thêm import này
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-// import org.springframework.data.jpa.repository.Query; // Nếu bạn dùng @Query
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Integer> {
@@ -11,11 +13,30 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
     List<BookingOrderEntity> findAllByOrderByCreatedAtDesc();
 
     // Phương thức để lấy N booking gần nhất
-    // Spring Data JPA sẽ tự hiểu "TopN" hoặc bạn có thể dùng @Query với Pageable
     List<BookingOrderEntity> findTopNByOrderByCreatedAtDesc(Pageable pageable);
 
-    // Nếu findTopNByOrderByCreatedAtDesc không hoạt động như mong đợi, bạn có thể dùng:
-    // @Query("SELECT b FROM BookingOrderEntity b ORDER BY b.createdAt DESC")
-    // List<BookingOrderEntity> findRecentBookings(Pageable pageable);
-    // Và trong service sẽ gọi: bookingOrderRepository.findRecentBookings(PageRequest.of(0, limit));
+    // Tìm các booking xung đột (conflicting bookings)
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.room.roomId = :roomId " +
+           "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED') " +
+           "AND ((b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate))")
+    List<BookingOrderEntity> findConflictingBookings(@Param("roomId") Integer roomId, 
+                                                     @Param("checkInDate") LocalDate checkInDate, 
+                                                     @Param("checkOutDate") LocalDate checkOutDate);
+
+    // Tìm booking theo trạng thái
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.status.statusName = :statusName")
+    List<BookingOrderEntity> findByStatusName(@Param("statusName") String statusName);
+
+    // Tìm booking theo khoảng thời gian
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.checkInDate >= :startDate AND b.checkInDate <= :endDate")
+    List<BookingOrderEntity> findByCheckInDateBetween(@Param("startDate") LocalDate startDate, 
+                                                      @Param("endDate") LocalDate endDate);
+
+    // Tìm booking cần thanh toán
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.paymentStatus = 'PENDING'")
+    List<BookingOrderEntity> findPendingPayments();
+
+    // Tìm booking cần hoàn tiền
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.refundStatus = 'PENDING'")
+    List<BookingOrderEntity> findPendingRefunds();
 }

@@ -16,11 +16,17 @@ public class VoucherEntity {
     @Column(name = "discount", precision = 5, scale = 2)
     private BigDecimal discount;
 
+    @Column(name = "discount_amount", precision = 10, scale = 2)
+    private BigDecimal discountAmount;
+
     @Column(name = "code", unique = true, length = 50)
     private String code;
 
     @Column(name = "expiration_date")
     private LocalDate expirationDate;
+
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -30,6 +36,18 @@ public class VoucherEntity {
 
     @Column(name = "status", length = 50)
     private String status;
+
+    @Column(name = "usage_limit")
+    private Integer usageLimit;
+
+    @Column(name = "used_count")
+    private Integer usedCount = 0;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "minimum_order_amount", precision = 10, scale = 2)
+    private BigDecimal minimumOrderAmount;
 
     // Getters and Setters
     public Integer getVoucherId() {
@@ -48,6 +66,14 @@ public class VoucherEntity {
         this.discount = discount;
     }
 
+    public BigDecimal getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
     public String getCode() {
         return code;
     }
@@ -62,6 +88,14 @@ public class VoucherEntity {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public LocalDate getStartDate() {
@@ -86,5 +120,37 @@ public class VoucherEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getUsageLimit() {
+        return usageLimit;
+    }
+
+    public void setUsageLimit(Integer usageLimit) {
+        this.usageLimit = usageLimit;
+    }
+
+    public Integer getUsedCount() {
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getMinimumOrderAmount() {
+        return minimumOrderAmount;
+    }
+
+    public void setMinimumOrderAmount(BigDecimal minimumOrderAmount) {
+        this.minimumOrderAmount = minimumOrderAmount;
     }
 }

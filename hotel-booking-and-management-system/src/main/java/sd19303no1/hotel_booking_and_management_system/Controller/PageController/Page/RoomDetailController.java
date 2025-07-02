@@ -2,6 +2,7 @@ package sd19303no1.hotel_booking_and_management_system.Controller.PageController
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -90,6 +91,12 @@ public class RoomDetailController {
                                  v.getEndDate().isAfter(java.time.LocalDate.now()))
                     .collect(Collectors.toList());
             model.addAttribute("vouchers", vouchers);
+
+            // Tính số phòng còn trống (mặc định: hôm nay đến hôm nay+1)
+            LocalDate checkIn = LocalDate.now();
+            LocalDate checkOut = checkIn.plusDays(1);
+            int roomAvailableCount = roomService.getAvailableRoomCount(id, checkIn, checkOut);
+            model.addAttribute("roomAvailableCount", roomAvailableCount);
 
             logger.info("Successfully fetched room details for id: {}", id);
             return "Page/Details";

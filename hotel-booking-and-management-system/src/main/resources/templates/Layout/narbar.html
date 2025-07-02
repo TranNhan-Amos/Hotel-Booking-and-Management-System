@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,40 +14,42 @@
     <nav class="navbar">
         <div class="nav-container">
             <!-- Logo -->
-            <a href="#" class="nav-brand">DaNang Travel</a>
+            <a href="/" class="nav-brand">DaNang Travel</a>
 
             <!-- Desktop Navigation Links -->
             <div class="nav-links">
-                <a href="/">Trang chủ </a>
-                <a href="/ListRoom">Khách sạn tại đà nẵng </a>
-                <a href="/feedbackuser">Đánh giá</a>
-                <a href="/About">Giới thiệu</a>
-                <a href="/Contact">Liên hệ </a>
-
+                <a href="/">Trang chủ</a>
+                <a href="/ListRoom">Khách sạn tại Đà Nẵng</a>
+                <a href="/feedbackuser">Đánh giá</a>
+                <a href="/About">Giới thiệu</a>
+                <a href="/Contact">Liên hệ</a>
             </div>
-
 
             <!-- User Menu Container -->
             <div class="user-menu-container">
                 <!-- User Menu (when logged in) -->
-                <div id="user-menu" class="user-menu" style="display: none;">
+                <div id="user-menu" class="user-menu" sec:authorize="isAuthenticated()">
                     <!-- Notification Bell -->
                     <button class="notification-btn" onclick="handleNotificationClick()">
                         <i data-lucide="bell" style="width: 1.25rem; height: 1.25rem;"></i>
-                        <span class="notification-badge" id="notification-badge">3</span>
+                        <span class="notification-badge" id="notification-badge" th:if="${notificationCount > 0}" th:text="${notificationCount > 9 ? '9+' : notificationCount}">3</span>
                     </button>
 
                     <!-- User Avatar Dropdown -->
                     <div class="user-dropdown" style="position: relative;">
                         <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()">
-                            <div class="user-avatar" id="user-avatar">NA</div>
+                            <div class="user-avatar" id="user-avatar" th:text="${#strings.substring(#authentication.principal.username, 0, 2).toUpperCase()}">NA</div>
                             <div class="user-info">
-                                <span class="user-name" id="user-name">Nguyễn Văn An</span>
+                                <span class="user-name" id="user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</span>
                                 <div class="user-role">
-                                    <span id="user-role-text">Khách hàng</span>
-                                    <div class="admin-badge" id="admin-badge" style="display: none;">
+                                    <span id="user-role-text" sec:authorize="hasRole('CUSTOMER')">Khách hàng</span>
+                                    <div class="admin-badge" id="admin-badge" sec:authorize="hasRole('ADMIN')">
                                         <i data-lucide="shield" style="width: 0.75rem; height: 0.75rem;"></i>
                                         Admin
+                                    </div>
+                                    <div class="partner-badge" id="partner-badge" sec:authorize="hasRole('PARTNER')">
+                                        <i data-lucide="building" style="width: 0.75rem; height: 0.75rem;"></i>
+                                        Đối tác
                                     </div>
                                 </div>
                             </div>
@@ -57,24 +59,24 @@
                         <!-- Dropdown Menu -->
                         <div class="dropdown-menu" id="dropdown-menu">
                             <div class="dropdown-header">
-                                <div class="dropdown-user-name" id="dropdown-user-name">Nguyễn Văn An</div>
-                                <div class="dropdown-user-email" id="dropdown-user-email">nguyenvanan@example.com</div>
+                                <div class="dropdown-user-name" id="dropdown-user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</div>
+                                <div class="dropdown-user-email" id="dropdown-user-email" th:text="${#authentication.principal.email}">nguyenvanan@example.com</div>
                             </div>
 
                             <div class="dropdown-section">
-                                <a href="#" class="dropdown-item">
+                                <a href="/profile" class="dropdown-item">
                                     <i data-lucide="user" class="dropdown-icon"></i>
                                     Thông tin cá nhân
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="/bookings/history" class="dropdown-item">
                                     <i data-lucide="book-open" class="dropdown-icon"></i>
                                     Lịch sử đặt phòng
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="/favorites" class="dropdown-item">
                                     <i data-lucide="heart" class="dropdown-icon"></i>
                                     Danh sách yêu thích
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="/payment-methods" class="dropdown-item">
                                     <i data-lucide="credit-card" class="dropdown-icon"></i>
                                     Phương thức thanh toán
                                 </a>
@@ -83,11 +85,11 @@
                             <div class="dropdown-separator"></div>
 
                             <div class="dropdown-section">
-                                <a href="#" class="dropdown-item">
+                                <a href="/upcoming-bookings" class="dropdown-item">
                                     <i data-lucide="calendar" class="dropdown-icon"></i>
                                     Đặt phòng sắp tới
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="/saved-locations" class="dropdown-item">
                                     <i data-lucide="map-pin" class="dropdown-icon"></i>
                                     Địa điểm đã lưu
                                 </a>
@@ -95,41 +97,72 @@
 
                             <div class="dropdown-separator"></div>
 
-                            <!-- Admin Section (hidden by default) -->
-                            <div class="dropdown-section" id="admin-section" style="display: none;">
-                                <a href="#" class="dropdown-item">
+                            <!-- Admin Section -->
+                            <div class="dropdown-section" id="admin-section" sec:authorize="hasRole('ADMIN')">
+                                <a href="/admin/dashboard" class="dropdown-item">
                                     <i data-lucide="shield" class="dropdown-icon"></i>
                                     Bảng điều khiển Admin
+                                </a>
+                                <a href="/admin/bookings" class="dropdown-item">
+                                    <i data-lucide="list" class="dropdown-icon"></i>
+                                    Quản lý đặt phòng
+                                </a>
+                                <a href="/admin/customers" class="dropdown-item">
+                                    <i data-lucide="users" class="dropdown-icon"></i>
+                                    Quản lý khách hàng
+                                </a>
+                                <a href="/admin/rooms" class="dropdown-item">
+                                    <i data-lucide="home" class="dropdown-icon"></i>
+                                    Quản lý phòng
+                                </a>
+                                <div class="dropdown-separator"></div>
+                            </div>
+
+                            <!-- Partner Section -->
+                            <div class="dropdown-section" id="partner-section" sec:authorize="hasRole('PARTNER')">
+                                <a href="/partner/dashboard" class="dropdown-item">
+                                    <i data-lucide="building" class="dropdown-icon"></i>
+                                    Bảng điều khiển Đối tác
+                                </a>
+                                <a href="/partner/rooms" class="dropdown-item">
+                                    <i data-lucide="home" class="dropdown-icon"></i>
+                                    Quản lý phòng
+                                </a>
+                                <a href="/partner/bookings" class="dropdown-item">
+                                    <i data-lucide="list" class="dropdown-icon"></i>
+                                    Quản lý đặt phòng
                                 </a>
                                 <div class="dropdown-separator"></div>
                             </div>
 
                             <div class="dropdown-section">
-                                <a href="#" class="dropdown-item">
+                                <a href="/settings" class="dropdown-item">
                                     <i data-lucide="settings" class="dropdown-icon"></i>
                                     Cài đặt
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="/notifications" class="dropdown-item">
                                     <i data-lucide="bell" class="dropdown-icon"></i>
                                     Thông báo
-                                    <span class="notification-count" id="dropdown-notification-count">3</span>
+                                    <span class="notification-count" id="dropdown-notification-count" th:if="${notificationCount > 0}" th:text="${notificationCount}">3</span>
                                 </a>
                             </div>
 
                             <div class="dropdown-separator"></div>
 
                             <div class="dropdown-section">
-                                <button class="dropdown-item danger" onclick="handleLogout()">
-                                    <i data-lucide="log-out" class="dropdown-icon"></i>
-                                    Đăng xuất
-                                </button>
+                                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                    <button type="submit" class="dropdown-item danger">
+                                        <i data-lucide="log-out" class="dropdown-icon"></i>
+                                        Đăng xuất
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Auth Buttons (when not logged in) -->
-                <div id="auth-buttons" class="auth-buttons">
+                <div id="auth-buttons" class="auth-buttons" sec:authorize="!isAuthenticated()">
                     <a th:href="@{/login}" class="btn btn-ghost">Đăng nhập</a>
                 </div>
 
@@ -161,215 +194,65 @@
 
                 <!-- Mobile Navigation Links -->
                 <div class="mobile-nav-links">
-                    <a href="#hotels">Khách sạn</a>
-                    <a href="#tours">Tour</a>
-                    <a href="#offers">Ưu đãi</a>
+                    <a href="/">Trang chủ</a>
+                    <a href="/ListRoom">Khách sạn</a>
+                    <a href="/feedbackuser">Đánh giá</a>
+                    <a href="/About">Giới thiệu</a>
+                    <a href="/Contact">Liên hệ</a>
+                </div>
+
+                <!-- Mobile User Menu (when logged in) -->
+                <div id="mobile-user-menu" class="mobile-user-menu" sec:authorize="isAuthenticated()">
+                    <div class="mobile-user-info">
+                        <div class="mobile-user-avatar" th:text="${#strings.substring(#authentication.principal.username, 0, 2).toUpperCase()}">NA</div>
+                        <div class="mobile-user-details">
+                            <div class="mobile-user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</div>
+                            <div class="mobile-user-role">
+                                <span sec:authorize="hasRole('CUSTOMER')">Khách hàng</span>
+                                <span sec:authorize="hasRole('ADMIN')">Admin</span>
+                                <span sec:authorize="hasRole('PARTNER')">Đối tác</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mobile-user-links">
+                        <a href="/profile" class="mobile-user-link">
+                            <i data-lucide="user"></i>
+                            Thông tin cá nhân
+                        </a>
+                        <a href="/bookings/history" class="mobile-user-link">
+                            <i data-lucide="book-open"></i>
+                            Lịch sử đặt phòng
+                        </a>
+                        <a href="/settings" class="mobile-user-link">
+                            <i data-lucide="settings"></i>
+                            Cài đặt
+                        </a>
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="mobile-user-link danger">
+                                <i data-lucide="log-out"></i>
+                                Đăng xuất
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Mobile Auth Buttons (when not logged in) -->
-                <div id="mobile-auth-buttons" class="auth-buttons" style="flex-direction: column; gap: 0.75rem;">
-                    <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="handleLogin()">
+                <div id="mobile-auth-buttons" class="auth-buttons" style="flex-direction: column; gap: 0.75rem;" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="btn btn-ghost" style="width: 100%; justify-content: center;">
                         <i data-lucide="user" style="width: 1rem; height: 1rem;"></i>
                         Đăng nhập
-                    </button>
-                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleRegister()">
+                    </a>
+                    <a th:href="@{/register}" class="btn btn-primary" style="width: 100%; justify-content: center;">
                         Đăng ký
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Demo Content -->
-    <!-- <div class="demo-content">
-        <div class="demo-card">
-            <h1 class="demo-title">Demo Menu User cho Navbar</h1>
-            <p class="demo-description">
-                Menu user đã được tích hợp vào navbar với đầy đủ tính năng cho hệ thống đặt phòng khách sạn DaNang Travel
-            </p> -->
-
-            <!-- Toggle Demo Button -->
-            <!-- <div class="demo-toggle">
-                <button class="toggle-btn" onclick="toggleUserState()">
-                    <span id="toggle-text">Đăng nhập (Demo)</span>
-                </button>
-            </div> -->
-
-            <!-- Feature Grid -->
-            <!-- <div class="feature-grid">
-                <div class="feature-item">
-                    <h3 class="feature-title">Khi chưa đăng nhập:</h3>
-                    <ul class="feature-list">
-                        <li>Hiển thị nút "Đăng nhập" và "Đăng ký"</li>
-                        <li>Menu mobile responsive</li>
-                        <li>Chuyển hướng đến trang login</li>
-                        <li>Giao diện tối giản</li>
-                    </ul>
-                </div>
-
-                <div class="feature-item">
-                    <h3 class="feature-title">Khi đã đăng nhập:</h3>
-                    <ul class="feature-list">
-                        <li>Avatar với fallback chữ cái đầu</li>
-                        <li>Hiển thị tên và email người dùng</li>
-                        <li>Badge phân biệt Admin/Customer</li>
-                        <li>Thông báo với số lượng chưa đọc</li>
-                        <li>Menu dropdown đầy đủ tính năng</li>
-                    </ul>
-                </div>
-
-                <div class="feature-item">
-                    <h3 class="feature-title">Menu dropdown bao gồm:</h3>
-                    <ul class="feature-list">
-                        <li>Quản lý tài khoản cá nhân</li>
-                        <li>Lịch sử và quản lý đặt phòng</li>
-                        <li>Danh sách yêu thích</li>
-                        <li>Cài đặt và thông báo</li>
-                        <li>Quyền Admin (nếu có)</li>
-                        <li>Đăng xuất</li>
-                    </ul>
-                </div>
-
-                <div class="feature-item">
-                    <h3 class="feature-title">Responsive Design:</h3>
-                    <ul class="feature-list">
-                        <li>Desktop: Menu dropdown đầy đủ</li>
-                        <li>Mobile: Menu overlay với navigation</li>
-                        <li>Tablet: Tối ưu cho màn hình trung bình</li>
-                        <li>Touch-friendly trên mobile</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <script>
-        // Thêm vào script hiện tại
-document.addEventListener('DOMContentLoaded', function() {
-    loadUserInfo();
-});
-
-function loadUserInfo() {
-    fetch('/api/user/current')
-        .then(response => response.json())
-        .then(data => {
-            if (data.username && data.role) {
-                updateUserDisplay(data.username, data.role);
-            }
-        })
-        .catch(error => {
-            console.log('Error loading user info:', error);
-        });
-}
-
-function updateUserDisplay(username, role) {
-    document.querySelector('.user-name').textContent = username;
-    document.querySelector('.user-role').textContent = getRoleDisplayName(role);
-}
-
         // Initialize Lucide icons
         lucide.createIcons();
-
-        // User state management
-        let isLoggedIn = false;
-        let currentUser = {
-            name: "Nguyễn Văn An",
-            email: "nguyenvanan@example.com",
-            role: "CUSTOMER", // or "ADMIN"
-            avatar: null,
-            notifications: 3
-        };
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateUserInterface();
-        });
-
-        // Toggle user state for demo
-        function toggleUserState() {
-            isLoggedIn = !isLoggedIn;
-            
-            if (isLoggedIn) {
-                // Randomly assign role for demo
-                currentUser.role = Math.random() > 0.5 ? "ADMIN" : "CUSTOMER";
-            }
-            
-            updateUserInterface();
-        }
-
-        // Update UI based on login state
-        function updateUserInterface() {
-            const userMenu = document.getElementById('user-menu');
-            const authButtons = document.getElementById('auth-buttons');
-            const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
-            const toggleText = document.getElementById('toggle-text');
-
-            if (isLoggedIn) {
-                userMenu.style.display = 'flex';
-                authButtons.style.display = 'none';
-                mobileAuthButtons.style.display = 'none';
-                toggleText.textContent = 'Đăng xuất (Demo)';
-                
-                updateUserInfo();
-            } else {
-                userMenu.style.display = 'none';
-                authButtons.style.display = 'flex';
-                mobileAuthButtons.style.display = 'flex';
-                toggleText.textContent = 'Đăng nhập (Demo)';
-            }
-        }
-
-        // Update user information in UI
-        function updateUserInfo() {
-            const initials = getInitials(currentUser.name);
-            
-            // Update avatar
-            document.getElementById('user-avatar').textContent = initials;
-            
-            // Update user info
-            document.getElementById('user-name').textContent = currentUser.name;
-            document.getElementById('dropdown-user-name').textContent = currentUser.name;
-            document.getElementById('dropdown-user-email').textContent = currentUser.email;
-            
-            // Update role
-            const roleText = document.getElementById('user-role-text');
-            const adminBadge = document.getElementById('admin-badge');
-            const adminSection = document.getElementById('admin-section');
-            
-            if (currentUser.role === 'ADMIN') {
-                roleText.style.display = 'none';
-                adminBadge.style.display = 'flex';
-                adminSection.style.display = 'block';
-            } else {
-                roleText.style.display = 'block';
-                roleText.textContent = 'Khách hàng';
-                adminBadge.style.display = 'none';
-                adminSection.style.display = 'none';
-            }
-            
-            // Update notification count
-            const notificationBadge = document.getElementById('notification-badge');
-            const dropdownNotificationCount = document.getElementById('dropdown-notification-count');
-            
-            if (currentUser.notifications > 0) {
-                notificationBadge.textContent = currentUser.notifications > 9 ? '9+' : currentUser.notifications;
-                notificationBadge.style.display = 'flex';
-                dropdownNotificationCount.textContent = currentUser.notifications;
-                dropdownNotificationCount.style.display = 'flex';
-            } else {
-                notificationBadge.style.display = 'none';
-                dropdownNotificationCount.style.display = 'none';
-            }
-        }
-
-        // Get initials from name
-        function getInitials(name) {
-            return name.split(' ')
-                      .map(word => word[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2);
-        }
 
         // Toggle user dropdown
         function toggleUserDropdown() {
@@ -386,7 +269,7 @@ function updateUserDisplay(username, role) {
             const dropdownMenu = document.getElementById('dropdown-menu');
             const avatarBtn = document.getElementById('user-avatar-btn');
             
-            if (!userDropdown.contains(event.target)) {
+            if (userDropdown && !userDropdown.contains(event.target)) {
                 dropdownMenu.classList.remove('active');
                 avatarBtn.classList.remove('active');
             }
@@ -406,35 +289,9 @@ function updateUserDisplay(username, role) {
         }
 
         // Handler functions
-        function handleLogin() {
-            console.log('Chuyển hướng đến trang đăng nhập');
-            // window.location.href = '/login';
-            alert('Chuyển hướng đến trang đăng nhập');
-        }
-
-        function handleRegister() {
-            console.log('Chuyển hướng đến trang đăng ký');
-            // window.location.href = '/register';
-            alert('Chuyển hướng đến trang đăng ký');
-        }
-
-        function handleLogout() {
-            console.log('Đăng xuất');
-            isLoggedIn = false;
-            updateUserInterface();
-            
-            // Close dropdown
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            const avatarBtn = document.getElementById('user-avatar-btn');
-            dropdownMenu.classList.remove('active');
-            avatarBtn.classList.remove('active');
-            
-            alert('Đã đăng xuất thành công!');
-        }
-
         function handleNotificationClick() {
             console.log('Mở trang thông báo');
-            alert('Mở trang thông báo');
+            window.location.href = '/notifications';
         }
 
         // Close mobile menu when window is resized to desktop
@@ -446,9 +303,20 @@ function updateUserDisplay(username, role) {
         });
 
         // Prevent dropdown from closing when clicking inside
-        document.getElementById('dropdown-menu').addEventListener('click', function(event) {
-            event.stopPropagation();
-        });
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        if (dropdownMenu) {
+            dropdownMenu.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        }
+
+        // Auto-hide notification badge after 5 seconds (demo)
+        setTimeout(function() {
+            const notificationBadge = document.getElementById('notification-badge');
+            if (notificationBadge) {
+                notificationBadge.style.display = 'none';
+            }
+        }, 5000);
     </script>
 </body>
 </html>

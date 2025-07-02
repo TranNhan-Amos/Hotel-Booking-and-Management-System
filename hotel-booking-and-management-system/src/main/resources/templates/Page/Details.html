@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${room.type + ' - Chi Tiết Khách Sạn'}">Chi Tiết Khách Sạn</title>
+    <title th:text="${room.type + ' - Chi Tiết Phòng'}">Chi Tiết Phòng</title>
     
     <!-- SEO Meta Tags -->
     <meta name="description" th:content="${room.description}">
@@ -12,27 +12,45 @@
     <meta property="og:image" th:content="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : ''}">
     <meta property="og:type" content="website">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/Details.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/Css/Narbar.css}">
+    <link rel="stylesheet" th:href="@{/Css/Details.css}">
+    <style>
+        .room-status {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+            color: #fff;
+        }
+        .room-status.available { background: #22c55e; }
+        .room-status.booked { background: #ef4444; }
+        .room-status.unknown { background: #64748b; }
+        .hotel-header h1 { display: inline; }
+    </style>
 </head>
 <body>
 
-    <div class="container">
+    <div th:replace="~{/Layout/narbar}"></div>
 
-       <div th:replace="~{/Layout/narbar}"></div>
+    <div class="container">
 
         <!-- Breadcrumb Navigation -->
         <div class="breadcrumb">
             <a href="/">Trang chủ</a> > 
-            <a href="/rooms">Danh sách phòng</a> > 
+            <a href="/ListRoom">Danh sách phòng</a> > 
             <span th:text="${room.type}">Tên phòng</span>
         </div>
 
         <!-- Hotel Details -->
         <div class="hotel-details">
             <div class="hotel-header">
-                <h1 th:text="${room.type}">Vinpearl Resort & Spa Đà Nẵng</h1>
+                <h1 th:text="${room.type}">Tên phòng</h1>
+                <span th:if="${roomAvailable != null}" th:classappend=" ' room-status ' + (${roomAvailable} ? 'available' : 'booked') " th:text="${roomAvailable} ? 'Còn trống' : 'Đã được đặt'">Còn trống</span>
+                <span th:if="${roomAvailable == null}" class="room-status unknown">Không xác định</span>
                 <div class="info">
                     <div class="rating" th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">8.9</div>
                     <div class="location"><i class="fas fa-map-marker-alt"></i> <span th:text="${room.description}">Bãi biển Non Nước, Đà Nẵng</span></div>
@@ -56,7 +74,7 @@
             </div>
 
             <!-- Room Details Grid -->
-            <div class="room-details-grid">
+            <div class="room-details-grid animate-slide">
                 <div class="detail-item">
                     <i class="fas fa-users"></i>
                     <span>Sức chứa: <strong th:text="${room.capacity}">2</strong> người</span>
@@ -84,7 +102,7 @@
             </div>
 
             <!-- Gallery -->
-            <div class="hotel-gallery">
+            <div class="hotel-gallery animate-fade">
                 <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : 'https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop'}" 
                      th:alt="${room.type}" class="main-img" onclick="openLightbox(this.src)">
                 <img th:src="${room.imageUrls != null and room.imageUrls.size() > 1 ? room.imageUrls[1] : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop'}" 
@@ -106,7 +124,7 @@
 
             <!-- Hotel Info -->
             <div class="hotel-info">
-                <div class="hotel-description">
+                <div class="hotel-description animate-fade">
                     <h2>Giới thiệu</h2>
                     <p th:text="${room.description}">Mô tả phòng từ database</p>
 
@@ -161,9 +179,18 @@
                     </div>
                 </div>
 
-                <div class="hotel-booking">
+                <div class="hotel-booking animate-fade">
                     <h3>Đặt phòng ngay</h3>
                     <div class="price" th:text="'Từ ' + ${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">Từ 2,500,000 ₫/đêm</div>
+                    
+                    <div class="room-available-info">
+                        <span th:if="${roomAvailableCount != null}" style="font-size:15px; color:#22c55e;">
+                            <i class="fas fa-door-open"></i> Còn <b th:text="${roomAvailableCount}">0</b> phòng trống
+                        </span>
+                        <span th:if="${roomAvailableCount == 0}" style="font-size:15px; color:#e74c3c;">
+                            <i class="fas fa-door-closed"></i> Hết phòng
+                        </span>
+                    </div>
                     
                     <form th:action="@{/bookings}" method="get" id="bookingForm">
                         <input type="hidden" name="roomId" th:value="${room.roomId}">
@@ -179,14 +206,14 @@
                         </div>
                         <div class="input-group">
                             <i class="fas fa-calendar-alt"></i>
-                            <input type="date" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                            <input type="date" name="checkInDate" th:value="${param.checkInDate != null ? param.checkInDate : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
                         </div>
                         <div class="input-group">
                             <i class="fas fa-calendar-alt"></i>
-                            <input type="date" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" required>
+                            <input type="date" name="checkOutDate" th:value="${param.checkOutDate != null ? param.checkOutDate : #temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" required>
                         </div>
                         
-                        <button type="submit">Tiếp tục đặt phòng</button>
+                        <button type="submit" th:disabled="${roomAvailableCount == 0}">Tiếp tục đặt phòng</button>
                     </form>
                 </div>
             </div>
@@ -211,54 +238,7 @@
         </div>
 
         <!-- Footer -->
-        <footer>
-            <div class="footer-container">
-                <div class="footer-column">
-                    <h4>Về chúng tôi</h4>
-                    <ul>
-                        <li><a href="#">Giới thiệu</a></li>
-                        <li><a href="#">Cách hoạt động</a></li>
-                        <li><a href="#">Tin tức</a></li>
-                        <li><a href="#">Nghề nghiệp</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Khách hàng</h4>
-                    <ul>
-                        <li><a href="#">Câu hỏi thường gặp</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
-                        <li><a href="#">Chính sách hoàn tiền</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Đối tác</h4>
-                    <ul>
-                        <li><a href="#">Đăng ký chỗ nghỉ</a></li>
-                        <li><a href="#">Chương trình đối tác</a></li>
-                        <li><a href="#">Hỗ trợ đối tác</a></li>
-                        <li><a href="#">Quảng cáo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Liên hệ</h4>
-                    <ul>
-                        <li><a href="#">Trung tâm hỗ trợ</a></li>
-                        <li><a href="#">Liên hệ chúng tôi</a></li>
-                        <li><a href="#">0935123456</a></li>
-                        <li><a href="#">support@datphong.com</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2025 Đặt Phòng Khách Sạn. Mọi quyền được bảo lưu.</p>
-            </div>
-        </footer>
+        <div th:replace="~{/Layout/footer}"></div>
     </div>
 
     <!-- JavaScript for Enhanced Features -->

@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/login", "/register", "/css/**", "/Css/**", "/js/**", 
                     "/images/**", "/room/**", "/search", "/rooms", "/details/**",
-                    "/bookings", "/payment", "/booking-confirmation", "/error", "/process-payment", "/test-data"
+                    "/bookings", "/payment", "/booking-confirmation", "/error", "/process-payment", "/test-data",
+                    "/profile"
                 ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/partner/**").hasRole("PARTNER")

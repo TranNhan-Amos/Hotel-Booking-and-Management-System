@@ -55,6 +55,17 @@ public class BookingController {
                         LocalDate checkOut = LocalDate.parse(checkOutDate);
                         int nights = checkIn.until(checkOut).getDays();
                         model.addAttribute("nights", nights);
+                        
+                        // Tính toán giá
+                        double basePrice = room.getPrice().doubleValue() * nights;
+                        double serviceFee = basePrice * 0.1;
+                        double vat = (basePrice + serviceFee) * 0.1;
+                        double total = basePrice + serviceFee + vat;
+                        
+                        model.addAttribute("basePrice", basePrice);
+                        model.addAttribute("serviceFee", serviceFee);
+                        model.addAttribute("vat", vat);
+                        model.addAttribute("total", total);
                     }
                 }
             }
@@ -86,9 +97,11 @@ public class BookingController {
             @RequestParam(required = false) String idNumber,
             @RequestParam(required = false) String specialRequest,
             @RequestParam(required = false) String voucherCode,
+            @RequestParam(name = "roomQuantity", required = false, defaultValue = "1") Integer roomQuantity,
             RedirectAttributes redirectAttributes) {
 
         try {
+            System.out.println("=== DEBUG: roomQuantity nhận từ form: " + roomQuantity);
             System.out.println("=== DEBUG: Processing booking ===");
             System.out.println("Customer: " + customerName + ", Email: " + email);
             System.out.println("Room ID: " + roomId + ", Check-in: " + checkInDate + ", Check-out: " + checkOutDate);
@@ -96,17 +109,19 @@ public class BookingController {
             // Validate voucher nếu có
             Integer voucherId = null;
             if (voucherCode != null && !voucherCode.trim().isEmpty()) {
-                // TODO: Implement voucher validation logic
-                // VoucherEntity voucher = voucherService.findByCode(voucherCode);
-                // if (voucher != null && voucher.isValid()) {
-                //     voucherId = voucher.getVoucherId();
-                // }
+                VoucherEntity voucher = voucherService.findByCode(voucherCode);
+                if (voucher != null && voucherService.isVoucherValid(voucher, checkInDate)) {
+                    voucherId = voucher.getVoucherId();
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+                    return "redirect:/bookings?roomId=" + roomId;
+                }
             }
             
             // Tạo booking
             BookingOrderEntity booking = bookingOrderService.createBooking(
                 customerName, email, phone, address, 
-                roomId, checkInDate, checkOutDate, voucherId
+                roomId, checkInDate, checkOutDate, voucherId, specialRequest, roomQuantity
             );
             
             System.out.println("=== DEBUG: Booking created successfully ===");
@@ -132,10 +147,16 @@ public class BookingController {
     @GetMapping("/booking-confirmation")
     public String showConfirmation(@RequestParam Integer bookingId, Model model) {
         try {
-            // Lấy thông tin booking để hiển thị xác nhận
-            // TODO: Implement booking confirmation service
-            model.addAttribute("bookingId", bookingId);
-            return "Page/BookingConfirmation";
+            Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+            if (bookingOpt.isPresent()) {
+                BookingOrderEntity booking = bookingOpt.get();
+                model.addAttribute("booking", booking);
+                model.addAttribute("bookingId", bookingId);
+                return "Page/BookingConfirmation";
+            } else {
+                model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
+                return "redirect:/";
+            }
         } catch (Exception e) {
             model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
             return "redirect:/";
@@ -184,41 +205,19 @@ public class BookingController {
         }
     }
 
-    // Xử lý thanh toán
+    // Xử lý thanh toán tại khách sạn
     @PostMapping("/process-payment")
     public String processPayment(
             @RequestParam Integer bookingId,
             @RequestParam String paymentMethod,
-            @RequestParam(required = false) String cardNumber,
-            @RequestParam(required = false) String expiryDate,
-            @RequestParam(required = false) String cvv,
-            @RequestParam(required = false) String cardHolderName,
-            @RequestParam(required = false) String momoNumber,
             RedirectAttributes redirectAttributes) {
         
         try {
-            // TODO: Implement payment processing logic
-            // 1. Validate payment information
-            // 2. Process payment with payment gateway
-            // 3. Update booking status
-            // 4. Send confirmation email
+            // Xác nhận thanh toán
+            BookingOrderEntity booking = bookingOrderService.confirmPayment(bookingId);
             
-            // Simulate payment processing
-            boolean paymentSuccess = true; // TODO: Replace with actual payment processing
-            
-            if (paymentSuccess) {
-                // Update booking status to paid
-                bookingOrderService.adminUpdateBookingStatus(bookingId, "PAID");
-                
-                redirectAttributes.addFlashAttribute("success", 
-                    "Thanh toán thành công! Mã đặt phòng: " + bookingId + 
-                    ". Chúng tôi đã gửi email xác nhận.");
-                
-                return "redirect:/booking-confirmation?bookingId=" + bookingId;
-            } else {
-                redirectAttributes.addFlashAttribute("error", "Thanh toán thất bại. Vui lòng thử lại.");
-                return "redirect:/payment?bookingId=" + bookingId;
-            }
+            redirectAttributes.addFlashAttribute("success", "Thanh toán thành công! Vui lòng đến khách sạn để check-in.");
+            return "redirect:/booking-confirmation?bookingId=" + bookingId;
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
@@ -226,21 +225,56 @@ public class BookingController {
         }
     }
 
-    // Test endpoint để kiểm tra dữ liệu
+    // Hủy đặt phòng
+    @PostMapping("/cancel-booking")
+    public String cancelBooking(
+            @RequestParam Integer bookingId,
+            @RequestParam String reason,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            BookingOrderEntity booking = bookingOrderService.cancelBooking(bookingId, reason);
+            
+            if (booking.getRefundAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                redirectAttributes.addFlashAttribute("success", 
+                    "Đã hủy đặt phòng thành công. Số tiền hoàn lại: " + 
+                    booking.getRefundAmount().toString() + " VNĐ");
+            } else {
+                redirectAttributes.addFlashAttribute("success", 
+                    "Đã hủy đặt phòng thành công. Không có tiền hoàn lại theo chính sách.");
+            }
+            
+            return "redirect:/booking-confirmation?bookingId=" + bookingId;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/booking-confirmation?bookingId=" + bookingId;
+        }
+    }
+
+    // Xử lý hoàn tiền
+    @PostMapping("/process-refund")
+    public String processRefund(
+            @RequestParam Integer bookingId,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            BookingOrderEntity booking = bookingOrderService.processRefund(bookingId);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Đã xử lý hoàn tiền thành công cho đặt phòng #" + bookingId);
+            
+            return "redirect:/booking-confirmation?bookingId=" + bookingId;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/booking-confirmation?bookingId=" + bookingId;
+        }
+    }
+
+    // Test data page
     @GetMapping("/test-data")
     public String testData(Model model) {
-        try {
-            // Kiểm tra rooms
-            List<RoomEntity> rooms = roomService.findAll();
-            model.addAttribute("rooms", rooms);
-            
-            // Kiểm tra status
-            // TODO: Add status service
-            
-            return "test-data";
-        } catch (Exception e) {
-            model.addAttribute("error", "Lỗi: " + e.getMessage());
-            return "error";
-        }
+        return "test-data";
     }
 }

@@ -94,7 +94,7 @@ public class ProfileController {
         model.addAttribute("displayRole", displayRole);
         model.addAttribute("isLoggedIn", true);
         
-        return "Page/Profile";
+        return "Page/profile";
     }
 
     @PostMapping("/update-profile")

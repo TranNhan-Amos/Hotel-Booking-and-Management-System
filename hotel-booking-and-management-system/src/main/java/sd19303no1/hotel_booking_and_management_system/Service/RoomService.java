@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.ReviewRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 import sd19303no1.hotel_booking_and_management_system.DTO.RoomTypeDTO;
 
 @Service
@@ -22,6 +23,9 @@ public class RoomService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private BookingOrderRepository bookingOrderRepository;
 
     public List<RoomEntity> getFeaturedRooms(int limit) {
         List<RoomEntity> rooms = roomRepository.findAll();
@@ -90,5 +94,17 @@ public class RoomService {
 
         public void deleteRoom(Integer id) {
         roomRepository.deleteById(id);
+    }
+
+    /**
+     * Tính số phòng còn trống cho một loại phòng trong khoảng ngày
+     */
+    public int getAvailableRoomCount(Integer roomId, LocalDate checkIn, LocalDate checkOut) {
+        RoomEntity room = roomRepository.findById(roomId).orElse(null);
+        if (room == null) return 0;
+        int total = room.getTotalRooms() != null ? room.getTotalRooms() : 0;
+        // Đếm số booking còn hiệu lực (không bị hủy, hoàn tiền, v.v.)
+        int booked = bookingOrderRepository.findConflictingBookings(roomId, checkIn, checkOut).size();
+        return Math.max(total - booked, 0);
     }
 }

@@ -529,4 +529,24 @@ public class BookingOrderService {
     public List<BookingOrderEntity> findByStatusName(String statusName) {
         return bookingOrderRepository.findByStatusName(statusName);
     }
+
+    //Đếm phòng booking hôm nay theo partner
+    public long countTodayBookingsByPartner(Long partnerId) {
+        return bookingOrderRepository.countTodayBookingsByPartner(partnerId);
+    }
+
+    //Hiện tất cả booking của partner
+    public List<BookingOrderEntity> findAllBookingsByPartner(Long partnerId) {
+        return bookingOrderRepository.findAllBookingsByPartner(partnerId);
+    }
+
+    //Doanh thu hôm nay theo partner
+    public Integer sumDoanhThuToday(Long partnerId) {
+        return bookingOrderRepository.sumDoanhThuToday(partnerId);
+    }
+
+    //DataReport for Partner
+    public List<Object[]> getReportData(Long partnerId ,LocalDate startDate, LocalDate endDate) {
+        return bookingOrderRepository.getReportData(partnerId ,startDate, endDate);
+    }
 }

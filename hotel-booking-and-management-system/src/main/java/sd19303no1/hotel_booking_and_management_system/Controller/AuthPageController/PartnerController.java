@@ -1,5 +1,9 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.AuthPageController;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +13,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
+import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
 import sd19303no1.hotel_booking_and_management_system.Service.PartnerService;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomPartnerService;
 import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
@@ -29,49 +33,64 @@ public class PartnerController {
 
     @Autowired
     private RoomPartnerService roomPartnerService;
-    
+
     @Autowired
     private PartnerService partnerService;
-    
+
     @Autowired
     private SystemUserService systemUserService;
-    
+
+    @Autowired
+    private BookingOrderService bookingOrderService;
+
     @GetMapping("/partner")
     public String partnerDashboard(Model model) {
         try {
+            System.out.println("=== DEBUG: partnerDashboard method called");
+
             // Get current authenticated user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName(); // Assuming email is used as username
-            
+            System.out.println("=== DEBUG: User email: " + userEmail);
+
             // Find system user by email
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
-            
+            System.out.println("=== DEBUG: SystemUser found: " + (systemUser != null));
+
             if (systemUser != null && systemUser.isPartner()) {
+                System.out.println("=== DEBUG: User is partner");
                 // Find partner information
                 PartnerEntity partner = partnerService.findBySystemUser(systemUser);
-                long roomCount = roomPartnerService.countRoomsByPartnerId(partner.getId());
-                
+                System.out.println("=== DEBUG: Partner found: " + (partner != null));
+
                 if (partner != null) {
-                    
+                    long roomCount = roomPartnerService.countRoomsByPartnerId(partner.getId());
+                    System.out.println("=== DEBUG: Room count: " + roomCount);
+
                     model.addAttribute("partner", partner);
                     model.addAttribute("systemUser", systemUser);
                     model.addAttribute("hasPartnerInfo", true);
                     model.addAttribute("userEmail", userEmail);
                     model.addAttribute("roomCount", roomCount);
                 } else {
+                    System.out.println("=== DEBUG: No partner info, showing registration prompt");
                     model.addAttribute("hasPartnerInfo", false);
                     model.addAttribute("userEmail", userEmail);
                 }
             } else {
+                System.out.println("=== DEBUG: User is not partner, redirecting to login");
                 // Redirect to login if not partner
                 return "redirect:/login";
             }
-            
+
         } catch (Exception e) {
+            System.out.println("=== DEBUG: Exception in partnerDashboard: " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("error", "Có lỗi xảy ra khi tải thông tin đối tác");
             model.addAttribute("hasPartnerInfo", false);
         }
-        
+
+        System.out.println("=== DEBUG: Returning DashboardPartner template");
         return "Partner/DashboardPartner";
     }
 
@@ -81,27 +100,27 @@ public class PartnerController {
             // Get current authenticated user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
-    
+
             // Find system user by email
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
-    
+
             if (systemUser != null && systemUser.isPartner()) {
                 // Check if partner info already exists
                 PartnerEntity existingPartner = partnerService.findBySystemUser(systemUser);
                 if (existingPartner != null) {
                     return "redirect:/partner"; // Already has partner info
                 }
-        
+
                 // Create new partner entity with pre-filled email
                 PartnerEntity partner = new PartnerEntity();
                 partner.setEmail(userEmail);
-        
+
                 model.addAttribute("partner", partner);
                 model.addAttribute("systemUser", systemUser);
             } else {
                 return "redirect:/login";
             }
-    
+
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra khi tải form đăng ký");
             // Tạo partner object rỗng để tránh lỗi template
@@ -156,29 +175,123 @@ public class PartnerController {
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi đăng ký thông tin đối tác: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error",
+                    "Có lỗi xảy ra khi đăng ký thông tin đối tác: " + e.getMessage());
             return "redirect:/partner/register";
         }
     }
 
     @GetMapping("/dashboard/partner")
-    public String DashboardPartner(Model model ) {
+    public String DashboardPartner(Model model) {
         return ("Partner/DashboardPartner");
     }
 
-    
+    // @GetMapping("/partner/bookings")
+    // public String viewPartnerBookings(Model model) {
+    // try {
+    // // Lấy thông tin người dùng đã đăng nhập
+    // Authentication authentication =
+    // SecurityContextHolder.getContext().getAuthentication();
+    // String userEmail = authentication.getName(); // Lấy email từ Authentication
 
-    @GetMapping("/partner/bookings")
-    public String viewPartnerBookings() {
-        // Logic to retrieve and display partner bookings information can be added here
-        return "Partner/BookingsPartner"; // Path to your Thymeleaf template for partner bookings
-    }
-    
+    // SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+
+    // if (systemUser != null && systemUser.isPartner()) {
+
+    // PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+    // if (partner != null) {
+    // Long partnerId = partner.getId();
+
+    // long bookingshomNay =
+    // bookingOrderService.countTodayBookingsByPartner(partnerId);
+    // List<BookingOrderEntity> RoomBookingsPartner =
+    // bookingOrderService.findAllBookingsByPartner(partnerId); // Lấy 10 booking
+    // gần nhất
+    // long sumDoanhThuToday = bookingOrderService.sumDoanhThuToday(partnerId);
+
+    // model.addAttribute("bookingshomNay", bookingshomNay);
+    // model.addAttribute("RoomBookingsPartner", RoomBookingsPartner);
+    // model.addAttribute("sumDoanhThuToday", sumDoanhThuToday);
+    // return "Partner/BookingsPartner";
+    // } else {
+    // model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+    // return "Partner/BookingsPartner";
+    // }
+    // } else {
+
+    // }
+
+    // } catch (Exception e) {
+    // // TODO: handle exception
+    // }
+    // // Logic to retrieve and display partner bookings information can be added
+    // here
+    // return "Partner/BookingsPartner"; // Path to your Thymeleaf template for
+    // partner bookings
+    // }
 
     @GetMapping("/partner/reports")
-    public String viewPartnerReports() {
-        // Logic to retrieve and display partner reports information can be added here
-        return "Partner/ReportsPartner"; // Path to your Thymeleaf template for partner reports
+    public String viewPartnerReports(@RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            Model model) {
+        try {
+            // Lấy thông tin người dùng đã đăng nhập
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+
+            if (systemUser != null && systemUser.isPartner()) {
+                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+                if (partner != null) {
+                    Long partnerId = partner.getId();
+
+                    // Chuyển đổi ngày từ chuỗi sang LocalDate
+                    LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
+                    LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
+
+                    BigDecimal totalRevenue = BigDecimal.ZERO;
+                    Long totalBookings = 0L;
+
+                    // Chỉ lấy dữ liệu nếu cả startDate và endDate đều được nhập
+                    if (start != null && end != null) {
+                        List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
+
+                        totalRevenue = (reportData != null && !reportData.isEmpty() && reportData.get(0)[0] != null)
+                                ? (BigDecimal) reportData.get(0)[0]
+                                : BigDecimal.ZERO;
+                        totalBookings = (reportData != null && !reportData.isEmpty() && reportData.get(0)[1] != null)
+                                ? ((Number) reportData.get(0)[1]).longValue()
+                                : 0L;
+
+                        System.out.println("Filtered from: " + start + " to " + end);
+                        System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
+                    } else {
+                        System.out.println("No date range selected.");
+                    }
+
+                    model.addAttribute("totalRevenue", totalRevenue);
+                    model.addAttribute("totalBookings", totalBookings);
+                    model.addAttribute("startDate", startDate);
+                    model.addAttribute("endDate", endDate);
+                    model.addAttribute("partnerId", partnerId);
+
+                    return "Partner/ReportsPartner";
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                    return "Partner/ReportsPartner";
+                }
+            } else {
+                model.addAttribute("error", "Bạn không có quyền truy cập.");
+                return "Partner/ReportsPartner";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
+            return "Partner/ReportsPartner";
+        }
     }
 
     @GetMapping("/partner/reviews")
@@ -199,14 +312,14 @@ public class PartnerController {
             // Get current authenticated user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName(); // Assuming email is used as username
-            
+
             // Find system user by email
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
-            
+
             if (systemUser != null && systemUser.isPartner()) {
                 // Find partner information
                 PartnerEntity partner = partnerService.findBySystemUser(systemUser);
-                
+
                 if (partner != null) {
                     model.addAttribute("partner", partner);
                     model.addAttribute("systemUser", systemUser);
@@ -219,9 +332,10 @@ public class PartnerController {
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra khi tải thông tin cài đặt đối tác");
         }
-        
+
         return "Partner/SettingsPartner";
     }
+
     @PostMapping("/partner/settings/update")
     public String updatePartnerSettings(
             @ModelAttribute("partner") @Valid PartnerEntity partner,
@@ -230,15 +344,16 @@ public class PartnerController {
         if (result.hasErrors()) {
             return "Partner/SettingsPartner"; // Return to settings page if there are validation errors
         }
-        
+
         try {
             // Save updated partner information
             partnerService.save(partner);
             redirectAttributes.addFlashAttribute("success", "Cài đặt đối tác đã được cập nhật thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật cài đặt đối tác: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error",
+                    "Có lỗi xảy ra khi cập nhật cài đặt đối tác: " + e.getMessage());
         }
-        
+
         return "redirect:/partner/settings";
     }
 

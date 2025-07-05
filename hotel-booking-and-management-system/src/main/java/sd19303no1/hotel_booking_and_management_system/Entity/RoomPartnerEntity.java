@@ -2,17 +2,17 @@ package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "rooms")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor 
 @AllArgsConstructor
-@Builder
 public class RoomPartnerEntity {
 
     @Id
@@ -21,7 +21,7 @@ public class RoomPartnerEntity {
     private Long  roomId;
 
     @Column(name = "bathroom_type")
-    private int bathroomType;
+    private String bathroomType;
 
     @Column(name = "bed_count")
     private Integer bedCount;

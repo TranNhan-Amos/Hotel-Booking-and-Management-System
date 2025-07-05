@@ -41,7 +41,7 @@
                     </div>
                     <div class="order-item">
                         <span>Ngày đặt:</span>
-                        <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}">27/05/2025</span>
+                        <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">27/05/2025</span>
                     </div>
                     <div class="order-item">
                         <span>Trạng thái:</span>
@@ -62,11 +62,11 @@
                     </div>
                     <div class="room-detail">
                         <span class="label">Ngày nhận phòng:</span>
-                        <span class="value" th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">01/06/2025</span>
+                        <span class="value" th:text="${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'}">01/06/2025</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Ngày trả phòng:</span>
-                        <span class="value" th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">03/06/2025</span>
+                        <span class="value" th:text="${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">03/06/2025</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Số đêm:</span>

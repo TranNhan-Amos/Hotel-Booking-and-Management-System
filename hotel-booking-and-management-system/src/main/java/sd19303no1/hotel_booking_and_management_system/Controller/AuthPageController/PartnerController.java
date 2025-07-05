@@ -186,50 +186,7 @@ public class PartnerController {
         return ("Partner/DashboardPartner");
     }
 
-    // @GetMapping("/partner/bookings")
-    // public String viewPartnerBookings(Model model) {
-    // try {
-    // // Lấy thông tin người dùng đã đăng nhập
-    // Authentication authentication =
-    // SecurityContextHolder.getContext().getAuthentication();
-    // String userEmail = authentication.getName(); // Lấy email từ Authentication
 
-    // SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
-
-    // if (systemUser != null && systemUser.isPartner()) {
-
-    // PartnerEntity partner = partnerService.findBySystemUser(systemUser);
-
-    // if (partner != null) {
-    // Long partnerId = partner.getId();
-
-    // long bookingshomNay =
-    // bookingOrderService.countTodayBookingsByPartner(partnerId);
-    // List<BookingOrderEntity> RoomBookingsPartner =
-    // bookingOrderService.findAllBookingsByPartner(partnerId); // Lấy 10 booking
-    // gần nhất
-    // long sumDoanhThuToday = bookingOrderService.sumDoanhThuToday(partnerId);
-
-    // model.addAttribute("bookingshomNay", bookingshomNay);
-    // model.addAttribute("RoomBookingsPartner", RoomBookingsPartner);
-    // model.addAttribute("sumDoanhThuToday", sumDoanhThuToday);
-    // return "Partner/BookingsPartner";
-    // } else {
-    // model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
-    // return "Partner/BookingsPartner";
-    // }
-    // } else {
-
-    // }
-
-    // } catch (Exception e) {
-    // // TODO: handle exception
-    // }
-    // // Logic to retrieve and display partner bookings information can be added
-    // here
-    // return "Partner/BookingsPartner"; // Path to your Thymeleaf template for
-    // partner bookings
-    // }
 
     @GetMapping("/partner/reports")
     public String viewPartnerReports(@RequestParam(required = false) String startDate,

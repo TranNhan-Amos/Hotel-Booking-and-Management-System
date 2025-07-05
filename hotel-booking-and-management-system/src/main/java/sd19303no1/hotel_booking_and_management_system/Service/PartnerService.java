@@ -26,5 +26,11 @@ public class PartnerService {
         return partnerRepository.save(partner);
     }
 
-  
+    public List<PartnerEntity> findAll() {
+        return partnerRepository.findAll();
+    }
+
+    public PartnerEntity findById(Long id) {
+        return partnerRepository.findById(id).orElse(null);
+    }
 }

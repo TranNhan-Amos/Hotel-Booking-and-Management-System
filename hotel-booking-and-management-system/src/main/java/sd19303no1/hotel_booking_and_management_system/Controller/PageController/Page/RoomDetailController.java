@@ -8,6 +8,8 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.ReviewEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Service.ReviewService;
 import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
+import sd19303no1.hotel_booking_and_management_system.Service.CustomersService;
 
 @Controller
 public class RoomDetailController {
@@ -34,6 +38,9 @@ public class RoomDetailController {
 
     @Autowired
     private VoucherService voucherService;
+
+    @Autowired
+    private CustomersService customersService;
 
     @GetMapping("/room/{id}")
     public String roomDetail(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
@@ -97,6 +104,17 @@ public class RoomDetailController {
             LocalDate checkOut = checkIn.plusDays(1);
             int roomAvailableCount = roomService.getAvailableRoomCount(id, checkIn, checkOut);
             model.addAttribute("roomAvailableCount", roomAvailableCount);
+
+            // Thêm thông tin người dùng đã đăng nhập nếu có
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated() && 
+                !"anonymousUser".equals(authentication.getName())) {
+                String email = authentication.getName();
+                CustomersEntity customer = customersService.findByEmail(email);
+                if (customer != null) {
+                    model.addAttribute("currentUser", customer);
+                }
+            }
 
             logger.info("Successfully fetched room details for id: {}", id);
             return "Page/Details";

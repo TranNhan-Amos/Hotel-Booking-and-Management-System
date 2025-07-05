@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "bookingorder")
@@ -19,6 +21,7 @@ public class BookingOrderEntity {
 
     @ManyToOne
     @JoinColumn(name = "voucher_id")
+    @JsonIgnore
     private VoucherEntity voucher;
 
     @CreationTimestamp
@@ -26,6 +29,7 @@ public class BookingOrderEntity {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonIgnore
     private RoomEntity room;
 
     @Column(name = "email")
@@ -42,10 +46,12 @@ public class BookingOrderEntity {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private CustomersEntity customer;
 
     @ManyToOne
     @JoinColumn(name = "status_id")
+    @JsonIgnore
     private StatusEntity status;
 
     // Thêm các trường mới cho tính năng hoàn tiền và chính sách hủy

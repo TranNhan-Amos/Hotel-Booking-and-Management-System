@@ -28,14 +28,27 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String lowerCaseEmail = email.toLowerCase();
+        System.out.println("=== CUSTOM USER DETAILS DEBUG ===");
+        System.out.println("Loading user by email: " + email + " (lowercase: " + lowerCaseEmail + ")");
 
         // Tìm trong SystemUserEntity
         return systemUserRepository.findByEmail(lowerCaseEmail)
-                .map(user -> new CustomUserDetails(user))
-                .orElseGet(() -> customersRepository.findByEmail(lowerCaseEmail)
-                        .map(customer -> new CustomUserDetails(customer))
-                        .orElseThrow(
-                                () -> new UsernameNotFoundException("Không tìm thấy người dùng với email: " + email)));
+                .map(user -> {
+                    System.out.println("Found SystemUser: " + user.getEmail() + " with role: " + user.getRole());
+                    return new CustomUserDetails(user);
+                })
+                .orElseGet(() -> {
+                    System.out.println("SystemUser not found, searching in Customers...");
+                    return customersRepository.findByEmail(lowerCaseEmail)
+                            .map(customer -> {
+                                System.out.println("Found Customer: " + customer.getEmail());
+                                return new CustomUserDetails(customer);
+                            })
+                            .orElseThrow(() -> {
+                                System.out.println("User not found in both tables");
+                                return new UsernameNotFoundException("Không tìm thấy người dùng với email: " + email);
+                            });
+                });
     }
 
    
@@ -49,17 +62,19 @@ public class CustomUserDetailsService implements UserDetailsService {
             this.systemUser = systemUser;
             this.customer = null;
             this.isSystemUser = true;
+            System.out.println("Created CustomUserDetails for SystemUser: " + systemUser.getEmail() + " with role: " + systemUser.getRole());
         }
 
         public CustomUserDetails(CustomersEntity customer) {
             this.customer = customer;
             this.systemUser = null;
             this.isSystemUser = false;
+            System.out.println("Created CustomUserDetails for Customer: " + customer.getEmail());
         }
 
         @Override
         public String getUsername() {
-            return getEmail();
+            return isSystemUser ? systemUser.getEmail() : customer.getEmail();
         }
 
         @Override
@@ -92,8 +107,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         @Override
         public java.util.Collection<? extends GrantedAuthority> getAuthorities() {
             if (isSystemUser) {
-                return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + systemUser.getRole().name()));
+                String authority = "ROLE_" + systemUser.getRole().name();
+                System.out.println("SystemUser authority: " + authority);
+                return Collections.singletonList(new SimpleGrantedAuthority(authority));
             } else {
+                System.out.println("Customer authority: ROLE_CUSTOMER");
                 return Collections.singletonList(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
             }
         }

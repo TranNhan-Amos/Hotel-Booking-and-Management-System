@@ -34,8 +34,9 @@ public class SecurityConfig {
                     "/", "/login", "/register", "/css/**", "/Css/**", "/js/**", 
                     "/images/**", "/room/**", "/search", "/rooms", "/details/**",
                     "/bookings", "/payment", "/booking-confirmation", "/error", "/process-payment", "/test-data",
-                    "/profile"
+                    "/search-rooms"
                 ).permitAll()
+                .requestMatchers("/profile", "/profile/**", "/update-profile", "/my-bookings", "/book-room", "/cancel-booking", "/booking-detail/**", "/upload-avatar", "/delete-avatar").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/partner/**").hasRole("PARTNER")
                 .requestMatchers("/staff/**").hasRole("STAFF")

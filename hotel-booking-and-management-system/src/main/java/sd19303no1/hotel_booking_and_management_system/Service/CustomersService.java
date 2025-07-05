@@ -33,17 +33,22 @@ public class CustomersService {
     }
 
     public List<CustomersEntity> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return customerRepository.findAll();
     }
 
     public List<CustomersEntity> findAllCustomersForAdmin() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAllCustomersForAdmin'");
+        return customerRepository.findAll();
     }
 
     public void save(CustomersEntity customer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        customerRepository.save(customer);
+    }
+
+    public CustomersEntity findBySystemUser(sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity systemUser) {
+        return customerRepository.findBySystemUser(systemUser).orElse(null);
+    }
+
+    public CustomersEntity findByEmail(String email) {
+        return customerRepository.findByEmail(email).orElse(null);
     }
 }

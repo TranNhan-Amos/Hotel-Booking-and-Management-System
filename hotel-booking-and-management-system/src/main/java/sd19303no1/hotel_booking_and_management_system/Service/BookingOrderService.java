@@ -44,12 +44,23 @@ public class BookingOrderService {
     public BookingOrderEntity createBooking(String customerName, String email, String phone, String address,
                                             Integer roomId, LocalDate checkInDate, LocalDate checkOutDate,
                                             Integer voucherId, String specialRequests, Integer roomQuantity) {
-        System.out.println("=== SERVICE DEBUG: createBooking started ===");
         
         // Validate đầu vào cơ bản
-        if (checkInDate == null || checkOutDate == null ||
-            checkInDate.isAfter(checkOutDate) || checkInDate.isEqual(checkOutDate)) {
-            throw new IllegalArgumentException("Ngày nhận phòng và trả phòng không hợp lệ.");
+        if (checkInDate == null || checkOutDate == null) {
+            throw new IllegalArgumentException("Ngày nhận phòng và trả phòng không được để trống.");
+        }
+        
+        if (checkInDate.isAfter(checkOutDate)) {
+            throw new IllegalArgumentException("Ngày trả phòng phải sau ngày nhận phòng.");
+        }
+        
+        if (checkInDate.isEqual(checkOutDate)) {
+            throw new IllegalArgumentException("Ngày trả phòng phải khác ngày nhận phòng (ít nhất 1 đêm).");
+        }
+        
+        // Kiểm tra ngày nhận phòng không được trong quá khứ
+        if (checkInDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày nhận phòng không thể là ngày trong quá khứ.");
         }
         if (roomId == null) {
             throw new IllegalArgumentException("ID phòng không được để trống.");
@@ -61,12 +72,9 @@ public class BookingOrderService {
             throw new IllegalArgumentException("Tên khách hàng không được để trống.");
         }
 
-        System.out.println("=== SERVICE DEBUG: Validation passed ===");
-
         // 1. Tìm hoặc tạo customer
         CustomersEntity customer = customersRepository.findByEmail(email.toLowerCase())
                 .orElseGet(() -> {
-                    System.out.println("=== SERVICE DEBUG: Creating new customer ===");
                     CustomersEntity newCustomer = new CustomersEntity();
                     newCustomer.setName(customerName);
                     newCustomer.setEmail(email.toLowerCase());
@@ -75,13 +83,9 @@ public class BookingOrderService {
                     return customersRepository.save(newCustomer);
                 });
 
-        System.out.println("=== SERVICE DEBUG: Customer found/created: " + customer.getCustomerId() + " ===");
-
         // 2. Lấy room
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + roomId));
-
-        System.out.println("=== SERVICE DEBUG: Room found: " + room.getRoomId() + " ===");
 
         // 3. Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không
         boolean isRoomAvailable = room.getTotalRooms() != null && room.getTotalRooms() >= roomQuantity;
@@ -103,14 +107,11 @@ public class BookingOrderService {
         final String PENDING_STATUS_NAME = "PENDING";
         StatusEntity status = statusRepository.findByStatusNameIgnoreCase(PENDING_STATUS_NAME);
         if (status == null) {
-            System.out.println("=== SERVICE DEBUG: Creating new PENDING status ===");
             StatusEntity newStatus = new StatusEntity();
             newStatus.setStatusName(PENDING_STATUS_NAME);
             newStatus.setDescription("Chờ xác nhận");
             status = statusRepository.save(newStatus);
         }
-
-        System.out.println("=== SERVICE DEBUG: Status found/created: " + status.getStatusId() + " ===");
 
         // 6. Tính toán tổng tiền
         BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), checkInDate, checkOutDate, voucherEntity);
@@ -131,12 +132,7 @@ public class BookingOrderService {
         booking.setPaymentStatus("PENDING");
         booking.setRoomQuantity(roomQuantity);
 
-        System.out.println("=== SERVICE DEBUG: roomQuantity nhận từ controller: " + roomQuantity);
-
-        System.out.println("=== SERVICE DEBUG: Booking object created, saving... ===");
-
         BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
-        System.out.println("=== SERVICE DEBUG: Booking saved successfully with ID: " + savedBooking.getBookingId() + " ===");
         
         // Trừ số phòng đã đặt khỏi tổng số phòng còn trống
         room.setTotalRooms(room.getTotalRooms() - roomQuantity);

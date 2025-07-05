@@ -55,6 +55,8 @@
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
 		
+
+		
 		<!-- Spring Data JPA + MySQL Driver -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

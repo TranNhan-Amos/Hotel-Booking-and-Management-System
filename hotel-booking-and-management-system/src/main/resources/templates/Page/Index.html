@@ -133,7 +133,7 @@
                             <label class="input-label">Ngày đến</label>
                             <div class="input-wrapper">
                                 <i data-lucide="calendar" class="input-icon"></i>
-                                <input type="date" class="search-input" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                                <input type="date" class="search-input" name="checkInDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                             </div>
                         </div>
                         
@@ -141,7 +141,7 @@
                             <label class="input-label">Ngày về</label>
                             <div class="input-wrapper">
                                 <i data-lucide="calendar" class="input-icon"></i>
-                                <input type="date" class="search-input" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" required>
+                                <input type="date" class="search-input" name="checkOutDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                             </div>
                         </div>
                         
@@ -332,7 +332,7 @@
                     </div>
                     <div class="offer-content">
                         <h3 class="offer-title" th:text="'Mã ' + ${voucher.code} + ' - Ưu đãi đặc biệt'">Mã SUMMER25 - Ưu đãi đặc biệt</h3>
-                        <p class="offer-description" th:text="'Áp dụng từ ' + ${#temporals.format(voucher.startDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(voucher.endDate, 'dd/MM/yyyy')}">Áp dụng từ 01/01/2025 đến 31/12/2025</p>
+                                                    <p class="offer-description" th:text="'Áp dụng từ ' + ${voucher.startDate != null ? voucher.startDate.toString() : 'N/A'} + ' đến ' + ${voucher.endDate != null ? voucher.endDate.toString() : 'N/A'}">Áp dụng từ 01/01/2025 đến 31/12/2025</p>
                         <div class="offer-code">
                             <code th:text="${voucher.code}">SUMMER25</code>
                             <button class="btn btn-outline btn-small" onclick="copyVoucherCode(this)" th:data-code="${voucher.code}">
@@ -428,7 +428,7 @@
                     <div class="booking-details">
                         <div class="booking-date">
                             <i data-lucide="calendar"></i>
-                            <span th:text="'Từ ' + ${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : 'N/A'}">Từ 15/01/2025 đến 17/01/2025</span>
+                                                            <span th:text="'Từ ' + ${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">Từ 15/01/2025 đến 17/01/2025</span>
                         </div>
                         <div class="booking-price">
                             <span class="price-amount" th:text="${booking.room != null ? #numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">2,500,000 ₫</span>

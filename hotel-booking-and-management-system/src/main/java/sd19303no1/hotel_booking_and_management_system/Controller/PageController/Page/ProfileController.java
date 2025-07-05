@@ -33,58 +33,74 @@ public class ProfileController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private static final String UPLOAD_DIR = "F:\\Githup\\Myweb\\Hotel-Booking-and-Management-System\\src\\main\\resources\\static\\img";
+
     @GetMapping("/profile")
     public String showProfilePage(Model model, HttpSession session) {
         // Get current authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
+        System.out.println("=== PROFILE DEBUG ===");
+        System.out.println("Authentication: " + authentication);
+        System.out.println("Is authenticated: " + (authentication != null && authentication.isAuthenticated()));
+        System.out.println("Principal: " + (authentication != null ? authentication.getPrincipal() : "null"));
+        System.out.println("Name: " + (authentication != null ? authentication.getName() : "null"));
+        System.out.println("Authorities: " + (authentication != null ? authentication.getAuthorities() : "null"));
+        
         if (authentication == null || !authentication.isAuthenticated() || 
             authentication.getName().equals("anonymousUser")) {
+            System.out.println("Redirecting to login - not authenticated");
             return "redirect:/login";
         }
 
         String email = authentication.getName();
+        System.out.println("Looking for user with email: " + email);
         
-        // Try to get user from session first
-        SystemUserEntity sessionUser = (SystemUserEntity) session.getAttribute("loggedInUser");
+        // Get user data from database
+        SystemUserEntity systemUser = systemUserRepository.findByEmail(email).orElse(null);
         
-        SystemUserEntity systemUser = null;
-        CustomersEntity customer = null;
-        
-        if (sessionUser != null) {
-            systemUser = sessionUser;
-            // Get corresponding customer data
-            customer = customersRepository.findByEmail(email).orElse(null);
-        } else {
-            // Fallback: get from database
-            systemUser = systemUserRepository.findByEmail(email).orElse(null);
-            customer = customersRepository.findByEmail(email).orElse(null);
-        }
-        
-        if (systemUser == null && customer == null) {
+        if (systemUser == null) {
+            System.out.println("SystemUser not found for email: " + email);
             return "redirect:/login";
         }
         
-        // Add user data to model
-        if (systemUser != null) {
-            model.addAttribute("user", systemUser);
-            model.addAttribute("userType", "system");
+        System.out.println("Found SystemUser: ID=" + systemUser.getId() + ", Email=" + systemUser.getEmail() + ", Role=" + systemUser.getRole());
+        
+        // Get customer details if user is CUSTOMER
+        CustomersEntity customer = null;
+        if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+            // Try to find customer by systemUser first
+            customer = customersRepository.findBySystemUser(systemUser).orElse(null);
+            
+            // If not found, try to find by email as fallback
+            if (customer == null) {
+                customer = customersRepository.findByEmail(email).orElse(null);
+            }
         }
+        
+        // Add user data to model
+        model.addAttribute("user", systemUser);
+        model.addAttribute("userType", systemUser.getRole().toString().toLowerCase());
         
         if (customer != null) {
             model.addAttribute("customer", customer);
-            model.addAttribute("userType", customer != null ? "customer" : "system");
         }
         
         // Add combined user info for display
-        String displayName = customer != null ? customer.getName() : 
-                           (systemUser != null ? systemUser.getUsername() : "Unknown User");
-        String displayEmail = customer != null ? customer.getEmail() : 
-                            (systemUser != null ? systemUser.getEmail() : "");
+        String displayName = customer != null ? customer.getName() : systemUser.getUsername();
+        String displayEmail = systemUser.getEmail();
         String displayPhone = customer != null ? customer.getPhone() : "Chưa cập nhật";
         String displayAddress = customer != null ? customer.getAddress() : "Chưa cập nhật";
         String displayCccd = customer != null ? customer.getCccd() : "Chưa cập nhật";
-        String displayRole = systemUser != null ? systemUser.getRole().toString() : "CUSTOMER";
+        String displayRole = systemUser.getRole().toString();
+
+        // Get avatar path
+        String avatarPath = null;
+        if (customer != null && customer.getAvatar() != null && !customer.getAvatar().isEmpty()) {
+            avatarPath = customer.getAvatar();
+        } else if (systemUser.getImg() != null && !systemUser.getImg().isEmpty()) {
+            avatarPath = systemUser.getImg();
+        }
 
         model.addAttribute("displayName", displayName);
         model.addAttribute("displayEmail", displayEmail);
@@ -92,6 +108,7 @@ public class ProfileController {
         model.addAttribute("displayAddress", displayAddress);
         model.addAttribute("displayCccd", displayCccd);
         model.addAttribute("displayRole", displayRole);
+        model.addAttribute("avatarPath", avatarPath);
         model.addAttribute("isLoggedIn", true);
         
         return "Page/profile";
@@ -124,17 +141,19 @@ public class ProfileController {
         String email = authentication.getName();
         
         try {
-            // Get user data
-            SystemUserEntity sessionUser = (SystemUserEntity) session.getAttribute("loggedInUser");
-            SystemUserEntity systemUser = null;
-            CustomersEntity customer = null;
+            // Get user data from database
+            SystemUserEntity systemUser = systemUserRepository.findByEmail(email).orElse(null);
             
-            if (sessionUser != null) {
-                systemUser = sessionUser;
-                customer = customersRepository.findByEmail(email).orElse(null);
-            } else {
-                systemUser = systemUserRepository.findByEmail(email).orElse(null);
-                customer = customersRepository.findByEmail(email).orElse(null);
+            if (systemUser == null) {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy thông tin người dùng!");
+                return ResponseEntity.ok(response);
+            }
+            
+            // Get customer details if user is CUSTOMER
+            CustomersEntity customer = null;
+            if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+                customer = customersRepository.findBySystemUser(systemUser).orElse(null);
             }
             
             // Validation
@@ -197,40 +216,39 @@ public class ProfileController {
                     systemUser.setPassword(passwordEncoder.encode(newPassword));
                 }
                 systemUserRepository.save(systemUser);
+            }
+            
+            // Update or create Customer (only for CUSTOMER role)
+            if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+                if (customer == null) {
+                    customer = new CustomersEntity();
+                    customer.setSystemUser(systemUser);
+                }
                 
-                // Update session
-                session.setAttribute("loggedInUser", systemUser);
+                customer.setName(name.trim());
+                customer.setPhone(phone != null ? phone.trim() : null);
+                customer.setAddress(address != null ? address.trim() : null);
+                customer.setCccd(cccd != null ? cccd.trim() : null);
+                
+                customersRepository.save(customer);
             }
-            
-            // Update or create Customer
-            if (customer == null) {
-                customer = new CustomersEntity();
-                customer.setEmail(email);
-            }
-            
-            customer.setName(name.trim());
-            customer.setPhone(phone != null ? phone.trim() : null);
-            customer.setAddress(address != null ? address.trim() : null);
-            customer.setCccd(cccd != null ? cccd.trim() : null);
-            
-            if (newPassword != null && !newPassword.trim().isEmpty()) {
-                customer.setPassword(passwordEncoder.encode(newPassword));
-            } else if (customer.getPassword() == null && systemUser != null) {
-                // Set password from systemUser if customer doesn't have one
-                customer.setPassword(systemUser.getPassword());
-            }
-            
-            customersRepository.save(customer);
             
             response.put("success", true);
             response.put("message", "Cập nhật thông tin thành công!");
             
             // Return updated data
             Map<String, String> updatedData = new HashMap<>();
-            updatedData.put("name", customer.getName());
-            updatedData.put("phone", customer.getPhone() != null ? customer.getPhone() : "Chưa cập nhật");
-            updatedData.put("address", customer.getAddress() != null ? customer.getAddress() : "Chưa cập nhật");
-            updatedData.put("cccd", customer.getCccd() != null ? customer.getCccd() : "Chưa cập nhật");
+            if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER && customer != null) {
+                updatedData.put("name", customer.getName());
+                updatedData.put("phone", customer.getPhone() != null ? customer.getPhone() : "Chưa cập nhật");
+                updatedData.put("address", customer.getAddress() != null ? customer.getAddress() : "Chưa cập nhật");
+                updatedData.put("cccd", customer.getCccd() != null ? customer.getCccd() : "Chưa cập nhật");
+            } else {
+                updatedData.put("name", systemUser.getUsername());
+                updatedData.put("phone", "Chưa cập nhật");
+                updatedData.put("address", "Chưa cập nhật");
+                updatedData.put("cccd", "Chưa cập nhật");
+            }
             response.put("data", updatedData);
             
             return ResponseEntity.ok(response);

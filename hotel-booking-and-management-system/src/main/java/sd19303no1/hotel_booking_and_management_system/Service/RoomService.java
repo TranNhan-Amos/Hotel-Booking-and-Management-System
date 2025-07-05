@@ -107,4 +107,8 @@ public class RoomService {
         int booked = bookingOrderRepository.findConflictingBookings(roomId, checkIn, checkOut).size();
         return Math.max(total - booked, 0);
     }
+
+    public List<RoomEntity> findByPartnerId(Long partnerId) {
+        return roomRepository.findByPartner_Id(partnerId);
+    }
 }

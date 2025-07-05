@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sd19303no1.hotel_booking_and_management_system.DTO.AdminBookingRequestDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.BookingDetailDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
 
@@ -175,7 +176,35 @@ public class AdminBookingApiController {
         try {
             var bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
             if (bookingOpt.isPresent()) {
-                return ResponseEntity.ok(bookingOpt.get());
+                BookingOrderEntity booking = bookingOpt.get();
+                BookingDetailDTO dto = new BookingDetailDTO();
+                
+                // Map booking data to DTO
+                dto.setBookingId(booking.getBookingId());
+                dto.setCustomerName(booking.getCustomer() != null ? booking.getCustomer().getName() : "N/A");
+                dto.setCustomerEmail(booking.getCustomer() != null ? booking.getCustomer().getEmail() : booking.getEmail());
+                dto.setCustomerPhone(booking.getCustomer() != null ? booking.getCustomer().getPhone() : "N/A");
+                dto.setRoomNumber(booking.getRoom() != null ? booking.getRoom().getRoomNumber() : "N/A");
+                dto.setRoomType(booking.getRoom() != null ? booking.getRoom().getType() : "N/A");
+                dto.setRoomQuantity(booking.getRoomQuantity());
+                dto.setCheckInDate(booking.getCheckInDate());
+                dto.setCheckOutDate(booking.getCheckOutDate());
+                dto.setBookingDate(booking.getBookingDate());
+                dto.setTotalPrice(booking.getTotalPrice());
+                dto.setStatusName(booking.getStatus() != null ? booking.getStatus().getStatusName() : "N/A");
+                dto.setPaymentMethod(booking.getPaymentMethod());
+                dto.setPaymentStatus(booking.getPaymentStatus());
+                dto.setPaidDate(booking.getPaidDate());
+                dto.setSpecialRequests(booking.getSpecialRequests());
+                dto.setCancellationDate(booking.getCancellationDate());
+                dto.setCancellationReason(booking.getCancellationReason());
+                dto.setRefundAmount(booking.getRefundAmount());
+                dto.setRefundStatus(booking.getRefundStatus());
+                dto.setRefundDate(booking.getRefundDate());
+                dto.setVoucherCode(booking.getVoucher() != null ? booking.getVoucher().getCode() : null);
+                dto.setVoucherDiscount(booking.getVoucher() != null ? booking.getVoucher().getDiscountAmount() : null);
+                
+                return ResponseEntity.ok(dto);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "Không tìm thấy đặt phòng với ID: " + bookingId));

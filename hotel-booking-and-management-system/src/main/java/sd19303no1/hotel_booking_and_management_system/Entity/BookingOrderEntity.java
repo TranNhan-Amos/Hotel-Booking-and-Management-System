@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -249,4 +251,12 @@ public class BookingOrderEntity {
     public void setRoomQuantity(Integer roomQuantity) {
         this.roomQuantity = roomQuantity;
     }
+    public String getDurationString() {
+    if (checkInDate != null && checkOutDate != null) {
+        long days = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+        long nights = days > 0 ? days - 1 : 0;
+        return days + " ngày " + nights + " đêm";
+    }
+    return "0 ngày 0 đêm";
+}
 }

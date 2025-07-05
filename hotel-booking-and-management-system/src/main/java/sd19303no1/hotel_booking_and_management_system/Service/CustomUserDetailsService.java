@@ -12,7 +12,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -32,9 +34,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(user -> new CustomUserDetails(user))
                 .orElseGet(() -> customersRepository.findByEmail(lowerCaseEmail)
                         .map(customer -> new CustomUserDetails(customer))
-                        .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với email: " + email)));
+                        .orElseThrow(
+                                () -> new UsernameNotFoundException("Không tìm thấy người dùng với email: " + email)));
     }
 
+   
     // Custom UserDetails implementation
     public static class CustomUserDetails implements UserDetails {
         private final SystemUserEntity systemUser;
@@ -55,7 +59,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         @Override
         public String getUsername() {
-            return isSystemUser ? systemUser.getUsername() : customer.getName();
+            return getEmail();
         }
 
         @Override
@@ -82,6 +86,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         public boolean isEnabled() {
             return true;
         }
+
+
 
         @Override
         public java.util.Collection<? extends GrantedAuthority> getAuthorities() {

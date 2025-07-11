@@ -59,6 +59,9 @@ public class RoomEntity {
     @Column(name = "is_smoking", nullable = false)
     private Boolean isSmoking = false; // Cho phép hút thuốc
 
+    @Column(name = "total_rooms", nullable = false)
+    private Integer totalRooms; // Tổng số phòng của loại này
+
     // Quan hệ với đối tác (partner) nếu phòng do đối tác quản lý
     @ManyToOne
     @JoinColumn(name = "partner_id")
@@ -199,6 +202,14 @@ public class RoomEntity {
 
     public void setIsSmoking(Boolean isSmoking) {
         this.isSmoking = isSmoking;
+    }
+
+    public Integer getTotalRooms() {
+        return totalRooms;
+    }
+
+    public void setTotalRooms(Integer totalRooms) {
+        this.totalRooms = totalRooms;
     }
 
     public PartnerEntity getPartner() {

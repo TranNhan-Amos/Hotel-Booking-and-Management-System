@@ -12,6 +12,7 @@
     </style>
 </head>
 <body>
+
     <div>
 <nav class="navbar">
     <div class="navbar-brand">
@@ -21,9 +22,21 @@
         <div class="logo-text">Dashboard</div>
     </div>
 
+    <div class="dashboard-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <div class="logo-icon">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div class="logo-text" >Dashboard</div>
+            </div>
+
+
     <button class="hamburger">
         <i class="fas fa-bars"></i>
     </button>
+
 
     <div class="nav-menu">
         <a href="/partner" class="nav-item" data-page="home">
@@ -181,6 +194,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+            <div class="nav-menu">
+                <a href="/partner" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Trang chủ</span>
+                </a>    
+                <a th:href="@{/room/partner}" class="nav-item">
+                    <i class="fas fa-bed"></i>
+                    <span >Quản lý phòng</span>
+                </a>
+                <a href="/partner/bookings" class="nav-item ">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Đặt phòng</span>
+                </a>
+                <a href="/partner/reports" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="/partner/reviews" class="nav-item">
+                    <i class="fas fa-star"></i>
+                    <span>Đánh giá</span>
+                </a>
+                <!-- <a href="/partner/payments" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Thanh toán</span>
+                </a> -->
+                <a href="/partner/settings" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Cài đặt</span>
+                </a>
+                <a href="/partner/support" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Hỗ trợ</span>
+                </a>
+                <!-- <div class="partner-info">
+                    <div class="partner-avatar">KH</div>
+                    <div class="partner-name" >Khách sạn Hải Âu</div>
+                </div> -->
+            </div>
+        </nav>
+</div>
+
+
         
 </body>
 

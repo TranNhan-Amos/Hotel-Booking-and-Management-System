@@ -110,6 +110,8 @@
             align-items: center;
             gap: 15px;
             padding: 0;
+            padding: 25px 0;
+
         }
 
         .nav-item {
@@ -630,4 +632,6 @@
                 padding: 6px 8px;
                 font-size: 12px;
             }
+           
+
         }

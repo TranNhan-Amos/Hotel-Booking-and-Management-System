@@ -9,4 +9,6 @@ import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 public interface PartnerRepository extends JpaRepository<PartnerEntity, Long> {
     PartnerEntity findBySystemUser(SystemUserEntity systemUser);
     PartnerEntity findByEmail(String email);
+    
+    
 }

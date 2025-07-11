@@ -32,4 +32,35 @@ public class VoucherService {
     public VoucherEntity findByCode(String code) {
         return voucherRepository.findByCode(code);
     }
+
+    // Kiểm tra voucher có hợp lệ không
+    public boolean isVoucherValid(VoucherEntity voucher, LocalDate checkInDate) {
+        if (voucher == null) return false;
+        
+        // Kiểm tra voucher còn hạn không
+        if (voucher.getExpiryDate() != null && checkInDate.isAfter(voucher.getExpiryDate())) {
+            return false;
+        }
+        
+        // Kiểm tra voucher còn số lượng không
+        if (voucher.getUsageLimit() != null && voucher.getUsedCount() >= voucher.getUsageLimit()) {
+            return false;
+        }
+        
+        // Kiểm tra trạng thái voucher
+        if (!"ACTIVE".equals(voucher.getStatus())) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Tăng số lần sử dụng voucher
+    public void incrementUsageCount(Integer voucherId) {
+        VoucherEntity voucher = voucherRepository.findById(voucherId).orElse(null);
+        if (voucher != null) {
+            voucher.setUsedCount(voucher.getUsedCount() + 1);
+            voucherRepository.save(voucher);
+        }
+    }
 }

@@ -25,8 +25,11 @@ public class SystemUserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "img", length = 255)
+    private String img;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false)   
     private Role role;
 
     @CreationTimestamp
@@ -87,6 +90,14 @@ public class SystemUserEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 
     public Role getRole() {

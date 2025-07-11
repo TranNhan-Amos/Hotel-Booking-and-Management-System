@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 
+
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,7 @@ public class RoomDetailController {
                     model.addAttribute("currentUser", customer);
                 }
             }
+
 
             logger.info("Successfully fetched room details for id: {}", id);
             return "Page/Details";

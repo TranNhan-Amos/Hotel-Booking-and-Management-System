@@ -19,6 +19,16 @@ public class RoomPartnerService {
         return roomPartnerRepository.findByPartnerId(partnerId);
     }
 
+
+    public RoomPartnerEntity save(RoomPartnerEntity roomPartner) {
+    return roomPartnerRepository.save(roomPartner);   
+    }
+
+    public long countRoomsByPartnerId(Long partnerId) {
+    return roomPartnerRepository.countRoomsByPartnerId(partnerId);
+    }
+
+
     public long countRoomsByPartnerId(Long partnerId) {
     return roomPartnerRepository.countRoomsByPartnerId(partnerId);
     }
@@ -38,6 +48,7 @@ public RoomPartnerEntity findById(Long roomId) {
     return roomPartnerRepository.findById(roomId)
             .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
 }
+
     
     
 }

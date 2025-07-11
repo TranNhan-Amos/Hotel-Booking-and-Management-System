@@ -225,10 +225,45 @@
                     <div class="card-title">Danh sách phòng</div>
                     <button class="action-btn btn-secondary">Xem tất cả</button>
                 </div>
-
-                <div class="table-container">
+                <div class="room-table-wrapper">
                     <table class="room-table">
                         <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Mã phòng</th>
+                                <th>Tên phòng</th>
+                                <th>Loại giường</th>
+                                <th>Giá (VND)</th>
+                                <th>Sức chứa</th>
+                                <th>Phòng hút thuốc</th>
+                                <th>View</th>
+                                <th>Mô tả phòng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="roomPartner : ${roomPartners}">
+                                <td><img src="https://byvn.net/gqQ1" alt="Room" class="room-image"></td>    
+                                <td th:text="${roomPartner.roomNumber}"></td>                            
+                                <td th:text="${roomPartner.bathroomType}">Deluxe Ocean View</td>
+                                <td th:text="${roomPartner.bedType}">King</td>
+                                <td th:text="${roomPartner.price}"></td>                                <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
+                                <td>
+                                    <span th:classappend="${roomPartner.isSmoking ? 'smoking-yes' : 'smoking-no'}" class="room-smoking-status" th:text="${roomPartner.isSmoking ? 'Có' : 'Không'}">Không</span>
+                                </td>
+                                <th th:text="${roomPartner.view}"></th>
+                                <td th:text="${roomPartner.description}">Phòng rộng rãi, view biển đẹp</td>
+                                <td>
+                                    <span th:classappend="${roomPartner.status == 'Available' ? 'status-available' : 'status-unavailable'}" class="room-status" th:text="${roomPartner.status == 'Available' ? 'Còn trống' : 'Đã đặt'}">Còn trống</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn btn-secondary">Chỉnh sửa</button>
+                                        <button class="action-btn btn-danger">Xóa</button>
+                                    </div>
+                                </td>
+                            </tr>
                         <tr>
                             <th>Hình ảnh</th>
                             <th>Mã phòng</th>
@@ -315,6 +350,19 @@
                         </div>
                         <div class="form-group">
                             <label>Loại giường</label>
+                            <input type="text" th:field="*{bedType}" placeholder="Loại giường">
+                        </div>
+                        <div class="form-group">
+                            <label>Giá (VND)</label>
+                            <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sức chứa</label>
+                            <input type="number" th:field="*{capacity}" placeholder="Số người" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tầng</label>
+                            <input type="number" th:field="*{floor}" placeholder="Tầng">
                             <select th:field="*{bedType}">
                                 <option value="Single bed">Single bed</option>
                                 <option value="Double bed">Double bed</option>

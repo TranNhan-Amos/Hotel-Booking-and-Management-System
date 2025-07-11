@@ -61,12 +61,15 @@ public class PartnerController {
                 System.out.println("=== DEBUG: User is partner");
                 // Find partner information
                 PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+                long roomCount = roomPartnerService.countRoomsByPartnerId(partner.getId());
+                
+                if (partner != null) {
+                    
                 System.out.println("=== DEBUG: Partner found: " + (partner != null));
 
                 if (partner != null) {
                     long roomCount = roomPartnerService.countRoomsByPartnerId(partner.getId());
                     System.out.println("=== DEBUG: Room count: " + roomCount);
-
                     model.addAttribute("partner", partner);
                     model.addAttribute("systemUser", systemUser);
                     model.addAttribute("hasPartnerInfo", true);
@@ -185,7 +188,86 @@ public class PartnerController {
     public String DashboardPartner(Model model) {
         return ("Partner/DashboardPartner");
     }
+  @GetMapping("/room/partner")
+    public String roomPartner(Model model) {
+    try {
+        // Lấy thông tin người dùng đã đăng nhập
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName(); // Lấy email từ Authentication
 
+
+        SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+        
+        if (systemUser != null && systemUser.isPartner()) {
+           
+            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+            
+            if (partner != null) {
+                Long partnerId = partner.getId();
+                
+                List<RoomPartnerEntity> roomPartners = roomPartnerService.findByPartnerId(partnerId);
+                
+               
+                RoomPartnerEntity roomPartner = new RoomPartnerEntity();
+                roomPartner.setPartnerId(partnerId);
+
+                
+                model.addAttribute("roomPartners", roomPartners);
+                model.addAttribute("roomPartner", roomPartner);
+                
+                return "Partner/RoomPartner"; 
+            } else {
+                model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                return "Partner/RoomPartner";
+            }
+        } else {
+            return "redirect:/login"; 
+        }
+    } catch (Exception e) {
+        model.addAttribute("error", "Có lỗi xảy ra khi tải danh sách phòng: " + e.getMessage());
+        return "Partner/RoomPartner";
+    }
+}
+
+     @PostMapping("/room/partner/add")
+        public String addRoomPartner(
+        @ModelAttribute("roomPartner") @Valid RoomPartnerEntity roomPartner,
+        BindingResult result,
+        RedirectAttributes redirectAttributes) {
+    try {
+    
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+       
+        SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+        
+        if (systemUser != null && systemUser.isPartner()) {
+            
+            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+            
+            if (partner != null) {
+                if (result.hasErrors()) {
+                    return "Partner/AddRoomPartner"; 
+                }
+                
+                roomPartner.setPartnerId(partner.getId());
+                roomPartnerService.save(roomPartner);
+                redirectAttributes.addFlashAttribute("success", "Thêm phòng mới thành công!");
+                return "redirect:/room/partner"; 
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy thông tin đối tác.");
+                return "redirect:/room/partner";
+            }
+        } else {
+            return "redirect:/login";
+        }
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi thêm phòng: " + e.getMessage());
+        return "redirect:/room/partner";
+    }
+}
+    
 
 
     @GetMapping("/partner/reports")

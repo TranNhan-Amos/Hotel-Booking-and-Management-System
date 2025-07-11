@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${room.type + ' - Chi Tiết Khách Sạn'}">Chi Tiết Khách Sạn</title>
+
     <title th:text="${room.type + ' - Chi Tiết Phòng'}">Chi Tiết Phòng</title>
-    
+
     <!-- SEO Meta Tags -->
     <meta name="description" th:content="${room.description}">
     <meta property="og:title" th:content="${room.type}">
@@ -12,6 +15,11 @@
     <meta property="og:image" th:content="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : ''}">
     <meta property="og:type" content="website">
     
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/Details.css}">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/Css/Narbar.css}">
@@ -142,6 +150,7 @@
         .room-status.unknown { background: #64748b; }
         .hotel-header h1 { display: inline; }
     </style>
+
 </head>
 <body>
     <div th:replace="~{/Layout/narbar}"></div>
@@ -171,6 +180,13 @@
             <span th:text="${room.type}">Tên phòng</span>
         </div>
 
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb">
+            <a href="/">Trang chủ</a> > 
+            <a href="/rooms">Danh sách phòng</a> > 
+            <span th:text="${room.type}">Tên phòng</span>
+        </div>
+
         <!-- Hotel Details -->
         <div class="hotel-details">
             <div class="hotel-header">
@@ -184,6 +200,19 @@
                 
                 <!-- Room Actions -->
                 <div class="room-actions">
+
+                    <button class="action-btn favorite" onclick="toggleFavorite()">
+                        <i class="far fa-heart"></i>
+                        <span>Yêu thích</span>
+                    </button>
+                    <button class="action-btn share" onclick="shareRoom()">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Chia sẻ</span>
+                    </button>
+                    <button class="action-btn print" onclick="window.print()">
+                        <i class="fas fa-print"></i>
+                        <span>In</span>
+
                     <button class="action-btn favorite" onclick="toggleFavorite()" title="Yêu thích">
                         <i class="far fa-heart"></i>
                     </button>
@@ -192,11 +221,14 @@
                     </button>
                     <button class="action-btn print" onclick="window.print()" title="In">
                         <i class="fas fa-print"></i>
+
                     </button>
                 </div>
             </div>
 
             <!-- Room Details Grid -->
+
+            <div class="room-details-grid">
             <div class="room-details-grid animate-slide">
                 <div class="detail-item">
                     <i class="fas fa-users"></i>
@@ -242,6 +274,8 @@
             <div id="lightboxModal" class="lightbox-modal">
                 <span class="lightbox-close">&times;</span>
                 <img class="lightbox-content" id="lightboxImg">
+                <div class="lightbox-caption" id="lightboxCaption"></div>
+
             </div>
 
             <!-- Hotel Info -->
@@ -259,12 +293,53 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Reviews -->
+                    <div class="hotel-reviews">
+                        <div class="reviews-header">
+                            <h2>Đánh giá từ khách hàng</h2>
+                            <div class="reviews-filter">
+                                <select id="ratingFilter">
+                                    <option value="">Tất cả đánh giá</option>
+                                    <option value="5">5 sao</option>
+                                    <option value="4">4 sao</option>
+                                    <option value="3">3 sao</option>
+                                    <option value="2">2 sao</option>
+                                    <option value="1">1 sao</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="reviews-stats">
+                            <div class="average-rating">
+                                <span class="rating-number" th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">4.5</span>
+                                <div class="stars">
+                                    <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}" 
+                                       th:class="${i <= room.averageRating ? 'filled' : ''}"></i>
+                                </div>
+                                <span class="total-reviews" th:text="${reviews.size()} + ' đánh giá'">15 đánh giá</span>
+                            </div>
+                        </div>
+                        
+                        <div class="review animate-slide" th:each="review, iterStat : ${reviews}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
+                            <div class="review-header">
+                                <span class="reviewer" th:text="${review.customer.name}">Tên khách hàng</span>
+                                <div class="rating" th:text="${review.rating} + '/5'">9.2</div>
+                            </div>
+                            <p th:text="${review.comment}">Nội dung đánh giá</p>
+                            <div class="response" th:if="${review.response != null}">
+                                <strong>Phản hồi từ khách sạn:</strong>
+                                <p th:text="${review.response}" style="margin: 4px 0 0 0; font-size: 13px;"></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="hotel-booking animate-fade">
                     <h3>Đặt phòng ngay</h3>
                     <div class="price" th:text="'Từ ' + ${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">Từ 2,500,000 ₫/đêm</div>
-                    
+       
+                    <form th:action="@{/bookings}" method="get" id="bookingForm">
                     <div class="room-available-info">
                         <span th:if="${roomAvailableCount != null}">
                             <i class="fas fa-door-open"></i> Còn <strong th:text="${roomAvailableCount}">0</strong> phòng trống
@@ -307,6 +382,8 @@
                             <i class="fas fa-calendar-alt"></i>
                             <input type="date" name="checkOutDate" id="checkOutDate" required>
                         </div>
+                        
+                        <button type="submit">Tiếp tục đặt phòng</button>
                         <div class="input-group">
                             <i class="fas fa-comment"></i>
 
@@ -452,7 +529,11 @@
         <div th:replace="~{/Layout/footer}"></div>
     </div>
 
+
+    <!-- JavaScript for Enhanced Features -->
+
     <!-- JavaScript -->
+
     <script>
         // Lightbox functionality
         function openLightbox(src) {
@@ -1188,6 +1269,212 @@
             }
         });
 
+        // Lightbox functionality
+        function openLightbox(src) {
+            const modal = document.getElementById('lightboxModal');
+            const modalImg = document.getElementById('lightboxImg');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+
+        // Close lightbox
+        document.querySelector('.lightbox-close').addEventListener('click', function() {
+            document.getElementById('lightboxModal').style.display = 'none';
+        });
+
+        document.getElementById('lightboxModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Calculate booking price and nights
+        function calculateBooking() {
+            const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
+            const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
+            const basePriceElement = document.querySelector('.price');
+            const basePrice = parseFloat(basePriceElement.textContent.replace(/[^\d]/g, ''));
+            const voucherSelect = document.getElementById('voucherSelect');
+            
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const totalBase = basePrice * nights;
+                
+                document.getElementById('nightsCount').textContent = nights;
+                document.getElementById('basePrice').textContent = totalBase.toLocaleString() + ' ₫';
+                
+                // Calculate discount if voucher selected
+                if (voucherSelect.value) {
+                    const selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+                    const discountPercent = parseFloat(selectedOption.dataset.discount);
+                    const discountAmount = totalBase * (discountPercent / 100);
+                    const finalPrice = totalBase - discountAmount;
+                    
+                    document.getElementById('discountRow').style.display = 'block';
+                    document.getElementById('discountAmount').textContent = `-${discountAmount.toLocaleString()} ₫`;
+                    document.getElementById('totalPrice').textContent = `${finalPrice.toLocaleString()} ₫`;
+                } else {
+                    document.getElementById('discountRow').style.display = 'none';
+                    document.getElementById('totalPrice').textContent = `${totalBase.toLocaleString()} ₫`;
+                }
+            }
+        }
+
+        // Filter reviews
+        function filterReviews() {
+            const filterValue = document.getElementById('ratingFilter').value;
+            const reviews = document.querySelectorAll('.review');
+            
+            reviews.forEach(review => {
+                const rating = review.querySelector('.rating').textContent.split('/')[0];
+                if (!filterValue || rating == filterValue) {
+                    review.style.display = 'block';
+                } else {
+                    review.style.display = 'none';
+                }
+            });
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate name
+            const name = document.querySelector('input[name="customerName"]');
+            const nameError = document.getElementById('nameError');
+            if (!name.value.match(/^[A-Za-zÀ-ỹ\s]+$/)) {
+                nameError.textContent = 'Tên chỉ được chứa chữ cái và dấu cách';
+                isValid = false;
+            } else {
+                nameError.textContent = '';
+            }
+            
+            // Validate phone
+            const phone = document.querySelector('input[name="phone"]');
+            const phoneError = document.getElementById('phoneError');
+            if (!phone.value.match(/^[0-9]{10,11}$/)) {
+                phoneError.textContent = 'Số điện thoại phải có 10-11 chữ số';
+                isValid = false;
+            } else {
+                phoneError.textContent = '';
+            }
+            
+            // Validate email
+            const email = document.querySelector('input[name="email"]');
+            const emailError = document.getElementById('emailError');
+            if (!email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                emailError.textContent = 'Email không hợp lệ';
+                isValid = false;
+            } else {
+                emailError.textContent = '';
+            }
+            
+            return isValid;
+        }
+
+        // Toggle favorite
+        function toggleFavorite() {
+            const btn = document.querySelector('.favorite');
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                btn.style.color = '#e74c3c';
+                showNotification('Đã thêm vào danh sách yêu thích!', 'success');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                btn.style.color = '';
+                showNotification('Đã xóa khỏi danh sách yêu thích!', 'info');
+            }
+        }
+
+        // Share room
+        function shareRoom() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: document.querySelector('.hotel-header h1').textContent,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('Đã sao chép link vào clipboard!', 'success');
+                });
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+                ${type === 'success' ? 'background: #27ae60;' : 
+                  type === 'error' ? 'background: #e74c3c;' : 'background: #3498db;'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners
+            document.querySelectorAll('input[name="checkInDate"], input[name="checkOutDate"]').forEach(input => {
+                input.addEventListener('change', calculateBooking);
+            });
+            
+            document.getElementById('voucherSelect').addEventListener('change', calculateBooking);
+            document.getElementById('ratingFilter').addEventListener('change', filterReviews);
+            
+            // Form validation
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    showNotification('Vui lòng kiểm tra lại thông tin!', 'error');
+                }
+            });
+            
+            // Initial calculation
+            calculateBooking();
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Show success/error messages
+        /*[# th:if="${message}"]*/
+        showNotification(/*[[${message}]]*/ 'Message', 'success');
+        /*[/]*/
         // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `
@@ -1242,6 +1529,7 @@
             showNotification(/*[[${error}]]*/ 'Error', 'error');
             /*[/]*/
         });
+
     </script>
 </body>
 </html>

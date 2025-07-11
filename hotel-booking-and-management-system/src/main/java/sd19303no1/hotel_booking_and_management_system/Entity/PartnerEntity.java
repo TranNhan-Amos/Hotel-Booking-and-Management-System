@@ -1,11 +1,17 @@
 package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
+
+import lombok.Data;
+
+@Data
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+
 @Entity
 @Table(name = "partners")
 public class PartnerEntity {

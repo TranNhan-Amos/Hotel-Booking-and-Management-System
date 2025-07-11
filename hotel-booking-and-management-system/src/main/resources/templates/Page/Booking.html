@@ -159,6 +159,16 @@
 
     <!-- JavaScript for Booking -->
     <script>
+        // Calculate price based on nights
+        function calculatePrice() {
+            const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
+            const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
+            const basePricePerNight = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
+            
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const basePrice = basePricePerNight * nights;
+
         // Calculate price based on nights and room quantity
         function calculatePrice() {
             const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
@@ -169,6 +179,7 @@
             if (checkIn && checkOut && checkOut > checkIn) {
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
                 const basePrice = basePricePerNight * nights * roomQuantity;
+
                 const serviceFee = basePrice * 0.1;
                 const vat = (basePrice + serviceFee) * 0.1;
                 const total = basePrice + serviceFee + vat;
@@ -185,6 +196,7 @@
             const voucherCode = document.getElementById('voucherCode').value;
             const messageDiv = document.getElementById('voucherMessage');
             const roomQuantity = parseInt(document.getElementById('roomQuantity').value) || 1;
+
             
             if (!voucherCode) {
                 messageDiv.innerHTML = '<span style="color: #e74c3c;">Vui lòng nhập mã giảm giá</span>';
@@ -195,16 +207,34 @@
             if (voucherCode.toUpperCase() === 'WELCOME10') {
                 messageDiv.innerHTML = '<span style="color: #27ae60;">Mã giảm giá hợp lệ! Giảm 10%</span>';
                 document.getElementById('discountRow').style.display = 'flex';
+
+                document.getElementById('discountAmount').textContent = '-100,000 ₫';
+                // Recalculate total with discount
+                calculatePriceWithDiscount();
+            } else {
+                messageDiv.innerHTML = '<span style="color: #e74c3c;">Mã giảm giá không hợp lệ</span>';
+                document.getElementById('discountRow').style.display = 'none';
                 // Recalculate total with discount
                 calculatePriceWithDiscount();5
             } else {
                 messageDiv.innerHTML = '<span style="color: #e74c3c;">Mã giảm giá không hợp lệ</span>';
                 document.getElementById('discountRow').style.display = 'none';
                 calculatePrice();
+
             }
         }
 
         function calculatePriceWithDiscount() {
+
+            const basePrice = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
+            const discount = basePrice * 0.1;
+            const serviceFee = basePrice * 0.1;
+            const vat = (basePrice + serviceFee) * 0.1;
+            const total = basePrice + serviceFee + vat - discount;
+            
+            document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString() + ' ₫';
+            document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
+
             const basePricePerNight = parseFloat(document.getElementById('basePrice').getAttribute('data-base-price'));
             const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
             const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
@@ -219,6 +249,7 @@
                 document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString() + ' ₫';
                 document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
             }
+
         }
 
         // Form validation
@@ -238,6 +269,13 @@
             if (!isValid) {
                 e.preventDefault();
                 alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+
+            }
+        });
+
+        // Initial price calculation
+        calculatePrice();
+
             }
         });
 
@@ -259,6 +297,7 @@
                 calculatePrice();
             }
         });
+
     </script>
 
     <!-- JavaScript for Hamburger Menu -->

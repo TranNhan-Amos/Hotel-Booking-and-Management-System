@@ -2,17 +2,17 @@ package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "rooms")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor 
 @AllArgsConstructor
-@Builder
 public class RoomPartnerEntity {
 
     @Id
@@ -36,13 +36,13 @@ public class RoomPartnerEntity {
     private String description;
 
     @Column(name = "floor")
-    private Integer floor;
+    private int  floor;
 
     @Column(name = "is_smoking")
     private Boolean isSmoking;
 
     @Column(name = "price")
-    private Double price;
+    private int price;
 
     @Column(name = "room_number", unique = true)
     private String roomNumber;

@@ -47,7 +47,7 @@
                             <i class="fas fa-calendar-check"></i>
                         </div>
                     </div>
-                    <div class="stat-value">24</div>
+                    <div class="stat-value" th:text="${bookingshomNay}">0</div>
                 </div>
                 
                 <div class="stat-card">
@@ -77,7 +77,7 @@
                             <i class="fas fa-dollar-sign"></i>
                         </div>
                     </div>
-                    <div class="stat-value">18.5tr</div>
+                    <div class="stat-value" th:text="${#numbers.formatDecimal(sumDoanhThuToday, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">18.5tr</div>
                 </div>
             </div>
 
@@ -104,16 +104,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr th:each="RoomBookingsPartner : ${RoomBookingsPartner}">
                                 <td>
-                                    <div class="booking-id">#BK001234</div>
+                                    <div class="booking-id" th:text="${RoomBookingsPartner.bookingId}">#BK001234</div>
                                 </td>
                                 <td>
                                     <div class="guest-info">
                                         <div class="guest-avatar">NL</div>
                                         <div class="guest-details">
-                                            <h4>Nguyễn Thị Lan</h4>
-                                            <p>0987654321</p>
+                                            <h4 th:text="${RoomBookingsPartner.customer.name}">Nguyễn Thị Lan</h4>
+                                            <p th:text="${RoomBookingsPartner.customer.phone}">0987654321</p>
                                         </div>
                                     </div>
                                 </td>
@@ -121,25 +121,27 @@
                                     <div class="room-info">
                                         <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=100&h=70&fit=crop" alt="Room" class="room-image">
                                         <div class="room-details">
-                                            <h4>Deluxe Ocean View</h4>
-                                            <p>Tầng 5 - Phòng 501</p>
+                                            <h4 th:text="${RoomBookingsPartner.room.type}">Deluxe Ocean View</h4>
+                                           
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="date-info">
-                                        <div class="check-in">20/06/2024</div>
-                                        <div class="check-out">22/06/2024</div>
-                                        <div class="nights">2 đêm</div>
+                                        <div class="check-in" th:text="${RoomBookingsPartner.checkInDate}">20/06/2024</div>
+                                        <div class="check-out" th:text="${RoomBookingsPartner.checkOutDate}">22/06/2024</div>
+                                      <div class="nights" th:text="${RoomBookingsPartner.getDurationString()}">2 ngày 1 đêm</div>
                                     </div>
                                 </td>
-                                <td>2 người</td>
+                                <td th:text="${RoomBookingsPartner.room.capacity} + ' người'">2 người</td>
                                 <td>
-                                    <div class="price">3.450.000đ</div>
-                                    <div class="price-details">1.725.000đ/đêm</div>
+                                    <div class="price" th:text="${#numbers.formatDecimal(RoomBookingsPartner.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
                                 </td>
                                 <td>
-                                    <span class="booking-status status-confirmed">Đã xác nhận</span>
+                                    <span class="booking-status status-confirmed" th:if="${RoomBookingsPartner.status == 1}">Đã xác nhận</span>
+                                    <span class="booking-status status-checked-in" th:if="${RoomBookingsPartner.status == 2}">Đang lưu trú</span>
+                                    <span class="booking-status status-pending" th:if="${RoomBookingsPartner.status == 3}">Chờ xác nhận</span>
+                                    <span class="booking-status status-cancelled" th:if="${RoomBookingsPartner.status == 4}">Đã hủy</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">

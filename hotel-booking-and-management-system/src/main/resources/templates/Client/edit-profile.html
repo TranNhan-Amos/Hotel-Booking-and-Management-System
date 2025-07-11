@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa thông tin cá nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .section-divider {
+            border-top: 2px solid #e9ecef;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .info-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-display strong {
+            color: #667eea;
+        }
+
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #667eea;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9ecef;
+            color: #6c757d;
+            font-size: 3rem;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-outline-primary {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-edit me-2"></i>Chỉnh sửa thông tin cá nhân</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Back link -->
+                        <div class="mb-3">
+                            <a href="/profile" class="back-link">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại trang cá nhân
+                            </a>
+                        </div>
+
+                        <!-- Error message -->
+                        <div th:if="${error}" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <!-- Avatar upload section -->
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-image me-2"></i>Ảnh đại diện</h5>
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="avatar-container">
+                                        <div th:if="${systemUser.img == null && (customer == null || customer.avatar == null)}" class="avatar-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <img th:if="${systemUser.img != null}" th:src="${systemUser.img}" alt="Avatar" class="avatar-img">
+                                        <img th:if="${systemUser.img == null && customer != null && customer.avatar != null}" th:src="${customer.avatar}" alt="Avatar" class="avatar-img">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-3">
+                                        <label for="avatar-upload" class="btn btn-outline-primary">
+                                            <i class="fas fa-upload me-2"></i>Chọn ảnh
+                                        </label>
+                                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(this)">
+                                        <small class="form-text text-muted">Chỉ chấp nhận file ảnh (JPG, PNG, GIF) - Tối đa 5MB</small>
+                                    </div>
+                                    <button th:if="${systemUser.img != null || (customer != null && customer.avatar != null)}" class="btn btn-outline-danger" onclick="deleteAvatar()">
+                                        <i class="fas fa-trash me-2"></i>Xóa ảnh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current user info display -->
+                        <div th:if="${systemUser}" class="info-display">
+                            <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin hiện tại</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Email:</strong> <span th:text="${systemUser.email}"></span></p>
+                                    <p><strong>Vai trò:</strong> <span th:text="${systemUser.role}"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Ngày tạo:</strong> <span th:text="${#temporals.format(systemUser.createdAt, 'dd/MM/yyyy')}"></span></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Customer specific info -->
+                            <div th:if="${customer}" class="mt-3">
+                                <h6 class="mb-2"><i class="fas fa-user me-2"></i>Thông tin chi tiết</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p><strong>Họ tên:</strong> <span th:text="${customer.name}"></span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Số điện thoại:</strong> <span th:text="${customer.phone}"></span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Địa chỉ:</strong> <span th:text="${customer.address}"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update personal info form -->
+                        <form id="updateInfoForm" th:if="${customer}">
+                            <h5 class="mb-3"><i class="fas fa-user-edit me-2"></i>Cập nhật thông tin cá nhân</h5>
+                            
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">Họ tên</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" th:value="${customer.name}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" th:value="${customer.phone}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="form-label">Địa chỉ</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" th:text="${customer.address}" required></textarea>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cập nhật thông tin
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Update password form -->
+                        <form id="updatePasswordForm">
+                            <h5 class="mb-3"><i class="fas fa-lock me-2"></i>Đổi mật khẩu</h5>
+                            
+                            <div class="form-group">
+                                <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cập nhật mật khẩu
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Action buttons -->
+                        <div class="section-divider"></div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="/profile" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update personal info form submission
+        const updateInfoForm = document.getElementById('updateInfoForm');
+        if (updateInfoForm) {
+            updateInfoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                fetch('/profile/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showToast(data.success ? 'success' : 'error', data.message);
+                    
+                    if (data.success) {
+                        // Reload page to show updated info
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    }
+                })
+                .catch(error => {
+                    showToast('error', 'Có lỗi xảy ra khi cập nhật thông tin');
+                    console.error('Error:', error);
+                });
+            });
+        }
+
+        // Update password form submission
+        document.getElementById('updatePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/profile/update', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    // Clear form on success
+                    document.getElementById('updatePasswordForm').reset();
+                }
+            })
+            .catch(error => {
+                showToast('error', 'Có lỗi xảy ra khi cập nhật thông tin');
+                console.error('Error:', error);
+            });
+        });
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set title and message
+            toastTitle.textContent = type === 'success' ? 'Thành công' : 'Lỗi';
+            toastMessage.textContent = message;
+            
+            // Set toast class
+            toast.className = `toast ${type === 'success' ? 'bg-success text-white' : 'bg-danger text-white'}`;
+            
+            // Show toast
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword !== confirmPassword) {
+                this.setCustomValidity('Mật khẩu không khớp');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword.value) {
+                if (this.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Mật khẩu không khớp');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            }
+        });
+
+        // Avatar upload function
+        function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('error', 'Chỉ chấp nhận file ảnh (JPG, PNG, GIF)');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('error', 'Kích thước file không được vượt quá 5MB');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload-avatar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    // Reload page to show new avatar
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                showToast('error', 'Có lỗi xảy ra khi upload ảnh');
+                console.error('Error:', error);
+            });
+        }
+
+        // Delete avatar function
+        function deleteAvatar() {
+            if (!confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?')) {
+                return;
+            }
+
+            fetch('/delete-avatar', {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    // Reload page to show default avatar
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                showToast('error', 'Có lỗi xảy ra khi xóa ảnh');
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,99 +1,251 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaNang Travel - Trải nghiệm du lịch đẳng cấp</title>
+    <meta name="description" content="Khám phá Đà Nẵng với những trải nghiệm du lịch độc đáo. Đặt phòng khách sạn cao cấp, tour du lịch hấp dẫn và dịch vụ chất lượng.">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" th:href="@{Css/index.css}">
-    <style>
-    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
     <!-- Navigation -->
-   <div th:replace="~{/Layout/narbar}"></div>
+    <div th:replace="~{/Layout/narbar}"></div>
+
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-overlay"></div>
+        <div class="hero-background">
+            <div class="hero-video">
+                <video autoplay muted loop playsinline>
+                    <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+                </video>
+            </div>
+            <div class="hero-overlay"></div>
+        </div>
+        
         <div class="hero-content">
-            <h1 class="hero-title">
-                Khám phá <span class="hero-highlight">Đà Nẵng</span>
-            </h1>
-            <p class="hero-subtitle">
-                Thành phố biển đáng sống với những trải nghiệm độc đáo từ bãi biển Mỹ Khê đến cầu Rồng huyền thoại
-            </p>
+            <div class="hero-text">
+                <div class="hero-badge">
+                    <i data-lucide="star"></i>
+                    <span>Điểm đến hàng đầu Việt Nam</span>
+                </div>
+                <h1 class="hero-title">
+                    Khám phá <span class="hero-highlight">Đà Nẵng</span>
+                    <br>Thành phố đáng sống
+                </h1>
+                <p class="hero-subtitle">
+                    Trải nghiệm vẻ đẹp hoàn hảo từ bãi biển Mỹ Khê đến cầu Rồng huyền thoại. 
+                    Khám phá văn hóa, ẩm thực và con người thân thiện của thành phố biển xinh đẹp.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-large" onclick="scrollToSearch()">
+                        <i data-lucide="search"></i>
+                        Tìm kiếm ngay
+                    </button>
+                    <button class="btn btn-outline btn-large" onclick="scrollToDestinations()">
+                        <i data-lucide="map"></i>
+                        Khám phá điểm đến
+                    </button>
+                </div>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i data-lucide="building"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Khách sạn</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Khách hàng</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i data-lucide="star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">4.9★</div>
+                        <div class="stat-label">Đánh giá</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-scroll">
+            <div class="scroll-indicator">
+                <div class="scroll-dot"></div>
+            </div>
+            <span>Cuộn xuống khám phá</span>
         </div>
     </section>
 
     <!-- Search Section -->
-    <section class="search-section">
-        <div class="search-card card">
-            <div class="search-content">
+    <section class="search-section" id="search">
+        <div class="container">
+            <div class="search-wrapper">
+                <div class="search-header">
+                    <h2 class="search-title">Tìm kiếm trải nghiệm hoàn hảo</h2>
+                    <p class="search-subtitle">Đặt phòng với giá tốt nhất và khám phá những điểm đến hấp dẫn</p>
+                </div>
+                
                 <div class="search-tabs">
-                    <button class="search-tab active" data-tab="stay">
-                        <i data-lucide="map-pin"></i>
-                        <span>Lưu trú</span>
-                    </button>
-                    <button class="search-tab" data-tab="flight">
-                        <i data-lucide="calendar"></i>
-                        <span>Chuyến bay</span>
-                    </button>
-                    <button class="search-tab" data-tab="combo">
-                        <i data-lucide="star"></i>
-                        <span>Chuyến bay + Khách sạn</span>
+                    <button class="search-tab active" data-tab="hotel">
+                        <i data-lucide="building"></i>
+                        <span>Khách sạn</span>
                     </button>
                     <button class="search-tab" data-tab="tour">
-                        <i data-lucide="users"></i>
-                        <span>Tour Đà Nẵng</span>
+                        <i data-lucide="map-pin"></i>
+                        <span>Tour du lịch</span>
+                    </button>
+                    <button class="search-tab" data-tab="combo">
+                        <i data-lucide="package"></i>
+                        <span>Combo tiết kiệm</span>
                     </button>
                 </div>
+                
                 <form class="search-form" th:action="@{/search}" method="get" id="search-form">
-                    <div class="input-group">
-                        <i data-lucide="map-pin" class="input-icon"></i>
-                        <input type="text" class="form-input" name="location" value="Đà Nẵng" placeholder="Đà Nẵng, Hội An, Huế..." aria-label="Địa điểm" id="location">
+                    <div class="search-grid">
+                        <div class="search-input-group">
+                            <label class="input-label">Điểm đến</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="map-pin" class="input-icon"></i>
+                                <input type="text" class="search-input" name="location" value="Đà Nẵng" placeholder="Bạn muốn đi đâu?" required>
+                            </div>
+                        </div>
+                        
+                        <div class="search-input-group">
+                            <label class="input-label">Ngày đến</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="calendar" class="input-icon"></i>
+                                <input type="date" class="search-input" name="checkInDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="search-input-group">
+                            <label class="input-label">Ngày về</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="calendar" class="input-icon"></i>
+                                <input type="date" class="search-input" name="checkOutDate" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="search-input-group">
+                            <label class="input-label">Số khách</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="users" class="input-icon"></i>
+                                <select class="search-input" name="guests">
+                                    <option value="2">2 người lớn</option>
+                                    <option value="1">1 người lớn</option>
+                                    <option value="4">4 người lớn</option>
+                                    <option value="3">2 người lớn + 2 trẻ em</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-search">
+                            <i data-lucide="search"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
                     </div>
-                    <div class="input-group">
-                        <i data-lucide="calendar" class="input-icon"></i>
-                        <input type="date" class="form-input" name="checkInDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" aria-label="Ngày nhận phòng" id="check-in">
-                    </div>
-                    <div class="input-group">
-                        <i data-lucide="calendar" class="input-icon"></i>
-                        <input type="date" class="form-input" name="checkOutDate" th:value="${#temporals.format(#temporals.createNow().plusDays(2), 'yyyy-MM-dd')}" aria-label="Ngày trả phòng" id="check-out">
-                    </div>
-                    <div class="input-group">
-                        <i data-lucide="users" class="input-icon"></i>
-                        <select name="guests" class="form-select" aria-label="Số lượng khách" id="guests">
-                            <option value="2">2 người lớn, 0 trẻ em, 1 phòng</option>
-                            <option value="1">1 người lớn, 0 trẻ em, 1 phòng</option>
-                            <option value="4">4 người lớn, 0 trẻ em, 2 phòng</option>
-                            <option value="3">2 người lớn, 2 trẻ em, 1 phòng</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-search">
-                        <i data-lucide="search"></i>
-                        Tìm kiếm
-                    </button>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Property Types -->
-    <section class="section">
+    <!-- Featured Destinations -->
+    <section class="destinations-section" id="destinations">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Loại hình lưu trú tại Đà Nẵng</h2>
-                <p class="section-subtitle">Khám phá đa dạng các lựa chọn nghỉ dưỡng phù hợp với mọi nhu cầu</p>
+                <div class="section-badge">
+                    <i data-lucide="map"></i>
+                    <span>Điểm đến nổi bật</span>
+                </div>
+                <h2 class="section-title">Khám phá những điểm đến hấp dẫn</h2>
+                <p class="section-subtitle">Trải nghiệm vẻ đẹp độc đáo của Đà Nẵng qua những địa điểm được yêu thích nhất</p>
             </div>
-            <div class="grid grid-4">
-                <div class="card property-card animate-slide" th:each="type, iterStat : ${roomTypes}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
-                    <div class="property-image-wrapper">
-                        <img th:src="${type.imageUrl}" th:alt="${type.name}" class="property-image" src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
-                        <div class="property-overlay"></div>
+            
+            <div class="destinations-grid">
+                <div class="destination-card featured">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop" alt="Bãi biển Mỹ Khê">
+                        <div class="destination-overlay">
+                            <div class="destination-badge">Nổi bật</div>
+                        </div>
                     </div>
-                    <div class="card-content">
-                        <h3 class="hotel-title" th:text="${type.name}">Khách sạn biển</h3>
-                        <p class="amenity-description" th:text="${type.description}">Thưởng thức tầm nhìn biển Mỹ Khê với tiện nghi 5 sao.</p>
+                    <div class="destination-content">
+                        <h3 class="destination-title">Bãi biển Mỹ Khê</h3>
+                        <p class="destination-description">Một trong những bãi biển đẹp nhất thế giới với cát trắng mịn và nước biển trong xanh</p>
+                        <div class="destination-meta">
+                            <div class="meta-item">
+                                <i data-lucide="star"></i>
+                                <span>4.9/5</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="map-pin"></i>
+                                <span>5km từ trung tâm</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">Khám phá</button>
+                    </div>
+                </div>
+                
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=600&h=400&fit=crop" alt="Cầu Rồng">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <h3 class="destination-title">Cầu Rồng</h3>
+                        <p class="destination-description">Biểu tượng của Đà Nẵng với kiến trúc độc đáo và màn trình diễn phun lửa ấn tượng</p>
+                        <div class="destination-meta">
+                            <div class="meta-item">
+                                <i data-lucide="star"></i>
+                                <span>4.8/5</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="map-pin"></i>
+                                <span>Trung tâm thành phố</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">Khám phá</button>
+                    </div>
+                </div>
+                
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop" alt="Bán đảo Sơn Trà">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <h3 class="destination-title">Bán đảo Sơn Trà</h3>
+                        <p class="destination-description">Điểm ngắm toàn cảnh thành phố với tượng Phật Bà Quan Âm cao 67m</p>
+                        <div class="destination-meta">
+                            <div class="meta-item">
+                                <i data-lucide="star"></i>
+                                <span>4.7/5</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="map-pin"></i>
+                                <span>8km từ trung tâm</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">Khám phá</button>
                     </div>
                 </div>
             </div>
@@ -101,642 +253,445 @@
     </section>
 
     <!-- Featured Hotels -->
-    <section class="section section-bg-gray" id="hotels">
+    <section class="hotels-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Khách sạn nổi bật</h2>
-                <p class="section-subtitle">Những lựa chọn hàng đầu được khách hàng yêu thích nhất</p>
+                <div class="section-badge">
+                    <i data-lucide="building"></i>
+                    <span>Khách sạn nổi bật</span>
+                </div>
+                <h2 class="section-title">Lựa chọn lưu trú hoàn hảo</h2>
+                <p class="section-subtitle">Những khách sạn được đánh giá cao nhất với tiện nghi đẳng cấp và dịch vụ chuyên nghiệp</p>
             </div>
-            <div class="grid grid-3">
-                <a th:each="room, iterStat : ${featuredRooms}" th:href="@{/room/{id}(id=${room.roomId})}" class="card hotel-card animate-slide" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
-                    <div class="hotel-image-wrapper">
-                        <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : '/placeholder.svg?height=180&width=280'}" th:alt="${room.type}" class="hotel-image" src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop">
-                        <button class="hotel-favorite">
-                            <i data-lucide="heart"></i>
-                        </button>
-                        <div class="hotel-rating" th:if="${room.averageRating != null}">
-                            <i data-lucide="star" class="star-icon"></i>
-                            <span class="text-sm font-medium" th:text="${room.averageRating}">8.7</span>
+            
+            <div class="hotels-grid">
+                <div th:each="room, iterStat : ${featuredRooms}" class="hotel-card" th:style="'animation-delay: ' + ${0.1 * (iterStat.index + 1)} + 's;'">
+                    <div class="hotel-image">
+                        <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : 'https://images.unsplash.com/photo-1596436889106-be35e843f974?w=600&h=400&fit=crop'}" th:alt="${room.type}">
+                        <div class="hotel-overlay">
+                            <button class="hotel-favorite">
+                                <i data-lucide="heart"></i>
+                            </button>
+                            <div class="hotel-rating" th:if="${room.averageRating != null}">
+                                <i data-lucide="star"></i>
+                                <span th:text="${room.averageRating}">4.8</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-content">
-                        <h3 class="hotel-title" th:text="${room.type}">Ocean Breeze Hotel</h3>
-                        <p class="hotel-location" th:text="${room.description}">
-                            <i data-lucide="map-pin"></i>
-                            Mỹ Khê Beach - Gần cầu Rồng
-                        </p>
-                        <div class="hotel-price-section">
-                            <div>
-                                <span class="hotel-price" th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">1,800,000 ₫</span>
-                                <span class="hotel-price-unit"> / đêm</span>
+                    <div class="hotel-content">
+                        <div class="hotel-header">
+                            <h3 class="hotel-title" th:text="${room.type}">Ocean Breeze Resort</h3>
+                            <div class="hotel-location">
+                                <i data-lucide="map-pin"></i>
+                                <span>Mỹ Khê Beach</span>
                             </div>
-                            <button class="btn btn-primary book-now" th:data-room-id="${room.roomId}" th:data-room-name="${room.type}" th:attr="onclick='openBookingModal(this); event.stopPropagation(); return false;'">
+                        </div>
+                        <p class="hotel-description" th:text="${room.description}">Khách sạn 5 sao với tầm nhìn ra biển tuyệt đẹp và tiện nghi cao cấp</p>
+                        <div class="hotel-features">
+                            <span class="feature-tag">Wifi miễn phí</span>
+                            <span class="feature-tag">Hồ bơi</span>
+                            <span class="feature-tag">Spa</span>
+                        </div>
+                        <div class="hotel-footer">
+                            <div class="hotel-price">
+                                <span class="price-amount" th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">2,500,000 ₫</span>
+                                <span class="price-unit">/ đêm</span>
+                            </div>
+                            <button class="btn btn-primary"
+                                    th:data-room-id="${room.roomId}"
+                                    th:data-room-name="${room.type}"
+                                    th:onclick="'goToRoomDetail(' + ${room.roomId} + ');'">
                                 Đặt ngay
-                                <i data-lucide="arrow-right"></i>
                             </button>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Special Offers -->
-    <section class="section" id="offers">
+    <section class="offers-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Ưu đãi đặc biệt</h2>
-                <p class="section-subtitle">Tiết kiệm chi phí với những deal hấp dẫn chỉ có tại DaNang Travel</p>
+                <div class="section-badge">
+                    <i data-lucide="gift"></i>
+                    <span>Ưu đãi đặc biệt</span>
+                </div>
+                <h2 class="section-title">Tiết kiệm với ưu đãi độc quyền</h2>
+                <p class="section-subtitle">Những deal hấp dẫn chỉ có tại DaNang Travel</p>
             </div>
-            <div class="grid grid-2">
-                <div class="card offer-card animate-slide" th:each="voucher, iterStat : ${activeVouchers}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
-                    <div class="flex">
-                        <div style="flex: 1;">
-                            <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Ưu đãi" class="offer-image">
-                        </div>
-                        <div class="card-content" style="flex: 1;">
-                            <h3 class="text-2xl font-bold mb-4" th:text="'Giảm ' + ${#numbers.formatDecimal(voucher.discount, 0, 'COMMA', 0, 'POINT')} + '% với mã ' + ${voucher.code}">Giảm 25% với mã SUMMER25</h3>
-                            <p class="mb-4" th:text="'Áp dụng từ ' + ${#temporals.format(voucher.startDate, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(voucher.endDate, 'dd/MM/yyyy')}">Áp dụng từ 01/01/2025 đến 31/12/2025</p>
-                            <div class="flex items-center gap-4">
-                                <code style="background: white; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-family: monospace; color: #ea580c; font-weight: 600;" th:text="${voucher.code}">SUMMER25</code>
-                                <button class="btn btn-outline-orange" onclick="copyVoucherCode(this)" th:data-code="${voucher.code}">Sao chép</button>
-                            </div>
+            
+            <div class="offers-grid">
+                <div th:each="voucher, iterStat : ${activeVouchers}" class="offer-card" th:style="'animation-delay: ' + ${0.1 * (iterStat.index + 1)} + 's;'">
+                    <div class="offer-image">
+                        <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?w=600&h=300&fit=crop" alt="Ưu đãi">
+                        <div class="offer-badge">
+                            <span th:text="'Giảm ' + ${voucher.discount} + '%'">Giảm 25%</span>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Hotel Amenities -->
-    <section class="section section-bg-gradient">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Tiện ích nổi bật</h2>
-                <p class="section-subtitle">Trải nghiệm những tiện ích cao cấp tại các khách sạn đối tác của chúng tôi</p>
-            </div>
-            <div class="grid grid-4">
-                <div class="amenity-item">
-                    <div class="amenity-icon-wrapper">
-                        <i data-lucide="wifi" class="amenity-icon"></i>
+                    <div class="offer-content">
+                        <h3 class="offer-title" th:text="'Mã ' + ${voucher.code} + ' - Ưu đãi đặc biệt'">Mã SUMMER25 - Ưu đãi đặc biệt</h3>
+                                                    <p class="offer-description" th:text="'Áp dụng từ ' + ${voucher.startDate != null ? voucher.startDate.toString() : 'N/A'} + ' đến ' + ${voucher.endDate != null ? voucher.endDate.toString() : 'N/A'}">Áp dụng từ 01/01/2025 đến 31/12/2025</p>
+                        <div class="offer-code">
+                            <code th:text="${voucher.code}">SUMMER25</code>
+                            <button class="btn btn-outline btn-small" onclick="copyVoucherCode(this)" th:data-code="${voucher.code}">
+                                <i data-lucide="copy"></i>
+                                Sao chép
+                            </button>
+                        </div>
                     </div>
-                    <h3 class="amenity-title">Wifi miễn phí</h3>
-                    <p class="amenity-description">Kết nối internet tốc độ cao</p>
-                </div>
-                <div class="amenity-item">
-                    <div class="amenity-icon-wrapper">
-                        <i data-lucide="car" class="amenity-icon"></i>
-                    </div>
-                    <h3 class="amenity-title">Đỗ xe miễn phí</h3>
-                    <p class="amenity-description">Chỗ đậu xe an toàn và tiện lợi</p>
-                </div>
-                <div class="amenity-item">
-                    <div class="amenity-icon-wrapper">
-                        <i data-lucide="utensils" class="amenity-icon"></i>
-                    </div>
-                    <h3 class="amenity-title">Nhà hàng & Bar</h3>
-                    <p class="amenity-description">Thưởng thức ẩm thực đa dạng</p>
-                </div>
-                <div class="amenity-item">
-                    <div class="amenity-icon-wrapper">
-                        <i data-lucide="waves" class="amenity-icon"></i>
-                    </div>
-                    <h3 class="amenity-title">Hồ bơi</h3>
-                    <p class="amenity-description">Thư giãn và giải trí</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Statistics -->
-    <section class="section section-bg-blue">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">150+</div>
-                    <div class="stat-label">Khách sạn</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">Tour du lịch</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">10,000+</div>
-                    <div class="stat-label">Khách hàng</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">4.8</div>
-                    <div class="stat-label">Đánh giá</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Why Choose Us -->
-    <section class="section">
+    <section class="features-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Tại sao chọn DaNang Travel?</h2>
-                <p class="section-subtitle">Chúng tôi cam kết mang đến trải nghiệm đặt phòng tốt nhất cho bạn</p>
+                <div class="section-badge">
+                    <i data-lucide="award"></i>
+                    <span>Tại sao chọn chúng tôi</span>
+                </div>
+                <h2 class="section-title">Trải nghiệm du lịch đẳng cấp</h2>
+                <p class="section-subtitle">Cam kết mang đến những trải nghiệm tốt nhất cho khách hàng</p>
             </div>
-            <div class="grid grid-4">
-                <div class="card feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="award" class="feature-icon"></i>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="shield-check"></i>
                     </div>
-                    <h3 class="feature-title">Giá tốt nhất</h3>
-                    <p class="feature-description">Cam kết giá cạnh tranh nhất thị trường</p>
+                    <h3 class="feature-title">An toàn & Bảo mật</h3>
+                    <p class="feature-description">Thông tin cá nhân được bảo vệ tuyệt đối với công nghệ mã hóa tiên tiến</p>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="gift" class="feature-icon"></i>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="zap"></i>
                     </div>
-                    <h3 class="feature-title">Ưu đãi độc quyền</h3>
-                    <p class="feature-description">Nhiều chương trình khuyến mãi hấp dẫn</p>
+                    <h3 class="feature-title">Đặt phòng nhanh chóng</h3>
+                    <p class="feature-description">Quy trình đặt phòng đơn giản, chỉ mất 2 phút để hoàn tất</p>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="clock" class="feature-icon"></i>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="headphones"></i>
                     </div>
                     <h3 class="feature-title">Hỗ trợ 24/7</h3>
-                    <p class="feature-description">Luôn sẵn sàng giải đáp mọi thắc mắc</p>
+                    <p class="feature-description">Đội ngũ tư vấn chuyên nghiệp luôn sẵn sàng hỗ trợ mọi lúc</p>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i data-lucide="check-circle" class="feature-icon"></i>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="gift"></i>
                     </div>
-                    <h3 class="feature-title">Đặt phòng dễ dàng</h3>
-                    <p class="feature-description">Thao tác đơn giản và nhanh chóng</p>
+                    <h3 class="feature-title">Ưu đãi độc quyền</h3>
+                    <p class="feature-description">Những deal hấp dẫn chỉ có tại DaNang Travel</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Recent Reviews -->
-   <section class="section section-bg-gray">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Đánh giá gần đây</h2>
-            <p class="section-subtitle">Những đánh giá chân thực từ khách hàng</p>
-        </div>
-        <div th:if="${recentReviews != null and !recentReviews.isEmpty()}">
-            <div class="grid grid-3">
-                <div class="card review-card" th:each="review, iterStat : ${recentReviews}">
-                    <div class="card-content">
-                        <h4 th:text="${review.customer != null ? review.customer.name : 'N/A'}">Khách hàng</h4>
-                        <p th:text="${#temporals.format(review.reviewDate, 'dd/MM/yyyy')}">02/06/2025</p>
-                        <span th:text="${review.rating != null ? review.rating + '/5' : 'N/A'}">4.5/5</span>
-                        <p th:text="${review.comment != null ? review.comment : 'N/A'}">Very clean</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div th:unless="${recentReviews != null and !recentReviews.isEmpty()}">
-            <p>Chưa có đánh giá.</p>
-        </div>
-    </div>
-</section>
 
     <!-- Recent Bookings -->
-   <section class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Đặt phòng gần đây</h2>
-            <p class="section-subtitle">Xem các đặt phòng mới nhất từ khách hàng của chúng tôi</p>
-        </div>
-        <div th:if="${recentBookings != null and !recentBookings.isEmpty()}">
-            <div class="grid grid-3">
-                <div class="card booking-card animate-slide" th:each="booking, iterStat : ${recentBookings}" th:style="'animation-delay: ' + ${0.2 * (iterStat.index + 1)} + 's;'">
-                    <div class="card-content">
-                        <h3 class="hotel-title" th:text="${booking.room != null ? booking.room.type : 'N/A'}">Ocean Breeze Hotel</h3>
-                        <p class="hotel-location" th:text="${booking.customer != null ? booking.customer.name : 'N/A'}">Khách hàng</p>
-                        <p th:text="'Từ ' + ${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : 'N/A'}">Từ 01/01/2025 đến 03/01/2025</p>
+    <section class="bookings-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <i data-lucide="calendar"></i>
+                    <span>Đặt phòng gần đây</span>
+                </div>
+                <h2 class="section-title">Khách hàng đã đặt phòng</h2>
+                <p class="section-subtitle">Xem những đặt phòng mới nhất từ khách hàng của chúng tôi</p>
+            </div>
+            
+            <div th:if="${recentBookings != null and !recentBookings.isEmpty()}" class="bookings-grid">
+                <div th:each="booking, iterStat : ${recentBookings}" class="booking-card" th:style="'animation-delay: ' + ${0.1 * (iterStat.index + 1)} + 's;'">
+                    <div class="booking-header">
+                        <div class="booking-avatar">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <div class="booking-info">
+                            <h4 class="booking-customer" th:text="${booking.customer != null ? booking.customer.name : 'Khách hàng'}">Nguyễn Văn A</h4>
+                            <p class="booking-hotel" th:text="${booking.room != null ? booking.room.type : 'N/A'}">Ocean Breeze Resort</p>
+                        </div>
                         <div class="booking-status" 
                              th:text="${booking.status != null ? booking.status.statusName : 'N/A'}"
-                             th:class="${booking.status != null and booking.status.statusName == 'CONFIRMED' ? 'rating' : 'rating'}"
-                             th:style="${booking.status != null and booking.status.statusName == 'CONFIRMED' ? 'background: #e6f0e6; color: #008009;' : 
-                                       booking.status != null and booking.status.statusName == 'PENDING' ? 'background: #fff3cd; color: #856404;' : 
-                                       booking.status != null and booking.status.statusName == 'CANCELLED' ? 'background: #f8d7da; color: #721c24;' : 
-                                       'background: #d1ecf1; color: #0c5460;'}">
-                            CONFIRMED
+                             th:class="${booking.status != null and booking.status.statusName == 'CONFIRMED' ? 'status-confirmed' : 
+                                       booking.status != null and booking.status.statusName == 'PENDING' ? 'status-pending' : 
+                                       booking.status != null and booking.status.statusName == 'CANCELLED' ? 'status-cancelled' : 
+                                       'status-default'}">
+                            Đã xác nhận
                         </div>
-                        <p class="hotel-price-section">
-                            <span class="hotel-price" th:text="${booking.room != null ? #numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">1,800,000 ₫</span>
-                            <span class="hotel-price-unit"> / đêm</span>
-                        </p>
+                    </div>
+                    <div class="booking-details">
+                        <div class="booking-date">
+                            <i data-lucide="calendar"></i>
+                                                            <span th:text="'Từ ' + ${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">Từ 15/01/2025 đến 17/01/2025</span>
+                        </div>
+                        <div class="booking-price">
+                            <span class="price-amount" th:text="${booking.room != null ? #numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">2,500,000 ₫</span>
+                            <span class="price-unit">/ đêm</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div th:unless="${recentBookings != null and !recentBookings.isEmpty()}">
-            <p class="text-center">Chưa có đặt phòng nào.</p>
-        </div>
-    </div>
-</section>
-
-    <!-- Popular Destinations -->
-    <section class="section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Điểm đến phổ biến</h2>
-                <p class="section-subtitle">Khám phá những địa điểm du lịch hấp dẫn nhất tại miền Trung</p>
-            </div>
-            <div class="grid grid-4">
-                <div class="card destination-card">
-                    <div class="destination-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" alt="Đà Nẵng" class="destination-image">
-                        <div class="destination-overlay"></div>
-                        <div class="destination-info">
-                            <h3 class="destination-name">Đà Nẵng</h3>
-                            <p class="destination-hotels">120 khách sạn</p>
-                        </div>
-                    </div>
+            
+            <div th:unless="${recentBookings != null and !recentBookings.isEmpty()}" class="empty-state">
+                <div class="empty-icon">
+                    <i data-lucide="calendar"></i>
                 </div>
-                <div class="card destination-card">
-                    <div class="destination-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=400&h=300&fit=crop" alt="Hội An" class="destination-image">
-                        <div class="destination-overlay"></div>
-                        <div class="destination-info">
-                            <h3 class="destination-name">Hội An</h3>
-                            <p class="destination-hotels">80 khách sạn</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card destination-card">
-                    <div class="destination-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" alt="Huế" class="destination-image">
-                        <div class="destination-overlay"></div>
-                        <div class="destination-info">
-                            <h3 class="destination-name">Huế</h3>
-                            <p class="destination-hotels">60 khách sạn</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card destination-card">
-                    <div class="destination-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop" alt="Nha Trang" class="destination-image">
-                        <div class="destination-overlay"></div>
-                        <div class="destination-info">
-                            <h3 class="destination-name">Nha Trang</h3>
-                            <p class="destination-hotels">100 khách sạn</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="empty-title">Chưa có đặt phòng nào</h3>
+                <p class="empty-description">Hãy là người đầu tiên đặt phòng và nhận ưu đãi đặc biệt!</p>
+                <button class="btn btn-primary" onclick="scrollToSearch()">Đặt phòng ngay</button>
             </div>
         </div>
     </section>
 
-    <!-- Hotel Gallery -->
-    <section class="section section-bg-black">
+    <!-- Newsletter -->
+    <section class="newsletter-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Thư viện ảnh khách sạn</h2>
-                <p class="section-subtitle">Khám phá vẻ đẹp của các khách sạn qua bộ sưu tập ảnh chất lượng cao</p>
-            </div>
-            <div class="gallery-container">
-                <div class="gallery-wrapper">
-                    <img id="gallery-image" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop" alt="Phòng khách sạn Pullman Danang Beach Resort bên bờ biển" class="gallery-image">
-                    <div class="gallery-overlay"></div>
-                    <button class="gallery-nav gallery-nav-left" onclick="prevImage()" aria-label="Ảnh trước">
-                        <i data-lucide="chevron-left"></i>
-                    </button>
-                    <button class="gallery-nav gallery-nav-right" onclick="nextImage()" aria-label="Ảnh tiếp theo">
-                        <i data-lucide="chevron-right"></i>
-                    </button>
-                    <div class="gallery-dots" id="gallery-dots">
-                        <button class="gallery-dot active" onclick="setImage(0)"></button>
-                        <button class="gallery-dot" onclick="setImage(1)"></button>
-                        <button class="gallery-dot" onclick="setImage(2)"></button>
-                        <button class="gallery-dot" onclick="setImage(3)"></button>
-                        <button class="gallery-dot" onclick="setImage(4)"></button>
-                    </div>
+            <div class="newsletter-content">
+                <div class="newsletter-text">
+                    <h2 class="newsletter-title">Đăng ký nhận tin tức</h2>
+                    <p class="newsletter-description">Nhận thông tin về ưu đãi mới nhất, kinh nghiệm du lịch hữu ích và những điểm đến hấp dẫn</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Activities & Tours -->
-    <section class="section" id="tours">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Hoạt động & Tour du lịch</h2>
-                <p class="section-subtitle">Trải nghiệm những hoạt động thú vị và tour du lịch hấp dẫn tại Đà Nẵng</p>
-            </div>
-            <div class="grid grid-3">
-                <div class="card activity-card">
-                    <div class="activity-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" alt="Tour Bà Nà Hills" class="activity-image">
-                        <div class="activity-rating-badge">
-                            <i data-lucide="star" class="star-icon"></i>
-                            <span class="text-sm font-medium">4.8</span>
-                        </div>
-                        <div class="activity-duration-badge">1 ngày</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="activity-title">Tour Bà Nà Hills</h3>
-                        <p class="activity-description">Khám phá cây cầu Vàng nổi tiếng và khu vui chơi Fantasy Park</p>
-                        <div class="activity-price-section">
-                            <div>
-                                <span class="activity-price">850,000 ₫</span>
-                                <span class="activity-price-unit"> / người</span>
-                            </div>
-                            <button class="btn btn-orange">Đặt tour</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card activity-card">
-                    <div class="activity-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=400&h=300&fit=crop" alt="Tour Hội An cổ trấn" class="activity-image">
-                        <div class="activity-rating-badge">
-                            <i data-lucide="star" class="star-icon"></i>
-                            <span class="text-sm font-medium">4.9</span>
-                        </div>
-                        <div class="activity-duration-badge">Nửa ngày</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="activity-title">Tour Hội An cổ trấn</h3>
-                        <p class="activity-description">Dạo bước trong phố cổ với những ngôi nhà cổ kính</p>
-                        <div class="activity-price-section">
-                            <div>
-                                <span class="activity-price">650,000 ₫</span>
-                                <span class="activity-price-unit"> / người</span>
-                            </div>
-                            <button class="btn btn-orange">Đặt tour</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card activity-card">
-                    <div class="activity-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" alt="Massage & Spa thư giãn" class="activity-image">
-                        <div class="activity-rating-badge">
-                            <i data-lucide="star" class="star-icon"></i>
-                            <span class="text-sm font-medium">4.7</span>
-                        </div>
-                        <div class="activity-duration-badge">2 giờ</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="activity-title">Massage & Spa thư giãn</h3>
-                        <p class="activity-description">Thư giãn với dịch vụ massage truyền thống Việt Nam</p>
-                        <div class="activity-price-section">
-                            <div>
-                                <span class="activity-price">450,000 ₫</span>
-                                <span class="activity-price-unit"> / người</span>
-                            </div>
-                            <button class="btn btn-orange">Đặt tour</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog & Travel Tips -->
-    <section class="section section-bg-orange">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Blog & Kinh nghiệm du lịch</h2>
-                <p class="section-subtitle">Cập nhật những thông tin mới nhất và kinh nghiệm du lịch hữu ích</p>
-            </div>
-            <div class="grid grid-3">
-                <div class="card blog-card">
-                    <div class="blog-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop" alt="Top 10 khách sạn view biển đẹp nhất Đà Nẵng 2024" class="blog-image">
-                        <div class="blog-badge">Mới</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="blog-title">Top 10 khách sạn view biển đẹp nhất Đà Nẵng 2024</h3>
-                        <p class="blog-excerpt">Khám phá những khách sạn có tầm nhìn ra biển tuyệt đẹp tại thành phố biển Đà Nẵng</p>
-                        <div class="blog-meta">
-                            <span>15/12/2024</span>
-                            <span>5 phút đọc</span>
-                        </div>
-                        <button class="btn btn-outline-orange">
-                            Đọc thêm
-                            <i data-lucide="arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card blog-card">
-                    <div class="blog-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" alt="Kinh nghiệm du lịch Đà Nẵng 3 ngày 2 đêm" class="blog-image">
-                        <div class="blog-badge">Mới</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="blog-title">Kinh nghiệm du lịch Đà Nẵng 3 ngày 2 đêm</h3>
-                        <p class="blog-excerpt">Hướng dẫn chi tiết lịch trình du lịch Đà Nẵng tiết kiệm và trọn vẹn</p>
-                        <div class="blog-meta">
-                            <span>12/12/2024</span>
-                            <span>8 phút đọc</span>
-                        </div>
-                        <button class="btn btn-outline-orange">
-                            Đọc thêm
-                            <i data-lucide="arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card blog-card">
-                    <div class="blog-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=400&h=300&fit=crop" alt="Ẩm thực Đà Nẵng - Những món ăn không thể bỏ qua" class="blog-image">
-                        <div class="blog-badge">Mới</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="blog-title">Ẩm thực Đà Nẵng - Những món ăn không thể bỏ qua</h3>
-                        <p class="blog-excerpt">Khám phá văn hóa ẩm thực phong phú của thành phố biển xinh đẹp</p>
-                        <div class="blog-meta">
-                            <span>10/12/2024</span>
-                            <span>6 phút đọc</span>
-                        </div>
-                        <button class="btn btn-outline-orange">
-                            Đọc thêm
-                            <i data-lucide="arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Newsletter Signup -->
-    <section class="section section-bg-purple">
-        <div class="container">
-            <div class="text-center">
-                <h2 class="section-title mb-4">Đăng ký nhận tin tức</h2>
-                <p class="text-xl mb-8" style="color: rgba(191, 219, 254, 1);">Nhận thông tin về ưu đãi mới nhất và kinh nghiệm du lịch hữu ích</p>
                 <form class="newsletter-form">
-                    <input type="email" class="newsletter-input" placeholder="Nhập email của bạn" aria-label="Email">
-                    <button type="submit" class="btn newsletter-btn">
-                        Đăng ký
-                        <i data-lucide="mail"></i>
-                    </button>
+                    <div class="newsletter-input-group">
+                        <input type="email" class="newsletter-input" placeholder="Nhập email của bạn" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="mail"></i>
+                            <span>Đăng ký</span>
+                        </button>
+                    </div>
+                    <p class="newsletter-disclaimer">Chúng tôi cam kết bảo mật thông tin cá nhân của bạn</p>
                 </form>
-                <p class="newsletter-disclaimer">Chúng tôi cam kết bảo mật thông tin cá nhân của bạn</p>
             </div>
         </div>
     </section>
-
 
     <!-- Booking Modal -->
     <div class="modal" id="booking-modal">
-        <div class="modal-content card">
-            <div class="card-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Đặt phòng</h3>
-                    <button class="modal-close" onclick="modal.style.display='none'">×</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Đặt phòng</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form th:action="@{/bookings}" method="post" id="booking-form" class="modal-form">
+                <input type="hidden" name="roomId" id="selected-room-id">
+                
+                <div class="form-group">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text" name="customerName" class="form-input" placeholder="Nhập họ và tên" required>
                 </div>
-                <form th:action="@{/bookings}" method="post" id="booking-form" class="modal-form">
-                    <input type="hidden" name="roomId" id="selected-room-id" class="modal-input">
-                    <input type="text" name="customerName" placeholder="Họ và tên" aria-label="Họ và tên" required class="modal-input">
-                    <input type="email" name="email" placeholder="Email" aria-label="Email" required class="modal-input">
-                    <input type="tel" name="phone" placeholder="Số điện thoại" aria-label="Số điện thoại" required class="modal-input">
-                    <input type="text" name="address" placeholder="Địa chỉ" aria-label="Địa chỉ" required class="modal-input">
-                    <input type="date" name="checkInDate" aria-label="Ngày nhận phòng" required class="modal-input">
-                    <input type="date" name="checkOutDate" aria-label="Ngày trả phòng" required class="modal-input">
-                    <select name="voucherId" aria-label="Mã giảm giá" class="modal-select">
-                        <option value="">Chọn mã giảm giá (nếu có)</option>
-                        <option th:each="voucher : ${vouchers}" 
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" placeholder="Nhập email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="tel" name="phone" class="form-input" placeholder="Nhập số điện thoại" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Địa chỉ</label>
+                    <input type="text" name="address" class="form-input" placeholder="Nhập địa chỉ" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ngày nhận phòng</label>
+                        <input type="date" name="checkInDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày trả phòng</label>
+                        <input type="date" name="checkOutDate" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Mã giảm giá (nếu có)</label>
+                    <select name="voucherId" class="form-input">
+                        <option value="">Chọn mã giảm giá</option>
+                        <option th:each="voucher : ${activeVouchers}" 
                                 th:value="${voucher.voucherId}" 
                                 th:text="${voucher.code + ' - Giảm ' + voucher.discount + '%'}">
                         </option>
                     </select>
-                    <button type="submit" class="modal-submit">Xác nhận đặt phòng</button>
-                </form>
-            </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Xác nhận đặt phòng</button>
+            </form>
         </div>
     </div>
-    <div th:replace="~{/Layout/Footer}"></div>
 
+    <!-- Footer -->
+    <div th:replace="~{/Layout/footer}"></div>
+
+    <!-- Scripts -->
     <script th:inline="javascript">
-    // Initialize Lucide icons
-    lucide.createIcons();
+        // Initialize Lucide icons
+        lucide.createIcons();
 
-    // Hamburger Menu
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
+        // Smooth scrolling functions
+        function scrollToSearch() {
+            document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
+        }
 
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        hamburger.setAttribute('aria-expanded', navLinks.classList.contains('active'));
-    });
+        function scrollToDestinations() {
+            document.getElementById('destinations').scrollIntoView({ behavior: 'smooth' });
+        }
 
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
-            hamburger.setAttribute('aria-expanded', 'false');
+        // Search tabs functionality
+        const searchTabs = document.querySelectorAll('.search-tab');
+        searchTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                searchTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
         });
-    });
 
-    // Search Tabs
-    const tabs = document.querySelectorAll('.search-tabs button');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+        // Search form validation
+        const searchForm = document.getElementById('search-form');
+        searchForm.addEventListener('submit', (e) => {
+            const location = searchForm.querySelector('input[name="location"]').value;
+            const checkIn = searchForm.querySelector('input[name="checkInDate"]').value;
+            const checkOut = searchForm.querySelector('input[name="checkOutDate"]').value;
+
+            if (!location || !checkIn || !checkOut) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            if (new Date(checkIn) >= new Date(checkOut)) {
+                e.preventDefault();
+                alert('Ngày trả phòng phải sau ngày nhận phòng!');
+                return;
+            }
         });
-    });
 
-    // Search Form Validation
-    const searchForm = document.getElementById('search-form');
-    searchForm.addEventListener('submit', (e) => {
-        const location = document.getElementById('location').value;
-        const checkIn = document.getElementById('check-in').value;
-        const checkOut = document.getElementById('check-out').value;
-
-        if (!location) {
-            alert('Vui lòng nhập địa điểm!');
-            e.preventDefault();
-            return;
+        // Modal functionality
+        function openBookingModal(button) {
+            const roomId = button.getAttribute('data-room-id');
+            document.getElementById('selected-room-id').value = roomId;
+            
+            // Set default dates from search form
+            const searchCheckIn = document.querySelector('input[name="checkInDate"]').value;
+            const searchCheckOut = document.querySelector('input[name="checkOutDate"]').value;
+            
+            if (searchCheckIn) {
+                document.querySelector('#booking-modal input[name="checkInDate"]').value = searchCheckIn;
+            }
+            if (searchCheckOut) {
+                document.querySelector('#booking-modal input[name="checkOutDate"]').value = searchCheckOut;
+            }
+            
+            document.getElementById('booking-modal').style.display = 'flex';
         }
-        if (!checkIn || !checkOut) {
-            alert('Vui lòng chọn ngày nhận và trả phòng!');
-            e.preventDefault();
-            return;
+
+        function closeModal() {
+            document.getElementById('booking-modal').style.display = 'none';
         }
-        if (new Date(checkIn) >= new Date(checkOut)) {
-            alert('Ngày trả phòng phải sau ngày nhận phòng!');
-            e.preventDefault();
-            return;
-        }
-    });
 
-    // Booking Modal
-    const modal = document.getElementById('booking-modal');
-    const closeModal = document.querySelector('.modal .modal-close');
-
-    function openBookingModal(buttonElement) {
-        const roomId = buttonElement.getAttribute('data-room-id');
-        document.getElementById('selected-room-id').value = roomId;
-
-        const checkInDateFromSearch = document.getElementById('check-in').value;
-        const checkOutDateFromSearch = document.getElementById('check-out').value;
-        
-        const modalCheckInInput = modal.querySelector('input[name="checkInDate"]');
-        const modalCheckOutInput = modal.querySelector('input[name="checkOutDate"]');
-
-        if (modalCheckInInput && checkInDateFromSearch) {
-            modalCheckInInput.value = checkInDateFromSearch;
-        }
-        if (modalCheckOutInput && checkOutDateFromSearch) {
-            modalCheckOutInput.value = checkOutDateFromSearch;
-        }
-        
-        modal.style.display = 'flex';
-    }
-
-    closeModal.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-
-    // Copy voucher code function
-    function copyVoucherCode(button) {
-        const code = button.getAttribute('data-code');
-        navigator.clipboard.writeText(code).then(() => {
-            button.textContent = 'Đã sao chép!';
-            setTimeout(() => {
-                button.textContent = 'Sao chép';
-            }, 2000);
+        // Close modal when clicking outside
+        document.getElementById('booking-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'booking-modal') {
+                closeModal();
+            }
         });
-    }
-    
 
-    // Gallery Navigation (thêm từ mã đầu tiên để hỗ trợ thư viện ảnh)
-    const galleryImages = [
-        'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1596436889106-be35e843f974?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop'
-    ];
-    let currentImageIndex = 0;
+        // Copy voucher code
+        function copyVoucherCode(button) {
+            const code = button.getAttribute('data-code');
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i data-lucide="check"></i> Đã sao chép';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
 
-    function updateGallery() {
-        const galleryImage = document.getElementById('gallery-image');
-        const dots = document.querySelectorAll('.gallery-dot');
-        galleryImage.src = galleryImages[currentImageIndex];
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentImageIndex);
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.hotel-card, .offer-card, .booking-card, .destination-card, .feature-card').forEach(el => {
+            observer.observe(el);
         });
-    }
 
-    function prevImage() {
-        currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
-        updateGallery();
-    }
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
 
-    function nextImage() {
-        currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
-        updateGallery();
-    }
+        // Scroll animation for cards/sections
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.animate-in');
+            const windowHeight = window.innerHeight;
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < windowHeight - 60) {
+                    el.classList.add('show');
+                }
+            });
+        }
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('DOMContentLoaded', animateOnScroll);
 
-    function setImage(index) {
-        currentImageIndex = index;
-        updateGallery();
-    }
+        // Counter animation for stat-card
+        function animateCounter(el, target) {
+            let current = 0;
+            const increment = target / 60;
+            function update() {
+                current += increment;
+                if (current < target) {
+                    el.textContent = Math.floor(current) + (target >= 1000 ? '+' : '');
+                    requestAnimationFrame(update);
+                } else {
+                    el.textContent = target + (target >= 1000 ? '+' : '');
+                }
+            }
+            update();
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.stat-number').forEach(el => {
+                const val = el.textContent.replace(/\D/g, '');
+                if (val) animateCounter(el, parseInt(val));
+            });
+        });
+
+        function goToRoomDetail(roomId) {
+            // Lấy ngày nhận/trả nếu có trên form tìm kiếm
+            var checkIn = document.querySelector('input[name="checkInDate"]')?.value;
+            var checkOut = document.querySelector('input[name="checkOutDate"]')?.value;
+            var url = '/room/' + roomId;
+            if (checkIn && checkOut) {
+                url += '?checkInDate=' + encodeURIComponent(checkIn) + '&checkOutDate=' + encodeURIComponent(checkOut);
+            }
+            window.location.href = url;
+        }
     </script>
 </body>
 </html>

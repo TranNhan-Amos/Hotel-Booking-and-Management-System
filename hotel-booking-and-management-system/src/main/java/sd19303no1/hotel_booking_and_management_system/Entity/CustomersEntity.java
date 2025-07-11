@@ -37,6 +37,9 @@ public class CustomersEntity {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "avatar", length = 255)
+    private String avatar;
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private SystemUserEntity systemUser;
@@ -120,5 +123,13 @@ public class CustomersEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

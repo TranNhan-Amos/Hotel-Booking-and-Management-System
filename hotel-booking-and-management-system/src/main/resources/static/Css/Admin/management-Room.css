@@ -733,3 +733,244 @@
                 flex: none;
             }
         }
+
+        /* Giao diện hiện đại cho quản lý phòng admin */
+        .room-admin-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        .partner-select-box {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .partner-dropdown {
+            width: 320px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 1.1rem;
+            margin-top: 8px;
+            background: #f9fafb;
+            transition: border 0.2s;
+        }
+        .partner-dropdown:focus {
+            border: 1.5px solid #2563eb;
+            outline: none;
+        }
+        .notify-box {
+            text-align: center;
+            color: #888;
+            font-size: 1.1rem;
+            margin: 32px 0 16px 0;
+        }
+        .room-table-box {
+            margin-top: 24px;
+        }
+        .room-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .room-table th, .room-table td {
+            padding: 12px 10px;
+            text-align: center;
+        }
+        .room-table thead {
+            background: #f1f5f9;
+        }
+        .room-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+        }
+        .room-table tbody tr:hover {
+            background: #f3f4f6;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: #fff;
+        }
+        .status-badge.available {
+            background: #22c55e;
+        }
+        .status-badge.occupied {
+            background: #f59e42;
+        }
+        .status-badge.maintenance {
+            background: #f43f5e;
+        }
+        .status-badge.cleaning {
+            background: #3b82f6;
+        }
+        .action-btn {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 1em;
+            margin: 0 2px;
+            text-decoration: none;
+            color: #fff;
+            transition: background 0.2s;
+        }
+        .edit-btn {
+            background: #2563eb;
+        }
+        .edit-btn:hover {
+            background: #1d4ed8;
+        }
+        .delete-btn {
+            background: #ef4444;
+        }
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+        .no-room {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .room-admin-container {
+                padding: 10px 2px;
+            }
+            .partner-dropdown {
+                width: 100%;
+            }
+            .room-table th, .room-table td {
+                padding: 8px 2px;
+                font-size: 0.95em;
+            }
+        }
+
+        .modal-room-detail {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.35);
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        .modal-room-detail .modal-content {
+            background: #fff;
+            margin: 60px auto;
+            padding: 32px 28px 24px 28px;
+            border-radius: 16px;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            position: relative;
+            animation: modalShow 0.2s;
+        }
+        @keyframes modalShow {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px; right: 18px;
+            font-size: 2rem;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-modal:hover {
+            color: #ef4444;
+        }
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+        .detail-table th {
+            text-align: left;
+            color: #2563eb;
+            width: 40%;
+            padding: 6px 0;
+            font-weight: 600;
+            background: none;
+        }
+        .detail-table td {
+            padding: 6px 0;
+            color: #222;
+            background: none;
+        }
+        @media (max-width: 600px) {
+            .modal-room-detail .modal-content {
+                max-width: 98vw;
+                padding: 16px 4px 12px 4px;
+            }
+            .detail-table th, .detail-table td {
+                font-size: 0.98em;
+            }
+        }
+        .view-btn {
+            background: #10b981;
+        }
+        .view-btn:hover {
+            background: #059669;
+        }
+
+        .edit-room-form-box {
+            background: #f9fafb;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 24px 18px 12px 18px;
+            margin-bottom: 28px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .edit-room-form h3 {
+            margin-bottom: 12px;
+            color: #2563eb;
+        }
+        .edit-room-form .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .edit-room-form .form-row label {
+            width: 120px;
+            font-weight: 500;
+            color: #222;
+            margin-right: 10px;
+        }
+        .edit-room-form .form-row input,
+        .edit-room-form .form-row textarea {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 1em;
+            background: #fff;
+            transition: border 0.2s;
+        }
+        .edit-room-form .form-row input:focus,
+        .edit-room-form .form-row textarea:focus {
+            border: 1.5px solid #2563eb;
+            outline: none;
+        }
+        .edit-room-form .form-actions {
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        @media (max-width: 700px) {
+            .edit-room-form-box {
+                padding: 10px 2px 6px 2px;
+            }
+            .edit-room-form .form-row label {
+                width: 90px;
+                font-size: 0.98em;
+            }
+        }

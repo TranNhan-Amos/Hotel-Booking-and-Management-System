@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Kiếm Phòng - Khách Sạn Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Search Form */
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #333;
+            text-align: center;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        /* Results Section */
+        .results-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .room-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .room-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .room-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .room-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-description {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Navbar -->
+    <div th:replace="~{Layout/narbar}"></div>
+
+    <div class="container">
+        <!-- Search Form -->
+        <div class="search-section">
+            <h2 class="search-title">
+                <i class="fas fa-search"></i>
+                Tìm Kiếm Phòng
+            </h2>
+            
+            <form class="search-form" method="get" action="/search-rooms">
+                <div class="form-group">
+                    <label class="form-label">Loại phòng</label>
+                    <select class="form-select" name="roomType" th:value="${roomType}">
+                        <option value="">Tất cả loại phòng</option>
+                        <option value="standard" th:selected="${roomType == 'standard'}">Phòng Standard</option>
+                        <option value="deluxe" th:selected="${roomType == 'deluxe'}">Phòng Deluxe</option>
+                        <option value="suite" th:selected="${roomType == 'suite'}">Phòng Suite</option>
+                        <option value="presidential" th:selected="${roomType == 'presidential'}">Phòng Presidential</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Ngày check-in</label>
+                    <input type="date" class="form-input" name="checkInDate" 
+                           th:value="${checkInDate}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Ngày check-out</label>
+                    <input type="date" class="form-input" name="checkOutDate" 
+                           th:value="${checkOutDate}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Số lượng phòng</label>
+                    <input type="number" class="form-input" name="roomCount" 
+                           th:value="${roomCount}" min="1" max="5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Số người lớn</label>
+                    <input type="number" class="form-input" name="adults" 
+                           th:value="${adults}" min="1" max="4" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Số trẻ em</label>
+                    <input type="number" class="form-input" name="children" 
+                           th:value="${children}" min="0" max="4">
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Tìm phòng
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div th:if="${hasSearchResults}" class="results-section">
+            <h3 class="results-title">
+                <i class="fas fa-list"></i>
+                Kết quả tìm kiếm
+            </h3>
+            
+            <div th:if="${availableRooms != null && availableRooms.size() > 0}" class="room-grid">
+                <div th:each="room : ${availableRooms}" class="room-card">
+                    <div class="room-header">
+                        <div class="room-name" th:text="${room.roomNumber}">Phòng 101</div>
+                        <div class="room-price" th:text="${'₫' + room.price}">₫1,200,000</div>
+                    </div>
+                    
+                    <div class="room-details">
+                        <div class="room-detail">
+                            <div class="detail-label">Loại phòng</div>
+                            <div class="detail-value" th:text="${room.type}">Standard</div>
+                        </div>
+                        <div class="room-detail">
+                            <div class="detail-label">Sức chứa</div>
+                            <div class="detail-value" th:text="${room.capacity + ' người'}">2 người</div>
+                        </div>
+                        <div class="room-detail">
+                            <div class="detail-label">Tầng</div>
+                            <div class="detail-value" th:text="${room.floor}">1</div>
+                        </div>
+                        <div class="room-detail">
+                            <div class="detail-label">Trạng thái</div>
+                            <div class="detail-value" th:text="${room.status}">Available</div>
+                        </div>
+                    </div>
+                    
+                    <div class="room-actions">
+                        <button class="btn btn-primary" th:onclick="'bookRoom(' + ${room.roomId} + ')'">
+                            <i class="fas fa-calendar-plus"></i>
+                            Đặt phòng
+                        </button>
+                        <button class="btn btn-secondary" th:onclick="'viewRoomDetail(' + ${room.roomId} + ')'">
+                            <i class="fas fa-eye"></i>
+                            Xem chi tiết
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${availableRooms == null || availableRooms.size() == 0}" class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="empty-title">Không tìm thấy phòng phù hợp</div>
+                <div class="empty-description">
+                    Vui lòng thử lại với các tiêu chí khác hoặc liên hệ với chúng tôi để được hỗ trợ.
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="search-section" style="background: #ffebee; border-left: 4px solid #f44336;">
+            <div style="color: #d32f2f; font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}">Có lỗi xảy ra</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set minimum date for check-in and check-out
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelector('input[name="checkInDate"]').min = today;
+        document.querySelector('input[name="checkOutDate"]').min = today;
+
+        // Update check-out minimum date when check-in changes
+        document.querySelector('input[name="checkInDate"]').addEventListener('change', function() {
+            document.querySelector('input[name="checkOutDate"]').min = this.value;
+        });
+
+        // Book room function
+        function bookRoom(roomId) {
+            const checkInDate = document.querySelector('input[name="checkInDate"]').value;
+            const checkOutDate = document.querySelector('input[name="checkOutDate"]').value;
+            const roomCount = document.querySelector('input[name="roomCount"]').value;
+            
+            if (!checkInDate || !checkOutDate) {
+                alert('Vui lòng chọn ngày check-in và check-out');
+                return;
+            }
+            
+            if (new Date(checkOutDate) <= new Date(checkInDate)) {
+                alert('Ngày check-out phải sau ngày check-in');
+                return;
+            }
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('roomId', roomId);
+            formData.append('checkInDate', checkInDate);
+            formData.append('checkOutDate', checkOutDate);
+            formData.append('roomCount', roomCount);
+            
+            // Send booking request
+            fetch('/book-room', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đặt phòng thành công!');
+                    // Redirect to booking confirmation or profile
+                    window.location.href = '/profile';
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi đặt phòng');
+            });
+        }
+
+        // View room detail function
+        function viewRoomDetail(roomId) {
+            // For now, just show an alert
+            alert('Chi tiết phòng sẽ được hiển thị sớm!');
+        }
+    </script>
+</body>
+</html> 

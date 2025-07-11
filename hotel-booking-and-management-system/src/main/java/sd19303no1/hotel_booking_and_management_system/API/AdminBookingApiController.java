@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sd19303no1.hotel_booking_and_management_system.DTO.AdminBookingRequestDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.BookingDetailDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
 
@@ -84,6 +85,169 @@ public class AdminBookingApiController {
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Lỗi cập nhật trạng thái: " + e.getMessage()));
+        }
+    }
+
+    // CANCEL Booking (by Admin)
+    @PostMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> adminCancelBooking(@PathVariable Integer bookingId,
+                                                @RequestBody Map<String, String> payload) {
+        String reason = payload.get("reason");
+        if (reason == null || reason.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Lý do hủy không được để trống."));
+        }
+
+        try {
+            BookingOrderEntity cancelledBooking = bookingOrderService.cancelBooking(bookingId, reason);
+            return ResponseEntity.ok(Map.of(
+                "message", "Hủy đặt phòng thành công.",
+                "booking", cancelledBooking,
+                "refundAmount", cancelledBooking.getRefundAmount()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi hủy đặt phòng: " + e.getMessage()));
+        }
+    }
+
+    // PROCESS Refund (by Admin)
+    @PostMapping("/{bookingId}/refund")
+    public ResponseEntity<?> adminProcessRefund(@PathVariable Integer bookingId) {
+        try {
+            BookingOrderEntity refundedBooking = bookingOrderService.processRefund(bookingId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Xử lý hoàn tiền thành công.",
+                "booking", refundedBooking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi xử lý hoàn tiền: " + e.getMessage()));
+        }
+    }
+
+    // CONFIRM Payment (by Admin)
+    @PostMapping("/{bookingId}/confirm-payment")
+    public ResponseEntity<?> adminConfirmPayment(@PathVariable Integer bookingId) {
+        try {
+            BookingOrderEntity confirmedBooking = bookingOrderService.confirmPayment(bookingId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Xác nhận thanh toán thành công.",
+                "booking", confirmedBooking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi xác nhận thanh toán: " + e.getMessage()));
+        }
+    }
+
+    // CHECK-IN (by Admin)
+    @PostMapping("/{bookingId}/check-in")
+    public ResponseEntity<?> adminCheckIn(@PathVariable Integer bookingId) {
+        try {
+            BookingOrderEntity checkedInBooking = bookingOrderService.checkIn(bookingId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Check-in thành công.",
+                "booking", checkedInBooking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi check-in: " + e.getMessage()));
+        }
+    }
+
+    // CHECK-OUT (by Admin)
+    @PostMapping("/{bookingId}/check-out")
+    public ResponseEntity<?> adminCheckOut(@PathVariable Integer bookingId) {
+        try {
+            BookingOrderEntity checkedOutBooking = bookingOrderService.checkOut(bookingId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Check-out thành công.",
+                "booking", checkedOutBooking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi check-out: " + e.getMessage()));
+        }
+    }
+
+    // GET Booking by ID
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<?> getBookingById(@PathVariable Integer bookingId) {
+        try {
+            var bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+            if (bookingOpt.isPresent()) {
+                BookingOrderEntity booking = bookingOpt.get();
+                BookingDetailDTO dto = new BookingDetailDTO();
+                
+                // Map booking data to DTO
+                dto.setBookingId(booking.getBookingId());
+                dto.setCustomerName(booking.getCustomer() != null ? booking.getCustomer().getName() : "N/A");
+                dto.setCustomerEmail(booking.getCustomer() != null ? booking.getCustomer().getEmail() : booking.getEmail());
+                dto.setCustomerPhone(booking.getCustomer() != null ? booking.getCustomer().getPhone() : "N/A");
+                dto.setRoomNumber(booking.getRoom() != null ? booking.getRoom().getRoomNumber() : "N/A");
+                dto.setRoomType(booking.getRoom() != null ? booking.getRoom().getType() : "N/A");
+                dto.setRoomQuantity(booking.getRoomQuantity());
+                dto.setCheckInDate(booking.getCheckInDate());
+                dto.setCheckOutDate(booking.getCheckOutDate());
+                dto.setBookingDate(booking.getBookingDate());
+                dto.setTotalPrice(booking.getTotalPrice());
+                dto.setStatusName(booking.getStatus() != null ? booking.getStatus().getStatusName() : "N/A");
+                dto.setPaymentMethod(booking.getPaymentMethod());
+                dto.setPaymentStatus(booking.getPaymentStatus());
+                dto.setPaidDate(booking.getPaidDate());
+                dto.setSpecialRequests(booking.getSpecialRequests());
+                dto.setCancellationDate(booking.getCancellationDate());
+                dto.setCancellationReason(booking.getCancellationReason());
+                dto.setRefundAmount(booking.getRefundAmount());
+                dto.setRefundStatus(booking.getRefundStatus());
+                dto.setRefundDate(booking.getRefundDate());
+                dto.setVoucherCode(booking.getVoucher() != null ? booking.getVoucher().getCode() : null);
+                dto.setVoucherDiscount(booking.getVoucher() != null ? booking.getVoucher().getDiscountAmount() : null);
+                
+                return ResponseEntity.ok(dto);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Không tìm thấy đặt phòng với ID: " + bookingId));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy thông tin đặt phòng: " + e.getMessage()));
+        }
+    }
+
+    // GET All Bookings
+    @GetMapping
+    public ResponseEntity<?> getAllBookings() {
+        try {
+            var bookings = bookingOrderService.findAllBookingsForAdmin();
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy danh sách đặt phòng: " + e.getMessage()));
+        }
+    }
+
+    // GET Recent Bookings
+    @GetMapping("/recent")
+    public ResponseEntity<?> getRecentBookings(@RequestParam(defaultValue = "10") int limit) {
+        try {
+            var recentBookings = bookingOrderService.getRecentBookings(limit);
+            return ResponseEntity.ok(recentBookings);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy đặt phòng gần đây: " + e.getMessage()));
+        }
+    }
+
+    // GET Bookings by Status
+    @GetMapping("/status/{statusName}")
+    public ResponseEntity<?> getBookingsByStatus(@PathVariable String statusName) {
+        try {
+            var bookings = bookingOrderService.findByStatusName(statusName);
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy đặt phòng theo trạng thái: " + e.getMessage()));
         }
     }
 }

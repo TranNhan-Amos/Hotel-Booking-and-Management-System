@@ -41,4 +41,6 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     // Thêm method để tìm phòng liên quan
     @Query("SELECT r FROM RoomEntity r WHERE r.type = :roomType AND r.roomId != :excludeRoomId AND r.status = 'AVAILABLE'")
     List<RoomEntity> findRelatedRooms(@Param("roomType") String roomType, @Param("excludeRoomId") Integer excludeRoomId, Pageable pageable);
+
+    List<RoomEntity> findByPartner_Id(Long partnerId);
 }

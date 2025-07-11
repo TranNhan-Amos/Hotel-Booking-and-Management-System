@@ -11,235 +11,748 @@
     </style>
 </head>
 <body>
-    <div class="container">
         <div th:replace="~{/Layout/narbar}"></div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Sidebar (Category Nav) -->
-            <div class="sidebar">
-                <h3>Lọc khách sạn</h3>
-                <div class="category-group">
-                    <h4>Số sao</h4>
-                    <ul class="category-list">
-                        <li class="category-item" style="animation-delay: 0.2s;">
-                            <label><input type="checkbox" name="star" value="5"> 5 sao</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 0.3s;">
-                            <label><input type="checkbox" name="star" value="4"> 4 sao</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 0.4s;">
-                            <label><input type="checkbox" name="star" value="3"> 3 sao</label>
-                        </li>
-                    </ul>
+       <!-- Hero section từ website tham khảo -->
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container listroom-flex">
+            <!-- Search and Filter Section -->
+            <div class="search-filter-section" id="searchSection">
+                <!-- Search Bar -->
+                <div class="search-bar-container" style="position: relative;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm theo tên phòng, địa điểm, mô tả...">
                 </div>
-                <div class="category-group">
-                    <h4>Khoảng giá</h4>
-                    <ul class="category-list">
-                        <li class="category-item" style="animation-delay: 0.5s;">
-                            <label><input type="radio" name="price" value="under-1m"> Dưới 1 triệu</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 0.6s;">
-                            <label><input type="radio" name="price" value="1m-2m"> 1 - 2 triệu</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 0.7s;">
-                            <label><input type="radio" name="price" value="2m-5m"> 2 - 5 triệu</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 0.8s;">
-                            <label><input type="radio" name="price" value="above-5m"> Trên 5 triệu</label>
-                        </li>
-                    </ul>
+
+                <!-- Filters -->
+                <div class="filters-grid">
+                    <!-- Room Type Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Loại phòng</label>
+                        <select class="filter-select" id="roomTypeFilter">
+                            <option value="">Tất cả loại phòng</option>
+                            <option value="standard">Phòng tiêu chuẩn</option>
+                            <option value="deluxe">Phòng cao cấp</option>
+                            <option value="suite">Phòng suite</option>
+                            <option value="villa">Villa</option>
+                            <option value="homestay">Homestay</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Khoảng giá (VNĐ/đêm)</label>
+                        <div class="price-range">
+                            <input type="number" class="filter-input" id="minPrice" placeholder="Từ" min="0">
+                            <span class="price-separator">-</span>
+                            <input type="number" class="filter-input" id="maxPrice" placeholder="Đến" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Địa điểm</label>
+                        <select class="filter-select" id="locationFilter">
+                            <option value="">Tất cả địa điểm</option>
+                            <option value="ho-chi-minh">TP. Hồ Chí Minh</option>
+                            <option value="ha-noi">Hà Nội</option>
+                            <option value="da-nang">Đà Nẵng</option>
+                            <option value="nha-trang">Nha Trang</option>
+                            <option value="phu-quoc">Phú Quốc</option>
+                            <option value="da-lat">Đà Lạt</option>
+                            <option value="hoi-an">Hội An</option>
+                            <option value="sapa">Sapa</option>
+                        </select>
+                    </div>
+
+                    <!-- Rating Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Đánh giá tối thiểu</label>
+                        <select class="filter-select" id="ratingFilter">
+                            <option value="">Tất cả đánh giá</option>
+                            <option value="4.5">4.5+ sao</option>
+                            <option value="4.0">4.0+ sao</option>
+                            <option value="3.5">3.5+ sao</option>
+                            <option value="3.0">3.0+ sao</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="category-group">
-                    <h4>Tiện nghi</h4>
-                    <ul class="category-list">
-                        <li class="category-item" style="animation-delay: 0.9s;">
-                            <label><input type="checkbox" name="amenity" value="pool"> Hồ bơi</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.0s;">
-                            <label><input type="checkbox" name="amenity" value="wifi"> Wi-Fi miễn phí</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.1s;">
-                            <label><input type="checkbox" name="amenity" value="gym"> Phòng gym</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.2s;">
-                            <label><input type="checkbox" name="amenity" value="spa"> Spa</label>
-                        </li>
-                    </ul>
-                </div>
-                <div class="category-group">
-                    <h4>Loại phòng</h4>
-                    <ul class="category-list">
-                        <li class="category-item" style="animation-delay: 1.3s;">
-                            <label><input type="checkbox" name="room-type" value="deluxe"> Deluxe</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.4s;">
-                            <label><input type="checkbox" name="room-type" value="suite"> Suite</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.5s;">
-                            <label><input type="checkbox" name="room-type" value="family"> Family</label>
-                        </li>
-                        <li class="category-item" style="animation-delay: 1.6s;">
-                            <label><input type="checkbox" name="room-type" value="executive"> Executive</label>
-                        </li>
-                    </ul>
+
+                <!-- Amenities Filter -->
+                <div class="filter-group">
+                    <label class="filter-label">Tiện ích</label>
+                    <div class="amenities-grid">
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="wifi" value="wifi">
+                            <label for="wifi">
+                                <i class="fas fa-wifi"></i>
+                                WiFi miễn phí
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="pool" value="pool">
+                            <label for="pool">
+                                <i class="fas fa-swimming-pool"></i>
+                                Hồ bơi
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="restaurant" value="restaurant">
+                            <label for="restaurant">
+                                <i class="fas fa-utensils"></i>
+                                Nhà hàng
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="spa" value="spa">
+                            <label for="spa">
+                                <i class="fas fa-spa"></i>
+                                Spa
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="gym" value="gym">
+                            <label for="gym">
+                                <i class="fas fa-dumbbell"></i>
+                                Phòng gym
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="parking" value="parking">
+                            <label for="parking">
+                                <i class="fas fa-car"></i>
+                                Bãi đỗ xe
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="breakfast" value="breakfast">
+                            <label for="breakfast">
+                                <i class="fas fa-coffee"></i>
+                                Bữa sáng
+                            </label>
+                        </div>
+                        <div class="amenity-checkbox">
+                            <input type="checkbox" id="ac" value="ac">
+                            <label for="ac">
+                                <i class="fas fa-snowflake"></i>
+                                Điều hòa
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Mobile Filter -->
-            <div class="mobile-filter">
-                <select aria-label="Lọc khách sạn">
-                    <optgroup label="Số sao">
-                        <option value="5-star">5 sao</option>
-                        <option value="4-star">4 sao</option>
-                        <option value="3-star">3 sao</option>
-                    </optgroup>
-                    <optgroup label="Khoảng giá">
-                        <option value="under-1m">Dưới 1 triệu</option>
-                        <option value="1m-2m">1 - 2 triệu</option>
-                        <option value="2m-5m">2 - 5 triệu</option>
-                        <option value="above-5m">Trên 5 triệu</option>
-                    </optgroup>
-                    <optgroup label="Tiện nghi">
-                        <option value="pool">Hồ bơi</option>
-                        <option value="wifi">Wi-Fi miễn phí</option>
-                        <option value="gym">Phòng gym</option>
-                        <option value="spa">Spa</option>
-                    </optgroup>
-                    <optgroup label="Loại phòng">
-                        <option value="deluxe">Deluxe</option>
-                        <option value="suite">Suite</option>
-                        <option value="family">Family</option>
-                        <option value="executive">Executive</option>
-                    </optgroup>
-                </select>
-            </div>
+            <!-- Results Section -->
+            <div class="results-section" id="roomsSection">
+                <div class="results-header">
+                    <div class="results-count">
+                        Tìm thấy <span class="count" id="resultsCount">0</span> phòng
+                    </div>
+                    <div class="sort-controls">
+                        <select class="sort-select" id="sortSelect">
+                            <option value="price-asc">Giá: Thấp đến cao</option>
+                            <option value="price-desc">Giá: Cao đến thấp</option>
+                            <option value="rating-desc">Đánh giá cao nhất</option>
+                            <option value="name-asc">Tên A-Z</option>
+                        </select>
+                        <button class="clear-filters-btn" id="clearFilters">
+                            <i class="fas fa-times"></i>
+                            Xóa bộ lọc
+                        </button>
+                    </div>
+                </div>
 
-            <!-- Hotel List -->
-            <div class="hotel-content">
-                <h2>Danh sách khách sạn tại Đà Nẵng</h2>
-                <div class="hotel-list">
-                    <div class="hotel-card animate-slide" style="animation-delay: 0.2s;">
-                        <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop" alt="Vinpearl Resort & Spa Đà Nẵng">
-                        <div class="content">
-                            <h3>Vinpearl Resort & Spa Đà Nẵng</h3>
-                            <p>Bãi biển Non Nước, Đà Nẵng</p>
-                            <div class="rating">8.9</div>
-                            <p class="price">2,500,000 ₫/đêm</p>
-                            <button>Đặt phòng</button>
+                <!-- Rooms Grid -->
+                <div class="rooms-grid" id="roomsGrid">
+                    <!-- Rooms will be populated by JavaScript -->
+                </div>
+
+                <!-- No Results -->
+                <div class="no-results" id="noResults" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>Không tìm thấy phòng nào</h3>
+                    <p>Không có phòng nào phù hợp với tiêu chí tìm kiếm của bạn. Hãy thử điều chỉnh bộ lọc.</p>
+                    <button class="clear-filters-btn" onclick="clearAllFilters()">
+                        <i class="fas fa-refresh"></i>
+                        Đặt lại bộ lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <section class="hero-moi">
+        <div class="hero-content-moi">
+            <div class="hero-text-moi">
+                <div class="hero-badge-moi">
+                    <i class="fas fa-search"></i>
+                    Tìm kiếm phòng nghỉ
+                </div>
+                <h1 class="hero-title-moi">
+                    Khám phá những                     
+                    <span class="highlight-moi">phòng nghỉ tuyệt vời</span>                     
+                    cho chuyến đi của bạn
+                </h1>
+                <p class="hero-description-moi">
+                    Từ những khách sạn sang trọng đến homestay ấm cúng, chúng tôi có đầy đủ các lựa chọn phòng nghỉ chất lượng với giá tốt nhất.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-primary-moi" onclick="scrollToSearch()">
+                        <i class="fas fa-search"></i>
+                        Tìm phòng ngay
+                    </button>
+                    <button class="btn-secondary-moi" onclick="scrollToRooms()">
+                        <i class="fas fa-list"></i>
+                        Xem danh sách
+                    </button>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="hero-cards">
+                    <div class="hero-card">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=300&auto=format&fit=crop" alt="Suite Cao Cấp">
+                        <div class="hero-card-content">
+                            <h4>Suite Cao Cấp</h4>
+                            <div class="price">6,500,000₫</div>
                         </div>
                     </div>
-                    <div class="hotel-card animate-slide" style="animation-delay: 0.4s;">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Sapphire Hotel">
-                        <div class="content">
-                            <h3>Sapphire Hotel</h3>
-                            <p>Đà Nẵng</p>
-                            <div class="rating">8.5</div>
-                            <p class="price">1,800,000 ₫/đêm</p>
-                            <button>Đặt phòng</button>
+                    <div class="hero-card">
+                        <img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=300&auto=format&fit=crop" alt="Homestay Sapa">
+                        <div class="hero-card-content">
+                            <h4>Homestay Sapa</h4>
+                            <div class="price">650,000₫</div>
                         </div>
                     </div>
-                    <div class="hotel-card animate-slide" style="animation-delay: 0.6s;">
-                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2070&auto=format&fit=crop" alt="Sunrise Hotel">
-                        <div class="content">
-                            <h3>Sunrise Hotel</h3>
-                            <p>Đà Nẵng</p>
-                            <div class="rating">8.2</div>
-                            <p class="price">1,600,000 ₫/đêm</p>
-                            <button>Đặt phòng</button>
+                    <div class="hero-card">
+                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=300&auto=format&fit=crop" alt="Villa Biển">
+                        <div class="hero-card-content">
+                            <h4>Villa Biển</h4>
+                            <div class="price">4,800,000₫</div>
                         </div>
                     </div>
-                    <div class="hotel-card animate-slide" style="animation-delay: 0.8s;">
-                        <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2070&auto=format&fit=crop" alt="Ocean View Hotel">
-                        <div class="content">
-                            <h3>Ocean View Hotel</h3>
-                            <p>Đà Nẵng</p>
-                            <div class="rating">8.7</div>
-                            <p class="price">2,000,000 ₫/đêm</p>
-                            <button>Đặt phòng</button>
-                        </div>
-                    </div>
-                    <div class="hotel-card animate-slide" style="animation-delay: 1.0s;">
-                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop" alt="Paradise Hotel">
-                        <div class="content">
-                            <h3>Paradise Hotel</h3>
-                            <p>Đà Nẵng</p>
-                            <div class="rating">9.0</div>
-                            <p class="price">2,200,000 ₫/đêm</p>
-                            <button>Đặt phòng</button>
+                    <div class="hero-card">
+                        <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=300&auto=format&fit=crop" alt="Hotel Boutique">
+                        <div class="hero-card-content">
+                            <h4>Hotel Boutique</h4>
+                            <div class="price">1,800,000₫</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Footer -->
-        <footer>
-            <div class="footer-container">
-                <div class="footer-column">
-                    <h4>Về chúng tôi</h4>
-                    <ul>
-                        <li><a href="about.html">Giới thiệu</a></li>
-                        <li><a href="#">Cách hoạt động</a></li>
-                        <li><a href="#">Tin tức</a></li>
-                        <li><a href="#">Nghề nghiệp</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Khách hàng</h4>
-                    <ul>
-                        <li><a href="#">Câu hỏi thường gặp</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
-                        <li><a href="#">Chính sách hoàn tiền</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Đối tác</h4>
-                    <ul>
-                        <li><a href="#">Đăng ký chỗ nghỉ</a></li>
-                        <li><a href="#">Chương trình đối tác</a></li>
-                        <li><a href="#">Hỗ trợ đối tác</a></li>
-                        <li><a href="#">Quảng cáo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Liên hệ</h4>
-                    <ul>
-                        <li><a href="#">Trung tâm hỗ trợ</a></li>
-                        <li><a href="#">Liên hệ chúng tôi</a></li>
-                        <li><a href="#">0935123456</a></li>
-                        <li><a href="#">support@datphong.com</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2025 Đặt Phòng Khách Sạn. Mọi quyền được bảo lưu.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- JavaScript for Hamburger Menu -->
+    </section>
     <script>
-        // Hamburger Menu
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
+        // Sample room data
+        const rooms = [
+            {
+                id: 1,
+                name: "Grand Hotel Saigon - Suite Tổng thống",
+                type: "suite",
+                location: "ho-chi-minh",
+                locationName: "Quận 1, TP. Hồ Chí Minh",
+                price: 6500000,
+                oldPrice: 8000000,
+                rating: 4.9,
+                reviews: 324,
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "pool", "restaurant", "spa", "gym", "parking", "breakfast", "ac"],
+                description: "Suite sang trọng với view toàn cảnh thành phố, phòng khách riêng biệt và dịch vụ 5 sao.",
+                featured: true,
+                discount: true
+            },
+            {
+                id: 2,
+                name: "Sapa Mountain Homestay",
+                type: "homestay",
+                location: "sapa",
+                locationName: "Sapa, Lào Cai",
+                price: 650000,
+                rating: 4.7,
+                reviews: 156,
+                image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "restaurant", "breakfast", "ac"],
+                description: "Homestay ấm cúng giữa núi rừng Sapa, trải nghiệm văn hóa địa phương độc đáo.",
+                featured: false,
+                discount: false
+            },
+            {
+                id: 3,
+                name: "Sunset Beach Resort - Villa Biển",
+                type: "villa",
+                location: "phu-quoc",
+                locationName: "Phú Quốc, Kiên Giang",
+                price: 4800000,
+                oldPrice: 5500000,
+                rating: 4.8,
+                reviews: 89,
+                image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "pool", "restaurant", "spa", "gym", "parking", "breakfast", "ac"],
+                description: "Villa riêng tư bên bờ biển với hồ bơi private và dịch vụ butler 24/7.",
+                featured: true,
+                discount: true
+            },
+            {
+                id: 4,
+                name: "Hanoi Boutique Hotel - Deluxe",
+                type: "deluxe",
+                location: "ha-noi",
+                locationName: "Hoàn Kiếm, Hà Nội",
+                price: 1800000,
+                rating: 4.5,
+                reviews: 267,
+                image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "restaurant", "gym", "parking", "breakfast", "ac"],
+                description: "Khách sạn boutique tại trung tâm Hà Nội, thiết kế hiện đại kết hợp nét truyền thống.",
+                featured: false,
+                discount: false
+            },
+            {
+                id: 5,
+                name: "Da Nang Beach Resort",
+                type: "deluxe",
+                location: "da-nang",
+                locationName: "Ngũ Hành Sơn, Đà Nẵng",
+                price: 2400000,
+                rating: 4.6,
+                reviews: 198,
+                image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "pool", "restaurant", "spa", "gym", "breakfast", "ac"],
+                description: "Resort bên bờ biển Đà Nẵng với thiết kế hiện đại và dịch vụ chuyên nghiệp.",
+                featured: true,
+                discount: false
+            },
+            {
+                id: 6,
+                name: "Ancient Town Villa - Hội An",
+                type: "villa",
+                location: "hoi-an",
+                locationName: "Phố cổ Hội An",
+                price: 2200000,
+                rating: 4.4,
+                reviews: 134,
+                image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "restaurant", "parking", "breakfast", "ac"],
+                description: "Villa cổ kính tại trung tâm phố cổ Hội An, kiến trúc truyền thống Việt Nam.",
+                featured: false,
+                discount: false
+            },
+            {
+                id: 7,
+                name: "Nha Trang Bay Hotel - Standard",
+                type: "standard",
+                location: "nha-trang",
+                locationName: "Trung tâm Nha Trang",
+                price: 950000,
+                rating: 4.2,
+                reviews: 445,
+                image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "pool", "restaurant", "breakfast", "ac"],
+                description: "Khách sạn tiêu chuẩn gần biển Nha Trang, tiện nghi đầy đủ với giá cả phải chăng.",
+                featured: false,
+                discount: false
+            },
+            {
+                id: 8,
+                name: "Dalat Pine Resort - Suite",
+                type: "suite",
+                location: "da-lat",
+                locationName: "Trung tâm Đà Lạt",
+                price: 3200000,
+                oldPrice: 3800000,
+                rating: 4.7,
+                reviews: 178,
+                image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "restaurant", "spa", "gym", "parking", "breakfast", "ac"],
+                description: "Resort giữa rừng thông Đà Lạt, không khí trong lành và view thiên nhiên tuyệt đẹp.",
+                featured: false,
+                discount: true
+            },
+            {
+                id: 9,
+                name: "Saigon Central Apartment",
+                type: "standard",
+                location: "ho-chi-minh",
+                locationName: "Quận 3, TP. Hồ Chí Minh",
+                price: 1200000,
+                rating: 4.3,
+                reviews: 289,
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "gym", "parking", "ac"],
+                description: "Căn hộ dịch vụ tại trung tâm Sài Gòn, thuận tiện di chuyển và mua sắm.",
+                featured: false,
+                discount: false
+            },
+            {
+                id: 10,
+                name: "Hanoi Old Quarter Homestay",
+                type: "homestay",
+                location: "ha-noi",
+                locationName: "Phố cổ Hà Nội",
+                price: 800000,
+                rating: 4.1,
+                reviews: 167,
+                image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=400&auto=format&fit=crop",
+                amenities: ["wifi", "breakfast", "ac"],
+                description: "Homestay truyền thống tại phố cổ Hà Nội, trải nghiệm văn hóa Việt Nam đích thực.",
+                featured: false,
+                discount: false
+            }
+        ];
 
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburger.setAttribute('aria-expanded', navLinks.classList.contains('active'));
-        });
+        // Amenity labels
+        const amenityLabels = {
+            wifi: "WiFi miễn phí",
+            pool: "Hồ bơi",
+            restaurant: "Nhà hàng",
+            spa: "Spa",
+            gym: "Phòng gym",
+            parking: "Bãi đỗ xe",
+            breakfast: "Bữa sáng",
+            ac: "Điều hòa"
+        };
 
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                hamburger.setAttribute('aria-expanded', 'false');
+        // Room type labels
+        const roomTypeLabels = {
+            standard: "Tiêu chuẩn",
+            deluxe: "Cao cấp",
+            suite: "Suite",
+            villa: "Villa",
+            homestay: "Homestay"
+        };
+
+        // Format price function
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN').format(price) + '₫';
+        }
+
+        // Scroll functions
+        function scrollToSearch() {
+            document.getElementById('searchSection').scrollIntoView({
+                behavior: 'smooth'
             });
+        }
+
+        function scrollToRooms() {
+            document.getElementById('roomsSection').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Render rooms function
+        function renderRooms(roomsToRender) {
+            const roomsGrid = document.getElementById('roomsGrid');
+            const noResults = document.getElementById('noResults');
+            const resultsCount = document.getElementById('resultsCount');
+
+            resultsCount.textContent = roomsToRender.length;
+
+            if (roomsToRender.length === 0) {
+                roomsGrid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            roomsGrid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            roomsGrid.innerHTML = roomsToRender.map(room => `
+                <article class="room-card fade-in">
+                    <div class="room-image">
+                        <img src="${room.image}" alt="${room.name}">
+                        <div class="room-badges">
+                            <div>
+                                ${room.featured ? '<span class="room-badge badge-featured">Nổi bật</span>' : ''}
+                                ${room.discount ? '<span class="room-badge badge-discount">Giảm giá</span>' : ''}
+                            </div>
+                            <button class="favorite-btn" onclick="toggleFavorite(this, ${room.id})">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="room-content">
+                        <div class="room-header">
+                            <h3 class="room-name">${room.name}</h3>
+                            <span class="room-type">${roomTypeLabels[room.type]}</span>
+                            <div class="room-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${room.locationName}
+                            </div>
+                            <div class="room-rating">
+                                <div class="stars">
+                                    ${generateStars(room.rating)}
+                                </div>
+                                <span class="rating-score">${room.rating}</span>
+                                <span style="color: var(--xam-nhe); font-size: 0.9rem;">(${room.reviews} đánh giá)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="room-amenities">
+                            ${room.amenities.slice(0, 6).map(amenity => 
+                                `<span class="amenity-icon" title="${amenityLabels[amenity]}">
+                                    <i class="fas fa-${getAmenityIcon(amenity)}"></i>
+                                </span>`
+                            ).join('')}
+                            ${room.amenities.length > 6 ? `<span class="amenity-icon">+${room.amenities.length - 6}</span>` : ''}
+                        </div>
+                        
+                        <p class="room-description">${room.description}</p>
+                        
+                        <div class="room-footer">
+                            <div class="price-info">
+                                ${room.oldPrice ? `<div class="price-old">${formatPrice(room.oldPrice)}</div>` : ''}
+                                <div class="price-current">${formatPrice(room.price)}</div>
+                                <div class="price-unit">/ đêm</div>
+                            </div>
+                            <button class="book-btn" onclick="bookRoom(${room.id})">
+                                Đặt ngay
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            // Trigger fade-in animation
+            setTimeout(() => {
+                document.querySelectorAll('.room-card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('visible');
+                    }, index * 100);
+                });
+            }, 100);
+        }
+
+        // Generate stars function
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+
+            return stars;
+        }
+
+        // Get amenity icon function
+        function getAmenityIcon(amenity) {
+            const icons = {
+                wifi: 'wifi',
+                pool: 'swimming-pool',
+                restaurant: 'utensils',
+                spa: 'spa',
+                gym: 'dumbbell',
+                parking: 'car',
+                breakfast: 'coffee',
+                ac: 'snowflake'
+            };
+            return icons[amenity] || 'check';
+        }
+
+        // Filter rooms function
+        function filterRooms() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const roomType = document.getElementById('roomTypeFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+            const maxPrice = parseInt(document.getElementById('maxPrice').value) || Infinity;
+            const minRating = parseFloat(document.getElementById('ratingFilter').value) || 0;
+            
+            const selectedAmenities = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            const filteredRooms = rooms.filter(room => {
+                const matchesSearch = room.name.toLowerCase().includes(searchTerm) || 
+                                    room.locationName.toLowerCase().includes(searchTerm) ||
+                                    room.description.toLowerCase().includes(searchTerm);
+                
+                const matchesType = !roomType || room.type === roomType;
+                const matchesLocation = !location || room.location === location;
+                const matchesPrice = room.price >= minPrice && room.price <= maxPrice;
+                const matchesRating = room.rating >= minRating;
+                
+                const matchesAmenities = selectedAmenities.length === 0 || 
+                                       selectedAmenities.every(amenity => room.amenities.includes(amenity));
+
+                return matchesSearch && matchesType && matchesLocation && 
+                       matchesPrice && matchesRating && matchesAmenities;
+            });
+
+            // Sort rooms
+            const sortBy = document.getElementById('sortSelect').value;
+            filteredRooms.sort((a, b) => {
+                switch (sortBy) {
+                    case 'price-asc':
+                        return a.price - b.price;
+                    case 'price-desc':
+                        return b.price - a.price;
+                    case 'rating-desc':
+                        return b.rating - a.rating;
+                    case 'name-asc':
+                        return a.name.localeCompare(b.name);
+                    default:
+                        return 0;
+                }
+            });
+
+            renderRooms(filteredRooms);
+        }
+
+        // Clear all filters function
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('roomTypeFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('ratingFilter').value = '';
+            document.getElementById('sortSelect').value = 'price-asc';
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            filterRooms();
+        }
+
+        // Toggle favorite function
+        function toggleFavorite(button, roomId) {
+            const icon = button.querySelector('i');
+            button.classList.toggle('active');
+            
+            if (button.classList.contains('active')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                
+                // Create heart effect
+                createHeartEffect(button);
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        }
+
+        // Create heart effect function
+        function createHeartEffect(button) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'absolute';
+            heart.style.fontSize = '20px';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            heart.style.animation = 'heartFloat 1.2s ease-out forwards';
+            
+            const rect = button.getBoundingClientRect();
+            heart.style.left = rect.left + rect.width / 2 + 'px';
+            heart.style.top = rect.top + rect.height / 2 + 'px';
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 1200);
+        }
+
+        // Book room function
+        function bookRoom(roomId) {
+            const room = rooms.find(r => r.id === roomId);
+            alert(`Bạn đã chọn đặt phòng: ${room.name}\nGiá: ${formatPrice(room.price)}/đêm\n\nCảm ơn bạn đã lựa chọn StayVN!`);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial render
+            renderRooms(rooms);
+
+            // Add event listeners
+            document.getElementById('searchInput').addEventListener('input', filterRooms);
+            document.getElementById('roomTypeFilter').addEventListener('change', filterRooms);
+            document.getElementById('locationFilter').addEventListener('change', filterRooms);
+            document.getElementById('minPrice').addEventListener('input', filterRooms);
+            document.getElementById('maxPrice').addEventListener('input', filterRooms);
+            document.getElementById('ratingFilter').addEventListener('change', filterRooms);
+            document.getElementById('sortSelect').addEventListener('change', filterRooms);
+            document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', filterRooms);
+            });
+
+            // Add heart animation CSS
+            const heartStyle = document.createElement('style');
+            heartStyle.textContent = `
+                @keyframes heartFloat {
+                    0% {
+                        transform: translate(-50%, -50%) scale(0);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: translate(-50%, -80px) scale(1.2);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: translate(-50%, -120px) scale(1);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(heartStyle);
+
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('.header-chinh');
+                if (window.scrollY > 100) {
+                    header.style.background = 'rgba(255, 255, 255, 0.98)';
+                    header.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+                } else {
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                    header.style.boxShadow = 'none';
+                }
+            });
+
+            // Parallax effect for hero cards
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const heroCards = document.querySelector('.hero-cards');
+                if (heroCards) {
+                    heroCards.style.transform = `translateY(${scrolled * 0.1}px) rotate(-5deg)`;
+                }
+            });
+
+            // Mobile menu toggle
+            document.querySelector('.menu-mobile').addEventListener('click', () => {
+                const navMenu = document.querySelector('.nav-menu');
+                const navActions = document.querySelector('.nav-actions');
+                
+                if (navMenu.style.display === 'flex') {
+                    navMenu.style.display = 'none';
+                    navActions.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navActions.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navActions.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '80px';
+                    navMenu.style.left = '0';
+                    navMenu.style.right = '0';
+                    navMenu.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navMenu.style.padding = '1rem 2rem';
+                    navMenu.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+                }
+            });
+
+            console.log('StayVN Room Listing loaded successfully');
         });
     </script>
 </body>

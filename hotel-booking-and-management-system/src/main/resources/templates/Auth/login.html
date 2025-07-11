@@ -14,15 +14,16 @@
             font-family: 'Poppins', sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #6b48ff, #00ddeb);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            padding: 20px 0; /* Thay đổi: thêm padding top/bottom */
+            /* Bỏ overflow: hidden */
         }
         
-        /* Toast Notification Styles */
+        /* Toast Notification Styles - GIỮ NGUYÊN */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -114,25 +115,220 @@
             to { width: 0%; }
         }
         
+        /* Main Container - SỬA LẠI HEIGHT */
         .login-container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            min-height: 600px; /* Thay đổi: dùng min-height thay vì height cố định */
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
+            overflow: hidden;
             animation: popIn 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
             transform: scale(0.95);
             opacity: 0;
+            margin: 20px; /* Thêm margin */
         }
         @keyframes popIn {
             0% { opacity: 0; transform: scale(0.95) translateY(30px); filter: blur(5px); }
             100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
-        .login-container h2 {
+
+        /* Left Side - Interactive Showcase */
+        .interactive-showcase {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            flex-direction: column;
+            min-height: 600px; /* Thêm min-height */
+        }
+
+        .slideshow-container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.6));
+        }
+
+        /* Slide backgrounds */
+        .slide:nth-child(1) {
+            background: linear-gradient(rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="100%" height="100%" fill="%234f46e5"/><rect x="100" y="100" width="600" height="300" rx="20" fill="%236366f1" opacity="0.8"/><circle cx="400" cy="250" r="80" fill="%238b5cf6" opacity="0.6"/></svg>');
+        }
+
+        .slide:nth-child(2) {
+            background: linear-gradient(rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="100%" height="100%" fill="%233b82f6"/><ellipse cx="400" cy="300" rx="300" ry="150" fill="%2306b6d4" opacity="0.7"/></svg>');
+        }
+
+        .slide:nth-child(3) {
+            background: linear-gradient(rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="100%" height="100%" fill="%236366f1"/><polygon points="400,50 600,200 500,350 300,350 200,200" fill="%238b5cf6" opacity="0.6"/></svg>');
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .slide-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .slide-features li {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .slide-features i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .interactive-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .interactive-btn {
+            padding: 12px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .interactive-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Slideshow Controls */
+        .slideshow-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 3;
+        }
+
+        .slide-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .slide-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .slide-arrow {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .slide-arrow:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Right Side - Form Container */
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            text-align: center;
+            overflow-y: auto; /* Thêm scroll cho form nếu cần */
+            max-height: 100%; /* Giới hạn chiều cao */
+        }
+
+        .form-container h2 {
             font-size: 28px;
-            color: #6b48ff;
+            color: #667eea;
             margin-bottom: 20px;
             font-weight: 600;
         }
@@ -147,25 +343,24 @@
             overflow: hidden;
         }
 
-        /* CSS cho hiệu ứng social login */
+        /* CSS cho hiệu ứng social login - GIỮ NGUYÊN */
         .social-login {
             margin-bottom: 20px;
-            overflow: hidden; /* Quan trọng cho max-height transition */
+            overflow: hidden;
             transition: opacity 0.4s ease-in-out, 
                         max-height 0.4s ease-in-out, 
                         transform 0.4s ease-in-out,
                         margin-bottom 0.4s ease-in-out;
             opacity: 1;
-            max-height: 300px; /* Đặt một giá trị đủ lớn cho nội dung */
+            max-height: 300px;
             transform: translateY(0);
         }
         .social-login.hidden {
             opacity: 0;
             max-height: 0;
-            transform: translateY(-10px); /* Hiệu ứng trượt nhẹ lên khi ẩn */
-            margin-bottom: 0; /* Loại bỏ khoảng trống khi ẩn */
+            transform: translateY(-10px);
+            margin-bottom: 0;
         }
-        /* Kết thúc CSS cho hiệu ứng social login */
 
         .social-btn {
             width: 100%;
@@ -204,7 +399,7 @@
             position: absolute;
             width: 50%;
             height: 100%;
-            background: #6b48ff;
+            background: #667eea;
             border-radius: 50px;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
@@ -251,13 +446,13 @@
         .form-group input:focus {
             background: #fff;
             transform: scale(1.02);
-            box-shadow: 0 0 12px rgba(107, 72, 255, 0.3);
+            box-shadow: 0 0 12px rgba(102, 126, 234, 0.3);
             outline: none;
         }
         .login-btn, .register-btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(45deg, #6b48ff, #00ddeb);
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
             border-radius: 10px;
@@ -268,13 +463,13 @@
         }
         .login-btn:hover, .register-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(107, 72, 255, 0.4);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
         }
         .forgot-password {
             display: block;
             margin-top: 15px;
             font-size: 14px;
-            color: #6b48ff;
+            color: #667eea;
             text-decoration: none;
         }
         .tab-content { display: none; }
@@ -290,13 +485,33 @@
         }
         .checkbox-group label { font-size: 14px; color: #333; }
         
-        /* Loading state */
+        /* Loading state - GIỮ NGUYÊN */
         .loading {
             opacity: 0.7;
             pointer-events: none;
         }
         
-        /* Responsive */
+        /* Responsive - SỬA LẠI */
+        @media (max-width: 968px) {
+            body {
+                align-items: flex-start; /* Thay đổi: align từ trên xuống trên mobile */
+                padding: 10px 0;
+            }
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+                margin: 10px;
+                min-height: auto; /* Bỏ min-height cố định */
+            }
+            .interactive-showcase {
+                min-height: 400px;
+            }
+            .form-container {
+                padding: 30px;
+                max-height: none; /* Bỏ giới hạn height trên mobile */
+            }
+        }
+        
         @media (max-width: 768px) {
             .toast-container {
                 top: 10px;
@@ -307,10 +522,20 @@
                 min-width: auto;
                 width: 100%;
             }
-            .login-container {
-                margin: 20px;
-                padding: 30px;
+            .form-container {
+                padding: 20px;
             }
+            .slide-title {
+                font-size: 2rem;
+            }
+            .interactive-showcase {
+                min-height: 300px;
+            }
+        }
+
+        /* Thêm CSS cho scroll smooth */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
@@ -319,66 +544,154 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="login-container">
-        <h2>Đăng Nhập/Đăng Ký</h2>
+        <!-- Left Side - Interactive Showcase -->
+        <div class="interactive-showcase">
+            <div class="slideshow-container">
+                <!-- Slide 1 -->
+                <div class="slide active">
+                    <div class="slide-content">
+                        <h1 class="slide-title">Da Nang Travel</h1>
+                        <p class="slide-description">Khám phá không gian nghỉ dưỡng sang trọng bên bờ biển xanh ngọc bích</p>
+                        <ul class="slide-features">
+                            <li><i class="fas fa-bed"></i> Phòng suite cao cấp view biển</li>
+                            <li><i class="fas fa-wifi"></i> WiFi tốc độ cao miễn phí</li>
+                            <li><i class="fas fa-concierge-bell"></i> Dịch vụ 24/7</li>
+                        </ul>
+                        <div class="interactive-buttons">
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Virtual Tour')">
+                                <i class="fas fa-vr-cardboard"></i> Virtual Tour
+                            </button>
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Xem phòng')">
+                                <i class="fas fa-images"></i> Xem phòng
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="tab-switch login-active">
-            <button class="tab-btn active" data-tab="login">Đăng Nhập</button>
-            <button class="tab-btn" data-tab="register">Đăng Ký</button>
-        </div>
-        
-        <!-- Phần đăng nhập bằng mạng xã hội -->
-        <div class="social-login">
-            <button class="social-btn google"><i class="fab fa-google"></i> Đăng nhập với Google</button>
-            <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Đăng nhập với Facebook</button>
-            <button class="social-btn twitter"><i class="fab fa-twitter"></i> Đăng nhập với Twitter</button>
-        </div>  
-        
-        <!-- Tab Đăng Nhập -->
-        <div id="login" class="tab-content active">
-            <form id="loginForm" th:action="@{/login}" method="post">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" name="email" placeholder="Nhập email" required th:value="${email}">
+                <!-- Slide 2 -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <h1 class="slide-title">Tiện Nghi Đẳng Cấp</h1>
+                        <p class="slide-description">Trải nghiệm những tiện ích hiện đại và dịch vụ chăm sóc tận tâm</p>
+                        <ul class="slide-features">
+                            <li><i class="fas fa-swimming-pool"></i> Hồ bơi vô cực</li>
+                            <li><i class="fas fa-spa"></i> Spa & Wellness Center</li>
+                            <li><i class="fas fa-dumbbell"></i> Phòng gym hiện đại</li>
+                        </ul>
+                        <div class="interactive-buttons">
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Đặt Spa')">
+                                <i class="fas fa-calendar-check"></i> Đặt Spa
+                            </button>
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Tiện ích')">
+                                <i class="fas fa-list"></i> Tiện ích
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="login-password">Mật Khẩu</label>
-                    <input type="password" id="login-password" name="password" placeholder="Nhập mật khẩu" required>
+
+                <!-- Slide 3 -->
+                <div class="slide">
+                    <div class="slide-content">
+                        <h1 class="slide-title">Ẩm Thực Tinh Tế</h1>
+                        <p class="slide-description">Thưởng thức những món ăn đặc sắc từ đầu bếp hàng đầu thế giới</p>
+                        <ul class="slide-features">
+                            <li><i class="fas fa-utensils"></i> 3 nhà hàng cao cấp</li>
+                            <li><i class="fas fa-cocktail"></i> Sky bar view 360°</li>
+                            <li><i class="fas fa-coffee"></i> Café & Bakery</li>
+                        </ul>
+                        <div class="interactive-buttons">
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Xem menu')">
+                                <i class="fas fa-book-open"></i> Xem menu
+                            </button>
+                            <button class="interactive-btn" onclick="showInteractiveFeature('Đặt bàn')">
+                                <i class="fas fa-chair"></i> Đặt bàn
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="login-btn">Đăng Nhập</button>
-                <a href="#" class="forgot-password">Quên mật khẩu?</a>
-            </form>
+            </div>
+
+            <!-- Slideshow Controls -->
+            <div class="slideshow-controls">
+                <button class="slide-arrow" id="prevSlide">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="slide-nav">
+                    <span class="slide-dot active" data-slide="0"></span>
+                    <span class="slide-dot" data-slide="1"></span>
+                    <span class="slide-dot" data-slide="2"></span>
+                </div>
+                <button class="slide-arrow" id="nextSlide">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Tab Đăng Ký -->
-        <div id="register" class="tab-content">
-            <form id="registerForm" th:action="@{/register}" method="post">
-                <div class="form-group">
-                    <label for="register-username">Tên Người Dùng</label>
-                    <input type="text" id="register-username" name="username" placeholder="Nhập tên người dùng" required th:value="${username}">
-                </div>
-                <div class="form-group">
-                    <label for="register-email">Email</label>
-                    <input type="email" id="register-email" name="email" placeholder="Nhập email" required th:value="${email}">
-                </div>
-                <div class="form-group">
-                    <label for="register-password">Mật Khẩu</label>
-                    <input type="password" id="register-password" name="password" placeholder="Nhập mật khẩu (ít nhất 6 ký tự)" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-confirm-password">Xác Nhận Mật Khẩu</label>
-                    <input type="password" id="register-confirm-password" name="confirm-password" placeholder="Xác nhận mật khẩu" required>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="terms" name="terms" value="true" required>
-                    <label for="terms">Tôi đồng ý với <a href="#" style="color: #6b48ff;">điều khoản sử dụng</a></label>
-                </div>
-                <button type="submit" class="register-btn">Đăng Ký</button>
-            </form>
+        <!-- Right Side - Form Container -->
+        <div class="form-container">
+            <h2>Đăng Nhập/Đăng Ký</h2>
+
+            <div class="tab-switch login-active">
+                <button class="tab-btn active" data-tab="login">Đăng Nhập</button>
+                <button class="tab-btn" data-tab="register">Đăng Ký</button>
+            </div>
+            
+            <!-- Phần đăng nhập bằng mạng xã hội -->
+             
+            
+            <!-- Tab Đăng Nhập -->
+            <div id="login" class="tab-content active">
+                <form id="loginForm" th:action="@{/login}" method="post">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" placeholder="Nhập email" required th:value="${email}">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Mật Khẩu</label>
+                        <input type="password" id="login-password" name="password" placeholder="Nhập mật khẩu" required>
+                    </div>
+                    <button type="submit" class="login-btn">Đăng Nhập</button>
+                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                </form>
+            </div>
+            <div class="social-login">
+                <button class="social-btn google"><i class="fab fa-google"></i> Đăng nhập với Google</button>
+                <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Đăng nhập với Facebook</button>
+            </div> 
+
+            <!-- Tab Đăng Ký -->
+            <div id="register" class="tab-content">
+                <form id="registerForm" th:action="@{/register}" method="post">
+                    <div class="form-group">
+                        <label for="register-username">Tên Người Dùng</label>
+                        <input type="text" id="register-username" name="username" placeholder="Nhập tên người dùng" required th:value="${username}">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" name="email" placeholder="Nhập email" required th:value="${email}">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Mật Khẩu</label>
+                        <input type="password" id="register-password" name="password" placeholder="Nhập mật khẩu (ít nhất 6 ký tự)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Xác Nhận Mật Khẩu</label>
+                        <input type="password" id="register-confirm-password" name="confirm-password" placeholder="Xác nhận mật khẩu" required>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" name="terms" value="true" required>
+                        <label for="terms">Tôi đồng ý với <a href="#" style="color: #667eea;">điều khoản sử dụng</a></label>
+                    </div>
+                    <button type="submit" class="register-btn">Đăng Ký</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script th:inline="javascript">
-        // Toast Notification System
+        // GIỮ NGUYÊN TOÀN BỘ JAVASCRIPT GỐC + THÊM SLIDESHOW
+
+        // Toast Notification System - GIỮ NGUYÊN
         const toastContainer = document.getElementById('toastContainer');
 
         function showToast(message, type = 'info', title = '', duration = 5000) {
@@ -435,7 +748,48 @@
             }
         }
 
+        // THÊM SLIDESHOW FUNCTIONALITY
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slide-dot');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+
+        function showInteractiveFeature(feature) {
+            showToast(`Tính năng ${feature} sẽ sớm được triển khai!`, 'info', 'Thông báo');
+        }
+
+        // Auto slideshow
+        setInterval(nextSlide, 5000);
+
         document.addEventListener('DOMContentLoaded', function() {
+            // SLIDESHOW CONTROLS
+            document.getElementById('nextSlide').addEventListener('click', nextSlide);
+            document.getElementById('prevSlide').addEventListener('click', prevSlide);
+            
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => showSlide(index));
+            });
+
+            // GIỮ NGUYÊN TOÀN BỘ LOGIC GỐC
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabSwitchElement = document.querySelector('.tab-switch');
             const socialLoginDiv = document.querySelector('.social-login'); 
@@ -482,7 +836,7 @@
                 });
             });
 
-            // Form validation and submission
+            // Form validation and submission - GIỮ NGUYÊN
             function validateRegisterForm() {
                 const password = document.getElementById('register-password').value;
                 const confirmPassword = document.getElementById('register-confirm-password').value;
@@ -535,7 +889,7 @@
                 return true;
             }
 
-            // Login form submission
+            // Login form submission - GIỮ NGUYÊN
             loginForm.addEventListener('submit', function(e) {
                 if (!validateLoginForm()) {
                     e.preventDefault();
@@ -550,7 +904,7 @@
                 loginForm.classList.add('loading');
             });
 
-            // Register form submission
+            // Register form submission - GIỮ NGUYÊN
             registerForm.addEventListener('submit', function(e) {
                 if (!validateRegisterForm()) {
                     e.preventDefault();
@@ -565,7 +919,7 @@
                 registerForm.classList.add('loading');
             });
 
-            // Show notifications based on server response
+            // Show notifications based on server response - GIỮ NGUYÊN
             const error = /*[[${error}]]*/ null;
             const logoutMessage = /*[[${param.logout}]]*/ null;
             const showRegisterOnError = /*[[${showRegister == true}]]*/ false;
@@ -578,7 +932,7 @@
                 showToast('Bạn đã đăng xuất thành công.', 'success', 'Đăng xuất thành công!');
             }
 
-            // Handle tab switching based on server response
+            // Handle tab switching based on server response - GIỮ NGUYÊN
             if (showRegisterOnError) {
                 activateTab('register');
             } else {
@@ -590,7 +944,7 @@
                 }
             }
 
-            // Social login buttons (placeholder functionality)
+            // Social login buttons (placeholder functionality) - GIỮ NGUYÊN
             document.querySelectorAll('.social-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const platform = this.classList.contains('google') ? 'Google' : 

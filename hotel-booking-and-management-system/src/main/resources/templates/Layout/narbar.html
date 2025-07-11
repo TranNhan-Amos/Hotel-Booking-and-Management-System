@@ -28,19 +28,26 @@
             <!-- User Menu Container -->
             <div class="user-menu-container">
                 <!-- User Menu (when logged in) -->
+                <div id="user-menu" class="user-menu" sec:authorize="isAuthenticated()" style="display: flex; align-items: center; gap: 1rem;">
                 <div id="user-menu" class="user-menu" sec:authorize="isAuthenticated()">
                     <!-- Notification Bell -->
-                    <button class="notification-btn" onclick="handleNotificationClick()">
+                    <button class="notification-btn" onclick="handleNotificationClick()" style="flex-shrink: 0;">
                         <i data-lucide="bell" style="width: 1.25rem; height: 1.25rem;"></i>
                         <span class="notification-badge" id="notification-badge" th:if="${notificationCount > 0}" th:text="${notificationCount > 9 ? '9+' : notificationCount}">3</span>
                     </button>
 
                     <!-- User Avatar Dropdown -->
                     <div class="user-dropdown" style="position: relative;">
+                        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()" style="display: flex; align-items: center; gap: 0.5rem; max-width: 180px;">
+                            <div class="user-avatar" id="user-avatar" th:text="${#strings.substring(#authentication.principal.username, 0, 2).toUpperCase()}" style="flex-shrink: 0;">NA</div>
+                            <div class="user-info" style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0;">
+                                <span class="user-name" id="user-name" th:text="${#authentication.principal.username}" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Nguyễn Văn An</span>
+
                         <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()">
                             <div class="user-avatar" id="user-avatar" th:text="${#strings.substring(#authentication.principal.username, 0, 2).toUpperCase()}">NA</div>
                             <div class="user-info">
                                 <span class="user-name" id="user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</span>
+
                                 <div class="user-role">
                                     <span id="user-role-text" sec:authorize="hasRole('CUSTOMER')">Khách hàng</span>
                                     <div class="admin-badge" id="admin-badge" sec:authorize="hasRole('ADMIN')">

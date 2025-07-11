@@ -51,7 +51,6 @@ public class IndexController {
             model.addAttribute("notificationCount", notificationCount);
         }
 
-            
         // Lấy danh sách loại phòng
         List<RoomTypeDTO> roomTypes = getRoomTypes();
         model.addAttribute("roomTypes", roomTypes);

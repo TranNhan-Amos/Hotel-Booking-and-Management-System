@@ -231,6 +231,18 @@
             white-space: nowrap;
         }
 
+        .partner-badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-size: 0.625rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
         .chevron-icon {
             width: 1rem;
             height: 1rem;
@@ -254,6 +266,8 @@
             border-radius: 0.75rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 0.75rem;
+            margin-top: 0.5rem;
+
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
@@ -261,6 +275,7 @@
             z-index: 1002;
             max-height: 80vh;
             overflow-y: auto;
+            z-index: 100;
         }
 
         .dropdown-menu.active {
@@ -427,6 +442,7 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
+            z-index: 1000;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;

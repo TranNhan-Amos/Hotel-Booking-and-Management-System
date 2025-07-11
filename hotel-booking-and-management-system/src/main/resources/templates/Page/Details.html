@@ -126,20 +126,40 @@
         }
     </style>
    
+
+    <style>
+        .room-status {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+            color: #fff;
+        }
+        .room-status.available { background: #22c55e; }
+        .room-status.booked { background: #ef4444; }
+        .room-status.unknown { background: #64748b; }
+        .hotel-header h1 { display: inline; }
+    </style>
 </head>
 <body>
+    <div th:replace="~{/Layout/narbar}"></div>
+
     <div th:replace="~{/Layout/narbar}"></div>
 
     <div class="container">
 
         <!-- Error Messages -->
         <div th:if="${error}" class="alert alert-danger">
+        <div th:if="${error}" class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
             <i class="fas fa-exclamation-circle"></i>
             <span th:text="${error}">Lỗi</span>
         </div>
 
         <!-- Success Messages -->
         <div th:if="${message}" class="alert alert-success">
+        <div th:if="${message}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
             <i class="fas fa-check-circle"></i>
             <span th:text="${message}">Thành công</span>
         </div>
@@ -177,7 +197,7 @@
             </div>
 
             <!-- Room Details Grid -->
-            <div class="room-details-grid">
+            <div class="room-details-grid animate-slide">
                 <div class="detail-item">
                     <i class="fas fa-users"></i>
                     <span>Sức chứa: <strong th:text="${room.capacity}">2</strong> người</span>
@@ -205,7 +225,7 @@
             </div>
 
             <!-- Gallery -->
-            <div class="hotel-gallery">
+            <div class="hotel-gallery animate-fade">
                 <img th:src="${room.imageUrls != null and !room.imageUrls.empty ? room.imageUrls[0] : 'https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop'}" 
                      th:alt="${room.type}" class="main-img" onclick="openLightbox(this.src)">
                 <img th:src="${room.imageUrls != null and room.imageUrls.size() > 1 ? room.imageUrls[1] : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop'}" 
@@ -226,7 +246,7 @@
 
             <!-- Hotel Info -->
             <div class="hotel-info">
-                <div class="hotel-description">
+                <div class="hotel-description animate-fade">
                     <h2>Giới thiệu</h2>
                     <p th:text="${room.description}">Mô tả phòng từ database</p>
 
@@ -241,7 +261,7 @@
                     </div>
                 </div>
 
-                <div class="hotel-booking">
+                <div class="hotel-booking animate-fade">
                     <h3>Đặt phòng ngay</h3>
                     <div class="price" th:text="'Từ ' + ${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">Từ 2,500,000 ₫/đêm</div>
                     
@@ -250,6 +270,11 @@
                             <i class="fas fa-door-open"></i> Còn <strong th:text="${roomAvailableCount}">0</strong> phòng trống
                         </span>
                         <span th:if="${roomAvailableCount == 0}">
+                    <div class="room-available-info">
+                        <span th:if="${roomAvailableCount != null}" style="font-size:15px; color:#22c55e;">
+                            <i class="fas fa-door-open"></i> Còn <b th:text="${roomAvailableCount}">0</b> phòng trống
+                        </span>
+                        <span th:if="${roomAvailableCount == 0}" style="font-size:15px; color:#e74c3c;">
                             <i class="fas fa-door-closed"></i> Hết phòng
                         </span>
                     </div>
@@ -265,6 +290,7 @@
                         </div>
                         <div class="input-group">
                             <i class="fas fa-envelope"></i>
+
                             <input type="email" name="email" placeholder="Email" 
                                    th:value="${currentUser != null ? currentUser.email : ''}" required>
                         </div>
@@ -283,10 +309,12 @@
                         </div>
                         <div class="input-group">
                             <i class="fas fa-comment"></i>
+
                             <textarea name="specialRequests" placeholder="Yêu cầu đặc biệt (không bắt buộc)" rows="3"></textarea>
                         </div>
                         
                         <button type="submit" th:disabled="${roomAvailableCount == 0}">Tiếp tục đặt phòng</button>
+
                     </form>
                     
                     <!-- Login Button for Non-Authenticated Users -->
@@ -370,6 +398,13 @@
                             <span>Gửi đánh giá</span>
                         </button>
                     </form>
+                    
+                    <!-- Login Button for Non-Authenticated Users -->
+                    <div th:if="${currentUser == null}" style="text-align: center; margin-top: 20px;">
+                        <a href="/login" class="btn btn-primary" style="background: #007bff; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập để đặt phòng
+                        </a>
+                    </div>
                 </div>
                 <div class="review" th:each="review : ${reviews}">
                     <div class="review-header">
@@ -547,6 +582,65 @@
             Array.from(input.files).forEach((file, i) => {
                 if (i !== index) {
                     dt.items.add(file);
+        // Calculate booking price and nights
+        function calculateBooking() {
+            const checkInInput = document.querySelector('input[name="checkInDate"]');
+            const checkOutInput = document.querySelector('input[name="checkOutDate"]');
+            const basePriceElement = document.querySelector('.price');
+            
+            if (!checkInInput || !checkOutInput || !basePriceElement) {
+                return;
+            }
+            
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            const basePrice = parseFloat(basePriceElement.textContent.replace(/[^\d]/g, ''));
+            const voucherSelect = document.getElementById('voucherSelect');
+            
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const totalBase = basePrice * nights;
+                
+                const nightsCountElement = document.getElementById('nightsCount');
+                const basePriceElement2 = document.getElementById('basePrice');
+                const discountRowElement = document.getElementById('discountRow');
+                const discountAmountElement = document.getElementById('discountAmount');
+                const totalPriceElement = document.getElementById('totalPrice');
+                
+                if (nightsCountElement) nightsCountElement.textContent = nights;
+                if (basePriceElement2) basePriceElement2.textContent = totalBase.toLocaleString() + ' ₫';
+                
+                // Calculate discount if voucher selected
+                if (voucherSelect && voucherSelect.value) {
+                    const selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+                    const discountPercent = parseFloat(selectedOption.dataset.discount);
+                    const discountAmount = totalBase * (discountPercent / 100);
+                    const finalPrice = totalBase - discountAmount;
+                    
+                    if (discountRowElement) discountRowElement.style.display = 'block';
+                    if (discountAmountElement) discountAmountElement.textContent = `-${discountAmount.toLocaleString()} ₫`;
+                    if (totalPriceElement) totalPriceElement.textContent = `${finalPrice.toLocaleString()} ₫`;
+                } else {
+                    if (discountRowElement) discountRowElement.style.display = 'none';
+                    if (totalPriceElement) totalPriceElement.textContent = `${totalBase.toLocaleString()} ₫`;
+                }
+            }
+        }
+
+        // Filter reviews
+        function filterReviews() {
+            const filterValue = document.getElementById('ratingFilter')?.value;
+            const reviews = document.querySelectorAll('.review');
+            
+            reviews.forEach(review => {
+                const ratingElement = review.querySelector('.rating');
+                if (ratingElement) {
+                    const rating = ratingElement.textContent.split('/')[0];
+                    if (!filterValue || rating == filterValue) {
+                        review.style.display = 'block';
+                    } else {
+                        review.style.display = 'none';
+                    }
                 }
             });
             
@@ -565,6 +659,19 @@
                 submitBtn.disabled = false;
             } else {
                 submitBtn.disabled = true;
+        // Form validation
+        function validateForm() {
+            console.log('Validating form...');
+            let isValid = true;
+            
+            // Validate name
+            const name = document.querySelector('input[name="customerName"]');
+            if (name && name.value.trim() === '') {
+                showNotification('Vui lòng nhập họ và tên', 'error');
+                isValid = false;
+            } else if (name && !name.value.match(/^[A-Za-zÀ-ỹ\s]+$/)) {
+                showNotification('Tên chỉ được chứa chữ cái và dấu cách', 'error');
+                isValid = false;
             }
         }
 
@@ -680,6 +787,58 @@
                 
                 updateCarousel();
             });
+            // Validate phone
+            const phone = document.querySelector('input[name="phone"]');
+            if (phone && phone.value.trim() === '') {
+                showNotification('Vui lòng nhập số điện thoại', 'error');
+                isValid = false;
+            } else if (phone && !phone.value.match(/^[0-9]{10,11}$/)) {
+                showNotification('Số điện thoại phải có 10-11 chữ số', 'error');
+                isValid = false;
+            }
+            
+            // Validate email
+            const email = document.querySelector('input[name="email"]');
+            if (email && email.value.trim() === '') {
+                showNotification('Vui lòng nhập email', 'error');
+                isValid = false;
+            } else if (email && !email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                showNotification('Email không hợp lệ', 'error');
+                isValid = false;
+            }
+            
+            // Validate dates
+            const checkIn = document.querySelector('input[name="checkInDate"]');
+            const checkOut = document.querySelector('input[name="checkOutDate"]');
+            
+            console.log('Check-in value:', checkIn ? checkIn.value : 'null');
+            console.log('Check-out value:', checkOut ? checkOut.value : 'null');
+            
+            if (checkIn && checkOut) {
+                const checkInDate = new Date(checkIn.value);
+                const checkOutDate = new Date(checkOut.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                console.log('Check-in date:', checkInDate);
+                console.log('Check-out date:', checkOutDate);
+                console.log('Today:', today);
+                
+                if (checkInDate < today) {
+                    console.log('Check-in date is in the past');
+                    showNotification('Ngày nhận phòng không thể là ngày trong quá khứ', 'error');
+                    isValid = false;
+                }
+                
+                if (checkOutDate <= checkInDate) {
+                    console.log('Check-out date is not after check-in date');
+                    showNotification('Ngày trả phòng phải sau ngày nhận phòng', 'error');
+                    isValid = false;
+                }
+            }
+            
+            console.log('Form validation result:', isValid);
+            return isValid;
         }
 
         // Toggle favorite
@@ -692,6 +851,7 @@
                         icon.classList.remove('far');
                         icon.classList.add('fas');
                         btn.style.color = '#ef4444';
+                        btn.style.color = '#e74c3c';
                         showNotification('Đã thêm vào danh sách yêu thích!', 'success');
                     } else {
                         icon.classList.remove('fas');
@@ -755,6 +915,10 @@
                 background: ${bgGradient};
                 border: 1px solid rgba(255,255,255,0.2);
                 backdrop-filter: blur(10px);
+                animation: slideInRight 0.3s ease-out;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                ${type === 'success' ? 'background: #27ae60;' : 
+                  type === 'error' ? 'background: #e74c3c;' : 'background: #3498db;'}
             `;
             
             document.body.appendChild(notification);
@@ -852,6 +1016,104 @@
             
             if (reviewTitle) {
                 reviewTitle.addEventListener('input', checkFormValidity);
+            // Set minimum date for check-out based on check-in
+            const checkInInput = document.querySelector('input[name="checkInDate"]');
+            const checkOutInput = document.querySelector('input[name="checkOutDate"]');
+            
+            if (checkInInput && checkOutInput) {
+                            // Set minimum date for check-in (today)
+            const today = new Date().toISOString().split('T')[0];
+            checkInInput.min = today;
+            
+            // Set default check-in date to today if not already set
+            if (!checkInInput.value) {
+                checkInInput.value = today;
+            }
+            
+            // Set default check-out date to tomorrow if not already set
+            if (!checkOutInput.value) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                checkOutInput.value = tomorrow.toISOString().split('T')[0];
+            }
+            
+            // Set minimum date for check-out based on check-in
+            checkInInput.addEventListener('change', function() {
+                const checkInDate = new Date(this.value);
+                const nextDay = new Date(checkInDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                
+                checkOutInput.min = nextDay.toISOString().split('T')[0];
+                
+                // If current check-out date is before new minimum, update it
+                if (checkOutInput.value && new Date(checkOutInput.value) <= checkInDate) {
+                    checkOutInput.value = nextDay.toISOString().split('T')[0];
+                }
+            });
+            
+            // Force set check-out date to tomorrow if it's not set or same as check-in
+            if (!checkOutInput.value || checkOutInput.value === checkInInput.value) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                checkOutInput.value = tomorrow.toISOString().split('T')[0];
+            }
+            
+            checkInInput.addEventListener('change', function() {
+                const checkInDate = new Date(this.value);
+                const nextDay = new Date(checkInDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                
+                checkOutInput.min = nextDay.toISOString().split('T')[0];
+                
+                // If current check-out date is before new minimum, update it
+                if (checkOutInput.value && new Date(checkOutInput.value) <= checkInDate) {
+                    checkOutInput.value = nextDay.toISOString().split('T')[0];
+                }
+            });
+            }
+            
+            const voucherSelect = document.getElementById('voucherSelect');
+            if (voucherSelect) {
+                voucherSelect.addEventListener('change', calculateBooking);
+            }
+            
+            const ratingFilter = document.getElementById('ratingFilter');
+            if (ratingFilter) {
+                ratingFilter.addEventListener('change', filterReviews);
+            }
+            
+            // Form validation
+            const bookingForm = document.getElementById('bookingForm');
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', function(e) {
+                    console.log('Form submit triggered');
+                    
+                    // Force validate dates before submit
+                    const checkIn = document.querySelector('input[name="checkInDate"]');
+                    const checkOut = document.querySelector('input[name="checkOutDate"]');
+                    
+                    if (checkIn && checkOut) {
+                        const checkInDate = new Date(checkIn.value);
+                        const checkOutDate = new Date(checkOut.value);
+                        
+                        // If dates are the same, set check-out to next day
+                        if (checkInDate.getTime() === checkOutDate.getTime()) {
+                            const nextDay = new Date(checkInDate);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            checkOut.value = nextDay.toISOString().split('T')[0];
+                            console.log('Auto-corrected check-out date to:', checkOut.value);
+                        }
+                    }
+                    
+                    if (!validateForm()) {
+                        console.log('Form validation failed');
+                        e.preventDefault();
+                        showNotification('Vui lòng kiểm tra lại thông tin!', 'error');
+                        return false;
+                    }
+                    console.log('Form validation passed, submitting...');
+                    return true;
+                });
             }
             
             if (reviewComment) {
@@ -952,6 +1214,34 @@
             }
         `;
         document.head.appendChild(style);
+            // Add CSS animations if not already added
+            if (!document.getElementById('notification-animations')) {
+                const style = document.createElement('style');
+                style.id = 'notification-animations';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        });
+
+        // Show success/error messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            /*[# th:if="${message}"]*/
+            showNotification(/*[[${message}]]*/ 'Message', 'success');
+            /*[/]*/
+            
+            /*[# th:if="${error}"]*/
+            showNotification(/*[[${error}]]*/ 'Error', 'error');
+            /*[/]*/
+        });
     </script>
 </body>
 </html>

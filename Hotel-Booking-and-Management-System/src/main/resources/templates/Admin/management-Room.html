@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Phòng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/management-Room.css}">
+    <style>
+        body { background: #f4f6fa; }
+        .room-admin-flex {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            margin-top: 32px;
+        }
+        .room-list-section {
+            flex: 2;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px #0002;
+            padding: 28px 18px 24px 18px;
+            min-width: 0;
+        }
+        .room-form-section {
+            flex: 1.2;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px #0002;
+            padding: 32px 24px;
+            min-width: 320px;
+            max-width: 420px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .section-header h2 {
+            color: #1976d2;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .add-btn {
+            background: #43a047;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-btn:hover { background: #388e3c; }
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .filter-row input, .filter-row select {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+        .room-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+        }
+        .room-table th, .room-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .room-table th {
+            background: #f7f7f7;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        .room-table tr:hover { background: #f0f4fa; }
+        .room-table .room-thumb {
+            width: 54px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .status-badge.active { background: #43a047; }
+        .status-badge.inactive { background: #e53935; }
+        .action-btn {
+            margin-right: 4px;
+            padding: 5px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .edit-btn { background: #1976d2; color: #fff; }
+        .edit-btn:hover { background: #125ea2; }
+        .delete-btn { background: #e53935; color: #fff; }
+        .delete-btn:hover { background: #b71c1c; }
+        .view-btn { background: #ff9800; color: #fff; }
+        .view-btn:hover { background: #f57c00; }
+        .no-room {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+        .notify-box {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+        }
+        /* Form thêm phòng */
+        .form-title {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .add-room-form label {
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .add-room-form input, .add-room-form select, .add-room-form textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 14px;
+            font-size: 15px;
+        }
+        .add-room-form .form-row {
+            display: flex;
+            gap: 14px;
+        }
+        .add-room-form .form-row > div {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+        .add-btn-form {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 28px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .reset-btn {
+            background: #888;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 28px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        @media (max-width: 1100px) {
+            .room-admin-flex { flex-direction: column; }
+            .room-form-section { max-width: 100%; margin-top: 24px; }
+        }
+        @media (max-width: 700px) {
+            .room-list-section, .room-form-section { padding: 10px 2px; }
+            .add-room-form .form-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container room-admin-container">
+    <div th:replace="~{/Layout/NavbarAdmin}"></div>
+    <div class="main-content">
+        <div class="room-admin-flex">
+            <!-- Danh sách phòng (bên trái) -->
+            <div class="room-list-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-bed"></i> Quản Lý Phòng</h2>
+                    <a th:href="@{'/admin/rooms/add'(partnerId=${selectedPartnerId})}" class="add-btn"><i class="fas fa-plus"></i> Thêm phòng mới</a>
+                </div>
+                <form class="filter-row" method="get" th:action="@{/admin/rooms}">
+                    <select name="partnerId" onchange="this.form.submit()">
+                        <option value="" th:text="'-- Chọn công ty --'" th:selected="${selectedPartnerId == null}"></option>
+                        <option th:each="partner : ${partners}" th:value="${partner.id}" th:text="${partner.companyName}" th:selected="${partner.id} == ${selectedPartnerId}"></option>
+                    </select>
+                    <input type="text" name="search" placeholder="Tìm tên phòng..." th:value="${search}">
+                    <select name="status">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="active" th:selected="${status == 'active'}">Đang hoạt động</option>
+                        <option value="inactive" th:selected="${status == 'inactive'}">Ngừng hoạt động</option>
+                    </select>
+                    <button type="submit" class="action-btn view-btn"><i class="fas fa-search"></i></button>
+                </form>
+                <div th:if="${selectedPartnerId == null}" class="notify-box">
+                    <p>Vui lòng chọn công ty để xem danh sách phòng.</p>
+                </div>
+                <div th:if="${rooms != null}" class="room-table-box" style="overflow-x:auto;max-height:420px;overflow-y:auto;">
+                    <table class="room-table">
+                        <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Mã phòng</th>
+                            <th>Tên phòng</th>
+                            <th>Loại</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${rooms.size() == 0}">
+                            <td colspan="7" class="no-room">Không có phòng nào cho công ty này.</td>
+                        </tr>
+                        <tr th:each="room : ${rooms}">
+                            <td>
+                                <img th:if="${room.imageUrls != null && !room.imageUrls.isEmpty()}" th:src="@{'/img/rooms/' + ${room.imageUrls[0]}}" class="room-thumb" alt="Ảnh phòng">
+                                <span th:if="${room.imageUrls == null || room.imageUrls.isEmpty()}">-</span>
+                            </td>
+                            <td th:text="${room.roomId}"></td>
+                            <td th:text="${room.roomNumber}"></td>
+                            <td th:text="${room.type}"></td>
+                            <td th:text="${room.price}"></td>
+                            <td>
+                                <span th:text="${room.status == 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}"
+                                      th:classappend="' status-badge ' + ${room.status}"></span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/rooms/edit/' + ${room.roomId}}" class="action-btn edit-btn"><i class="fas fa-edit"></i> Sửa</a>
+                                <a th:href="@{'/admin/rooms/delete/' + ${room.roomId}}" class="action-btn delete-btn" onclick="return confirm('Bạn có chắc muốn xóa phòng này?')"><i class="fas fa-trash"></i> Xóa</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

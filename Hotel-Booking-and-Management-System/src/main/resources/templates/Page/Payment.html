@@ -6,6 +6,46 @@
     <title>Thanh Toán - Khách Sạn</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/Payment.css}">
+    <style>
+        /* CSS giữ nguyên từ phiên bản trước, chỉ thêm một số cải tiến nhỏ */
+        .error-list {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .error-list li {
+            margin-bottom: 5px;
+        }
+        .form-group input:invalid {
+            border-color: #dc2626;
+        }
+        .btn-pay.loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+        /* Giữ nguyên các style khác */
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,9 +53,12 @@
 
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="/">Trang chủ</a> > 
-            <a href="/rooms">Danh sách phòng</a> > 
-            <span>Chi tiết đặt phòng</span> > 
+            <a href="/" title="Trang chủ"><i class="fas fa-home"></i> Trang chủ</a>
+            <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+            <a href="/ListRoom" title="Danh sách phòng"><i class="fas fa-list"></i> Danh sách phòng</a>
+            <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+            <a href="#" th:href="@{/room/{id}(id=${room != null ? room.roomId : ''})}" th:if="${room != null}"><i class="fas fa-bed"></i> Chi tiết đặt phòng</a>
+            <span class="breadcrumb-sep" th:if="${room != null}"><i class="fas fa-chevron-right"></i></span>
             <span>Thanh toán</span>
         </div>
 
@@ -28,109 +71,111 @@
             <i class="fas fa-check-circle"></i>
             <span th:text="${success}">Thành công</span>
         </div>
+        <div th:if="${booking == null or bookingId == null}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>Không tìm thấy thông tin đặt phòng. Vui lòng kiểm tra lại.</span>
+        </div>
 
-        <!-- Payment Section -->
-        <div class="payment-section">
+        <div th:if="${booking != null and bookingId != null}" class="payment-section">
             <!-- Order Summary -->
             <div class="order-summary">
                 <h2>Thông tin đơn hàng</h2>
                 <div class="order-details">
                     <div class="order-item">
                         <span>Mã đặt phòng:</span>
-                        <span th:text="${bookingId != null ? '#' + bookingId : 'Đang xử lý'}">#BK123456</span>
+                        <span th:text="${bookingId}">Chưa có mã đặt phòng</span>
                     </div>
                     <div class="order-item">
                         <span>Ngày đặt:</span>
-
-                        <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}">27/05/2025</span>
-                        <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">27/05/2025</span>
-
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}">--/--/----</span>
                     </div>
                     <div class="order-item">
                         <span>Trạng thái:</span>
                         <span class="status pending">Chờ thanh toán</span>
                     </div>
                 </div>
-                
                 <!-- Room Information -->
-                <div class="room-info" th:if="${booking != null}">
+                <div class="room-info">
                     <h3>Thông tin phòng</h3>
                     <div class="room-detail">
                         <span class="label">Loại phòng:</span>
-                        <span class="value" th:text="${booking.room.type}">Superior</span>
+                        <span class="value" th:text="${room != null ? room.type : 'N/A'}">Loại phòng</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Số phòng:</span>
-                        <span class="value" th:text="${booking.room.roomNumber}">P101</span>
+                        <span class="value" th:text="${room != null ? room.roomNumber : 'N/A'}">Số phòng</span>
+                    </div>
+                    <div class="room-detail">
+                        <span class="label">Số lượng phòng đã đặt:</span>
+                        <span class="value" th:text="${booking.roomQuantity != null ? booking.roomQuantity : '1'}">1</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Ngày nhận phòng:</span>
-                        <span class="value" th:text="${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'}">01/06/2025</span>
+                        <span class="value" th:text="${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : 'N/A'}">--/--/----</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Ngày trả phòng:</span>
-                        <span class="value" th:text="${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">03/06/2025</span>
+                        <span class="value" th:text="${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : 'N/A'}">--/--/----</span>
                     </div>
                     <div class="room-detail">
                         <span class="label">Số đêm:</span>
-                        <span class="value" th:text="${nights != null ? nights + ' đêm' : '2 đêm'}">2 đêm</span>
+                        <span class="value" th:text="${nights != null ? nights + ' đêm' : 'N/A'}">N/A</span>
                     </div>
-
                 </div>
-                
                 <div class="price-breakdown">
                     <h3>Chi tiết giá</h3>
                     <div class="price-item">
                         <span>Giá phòng:</span>
-                        <span>2,500,000 ₫</span>
+                        <span th:text="${basePrice != null ? #numbers.formatDecimal(basePrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
                     </div>
                     <div class="price-item">
                         <span>Phí dịch vụ (10%):</span>
-                        <span>250,000 ₫</span>
+                        <span th:text="${serviceFee != null ? #numbers.formatDecimal(serviceFee, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
                     </div>
                     <div class="price-item">
                         <span>Thuế VAT (10%):</span>
-                        <span>275,000 ₫</span>
+                        <span th:text="${vat != null ? #numbers.formatDecimal(vat, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
                     </div>
                     <div class="price-item discount" th:if="${discount != null and discount > 0}">
                         <span>Giảm giá:</span>
-                        <span th:text="'-' + #numbers.formatDecimal(discount, 0, 'COMMA', 0, 'POINT') + ' ₫'">-100,000 ₫</span>
+                        <span th:text="'-' + #numbers.formatDecimal(discount, 0, 'COMMA', 0, 'POINT') + ' ₫'">-0 ₫</span>
                     </div>
                     <div class="price-item total">
                         <span>Tổng cộng:</span>
-                        <span class="total-amount">2,925,000 ₫</span>
-
-                        <span th:text="${basePrice != null ? #numbers.formatDecimal(basePrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '2,500,000 ₫'}">2,500,000 ₫</span>
-                    </div>
-                    <div class="price-item">
-                        <span>Phí dịch vụ (10%):</span>
-                        <span th:text="${serviceFee != null ? #numbers.formatDecimal(serviceFee, 0, 'COMMA', 0, 'POINT') + ' ₫' : '250,000 ₫'}">250,000 ₫</span>
-                    </div>
-                    <div class="price-item">
-                        <span>Thuế VAT (10%):</span>
-                        <span th:text="${vat != null ? #numbers.formatDecimal(vat, 0, 'COMMA', 0, 'POINT') + ' ₫' : '275,000 ₫'}">275,000 ₫</span>
-                    </div>
-                    <div class="price-item total">
-                        <span>Tổng cộng:</span>
-                        <span class="total-amount" th:text="${total != null ? #numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT') + ' ₫' : '2,925,000 ₫'}">2,925,000 ₫</span>
-
+                        <span class="total-amount" th:text="${total != null ? #numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
                     </div>
                 </div>
             </div>
-
             <!-- Payment Form -->
             <div class="payment-form">
-
                 <h2>Thông tin thanh toán</h2>
-
-                <h2>Phương thức thanh toán</h2>
-
+                <div id="errorMessages" class="error-list">
+                    <ul></ul>
+                </div>
                 <form th:action="@{/process-payment}" method="post" id="paymentForm">
                     <input type="hidden" name="bookingId" th:value="${bookingId}">
-                    
+                    <!-- Customer Information -->
+                    <div class="customer-info">
+                        <h3>Thông tin người đặt</h3>
+                        <div class="customer-detail">
+                            <span class="label">Họ tên:</span>
+                            <input type="text" name="customerName" th:value="${customerName ?: ''}" required>
+                        </div>
+                        <div class="customer-detail">
+                            <span class="label">Email:</span>
+                            <input type="email" name="customerEmail" th:value="${email ?: ''}" required>
+                        </div>
+                        <div class="customer-detail">
+                            <span class="label">Số điện thoại:</span>
+                            <input type="tel" name="customerPhone" th:value="${phone ?: ''}" pattern="[0-9]{10,11}" required>
+                        </div>
+                        <div class="customer-detail">
+                            <span class="label">CCCD:</span>
+                            <input type="text" name="customerCCCD" th:value="${customerCCCD ?: ''}">
+                        </div>
+                    </div>
                     <!-- Payment Method Selection -->
                     <div class="form-section">
-
                         <h3>Phương thức thanh toán</h3>
                         <div class="payment-methods">
                             <label class="payment-method-card selected">
@@ -143,7 +188,6 @@
                                     <span class="method-desc">Visa, Mastercard, JCB</span>
                                 </div>
                             </label>
-                            
                             <label class="payment-method-card">
                                 <input type="radio" name="paymentMethod" value="momo">
                                 <div class="method-icon">
@@ -154,7 +198,6 @@
                                     <span class="method-desc">Ví điện tử MoMo</span>
                                 </div>
                             </label>
-                            
                             <label class="payment-method-card">
                                 <input type="radio" name="paymentMethod" value="bankTransfer">
                                 <div class="method-icon">
@@ -165,15 +208,8 @@
                                     <span class="method-desc">Chuyển khoản ngân hàng</span>
                                 </div>
                             </label>
-                            
                             <label class="payment-method-card">
                                 <input type="radio" name="paymentMethod" value="payOnArrival">
-
-                        <h3>Chọn phương thức thanh toán</h3>
-                        <div class="payment-methods">
-                            <label class="payment-method-card selected">
-                                <input type="radio" name="paymentMethod" value="payOnArrival" checked>
-
                                 <div class="method-icon">
                                     <i class="fas fa-handshake"></i>
                                 </div>
@@ -184,49 +220,40 @@
                             </label>
                         </div>
                     </div>
-
-
                     <!-- Credit Card Fields -->
                     <div id="cardFields" class="payment-fields">
                         <div class="form-section">
                             <h3>Thông tin thẻ</h3>
                             <div class="form-group">
                                 <label for="cardNumber">Số thẻ *</label>
-                                <input type="text" id="cardNumber" name="cardNumber" 
-                                       placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
                             </div>
                             <div class="card-details">
                                 <div class="form-group">
                                     <label for="expiryDate">Ngày hết hạn *</label>
-                                    <input type="text" id="expiryDate" name="expiryDate" 
-                                           placeholder="MM/YY" maxlength="5" required>
+                                    <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="cvv">CVV *</label>
-                                    <input type="text" id="cvv" name="cvv" 
-                                           placeholder="123" maxlength="4" required>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="cardHolderName">Tên chủ thẻ *</label>
-                                <input type="text" id="cardHolderName" name="cardHolderName" 
-                                       placeholder="NGUYEN VAN A" required>
+                                <input type="text" id="cardHolderName" name="cardHolderName" placeholder="NGUYEN VAN A" required>
                             </div>
                         </div>
                     </div>
-
                     <!-- MoMo Fields -->
                     <div id="momoFields" class="payment-fields" style="display: none;">
                         <div class="form-section">
                             <h3>Thông tin MoMo</h3>
                             <div class="form-group">
                                 <label for="momoNumber">Số điện thoại MoMo *</label>
-                                <input type="tel" id="momoNumber" name="momoNumber" 
-                                       placeholder="0935123456" required>
+                                <input type="tel" id="momoNumber" name="momoNumber" placeholder="0935123456" pattern="[0-9]{10,11}" required>
                             </div>
                         </div>
                     </div>
-
                     <!-- Bank Transfer Fields -->
                     <div id="bankFields" class="payment-fields" style="display: none;">
                         <div class="form-section">
@@ -246,12 +273,11 @@
                                 </div>
                                 <div class="bank-detail">
                                     <span class="label">Nội dung:</span>
-                                    <span class="value" th:text="'Thanh toan ' + ${bookingId}">Thanh toan BK123456</span>
+                                    <span class="value" th:text="${bookingId != null ? 'Thanh toan phong #' + bookingId : 'Thanh toan'}">Thanh toan</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Pay on Arrival Info -->
                     <div id="arrivalFields" class="payment-fields" style="display: none;">
                         <div class="form-section">
@@ -259,82 +285,68 @@
                             <div class="arrival-info">
                                 <p>Bạn sẽ thanh toán toàn bộ số tiền khi nhận phòng tại khách sạn.</p>
                                 <p>Vui lòng mang theo giấy tờ tùy thân và thông tin đặt phòng.</p>
-
-                    <!-- Pay on Arrival Info -->
-                    <div class="payment-info">
-                        <div class="info-section">
-                            <h3><i class="fas fa-info-circle"></i> Thông tin thanh toán</h3>
-                            <div class="info-content">
-                                <p><strong>Phương thức:</strong> Thanh toán tại khách sạn</p>
-                                <p><strong>Thời gian thanh toán:</strong> Khi check-in</p>
-                                <p><strong>Chấp nhận:</strong> Tiền mặt, thẻ tín dụng, chuyển khoản</p>
                             </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h3><i class="fas fa-map-marker-alt"></i> Địa chỉ khách sạn</h3>
-                            <div class="info-content">
-                                <p><strong>Khách sạn Grand Ocean</strong></p>
-                                <p>123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
-                                <p>Điện thoại: 0935 123 456</p>
-                                <p>Email: info@grandocean.com</p>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h3><i class="fas fa-clock"></i> Giờ check-in/check-out</h3>
-                            <div class="info-content">
-                                <p><strong>Check-in:</strong> 14:00</p>
-                                <p><strong>Check-out:</strong> 12:00</p>
-                                <p><em>Vui lòng mang theo giấy tờ tùy thân khi check-in</em></p>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h3><i class="fas fa-exclamation-triangle"></i> Lưu ý quan trọng</h3>
-                            <div class="info-content">
-                                <ul>
-                                    <li>Đặt phòng sẽ được giữ đến 18:00 ngày check-in</li>
-                                    <li>Nếu đến sau 18:00, vui lòng liên hệ trước</li>
-                                    <li>Thanh toán đầy đủ khi check-in</li>
-                                    <li>Chấp nhận tiền mặt VND hoặc thẻ tín dụng</li>
-                                </ul>
-
+                            <div class="payment-info">
+                                <div class="info-section">
+                                    <h3><i class="fas fa-info-circle"></i> Thông tin thanh toán</h3>
+                                    <div class="info-content">
+                                        <p><strong>Phương thức:</strong> Thanh toán tại khách sạn</p>
+                                        <p><strong>Thời gian thanh toán:</strong> Khi check-in</p>
+                                        <p><strong>Chấp nhận:</strong> Tiền mặt, thẻ tín dụng, chuyển khoản</p>
+                                    </div>
+                                </div>
+                                <div class="info-section">
+                                    <h3><i class="fas fa-map-marker-alt"></i> Địa chỉ khách sạn</h3>
+                                    <div class="info-content">
+                                        <p><strong>Khách sạn Grand Ocean</strong></p>
+                                        <p>123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
+                                        <p>Điện thoại: 0935 123 456</p>
+                                        <p>Email: info@grandocean.com</p>
+                                    </div>
+                                </div>
+                                <div class="info-section">
+                                    <h3><i class="fas fa-clock"></i> Giờ check-in/check-out</h3>
+                                    <div class="info-content">
+                                        <p><strong>Check-in:</strong> 14:00</p>
+                                        <p><strong>Check-out:</strong> 12:00</p>
+                                        <p><em>Vui lòng mang theo giấy tờ tùy thân khi check-in</em></p>
+                                    </div>
+                                </div>
+                                <div class="info-section">
+                                    <h3><i class="fas fa-exclamation-triangle"></i> Lưu ý quan trọng</h3>
+                                    <div class="info-content">
+                                        <ul>
+                                            <li>Đặt phòng sẽ được giữ đến 18:00 ngày check-in</li>
+                                            <li>Nếu đến sau 18:00, vui lòng liên hệ trước</li>
+                                            <li>Thanh toán đầy đủ khi check-in</li>
+                                            <li>Chấp nhận tiền mặt VND hoặc thẻ tín dụng</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Terms and Conditions -->
-                    <div class="form-section">
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
-                                <span class="checkmark"></span>
-                                Tôi đồng ý với <a href="#" target="_blank">điều khoản sử dụng</a> và <a href="#" target="_blank">chính sách bảo mật</a>
-                            </label>
-                        </div>
+                    <div class="form-section checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <span class="checkmark"></span>
+                            Tôi đồng ý với <a href="#" target="_blank">điều khoản sử dụng</a> và <a href="#" target="_blank">chính sách bảo mật</a>
+                        </label>
                     </div>
-
-                    <button type="submit" class="btn-pay">Thanh toán ngay</button>
-
-                    <button type="submit" class="btn-confirm-payment">
-                        <i class="fas fa-check"></i> Xác Nhận Thanh Toán Tại Khách Sạn
-                    </button>
-
+                    <button type="submit" class="btn-pay" id="submitButton" disabled>Thanh toán ngay</button>
                 </form>
             </div>
         </div>
     </div>
 
-
-    <!-- JavaScript for Payment -->
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
         // Toggle payment fields based on selected method
         function togglePaymentFields() {
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const fields = document.querySelectorAll('.payment-fields');
-            fields.forEach(field => field.style.display = 'none');
-
+            const checkedRadio = document.querySelector('input[name="paymentMethod"]:checked');
+            const method = checkedRadio ? checkedRadio.value : null;
+            document.querySelectorAll('.payment-fields').forEach(field => field.style.display = 'none');
             if (method === 'creditCard') {
                 document.getElementById('cardFields').style.display = 'block';
             } else if (method === 'momo') {
@@ -346,332 +358,195 @@
             }
         }
 
-        // Add selected class to payment method cards
+        // Handle payment method selection
         document.querySelectorAll('.payment-method-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', function() {
                 document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                card.querySelector('input').checked = true;
+                this.classList.add('selected');
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
                 togglePaymentFields();
             });
         });
 
+        // Enable/disable submit button based on terms agreement
+        const agreeTerms = document.getElementById('agreeTerms');
+        const submitButton = document.getElementById('submitButton');
+        if (agreeTerms && submitButton) {
+            submitButton.disabled = !agreeTerms.checked;
+            agreeTerms.addEventListener('change', function() {
+                submitButton.disabled = !this.checked;
+            });
+        }
+
         // Format card number with spaces
-        document.getElementById('cardNumber').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            e.target.value = formattedValue;
-        });
+        const cardNumber = document.getElementById('cardNumber');
+        if (cardNumber) {
+            cardNumber.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g) ? value.match(/.{1,4}/g).join(' ') : value;
+                e.target.value = formattedValue;
+                if (value.length < 13 || value.length > 19) {
+                    e.target.setCustomValidity('Số thẻ phải có từ 13 đến 19 số.');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        }
 
-        // Format expiry date
-        document.getElementById('expiryDate').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            e.target.value = value;
-        });
+        // Format and validate expiry date
+        const expiryDate = document.getElementById('expiryDate');
+        if (expiryDate) {
+            expiryDate.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+                if (value.length === 5) {
+                    let [month, year] = value.split('/').map(Number);
+                    let currentYear = new Date().getFullYear() % 100;
+                    let currentMonth = new Date().getMonth() + 1;
+                    if (month < 1 || month > 12 || year < currentYear || (year === currentYear && month < currentMonth)) {
+                        e.target.setCustomValidity('Ngày hết hạn không hợp lệ.');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                } else {
+                    e.target.setCustomValidity('Ngày hết hạn phải có định dạng MM/YY.');
+                }
+            });
+        }
 
-        // Format CVV
-        document.getElementById('cvv').addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/\D/g, '');
-        });
+        // Format and validate CVV
+        const cvv = document.getElementById('cvv');
+        if (cvv) {
+            cvv.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                if (e.target.value.length < 3 || e.target.value.length > 4) {
+                    e.target.setCustomValidity('CVV phải có 3 hoặc 4 số.');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        }
+
+        // Format and validate MoMo number
+        const momoNumber = document.getElementById('momoNumber');
+        if (momoNumber) {
+            momoNumber.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                if (e.target.value && !/^[0-9]{10,11}$/.test(e.target.value)) {
+                    e.target.setCustomValidity('Số điện thoại MoMo phải có 10 hoặc 11 số.');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        }
 
         // Form validation
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            let isValid = true;
-
-            // Validate required fields based on payment method
-            if (method === 'creditCard') {
-                const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-                const expiryDate = document.getElementById('expiryDate').value;
-                const cvv = document.getElementById('cvv').value;
-                const cardHolderName = document.getElementById('cardHolderName').value;
-
-                if (cardNumber.length < 13 || cardNumber.length > 19) {
-                    alert('Số thẻ không hợp lệ');
-                    isValid = false;
-                }
-                if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
-                    alert('Ngày hết hạn không hợp lệ (MM/YY)');
-                    isValid = false;
-                }
-                if (cvv.length < 3 || cvv.length > 4) {
-                    alert('CVV không hợp lệ');
-                    isValid = false;
-                }
-                if (!cardHolderName.trim()) {
-                    alert('Vui lòng nhập tên chủ thẻ');
-                    isValid = false;
-                }
-            } else if (method === 'momo') {
-                const momoNumber = document.getElementById('momoNumber').value;
-                if (!momoNumber.match(/^[0-9]{10,11}$/)) {
-                    alert('Số điện thoại MoMo không hợp lệ');
-                    isValid = false;
-                }
-            }
-
-            if (!document.getElementById('agreeTerms').checked) {
-                alert('Vui lòng đồng ý với điều khoản sử dụng');
-                isValid = false;
-            }
-
-            if (!isValid) {
+        const paymentForm = document.getElementById('paymentForm');
+        const errorMessages = document.getElementById('errorMessages');
+        const errorList = errorMessages.querySelector('ul');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-            }
-        });
+                const errors = [];
+                const checkedRadio = document.querySelector('input[name="paymentMethod"]:checked');
+                const method = checkedRadio ? checkedRadio.value : null;
+
+                // Validate hidden fields
+                const bookingId = document.querySelector('input[name="bookingId"]').value;
+                if (!bookingId) errors.push('Mã đặt phòng không được để trống');
+
+                // Validate customer fields
+                const customerName = document.querySelector('input[name="customerName"]');
+                const customerEmail = document.querySelector('input[name="customerEmail"]');
+                const customerPhone = document.querySelector('input[name="customerPhone"]');
+                if (!customerName.value.trim()) {
+                    errors.push('Vui lòng nhập họ tên người đặt');
+                    customerName.style.borderColor = '#dc2626';
+                } else {
+                    customerName.style.borderColor = '#dfe6e9';
+                }
+                if (!customerEmail.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.value)) {
+                    errors.push('Vui lòng nhập email hợp lệ');
+                    customerEmail.style.borderColor = '#dc2626';
+                } else {
+                    customerEmail.style.borderColor = '#dfe6e9';
+                }
+                if (!customerPhone.value.trim() || !/^[0-9]{10,11}$/.test(customerPhone.value)) {
+                    errors.push('Số điện thoại không hợp lệ (phải có 10 hoặc 11 số)');
+                    customerPhone.style.borderColor = '#dc2626';
+                } else {
+                    customerPhone.style.borderColor = '#dfe6e9';
+                }
+
+                // Validate payment fields
+                if (!method) {
+                    errors.push('Vui lòng chọn phương thức thanh toán');
+                } else if (method === 'creditCard') {
+                    const cardNumberVal = cardNumber.value.replace(/\s/g, '');
+                    const expiryDateVal = expiryDate.value;
+                    const cvvVal = cvv.value;
+                    const cardHolderName = document.getElementById('cardHolderName').value;
+
+                    if (!cardNumberVal || cardNumberVal.length < 13 || cardNumberVal.length > 19) {
+                        errors.push('Số thẻ không hợp lệ (phải có từ 13 đến 19 số)');
+                        cardNumber.style.borderColor = '#dc2626';
+                    } else {
+                        cardNumber.style.borderColor = '#dfe6e9';
+                    }
+                    if (!expiryDateVal || !/^\d{2}\/\d{2}$/.test(expiryDateVal)) {
+                        errors.push('Ngày hết hạn không hợp lệ (MM/YY)');
+                        expiryDate.style.borderColor = '#dc2626';
+                    } else {
+                        expiryDate.style.borderColor = '#dfe6e9';
+                    }
+                    if (!cvvVal || cvvVal.length < 3 || cvvVal.length > 4) {
+                        errors.push('CVV không hợp lệ (phải có 3 hoặc 4 số)');
+                        cvv.style.borderColor = '#dc2626';
+                    } else {
+                        cvv.style.borderColor = '#dfe6e9';
+                    }
+                    if (!cardHolderName.trim()) {
+                        errors.push('Vui lòng nhập tên chủ thẻ');
+                        document.getElementById('cardHolderName').style.borderColor = '#dc2626';
+                    } else {
+                        document.getElementById('cardHolderName').style.borderColor = '#dfe6e9';
+                    }
+                } else if (method === 'momo') {
+                    const momoNumberVal = momoNumber.value;
+                    if (!momoNumberVal || !/^[0-9]{10,11}$/.test(momoNumberVal)) {
+                        errors.push('Số điện thoại MoMo không hợp lệ (phải có 10 hoặc 11 số)');
+                        momoNumber.style.borderColor = '#dc2626';
+                    } else {
+                        momoNumber.style.borderColor = '#dfe6e9';
+                    }
+                }
+
+                // Validate terms agreement
+                if (!agreeTerms.checked) {
+                    errors.push('Vui lòng đồng ý với điều khoản sử dụng');
+                }
+
+                // Display errors or submit form
+                if (errors.length > 0) {
+                    errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+                    errorMessages.style.display = 'block';
+                } else {
+                    errorMessages.style.display = 'none';
+                    submitButton.classList.add('loading');
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Đang xử lý...';
+                    paymentForm.submit();
+                }
+            });
+        }
 
         // Initial call to set default fields
         togglePaymentFields();
-    </script>
-
-    <!-- JavaScript for Hamburger Menu -->
-    <script>
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-
-    <style>
-        .payment-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .order-summary, .payment-form {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .order-summary h2, .payment-form h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-        }
-
-        .order-details, .room-info {
-            margin-bottom: 25px;
-        }
-
-        .order-item, .room-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f8f9fa;
-        }
-
-        .order-item:last-child, .room-detail:last-child {
-            border-bottom: none;
-        }
-
-        .status.pending {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .price-breakdown {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .price-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .price-item.total {
-            border-top: 2px solid #dee2e6;
-            padding-top: 10px;
-            margin-top: 10px;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .payment-methods {
-            margin-bottom: 30px;
-        }
-
-        .payment-method-card {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-method-card.selected {
-            border-color: #3498db;
-            background-color: #f8f9ff;
-        }
-
-        .method-icon {
-            width: 50px;
-            height: 50px;
-            background: #3498db;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-        }
-
-        .method-icon i {
-            color: white;
-            font-size: 20px;
-        }
-
-        .method-info {
-            flex: 1;
-        }
-
-        .method-name {
-            display: block;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-
-        .method-desc {
-            display: block;
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-
-        .payment-info {
-            margin-top: 30px;
-        }
-
-        .info-section {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-
-        .info-section h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .info-section h3 i {
-            margin-right: 8px;
-            color: #3498db;
-        }
-
-        .info-content p {
-            margin-bottom: 8px;
-            color: #34495e;
-            line-height: 1.6;
-        }
-
-        .info-content ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .info-content li {
-            margin-bottom: 5px;
-            color: #34495e;
-        }
-
-        .btn-confirm-payment {
-            width: 100%;
-            padding: 15px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .btn-confirm-payment:hover {
-            background: #229954;
-        }
-
-        .btn-confirm-payment i {
-            margin-right: 8px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .breadcrumb {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            margin-bottom: 20px;
-        }
-
-        .breadcrumb a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .payment-section {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-    </style>
-
-    <script>
-        // Handle payment method selection
-        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                // Remove selected class from all cards
-                document.querySelectorAll('.payment-method-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                // Add selected class to the checked card
-                if (this.checked) {
-                    this.closest('.payment-method-card').classList.add('selected');
-                }
-            });
-
-        });
+    });
     </script>
 </body>
 </html>

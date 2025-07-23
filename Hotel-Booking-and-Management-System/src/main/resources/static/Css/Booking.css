@@ -200,6 +200,165 @@ body {
     background: white;
 }
 
+/* Room Quantity Section */
+.room-quantity-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 20px;
+}
+
+.quantity-info {
+    margin-bottom: 20px;
+}
+
+.quantity-info p {
+    color: #666;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quantity-info p i {
+    color: #667eea;
+}
+
+.room-available {
+    color: #28a745 !important;
+    font-weight: 600;
+}
+
+.room-available i {
+    color: #28a745 !important;
+}
+
+.room-warning {
+    color: #f39c12 !important;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.room-warning i {
+    color: #f39c12 !important;
+}
+
+.quantity-group {
+    margin-bottom: 20px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 200px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.quantity-btn:active {
+    transform: translateY(0);
+}
+
+.quantity-btn:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.quantity-group input[type="number"] {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    border: 2px solid #667eea;
+    background: white;
+}
+
+.quantity-group input[type="number"]:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.quantity-help {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.quantity-help small {
+    color: #666;
+    font-style: italic;
+}
+
+.quantity-summary {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row span:first-child {
+    color: #666;
+    font-weight: 500;
+}
+
+.summary-row span:last-child {
+    color: #333;
+    font-weight: 600;
+}
+
+.total-row {
+    border-top: 2px solid #667eea;
+    margin-top: 10px;
+    padding-top: 15px;
+}
+
+.total-row span:first-child {
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.total-row span:last-child {
+    color: #667eea;
+    font-weight: 700;
+    font-size: 18px;
+}
+
 /* Voucher Input */
 .voucher-input {
     display: flex;
@@ -328,6 +487,24 @@ body {
     .container {
         padding: 15px;
     }
+    
+    /* Room Quantity Responsive */
+    .room-quantity-section {
+        padding: 20px;
+    }
+    
+    .quantity-controls {
+        max-width: 100%;
+        justify-content: center;
+    }
+    
+    .quantity-summary {
+        padding: 15px;
+    }
+    
+    .summary-row {
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -345,6 +522,42 @@ body {
     
     .btn-continue {
         padding: 15px;
+        font-size: 16px;
+    }
+    
+    /* Room Quantity Mobile */
+    .room-quantity-section {
+        padding: 15px;
+    }
+    
+    .quantity-controls {
+        gap: 8px;
+    }
+    
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .quantity-group input[type="number"] {
+        font-size: 16px;
+    }
+    
+    .quantity-summary {
+        padding: 12px;
+    }
+    
+    .summary-row {
+        font-size: 13px;
+        padding: 6px 0;
+    }
+    
+    .total-row span:first-child {
+        font-size: 14px;
+    }
+    
+    .total-row span:last-child {
         font-size: 16px;
     }
 }

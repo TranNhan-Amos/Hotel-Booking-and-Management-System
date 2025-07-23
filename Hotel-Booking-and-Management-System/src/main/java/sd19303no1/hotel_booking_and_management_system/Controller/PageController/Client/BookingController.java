@@ -1,27 +1,5 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Client;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
-import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
-import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
-import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
-import sd19303no1.hotel_booking_and_management_system.Service.CustomersService;
-import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,10 +9,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Optional;
+
+import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.StatusEntity;
+import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
+import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
+import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
+import sd19303no1.hotel_booking_and_management_system.Service.CustomersService;
+import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
+import sd19303no1.hotel_booking_and_management_system.Repository.StatusRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 
 @Controller
 public class BookingController {
@@ -54,7 +46,13 @@ public class BookingController {
     @Autowired
     private SystemUserService systemUserService;
 
-    // Bước 2: Hiển thị trang chi tiết đặt phòng
+    @Autowired
+    private StatusRepository statusRepository;
+
+    @Autowired
+    private BookingOrderRepository bookingOrderRepository;
+
+    // Hiển thị trang chi tiết đặt phòng
     @GetMapping("/bookings")
     public String showBookingPage(
             @RequestParam(required = false) Integer roomId,
@@ -67,60 +65,166 @@ public class BookingController {
 
         try {
             if (roomId != null) {
-                // Lấy thông tin phòng
                 RoomEntity room = roomService.findById(roomId);
                 if (room != null) {
                     model.addAttribute("room", room);
-                    
-                    // Tính toán số đêm
                     if (checkInDate != null && checkOutDate != null) {
                         LocalDate checkIn = LocalDate.parse(checkInDate);
                         LocalDate checkOut = LocalDate.parse(checkOutDate);
-                        int nights = checkIn.until(checkOut).getDays();
+                        long nights = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
+                        if (nights < 1) {
+                            model.addAttribute("error", "Ngày trả phòng phải sau ngày nhận phòng");
+                            return "Page/Booking";
+                        }
                         model.addAttribute("nights", nights);
                     }
+                    if (room.getTotalRooms() != null) {
+                        model.addAttribute("availableRooms", room.getTotalRooms());
+                        int maxRoomsToBook = Math.min(room.getTotalRooms(), 5);
+                        model.addAttribute("maxRoomsToBook", maxRoomsToBook);
+                    }
+                } else {
+                    model.addAttribute("error", "Không tìm thấy phòng");
                 }
             }
-            
-            // Thêm thông tin khách hàng nếu có
-            if (customerName != null) model.addAttribute("customerName", customerName);
-            if (email != null) model.addAttribute("email", email);
-            if (phone != null) model.addAttribute("phone", phone);
-            if (checkInDate != null) model.addAttribute("checkInDate", checkInDate);
-            if (checkOutDate != null) model.addAttribute("checkOutDate", checkOutDate);
-            
+            model.addAttribute("customerName", customerName != null ? customerName : "");
+            model.addAttribute("email", email != null ? email : "");
+            model.addAttribute("phone", phone != null ? phone : "");
+            model.addAttribute("checkInDate", checkInDate);
+            model.addAttribute("checkOutDate", checkOutDate);
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
-
         return "Page/Booking";
     }
 
-    // Bước 3: Xử lý thanh toán và tạo booking
-    @PostMapping("/bookings")
+    // Xử lý tạo booking
+    @PostMapping("/process-booking")
     public String processBooking(
             @RequestParam String customerName,
             @RequestParam String email,
             @RequestParam String phone,
             @RequestParam String address,
             @RequestParam Integer roomId,
-            @RequestParam LocalDate checkInDate,
-            @RequestParam LocalDate checkOutDate,
+            @RequestParam String checkInDate,
+            @RequestParam String checkOutDate,
             @RequestParam(required = false) String idNumber,
             @RequestParam(required = false) String specialRequest,
             @RequestParam(required = false) String voucherCode,
+            @RequestParam(defaultValue = "1") Integer roomQuantity,
             RedirectAttributes redirectAttributes) {
-        
+
+        System.out.println("=== PROCESS BOOKING DEBUG START ===");
+        System.out.println("roomId: " + roomId);
+        System.out.println("customerName: " + customerName);
+        System.out.println("email: " + email);
+        System.out.println("phone: " + phone);
+        System.out.println("checkInDate: " + checkInDate);
+        System.out.println("checkOutDate: " + checkOutDate);
+        System.out.println("roomQuantity: " + roomQuantity);
+        System.out.println("specialRequest: " + specialRequest);
+
         try {
-            // TODO: Implement booking processing logic
-            redirectAttributes.addFlashAttribute("success", "Đặt phòng thành công!");
-            return "redirect:/payment";
+            // Validate input
+            if (roomId == null || checkInDate == null || checkOutDate == null) {
+                redirectAttributes.addFlashAttribute("error", "Thông tin đặt phòng không hợp lệ");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            if (customerName.trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Họ tên không được để trống");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                redirectAttributes.addFlashAttribute("error", "Email không hợp lệ");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            if (!phone.matches("^[0-9]{10,11}$")) {
+                redirectAttributes.addFlashAttribute("error", "Số điện thoại không hợp lệ");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            if (roomQuantity < 1 || roomQuantity > 5) {
+                redirectAttributes.addFlashAttribute("error", "Số lượng phòng không hợp lệ (1-5 phòng)");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+
+            // Check room availability
+            RoomEntity room = roomService.findById(roomId);
+            if (room == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy phòng");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            if (room.getTotalRooms() == null || room.getTotalRooms() < roomQuantity) {
+                redirectAttributes.addFlashAttribute("error", "Không đủ phòng trống. Còn lại: " + (room.getTotalRooms() != null ? room.getTotalRooms() : 0) + " phòng");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+
+            // Parse dates
+            LocalDate checkIn = LocalDate.parse(checkInDate);
+            LocalDate checkOut = LocalDate.parse(checkOutDate);
+            if (checkIn.isAfter(checkOut) || checkIn.isEqual(checkOut)) {
+                redirectAttributes.addFlashAttribute("error", "Ngày trả phòng phải sau ngày nhận phòng");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+
+            // Create or update customer
+            CustomersEntity customer = customersService.findByEmail(email);
+            if (customer == null) {
+                customer = new CustomersEntity();
+                customer.setName(customerName);
+                customer.setEmail(email);
+                customer.setPhone(phone);
+                customer.setAddress(address);
+                customer.setCccd(idNumber);
+                customersService.save(customer);
+            } else {
+                customer.setName(customerName);
+                customer.setPhone(phone);
+                customer.setAddress(address);
+                customer.setCccd(idNumber);
+                customersService.save(customer);
+            }
+
+            // Create booking
+            Integer voucherId = null;
+            if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+                VoucherEntity voucher = voucherService.findByCode(voucherCode);
+                if (voucher != null) {
+                    voucherId = voucher.getVoucherId();
+                }
+            }
+            BookingOrderEntity booking = bookingOrderService.createBooking(
+                customerName,
+                email,
+                phone,
+                address,
+                roomId,
+                checkIn,
+                checkOut,
+                voucherId,
+                specialRequest,
+                roomQuantity
+            );
+
+            // Set initial status to PENDING
+            StatusEntity pendingStatus = statusRepository.findByStatusNameIgnoreCase("PENDING");
+            if (pendingStatus != null) {
+                booking.setStatus(pendingStatus);
+                bookingOrderRepository.save(booking);
+            }
+
+            System.out.println("=== PROCESS BOOKING DEBUG: Booking created with ID: " + booking.getBookingId() + " ===");
+            redirectAttributes.addFlashAttribute("success", "Đặt phòng thành công! Vui lòng tiến hành thanh toán.");
+            return "redirect:/payment?bookingId=" + booking.getBookingId();
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            return "redirect:/bookings";
+            System.out.println("=== PROCESS BOOKING DEBUG: Error occurred: " + e.getMessage() + " ===");
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi đặt phòng: " + e.getMessage());
+            return "redirect:/bookings?roomId=" + roomId;
         }
     }
 
+    // Tìm kiếm phòng
     @GetMapping("/search-rooms")
     public String searchRooms(@RequestParam(required = false) String roomType,
                              @RequestParam(required = false) String checkInDate,
@@ -129,8 +233,6 @@ public class BookingController {
                              @RequestParam(required = false, defaultValue = "2") Integer adults,
                              @RequestParam(required = false, defaultValue = "0") Integer children,
                              Model model) {
-        
-        // Add search parameters to model
         model.addAttribute("roomType", roomType);
         model.addAttribute("checkInDate", checkInDate);
         model.addAttribute("checkOutDate", checkOutDate);
@@ -138,28 +240,23 @@ public class BookingController {
         model.addAttribute("adults", adults);
         model.addAttribute("children", children);
 
-        // If search parameters are provided, search for available rooms
-        if (roomType != null && !roomType.isEmpty() && 
-            checkInDate != null && !checkInDate.isEmpty() && 
+        if (roomType != null && !roomType.isEmpty() &&
+            checkInDate != null && !checkInDate.isEmpty() &&
             checkOutDate != null && !checkOutDate.isEmpty()) {
-            
             try {
                 LocalDate checkIn = LocalDate.parse(checkInDate);
                 LocalDate checkOut = LocalDate.parse(checkOutDate);
-                
-                // Get all rooms for now (simplified)
-                List<RoomEntity> allRooms = roomService.getAllRooms();
-                model.addAttribute("availableRooms", allRooms);
+                List<RoomEntity> availableRooms = roomService.searchRooms(roomType, checkIn, checkOut, roomCount);
+                model.addAttribute("availableRooms", availableRooms);
                 model.addAttribute("hasSearchResults", true);
-                
             } catch (Exception e) {
                 model.addAttribute("error", "Có lỗi xảy ra khi tìm kiếm phòng: " + e.getMessage());
             }
         }
-
         return "Client/room-search";
     }
 
+    // Đặt phòng qua AJAX
     @PostMapping("/book-room")
     @ResponseBody
     public Map<String, Object> bookRoom(@RequestParam Integer roomId,
@@ -167,18 +264,8 @@ public class BookingController {
                                        @RequestParam String checkOutDate,
                                        @RequestParam Integer roomQuantity,
                                        @RequestParam(required = false) String specialRequests) {
-        
         Map<String, Object> response = new HashMap<>();
-        
         try {
-            System.out.println("=== CONTROLLER DEBUG: bookRoom started ===");
-            System.out.println("roomId: " + roomId);
-            System.out.println("checkInDate: " + checkInDate);
-            System.out.println("checkOutDate: " + checkOutDate);
-            System.out.println("roomQuantity: " + roomQuantity);
-            System.out.println("specialRequests: " + specialRequests);
-            
-            // Get current user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 response.put("success", false);
@@ -187,9 +274,6 @@ public class BookingController {
             }
 
             String email = authentication.getName();
-            System.out.println("=== CONTROLLER DEBUG: User email: " + email + " ===");
-            
-            // Get customer info
             CustomersEntity customer = customersService.findByEmail(email);
             if (customer == null) {
                 response.put("success", false);
@@ -197,11 +281,21 @@ public class BookingController {
                 return response;
             }
 
-            // Parse dates
             LocalDate checkIn = LocalDate.parse(checkInDate);
             LocalDate checkOut = LocalDate.parse(checkOutDate);
+            if (checkIn.isAfter(checkOut) || checkIn.isEqual(checkOut)) {
+                response.put("success", false);
+                response.put("message", "Ngày trả phòng phải sau ngày nhận phòng");
+                return response;
+            }
 
-            // Call service to create booking
+            RoomEntity room = roomService.findById(roomId);
+            if (room == null || room.getTotalRooms() == null || room.getTotalRooms() < roomQuantity) {
+                response.put("success", false);
+                response.put("message", "Không đủ phòng trống");
+                return response;
+            }
+
             BookingOrderEntity booking = bookingOrderService.createBooking(
                 customer.getName(),
                 email,
@@ -210,99 +304,30 @@ public class BookingController {
                 roomId,
                 checkIn,
                 checkOut,
-                null, // voucherId - null for now
+                null,
                 specialRequests,
                 roomQuantity
             );
 
-            System.out.println("=== CONTROLLER DEBUG: Booking created successfully with ID: " + booking.getBookingId() + " ===");
+            // Set initial status to PENDING
+            StatusEntity pendingStatus = statusRepository.findByStatusNameIgnoreCase("PENDING");
+            if (pendingStatus != null) {
+                booking.setStatus(pendingStatus);
+                bookingOrderRepository.save(booking);
+            }
 
             response.put("success", true);
             response.put("message", "Đặt phòng thành công!");
             response.put("bookingId", booking.getBookingId());
             response.put("totalPrice", booking.getTotalPrice());
-
         } catch (Exception e) {
-            System.out.println("=== CONTROLLER DEBUG: Error occurred: " + e.getMessage() + " ===");
             response.put("success", false);
             response.put("message", "Có lỗi xảy ra khi đặt phòng: " + e.getMessage());
         }
-
         return response;
     }
 
-    @PostMapping("/process-booking")
-    public String processBooking(@RequestParam Integer roomId,
-                                @RequestParam String customerName,
-                                @RequestParam String email,
-                                @RequestParam String phone,
-                                @RequestParam String checkInDate,
-                                @RequestParam String checkOutDate,
-                                @RequestParam(required = false) String specialRequests,
-                                @RequestParam(defaultValue = "1") Integer roomQuantity,
-                                Model model) {
-        
-        // Debug log for troubleshooting
-        System.out.println("=== PROCESS BOOKING DEBUG START ===");
-        System.out.println("roomId: " + roomId);
-        System.out.println("customerName: " + customerName);
-        System.out.println("email: " + email);
-        System.out.println("phone: " + phone);
-        System.out.println("checkInDate: " + checkInDate);
-        System.out.println("checkOutDate: " + checkOutDate);
-        System.out.println("specialRequests: " + specialRequests);
-        System.out.println("roomQuantity: " + roomQuantity);
-        
-        // Check if user is authenticated
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            System.out.println("=== PROCESS BOOKING DEBUG: User not authenticated ===");
-            return "redirect:/login";
-        }
-        
-        try {
-            // Validate input
-            if (roomId == null || checkInDate == null || checkOutDate == null) {
-                System.out.println("=== PROCESS BOOKING DEBUG: Invalid input ===");
-                model.addAttribute("error", "Thông tin đặt phòng không hợp lệ");
-                return "redirect:/room/" + roomId;
-            }
-
-            // Parse dates
-            LocalDate checkIn = LocalDate.parse(checkInDate);
-            LocalDate checkOut = LocalDate.parse(checkOutDate);
-            System.out.println("=== PROCESS BOOKING DEBUG: Parsed dates - checkIn: " + checkIn + ", checkOut: " + checkOut + " ===");
-
-            // Create booking
-            System.out.println("=== PROCESS BOOKING DEBUG: Calling createBooking service ===");
-            BookingOrderEntity booking = bookingOrderService.createBooking(
-                customerName,
-                email,
-                phone,
-                null, // address - null for now
-                roomId,
-                checkIn,
-                checkOut,
-                null, // voucherId - null for now
-                specialRequests,
-                roomQuantity
-            );
-
-            System.out.println("=== PROCESS BOOKING DEBUG: Booking created successfully with ID: " + booking.getBookingId() + " ===");
-
-            // Redirect to payment page with booking info
-            return "redirect:/payment?bookingId=" + booking.getBookingId();
-
-        } catch (Exception e) {
-            System.out.println("=== PROCESS BOOKING DEBUG: Error occurred: " + e.getMessage() + " ===");
-            e.printStackTrace();
-            model.addAttribute("error", "Có lỗi xảy ra khi đặt phòng: " + e.getMessage());
-            return "redirect:/room/" + roomId;
-        }
-    }
-
-
-
+    // Xem chi tiết đặt phòng
     @GetMapping("/booking-details")
     public String bookingDetails(@RequestParam(required = false) Integer bookingId,
                                 @RequestParam(required = false) String checkInDate,
@@ -312,19 +337,15 @@ public class BookingController {
                                 @RequestParam(required = false) String phone,
                                 Model model) {
         try {
-            // Get current user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return "redirect:/login";
             }
 
-            // If bookingId is provided, get booking details
             if (bookingId != null) {
-                BookingOrderEntity booking = bookingOrderService.findBookingByIdForAdmin(bookingId)
-                    .orElse(null);
-                
-                if (booking != null) {
-                    // Verify that the booking belongs to the current user
+                Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+                if (bookingOpt.isPresent()) {
+                    BookingOrderEntity booking = bookingOpt.get();
                     String currentUserEmail = authentication.getName();
                     if (currentUserEmail.equals(booking.getEmail())) {
                         model.addAttribute("booking", booking);
@@ -332,131 +353,153 @@ public class BookingController {
                         model.addAttribute("checkInDate", booking.getCheckInDate());
                         model.addAttribute("checkOutDate", booking.getCheckOutDate());
                         model.addAttribute("email", booking.getEmail());
-                        
-                        // Get customer info from related entity
                         if (booking.getCustomer() != null) {
                             model.addAttribute("customerName", booking.getCustomer().getName());
                             model.addAttribute("phone", booking.getCustomer().getPhone());
                         }
-                        
-                        // Calculate nights
                         if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
                             long nights = java.time.temporal.ChronoUnit.DAYS.between(
                                 booking.getCheckInDate(), booking.getCheckOutDate());
                             model.addAttribute("nights", nights);
                         }
+                    } else {
+                        model.addAttribute("error", "Bạn không có quyền xem thông tin đặt phòng này");
                     }
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
                 }
             } else {
-                // If no bookingId, use parameters from form
                 model.addAttribute("checkInDate", checkInDate);
                 model.addAttribute("checkOutDate", checkOutDate);
                 model.addAttribute("customerName", customerName);
                 model.addAttribute("email", email);
                 model.addAttribute("phone", phone);
             }
-
             return "Page/Booking";
-            
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             return "redirect:/";
         }
     }
 
+    // Xem danh sách đặt phòng của khách hàng
     @GetMapping("/my-bookings")
     public String myBookings(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-
-        // For now, just show a message that bookings will be implemented
-        model.addAttribute("message", "Chức năng xem lịch sử đặt phòng sẽ được cập nhật sớm!");
-        
+        String email = authentication.getName();
+        List<BookingOrderEntity> bookings = bookingOrderService.getBookingsByCustomerEmailForCustomer(email);
+        model.addAttribute("bookings", bookings);
         return "Client/my-bookings";
     }
 
+    // Hủy đặt phòng
     @PostMapping("/cancel-booking")
     @ResponseBody
     public Map<String, Object> cancelBooking(@RequestParam Integer bookingId,
                                             @RequestParam(required = false) String reason) {
-        
         Map<String, Object> response = new HashMap<>();
-        
         try {
-            // Get current user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 response.put("success", false);
                 response.put("message", "Vui lòng đăng nhập");
                 return response;
             }
-
-            // For now, just return success
-            response.put("success", true);
-            response.put("message", "Hủy đặt phòng thành công!");
-
+            Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+            if (bookingOpt.isPresent()) {
+                BookingOrderEntity booking = bookingOpt.get();
+                String currentUserEmail = authentication.getName();
+                if (currentUserEmail.equals(booking.getEmail())) {
+                    StatusEntity cancelledStatus = statusRepository.findByStatusNameIgnoreCase("CANCELLED");
+                    if (cancelledStatus != null) {
+                        booking.setStatus(cancelledStatus);
+                    }
+                    booking.setCancellationReason(reason);
+                    bookingOrderRepository.save(booking);
+                    response.put("success", true);
+                    response.put("message", "Hủy đặt phòng thành công!");
+                } else {
+                    response.put("success", false);
+                    response.put("message", "Bạn không có quyền hủy đặt phòng này");
+                }
+            } else {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy thông tin đặt phòng");
+            }
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Có lỗi xảy ra khi hủy đặt phòng: " + e.getMessage());
         }
-
         return response;
     }
 
+    // Xem chi tiết đặt phòng theo ID
     @GetMapping("/booking-detail/{bookingId}")
     public String bookingDetail(@PathVariable Integer bookingId, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-
-        // For now, just show a message
-        model.addAttribute("message", "Chi tiết đặt phòng sẽ được cập nhật sớm!");
-        model.addAttribute("bookingId", bookingId);
-        
+        Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+        if (bookingOpt.isPresent()) {
+            BookingOrderEntity booking = bookingOpt.get();
+            String currentUserEmail = authentication.getName();
+            if (currentUserEmail.equals(booking.getEmail())) {
+                model.addAttribute("booking", booking);
+                model.addAttribute("room", booking.getRoom());
+                // Truyền avatarPath
+                String avatarPath = null;
+                if (booking.getCustomer() != null && booking.getCustomer().getAvatar() != null && !booking.getCustomer().getAvatar().isEmpty()) {
+                    avatarPath = "/img/customers/" + booking.getCustomer().getAvatar();
+                } else {
+                    avatarPath = "/img/customers/default-avatar.png";
+                }
+                model.addAttribute("avatarPath", avatarPath);
+                if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
+                    long nights = java.time.temporal.ChronoUnit.DAYS.between(
+                        booking.getCheckInDate(), booking.getCheckOutDate());
+                    model.addAttribute("nights", nights);
+                }
+            } else {
+                model.addAttribute("error", "Bạn không có quyền xem thông tin đặt phòng này");
+            }
+        } else {
+            model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
+        }
         return "Client/booking-detail";
     }
 
+    // Chỉnh sửa thông tin cá nhân
     @GetMapping("/profile/edit")
     public String editProfile(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-
         String email = authentication.getName();
-        
         try {
-            // Get user from system_users table
             SystemUserEntity systemUser = systemUserService.findByEmail(email);
             if (systemUser == null) {
                 model.addAttribute("error", "Không tìm thấy thông tin người dùng");
                 return "Client/edit-profile";
             }
-
-            // If user is CUSTOMER, get detailed info from customers table
             if ("CUSTOMER".equals(systemUser.getRole())) {
                 CustomersEntity customer = customersService.findBySystemUser(systemUser);
                 if (customer != null) {
                     model.addAttribute("customer", customer);
                 }
-                model.addAttribute("systemUser", systemUser);
-            } else {
-                model.addAttribute("systemUser", systemUser);
             }
-
+            model.addAttribute("systemUser", systemUser);
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
-
         return "Client/edit-profile";
     }
 
+    // Cập nhật thông tin cá nhân
     @PostMapping("/profile/update")
     @ResponseBody
     public Map<String, Object> updateProfile(@RequestParam(required = false) String fullName,
@@ -465,9 +508,7 @@ public class BookingController {
                                             @RequestParam(required = false) String currentPassword,
                                             @RequestParam(required = false) String newPassword,
                                             @RequestParam(required = false) String confirmPassword) {
-        
         Map<String, Object> response = new HashMap<>();
-        
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
@@ -475,106 +516,54 @@ public class BookingController {
                 response.put("message", "Vui lòng đăng nhập");
                 return response;
             }
-
             String email = authentication.getName();
             SystemUserEntity systemUser = systemUserService.findByEmail(email);
-            
             if (systemUser == null) {
                 response.put("success", false);
                 response.put("message", "Không tìm thấy thông tin người dùng");
                 return response;
             }
-
-            // Update customer information if provided
-            if (fullName != null || phone != null || address != null) {
-                if ("CUSTOMER".equals(systemUser.getRole())) {
-                    CustomersEntity customer = customersService.findBySystemUser(systemUser);
-                    if (customer != null) {
-                        if (fullName != null && !fullName.trim().isEmpty()) {
-                            customer.setName(fullName.trim());
-                        }
-                        if (phone != null && !phone.trim().isEmpty()) {
-                            customer.setPhone(phone.trim());
-                        }
-                        if (address != null && !address.trim().isEmpty()) {
-                            customer.setAddress(address.trim());
-                        }
-                        customersService.save(customer);
+            if ("CUSTOMER".equals(systemUser.getRole())) {
+                CustomersEntity customer = customersService.findBySystemUser(systemUser);
+                if (customer != null) {
+                    if (fullName != null && !fullName.trim().isEmpty()) {
+                        customer.setName(fullName.trim());
                     }
+                    if (phone != null && !phone.trim().isEmpty()) {
+                        customer.setPhone(phone.trim());
+                    }
+                    if (address != null && !address.trim().isEmpty()) {
+                        customer.setAddress(address.trim());
+                    }
+                    customersService.save(customer);
                 }
             }
-
-            // Update password if provided
             if (newPassword != null && !newPassword.trim().isEmpty()) {
                 if (currentPassword == null || currentPassword.trim().isEmpty()) {
                     response.put("success", false);
                     response.put("message", "Vui lòng nhập mật khẩu hiện tại");
                     return response;
                 }
-                
                 if (!newPassword.equals(confirmPassword)) {
                     response.put("success", false);
                     response.put("message", "Mật khẩu mới không khớp");
                     return response;
                 }
-
-                // Verify current password (simplified - you should use proper password encoder)
+                // TODO: Use proper password encoder
                 if (!systemUser.getPassword().equals(currentPassword)) {
                     response.put("success", false);
                     response.put("message", "Mật khẩu hiện tại không đúng");
                     return response;
                 }
-
-                // Update password
                 systemUser.setPassword(newPassword);
                 systemUserService.save(systemUser);
             }
-
             response.put("success", true);
             response.put("message", "Cập nhật thông tin thành công!");
-
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Có lỗi xảy ra: " + e.getMessage());
         }
-
         return response;
-    }
-
-
-    // Trang xác nhận cuối cùng
-    @GetMapping("/booking-confirmation")
-    public String showConfirmation(@RequestParam Integer bookingId, Model model) {
-        try {
-            // Lấy thông tin booking để hiển thị xác nhận
-            // TODO: Implement booking confirmation service
-            model.addAttribute("bookingId", bookingId);
-            return "Page/BookingConfirmation";
-        } catch (Exception e) {
-            model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
-            return "redirect:/";
-        }
-    }
-
-
-
-
-
-    // Test endpoint để kiểm tra dữ liệu
-    @GetMapping("/test-data")
-    public String testData(Model model) {
-        try {
-            // Kiểm tra rooms
-            List<RoomEntity> rooms = roomService.findAll();
-            model.addAttribute("rooms", rooms);
-            
-            // Kiểm tra status
-            // TODO: Add status service
-            
-            return "test-data";
-        } catch (Exception e) {
-            model.addAttribute("error", "Lỗi: " + e.getMessage());
-            return "error";
-        }
     }
 }

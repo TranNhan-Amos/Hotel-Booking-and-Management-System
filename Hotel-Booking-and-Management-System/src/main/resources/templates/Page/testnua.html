@@ -4,199 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chỉnh sửa thông tin cá nhân</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 20px 20px 0 0 !important;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .card-header h3 {
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control {
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        .section-divider {
-            border-top: 2px solid #e9ecef;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .section-divider::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-        }
-
-        .back-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .info-display {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .info-display strong {
-            color: #667eea;
-        }
-
-        .avatar-container {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #667eea;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #e9ecef;
-            color: #6c757d;
-            font-size: 3rem;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .btn-outline-primary {
-            border-color: #667eea;
-            color: #667eea;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #667eea;
-            border-color: #667eea;
-            color: white;
-        }
-
-        .btn-outline-danger {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
-    </style>
+    <!-- Font Awesome đã được bao gồm trong style.css chính -->
+    <link rel="stylesheet" href="style.css">
 </head>
+<style>
+    
+</style>
 <body>
     <div class="container">
         <div class="row justify-content-center">
@@ -283,17 +96,17 @@
                             
                             <div class="form-group">
                                 <label for="fullName" class="form-label">Họ tên</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" th:value="${customer.name}" required>
+                                <input type="text" class="form-input" id="fullName" name="fullName" th:value="${customer.name}" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="phone" class="form-label">Số điện thoại</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" th:value="${customer.phone}" required>
+                                <input type="tel" class="form-input" id="phone" name="phone" th:value="${customer.phone}" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="address" class="form-label">Địa chỉ</label>
-                                <textarea class="form-control" id="address" name="address" rows="3" th:text="${customer.address}" required></textarea>
+                                <textarea class="form-input" id="address" name="address" rows="3" th:text="${customer.address}" required></textarea>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -309,17 +122,17 @@
                             
                             <div class="form-group">
                                 <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
-                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                <input type="password" class="form-input" id="currentPassword" name="currentPassword" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="newPassword" class="form-label">Mật khẩu mới</label>
-                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                <input type="password" class="form-input" id="newPassword" name="newPassword" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
-                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" required>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -343,18 +156,22 @@
         </div>
     </div>
 
-    <!-- Toast notification -->
-    <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto" id="toastTitle">Thông báo</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body" id="toastMessage">
-        </div>
-    </div>
+    <!-- Toast notification HTML đã được xóa, sẽ sử dụng toast toàn cục từ script.js -->
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
     <script>
+        // Adapter for showToast to match the global function signature
+        // Original: function showToast(type, message)
+        // Global: function showToast(message, type = "success")
+        function showToast(type, message) {
+            if (typeof window.showToast === 'function') {
+                window.showToast(message, type); // Swap arguments to match global function
+            } else {
+                console.warn("Global showToast function not found. Falling back to console log.");
+                console.log(`Toast (${type}): ${message}`);
+            }
+        }
+
         // Update personal info form submission
         const updateInfoForm = document.getElementById('updateInfoForm');
         if (updateInfoForm) {
@@ -409,24 +226,6 @@
                 console.error('Error:', error);
             });
         });
-  
-        // Toast notification function
-        function showToast(type, message) {
-            const toast = document.getElementById('toast');
-            const toastTitle = document.getElementById('toastTitle');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            // Set title and message
-            toastTitle.textContent = type === 'success' ? 'Thành công' : 'Lỗi';
-            toastMessage.textContent = message;
-            
-            // Set toast class
-            toast.className = `toast ${type === 'success' ? 'bg-success text-white' : 'bg-danger text-white'}`;
-            
-            // Show toast
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-        }
 
         // Password confirmation validation
         document.getElementById('confirmPassword').addEventListener('input', function() {
@@ -519,4 +318,4 @@
         }
     </script>
 </body>
-</html> 
+</html>

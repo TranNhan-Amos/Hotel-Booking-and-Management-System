@@ -186,10 +186,19 @@
                 <!-- Bookings Section -->
                 <div id="bookings" class="content-section">
                     <div class="booking-grid">
-                        <div class="booking-card">
+                        <div th:if="${bookings != null and #lists.isEmpty(bookings)}" class="no-booking-msg">
+                            <p>Bạn chưa có lịch sử đặt phòng nào.</p>
+                        </div>
+                        <div th:each="booking : ${bookings}" class="booking-card">
                             <div class="booking-header">
-                                <div class="booking-id">#GR2024001</div>
-                                <div class="booking-dates">15/12/2024 - 18/12/2024 • 3 đêm</div>
+                                <div class="booking-id">#BK<span th:text="${booking.bookingId}">0000</span></div>
+                                <div class="booking-dates">
+                                    <span th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">--/--/----</span>
+                                    -
+                                    <span th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">--/--/----</span>
+                                    •
+                                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate)}">0</span> đêm
+                                </div>
                             </div>
                             <div class="booking-body">
                                 <div class="booking-room">
@@ -197,57 +206,17 @@
                                         <i class="fas fa-bed"></i>
                                     </div>
                                     <div class="room-info">
-                                        <h4>Deluxe Ocean View</h4>
-                                        <p>Phòng 201 • 2 khách • King bed</p>
+                                        <h4 th:text="${booking.room != null ? booking.room.type : 'N/A'}">Loại phòng</h4>
+                                        <p>
+                                            <span th:text="${booking.room != null ? booking.room.roomNumber : 'N/A'}">Phòng</span>
+                                            • <span th:text="${booking.roomQuantity}">1</span> phòng
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="booking-footer">
-                                    <span class="booking-status status-confirmed">Đã xác nhận</span>
-                                    <span class="booking-price">2,400,000 VNĐ</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="booking-card">
-                            <div class="booking-header">
-                                <div class="booking-id">#GR2024002</div>
-                                <div class="booking-dates">01/01/2024 - 03/01/2024 • 2 đêm</div>
-                            </div>
-                            <div class="booking-body">
-                                <div class="booking-room">
-                                    <div class="room-thumbnail">
-                                        <i class="fas fa-crown"></i>
-                                    </div>
-                                    <div class="room-info">
-                                        <h4>Presidential Suite</h4>
-                                        <p>Phòng 305 • 4 khách • 2 King beds</p>
-                                    </div>
-                                </div>
-                                <div class="booking-footer">
-                                    <span class="booking-status status-cancelled">Đã hủy</span>
-                                    <span class="booking-price">0 VNĐ</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="booking-card">
-                            <div class="booking-header">
-                                <div class="booking-id">#GR2024003</div>
-                                <div class="booking-dates">25/11/2024 - 27/11/2024 • 2 đêm</div>
-                            </div>
-                            <div class="booking-body">
-                                <div class="booking-room">
-                                    <div class="room-thumbnail">
-                                        <i class="fas fa-spa"></i>
-                                    </div>
-                                    <div class="room-info">
-                                        <h4>Spa Suite</h4>
-                                        <p>Phòng 102 • 2 khách • Queen bed</p>
-                                    </div>
-                                </div>
-                                <div class="booking-footer">
-                                    <span class="booking-status status-pending">Chờ xác nhận</span>
-                                    <span class="booking-price">1,800,000 VNĐ</span>
+                                    <span class="booking-status" th:text="${booking.status != null ? booking.status.statusName : 'N/A'}">Trạng thái</span>
+                                    <span class="booking-price" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
+                                    <a th:href="@{'/booking-detail/' + ${booking.bookingId}}" class="booking-detail-link" style="margin-left:10px; color:#2563eb; text-decoration:underline; font-weight:500;">Xem chi tiết</a>
                                 </div>
                             </div>
                         </div>
@@ -590,9 +559,21 @@
             }
         }
 
-        // Initialize page - Giữ nguyên từ code gốc
+        // Tự động chuyển tab nếu có ?tab=bookings trên URL
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
         document.addEventListener('DOMContentLoaded', function() {
             initializeTheme();
+            const tab = getQueryParam('tab');
+            if (tab && document.getElementById(tab)) {
+                // Tìm nav-item tương ứng
+                const nav = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent.trim().includes('Lịch sử đặt phòng'));
+                if (tab === 'bookings' && nav) {
+                    showSection('bookings', nav);
+                }
+            }
             console.log('Grand Ocean Hotel Profile Page Loaded');
         });
     </script>

@@ -1,10 +1,13 @@
 package sd19303no1.hotel_booking_and_management_system.Service;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import sd19303no1.hotel_booking_and_management_system.DTO.AdminBookingRequestDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
@@ -582,6 +586,28 @@ public class BookingOrderService {
     public List<BookingOrderEntity> findAllBookingsByPartner(Long partnerId) {
         return bookingOrderRepository.findAllBookingsByPartner(partnerId);
     }
+
+   public Map<LocalDate, ReportsPartnerDTO> getDailyBookingCount(Long partnerId, LocalDate start, LocalDate end) {
+    LocalDateTime fromDate = start.atStartOfDay();
+    LocalDateTime toDate = end.plusDays(1).atStartOfDay(); // để lấy trọn cả ngày cuối cùng
+
+    List<Object[]> rawResults = bookingOrderRepository.getBookingStatsInRange(partnerId, fromDate, toDate);
+
+    Map<LocalDate, ReportsPartnerDTO> result = new LinkedHashMap<>();
+
+    for (Object[] row : rawResults) {
+        Date date = (Date) row[0];
+        Long count = (Long) row[1];
+        BigDecimal total = (BigDecimal) row[2];
+
+        result.put(date.toLocalDate(), new ReportsPartnerDTO(count, total));
+    }
+
+    return result;
+}
+
+
+
 
     //Doanh thu hôm nay theo partner
     public Integer sumDoanhThuToday(Long partnerId) {

@@ -3,8 +3,10 @@ package sd19303no1.hotel_booking_and_management_system.Controller.AuthPageContro
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
+import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
@@ -190,68 +194,74 @@ public class PartnerController {
     
 
 
-    @GetMapping("/partner/reports")
-    public String viewPartnerReports(@RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            Model model) {
-        try {
-            // Lấy thông tin người dùng đã đăng nhập
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String userEmail = authentication.getName();
+  @GetMapping("/partner/reports")
+public String viewPartnerReports(@RequestParam(required = false) String startDate,
+                                 @RequestParam(required = false) String endDate,
+                                 Model model) {
+    try {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
 
-            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+        if (systemUser != null && systemUser.isPartner()) {
+            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
 
-            if (systemUser != null && systemUser.isPartner()) {
-                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+            if (partner != null) {
+                Long partnerId = partner.getId();
 
-                if (partner != null) {
-                    Long partnerId = partner.getId();
+                // ✅ Xử lý ngày trước
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                String defaultDate = LocalDate.now().format(formatter);
 
-                    // Chuyển đổi ngày từ chuỗi sang LocalDate
-                    LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
-                    LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
+                startDate = (startDate != null && !startDate.isEmpty()) ? startDate : defaultDate;
+                endDate = (endDate != null && !endDate.isEmpty()) ? endDate : defaultDate;
 
-                    BigDecimal totalRevenue = BigDecimal.ZERO;
-                    Long totalBookings = 0L;
+                LocalDate start = LocalDate.parse(startDate);
+                LocalDate end = LocalDate.parse(endDate);
 
-                    // Chỉ lấy dữ liệu nếu cả startDate và endDate đều được nhập
-                    if (start != null && end != null) {
-                        List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
+                // ✅ Gọi service với ngày đã xử lý
+                Map<LocalDate, ReportsPartnerDTO> DayReports = bookingOrderService.getDailyBookingCount(partnerId, start, end);
 
-                        totalRevenue = (reportData != null && !reportData.isEmpty() && reportData.get(0)[0] != null)
-                                ? (BigDecimal) reportData.get(0)[0]
-                                : BigDecimal.ZERO;
-                        totalBookings = (reportData != null && !reportData.isEmpty() && reportData.get(0)[1] != null)
-                                ? ((Number) reportData.get(0)[1]).longValue()
-                                : 0L;
+                BigDecimal totalRevenue = BigDecimal.ZERO;
+                Long totalBookings = 0L;
 
-                        System.out.println("Filtered from: " + start + " to " + end);
-                        System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
-                    } else {
-                        System.out.println("No date range selected.");
-                    }
+                if (start != null && end != null) {
+                    List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
 
-                    model.addAttribute("totalRevenue", totalRevenue);
-                    model.addAttribute("totalBookings", totalBookings);
-                    model.addAttribute("startDate", startDate);
-                    model.addAttribute("endDate", endDate);
-                    model.addAttribute("partnerId", partnerId);
+                    totalRevenue = (reportData != null && !reportData.isEmpty() && reportData.get(0)[0] != null)
+                            ? (BigDecimal) reportData.get(0)[0]
+                            : BigDecimal.ZERO;
+                    totalBookings = (reportData != null && !reportData.isEmpty() && reportData.get(0)[1] != null)
+                            ? ((Number) reportData.get(0)[1]).longValue()
+                            : 0L;
 
-                    return "Partner/ReportsPartner";
-                } else {
-                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
-                    return "Partner/ReportsPartner";
+                    System.out.println("Filtered from: " + start + " to " + end);
+                    System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
                 }
+
+                model.addAttribute("totalRevenue", totalRevenue);
+                model.addAttribute("totalBookings", totalBookings);
+                model.addAttribute("startDate", startDate);
+                model.addAttribute("endDate", endDate);
+                model.addAttribute("partnerId", partnerId);
+                model.addAttribute("DayReports", DayReports);
+
+                return "Partner/ReportsPartner";
             } else {
-                model.addAttribute("error", "Bạn không có quyền truy cập.");
+                model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
                 return "Partner/ReportsPartner";
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
+        } else {
+            model.addAttribute("error", "Bạn không có quyền truy cập.");
             return "Partner/ReportsPartner";
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+        model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
+        return "Partner/ReportsPartner";
     }
+}
+
 
     @GetMapping("/partner/reviews")
     public String viewPartnerReviews() {

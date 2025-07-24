@@ -1,261 +1,459 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Phòng - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/management-Room.css}">
+    <title>Admin KS - Quản Lý Phòng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        body { background: #f4f6fa; }
-        .room-admin-flex {
-            display: flex;
-            gap: 32px;
-            align-items: flex-start;
-            margin-top: 32px;
+        .gradient-bg {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #4f46e5 100%);
         }
-        .room-list-section {
-            flex: 2;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 16px #0002;
-            padding: 28px 18px 24px 18px;
-            min-width: 0;
+        
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        .room-form-section {
-            flex: 1.2;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 16px #0002;
-            padding: 32px 24px;
-            min-width: 320px;
-            max-width: 420px;
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
+        
+        .image-hover {
+            transition: transform 0.3s ease;
         }
-        .section-header h2 {
-            color: #1976d2;
-            font-size: 1.5rem;
-            margin: 0;
+        
+        .card-hover:hover .image-hover {
+            transform: scale(1.05);
         }
-        .add-btn {
-            background: #43a047;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 18px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: background 0.2s;
+        
+        .backdrop-blur {
+            backdrop-filter: blur(10px);
         }
-        .add-btn:hover { background: #388e3c; }
-        .filter-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        .filter-row input, .filter-row select {
-            padding: 6px 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 15px;
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
         }
-        .room-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #fff;
-        }
-        .room-table th, .room-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-        .room-table th {
-            background: #f7f7f7;
-            font-weight: 600;
-            color: #1976d2;
-        }
-        .room-table tr:hover { background: #f0f4fa; }
-        .room-table .room-thumb {
-            width: 54px;
-            height: 36px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .status-badge {
+        
+        .dropdown {
+            position: relative;
             display: inline-block;
-            padding: 3px 12px;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #fff;
+            padding: 8px 0;
+            top: 100%;
+            right: 0;
         }
-        .status-badge.active { background: #43a047; }
-        .status-badge.inactive { background: #e53935; }
-        .action-btn {
-            margin-right: 4px;
-            padding: 5px 12px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            transition: background 0.2s;
-        }
-        .edit-btn { background: #1976d2; color: #fff; }
-        .edit-btn:hover { background: #125ea2; }
-        .delete-btn { background: #e53935; color: #fff; }
-        .delete-btn:hover { background: #b71c1c; }
-        .view-btn { background: #ff9800; color: #fff; }
-        .view-btn:hover { background: #f57c00; }
-        .no-room {
-            text-align: center;
-            color: #888;
-            font-style: italic;
-        }
-        .notify-box {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-            border-radius: 6px;
-            padding: 12px 18px;
-            margin-bottom: 16px;
-        }
-        /* Form thêm phòng */
-        .form-title {
-            text-align: center;
-            color: #1976d2;
-            margin-bottom: 18px;
-            letter-spacing: 1px;
-        }
-        .add-room-form label {
-            font-weight: 500;
-            margin-bottom: 4px;
+        
+        .dropdown:hover .dropdown-content {
             display: block;
         }
-        .add-room-form input, .add-room-form select, .add-room-form textarea {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-bottom: 14px;
-            font-size: 15px;
+        
+        .dropdown-item {
+            color: #374151;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
         }
-        .add-room-form .form-row {
-            display: flex;
-            gap: 14px;
+        
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
         }
-        .add-room-form .form-row > div {
-            flex: 1;
-        }
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 18px;
-        }
-        .add-btn-form {
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 28px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .reset-btn {
-            background: #888;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 28px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        @media (max-width: 1100px) {
-            .room-admin-flex { flex-direction: column; }
-            .room-form-section { max-width: 100%; margin-top: 24px; }
-        }
-        @media (max-width: 700px) {
-            .room-list-section, .room-form-section { padding: 10px 2px; }
-            .add-room-form .form-row { flex-direction: column; }
+        
+        .select-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
         }
     </style>
 </head>
-<body>
-<div class="container room-admin-container">
+<body class="min-h-screen bg-gray-100">
+    <!-- Header Navigation -->
     <div th:replace="~{/Layout/NavbarAdmin}"></div>
-    <div class="main-content">
-        <div class="room-admin-flex">
-            <!-- Danh sách phòng (bên trái) -->
-            <div class="room-list-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-bed"></i> Quản Lý Phòng</h2>
-                    <a th:href="@{'/admin/rooms/add'(partnerId=${selectedPartnerId})}" class="add-btn"><i class="fas fa-plus"></i> Thêm phòng mới</a>
-                </div>
-                <form class="filter-row" method="get" th:action="@{/admin/rooms}">
-                    <select name="partnerId" onchange="this.form.submit()">
-                        <option value="" th:text="'-- Chọn công ty --'" th:selected="${selectedPartnerId == null}"></option>
-                        <option th:each="partner : ${partners}" th:value="${partner.id}" th:text="${partner.companyName}" th:selected="${partner.id} == ${selectedPartnerId}"></option>
-                    </select>
-                    <input type="text" name="search" placeholder="Tìm tên phòng..." th:value="${search}">
-                    <select name="status">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="active" th:selected="${status == 'active'}">Đang hoạt động</option>
-                        <option value="inactive" th:selected="${status == 'inactive'}">Ngừng hoạt động</option>
-                    </select>
-                    <button type="submit" class="action-btn view-btn"><i class="fas fa-search"></i></button>
-                </form>
-                <div th:if="${selectedPartnerId == null}" class="notify-box">
-                    <p>Vui lòng chọn công ty để xem danh sách phòng.</p>
-                </div>
-                <div th:if="${rooms != null}" class="room-table-box" style="overflow-x:auto;max-height:420px;overflow-y:auto;">
-                    <table class="room-table">
-                        <thead>
-                        <tr>
-                            <th>Ảnh</th>
-                            <th>Mã phòng</th>
-                            <th>Tên phòng</th>
-                            <th>Loại</th>
-                            <th>Giá</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:if="${rooms.size() == 0}">
-                            <td colspan="7" class="no-room">Không có phòng nào cho công ty này.</td>
-                        </tr>
-                        <tr th:each="room : ${rooms}">
-                            <td>
-                                <img th:if="${room.imageUrls != null && !room.imageUrls.isEmpty()}" th:src="@{'/img/rooms/' + ${room.imageUrls[0]}}" class="room-thumb" alt="Ảnh phòng">
-                                <span th:if="${room.imageUrls == null || room.imageUrls.isEmpty()}">-</span>
-                            </td>
-                            <td th:text="${room.roomId}"></td>
-                            <td th:text="${room.roomNumber}"></td>
-                            <td th:text="${room.type}"></td>
-                            <td th:text="${room.price}"></td>
-                            <td>
-                                <span th:text="${room.status == 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}"
-                                      th:classappend="' status-badge ' + ${room.status}"></span>
-                            </td>
-                            <td>
-                                <a th:href="@{'/admin/rooms/edit/' + ${room.roomId}}" class="action-btn edit-btn"><i class="fas fa-edit"></i> Sửa</a>
-                                <a th:href="@{'/admin/rooms/delete/' + ${room.roomId}}" class="action-btn delete-btn" onclick="return confirm('Bạn có chắc muốn xóa phòng này?')"><i class="fas fa-trash"></i> Xóa</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+
+    <!-- Main Content -->
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <!-- Page Header with Stats -->
+            <div class="gradient-bg text-white p-8 rounded-2xl shadow-xl">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white/20 p-3 rounded-xl">
+                            <i data-lucide="bed" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold">Quản Lý Phòng</h1>
+                            <p class="text-purple-100">Quản lý và theo dõi tình trạng phòng khách sạn</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
+                            <div class="text-2xl font-bold">156</div>
+                            <div class="text-sm text-purple-100">Tổng phòng</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
+                            <div class="text-2xl font-bold text-green-300">89</div>
+                            <div class="text-sm text-purple-100">Còn trống</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
+                            <div class="text-2xl font-bold text-yellow-300">45</div>
+                            <div class="text-sm text-purple-100">Đã đặt</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
+                            <div class="text-2xl font-bold text-red-300">22</div>
+                            <div class="text-sm text-purple-100">Bảo trì</div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Filters and Controls -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <select class="select-custom w-full sm:w-64 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
+                            <option>🏢 Chọn công ty quản lý</option>
+                            <option value="company1">🏨 Grand Hotel & Resort</option>
+                            <option value="company2">🌟 Luxury Palace Hotel</option>
+                            <option value="company3">🏖️ Seaside Resort & Spa</option>
+                        </select>
+
+                        <select class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
+                            <option>📊 Trạng thái phòng</option>
+                            <option value="all">Tất cả phòng</option>
+                            <option value="available">✅ Còn trống</option>
+                            <option value="occupied">🔴 Đã đặt</option>
+                            <option value="maintenance">🔧 Bảo trì</option>
+                            <option value="cleaning">🧹 Đang dọn</option>
+                        </select>
+
+                        <select class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
+                            <option>🏠 Loại phòng</option>
+                            <option value="all">Tất cả loại</option>
+                            <option value="standard">Standard</option>
+                            <option value="deluxe">Deluxe</option>
+                            <option value="suite">Suite</option>
+                            <option value="presidential">Presidential</option>
+                        </select>
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <div class="relative">
+                            <input
+                                type="text"
+                                placeholder="🔍 Tìm kiếm phòng..."
+                                class="w-64 h-12 pl-4 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                            />
+                        </div>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-200 font-medium shadow-lg">
+                            + Thêm phòng mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="roomGrid">
+                <!-- Room Card 1 - Available -->
+                <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <img
+                            src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=300&h=200&fit=crop"
+                            alt="Deluxe Room"
+                            class="w-full h-48 object-cover image-hover"
+                        />
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                ✅ Còn trống
+                            </span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-white/90 backdrop-blur text-gray-800 px-2 py-1 rounded-lg text-sm font-bold">
+                                #101
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-gray-800">Deluxe Ocean View</h3>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
+                                <span class="text-sm font-medium">4.8</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">2 giường đôi • 35m² • View biển</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-2xl font-bold text-purple-600">2,500,000₫</div>
+                            <div class="text-sm text-gray-500">/đêm</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                                Chi tiết
+                            </button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                ⚙️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 2 - Occupied -->
+                <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <img
+                            src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=300&h=200&fit=crop"
+                            alt="Suite Room"
+                            class="w-full h-48 object-cover image-hover"
+                        />
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">🔴 Đã đặt</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-white/90 backdrop-blur text-gray-800 px-2 py-1 rounded-lg text-sm font-bold">
+                                #205
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-gray-800">Presidential Suite</h3>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
+                                <span class="text-sm font-medium">5.0</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">1 giường king • 85m² • Jacuzzi</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-2xl font-bold text-purple-600">8,500,000₫</div>
+                            <div class="text-sm text-gray-500">/đêm</div>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-3">
+                            <div>👤 Nguyễn Văn A</div>
+                            <div>📅 15/01 - 18/01/2024</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                                Chi tiết
+                            </button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                ⚙️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 3 - Maintenance -->
+                <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <img
+                            src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=300&h=200&fit=crop"
+                            alt="Standard Room"
+                            class="w-full h-48 object-cover image-hover grayscale"
+                        />
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                🔧 Bảo trì
+                            </span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-white/90 backdrop-blur text-gray-800 px-2 py-1 rounded-lg text-sm font-bold">
+                                #308
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-gray-800">Standard Room</h3>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
+                                <span class="text-sm font-medium">4.2</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">1 giường đôi • 25m² • City view</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-2xl font-bold text-gray-400">1,200,000₫</div>
+                            <div class="text-sm text-gray-500">/đêm</div>
+                        </div>
+                        <div class="text-sm text-orange-600 mb-3">
+                            <div>🔧 Sửa chữa điều hòa</div>
+                            <div>📅 Hoàn thành: 20/01/2024</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-gray-400 text-white py-2 rounded-lg cursor-not-allowed text-sm font-medium">
+                                Đang bảo trì
+                            </button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                ⚙️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 4 - Cleaning -->
+                <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden border border-gray-100">
+                    <div class="relative">
+                        <img
+                            src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=300&h=200&fit=crop"
+                            alt="Deluxe Room"
+                            class="w-full h-48 object-cover image-hover"
+                        />
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">🧹 Đang dọn</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-white/90 backdrop-blur text-gray-800 px-2 py-1 rounded-lg text-sm font-bold">
+                                #412
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-gray-800">Deluxe Garden View</h3>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
+                                <span class="text-sm font-medium">4.6</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">2 giường đơn • 30m² • View vườn</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-2xl font-bold text-purple-600">1,800,000₫</div>
+                            <div class="text-sm text-gray-500">/đêm</div>
+                        </div>
+                        <div class="text-sm text-blue-600 mb-3">
+                            <div>🧹 Dọn dẹp sau khách</div>
+                            <div>⏰ Hoàn thành: 30 phút</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                Chi tiết
+                            </button>
+                            <button class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                ⚙️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center">
+                <button class="bg-white border-2 border-purple-200 text-purple-600 px-8 py-3 rounded-xl hover:bg-purple-50 transition-all duration-200 font-medium shadow-sm">
+                    Xem thêm phòng
+                </button>
+            </div>
         </div>
-    </div>
-</div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.querySelector('input[placeholder*="Tìm kiếm"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const roomCards = document.querySelectorAll('#roomGrid > div');
+                    
+                    roomCards.forEach(card => {
+                        const roomName = card.querySelector('h3').textContent.toLowerCase();
+                        const roomNumber = card.querySelector('.absolute.top-3.right-3 span').textContent.toLowerCase();
+                        
+                        if (roomName.includes(searchTerm) || roomNumber.includes(searchTerm)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Filter functionality
+            const filterSelects = document.querySelectorAll('select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    console.log('Filter changed:', this.value);
+                    // Add filter logic here
+                });
+            });
+
+            // Button click handlers
+            const detailButtons = document.querySelectorAll('button:contains("Chi tiết")');
+            detailButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Mở chi tiết phòng');
+                });
+            });
+
+            // Add room button
+            const addRoomButton = document.querySelector('button:contains("Thêm phòng mới")');
+            if (addRoomButton) {
+                addRoomButton.addEventListener('click', function() {
+                    alert('Mở form thêm phòng mới');
+                });
+            }
+
+            // Load more button
+            const loadMoreButton = document.querySelector('button:contains("Xem thêm")');
+            if (loadMoreButton) {
+                loadMoreButton.addEventListener('click', function() {
+                    // Add loading animation
+                    this.innerHTML = '<span class="animate-pulse">Đang tải...</span>';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = 'Xem thêm phòng';
+                        alert('Tải thêm phòng thành công!');
+                    }, 1500);
+                });
+            }
+        });
+
+        // Responsive menu toggle for mobile
+        function toggleMobileMenu() {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('hidden');
+        }
+
+        // Update stats dynamically
+        function updateStats() {
+            const stats = {
+                total: Math.floor(Math.random() * 200) + 100,
+                available: Math.floor(Math.random() * 100) + 50,
+                occupied: Math.floor(Math.random() * 60) + 30,
+                maintenance: Math.floor(Math.random() * 30) + 10
+            };
+
+            document.querySelector('.text-2xl.font-bold:nth-child(1)').textContent = stats.total;
+            document.querySelector('.text-green-300').textContent = stats.available;
+            document.querySelector('.text-yellow-300').textContent = stats.occupied;
+            document.querySelector('.text-red-300').textContent = stats.maintenance;
+        }
+
+        // Auto-update stats every 30 seconds
+        setInterval(updateStats, 30000);
+    </script>
 </body>
 </html>

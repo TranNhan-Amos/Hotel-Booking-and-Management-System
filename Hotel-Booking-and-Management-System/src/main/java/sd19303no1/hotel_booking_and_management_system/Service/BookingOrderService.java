@@ -138,7 +138,7 @@ public class BookingOrderService {
         // 5. Tạo đối tượng BookingOrderEntity
 
         // 6. Tính toán tổng tiền
-        BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), checkInDate, checkOutDate, voucherEntity);
+        BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), checkInDate, checkOutDate, voucherEntity, roomQuantity);
 
         // 7. Tạo đối tượng BookingOrderEntity
 
@@ -193,12 +193,12 @@ public class BookingOrderService {
     }
 
     // Tính toán tổng tiền
-    public BigDecimal calculateTotalPrice(BigDecimal roomPrice, LocalDate checkInDate, LocalDate checkOutDate, VoucherEntity voucher) {
+    public BigDecimal calculateTotalPrice(BigDecimal roomPrice, LocalDate checkInDate, LocalDate checkOutDate, VoucherEntity voucher, Integer roomQuantity) {
         // Tính số đêm
         long nights = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
         
-        // Giá cơ bản
-        BigDecimal basePrice = roomPrice.multiply(BigDecimal.valueOf(nights));
+        // Giá cơ bản (nhân với số lượng phòng)
+        BigDecimal basePrice = roomPrice.multiply(BigDecimal.valueOf(nights)).multiply(BigDecimal.valueOf(roomQuantity));
         
         // Phí dịch vụ (10%)
         BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
@@ -347,6 +347,22 @@ public class BookingOrderService {
         return bookingOrderRepository.save(booking);
     }
 
+    // Xác nhận giữ phòng (không set PAID, chỉ CONFIRMED)
+    @Transactional
+    public BookingOrderEntity confirmBooking(Integer bookingId) {
+        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
+        StatusEntity confirmedStatus = statusRepository.findByStatusNameIgnoreCase("CONFIRMED");
+        if (confirmedStatus == null) {
+            confirmedStatus = new StatusEntity();
+            confirmedStatus.setStatusName("CONFIRMED");
+            confirmedStatus.setDescription("Đã xác nhận");
+            confirmedStatus = statusRepository.save(confirmedStatus);
+        }
+        booking.setStatus(confirmedStatus);
+        return bookingOrderRepository.save(booking);
+    }
+
     // Check-in
     @Transactional
     public BookingOrderEntity checkIn(Integer bookingId) {
@@ -477,8 +493,10 @@ public class BookingOrderService {
         }
 
         // Tính toán lại tổng tiền
-        BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), dto.getCheckInDate(), dto.getCheckOutDate(), booking.getVoucher());
+        Integer roomQuantity = dto.getRoomQuantity() != null ? dto.getRoomQuantity() : (booking.getRoomQuantity() != null ? booking.getRoomQuantity() : 1);
+        BigDecimal totalPrice = calculateTotalPrice(room.getPrice(), dto.getCheckInDate(), dto.getCheckOutDate(), booking.getVoucher(), roomQuantity);
         booking.setTotalPrice(totalPrice);
+        booking.setRoomQuantity(roomQuantity);
 
         String statusNameToSet;
         if (existingBookingId == null && isCustomerFlowTriggered) {

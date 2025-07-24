@@ -56,25 +56,72 @@
                         <span>Giá phòng:</span>
                         <span th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫/đêm' : 'Chưa có'}">Giá phòng</span>
                     </div>
+                    <div class="summary-item">
+                        <span>Phòng còn trống:</span>
+                        <span th:text="${room != null and room.totalRooms != null ? room.totalRooms + ' phòng' : 'Chưa có thông tin'}">Số phòng</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Detailed Booking Form -->
             <div class="booking-form">
                 <h2>Thông tin chi tiết</h2>
-                <form th:action="@{/bookings}" method="post" id="detailedBookingForm">
+                <form th:action="@{/process-booking}" method="post" id="detailedBookingForm">
                     <!-- Hidden fields for room data -->
                     <input type="hidden" name="roomId" th:value="${room != null ? room.roomId : ''}">
                     <input type="hidden" name="checkInDate" th:value="${checkInDate}">
                     <input type="hidden" name="checkOutDate" th:value="${checkOutDate}">
                     
+                    <!-- Room Quantity Selection -->
+                    <div class="form-section">
+                        <h3>Chọn số lượng phòng</h3>
+                        <div class="room-quantity-section">
+                            <div class="quantity-info">
+                                <p><i class="fas fa-info-circle"></i> Chọn số lượng phòng bạn muốn đặt</p>
+                                <p class="room-available" th:if="${room != null and room.totalRooms != null}">
+                                    <i class="fas fa-door-open"></i> Còn <strong th:text="${room.totalRooms}">0</strong> phòng trống
+                                </p>
+                                <p class="room-warning" th:if="${room != null and room.totalRooms != null and room.totalRooms <= 2}" style="color: #f39c12; font-weight: 600;">
+                                    <i class="fas fa-exclamation-triangle"></i> Chỉ còn ít phòng trống! Hãy đặt ngay
+                                </p>
+                            </div>
+                            <div class="form-group quantity-group">
+                                <label for="roomQuantity">Số lượng phòng *</label>
+                                <div class="quantity-controls">
+                                    <button type="button" class="quantity-btn" onclick="decreaseQuantity()">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="roomQuantity" name="roomQuantity" 
+                                           min="1" th:max="${maxRoomsToBook != null ? maxRoomsToBook : 5}" value="1" required 
+                                           onchange="updateQuantity()" oninput="updateQuantity()">
+                                    <button type="button" class="quantity-btn" onclick="increaseQuantity()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="quantity-help">
+                                    <small th:text="'Tối đa ' + ${maxRoomsToBook != null ? maxRoomsToBook : 5} + ' phòng cho mỗi lần đặt'">Tối đa 5 phòng cho mỗi lần đặt</small>
+                                </div>
+                            </div>
+                            <div class="quantity-summary">
+                                <div class="summary-row">
+                                    <span>Giá mỗi phòng:</span>
+                                    <span id="pricePerRoom" th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫/đêm' : '0 ₫/đêm'}">0 ₫/đêm</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Số đêm:</span>
+                                    <span id="nightsDisplay" th:text="${nights != null ? nights + ' đêm' : '0 đêm'}">0 đêm</span>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <span>Tổng giá phòng:</span>
+                                    <span id="totalRoomPrice">0 ₫</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Customer Information -->
                     <div class="form-section">
                         <h3>Thông tin khách hàng</h3>
-                        <div class="form-group">
-                            <label for="roomQuantity">Số lượng phòng *</label>
-                            <input type="number" id="roomQuantity" name="roomQuantity" min="1" max="5" value="1" required onchange="calculatePrice()">
-                        </div>
                         <div class="form-group">
                             <label for="customerName">Họ và Tên *</label>
                             <input type="text" id="customerName" name="customerName" 
@@ -131,7 +178,8 @@
                         <h3>Tính toán giá</h3>
                         <div class="price-item">
                             <span>Giá gốc:</span>
-                            <span id="basePrice" th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
+                            <span id="basePrice" th:text="${room != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}" 
+                                  th:attr="data-base-price=${room != null ? room.price : 0}">0 ₫</span>
                         </div>
                         <div class="price-item" id="discountRow" style="display: none;">
                             <span>Giảm giá:</span>
@@ -159,27 +207,80 @@
 
     <!-- JavaScript for Booking -->
     <script>
-        // Calculate price based on nights
-        function calculatePrice() {
+        let basePricePerNight = 0;
+        let currentDiscount = 0;
+
+        // Initialize on page load
+        window.onload = function() {
+            const basePriceElem = document.getElementById('basePrice');
+            if (basePriceElem) {
+                basePriceElem.setAttribute('data-base-price', basePriceElem.textContent.replace(/[^\d]/g, ''));
+                basePricePerNight = parseFloat(basePriceElem.getAttribute('data-base-price'));
+            }
+            calculatePrice();
+        };
+
+        // Quantity controls
+        function decreaseQuantity() {
+            const quantityInput = document.getElementById('roomQuantity');
+            const currentValue = parseInt(quantityInput.value) || 1;
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                updateQuantity();
+            }
+        }
+
+        function increaseQuantity() {
+            const quantityInput = document.getElementById('roomQuantity');
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const maxValue = parseInt(quantityInput.max) || 5;
+            if (currentValue < maxValue) {
+                quantityInput.value = currentValue + 1;
+                updateQuantity();
+            }
+        }
+
+        function updateQuantity() {
+            const quantityInput = document.getElementById('roomQuantity');
+            const quantity = parseInt(quantityInput.value) || 1;
+            const maxValue = parseInt(quantityInput.max) || 5;
+            
+            // Ensure quantity is within bounds
+            if (quantity < 1) quantityInput.value = 1;
+            if (quantity > maxValue) quantityInput.value = maxValue;
+            
+            // Update total room price display
+            const nights = getNights();
+            const totalRoomPrice = basePricePerNight * quantity * nights;
+            document.getElementById('totalRoomPrice').textContent = totalRoomPrice.toLocaleString() + ' ₫';
+            
+            // Recalculate total price
+            if (currentDiscount > 0) {
+                calculatePriceWithDiscount();
+            } else {
+                calculatePrice();
+            }
+        }
+
+        function getNights() {
             const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
             const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
-            const basePricePerNight = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
             
             if (checkIn && checkOut && checkOut > checkIn) {
-                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-                const basePrice = basePricePerNight * nights;
+                return Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            }
+            return 0;
+        }
 
         // Calculate price based on nights and room quantity
         function calculatePrice() {
             const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
             const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
-            const basePricePerNight = parseFloat(document.getElementById('basePrice').getAttribute('data-base-price'));
             const roomQuantity = parseInt(document.getElementById('roomQuantity').value) || 1;
             
             if (checkIn && checkOut && checkOut > checkIn) {
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
                 const basePrice = basePricePerNight * nights * roomQuantity;
-
                 const serviceFee = basePrice * 0.1;
                 const vat = (basePrice + serviceFee) * 0.1;
                 const total = basePrice + serviceFee + vat;
@@ -188,6 +289,9 @@
                 document.getElementById('serviceFee').textContent = serviceFee.toLocaleString() + ' ₫';
                 document.getElementById('vat').textContent = vat.toLocaleString() + ' ₫';
                 document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
+                
+                // Update nights display
+                document.getElementById('nightsDisplay').textContent = nights + ' đêm';
             }
         }
 
@@ -195,8 +299,6 @@
         function applyVoucher() {
             const voucherCode = document.getElementById('voucherCode').value;
             const messageDiv = document.getElementById('voucherMessage');
-            const roomQuantity = parseInt(document.getElementById('roomQuantity').value) || 1;
-
             
             if (!voucherCode) {
                 messageDiv.innerHTML = '<span style="color: #e74c3c;">Vui lòng nhập mã giảm giá</span>';
@@ -207,49 +309,35 @@
             if (voucherCode.toUpperCase() === 'WELCOME10') {
                 messageDiv.innerHTML = '<span style="color: #27ae60;">Mã giảm giá hợp lệ! Giảm 10%</span>';
                 document.getElementById('discountRow').style.display = 'flex';
-
-                document.getElementById('discountAmount').textContent = '-100,000 ₫';
-                // Recalculate total with discount
+                currentDiscount = 0.1; // 10% discount
                 calculatePriceWithDiscount();
             } else {
                 messageDiv.innerHTML = '<span style="color: #e74c3c;">Mã giảm giá không hợp lệ</span>';
                 document.getElementById('discountRow').style.display = 'none';
-                // Recalculate total with discount
-                calculatePriceWithDiscount();5
-            } else {
-                messageDiv.innerHTML = '<span style="color: #e74c3c;">Mã giảm giá không hợp lệ</span>';
-                document.getElementById('discountRow').style.display = 'none';
+                currentDiscount = 0;
                 calculatePrice();
-
             }
         }
 
         function calculatePriceWithDiscount() {
-
-            const basePrice = parseFloat(document.getElementById('basePrice').textContent.replace(/[^\d]/g, ''));
-            const discount = basePrice * 0.1;
-            const serviceFee = basePrice * 0.1;
-            const vat = (basePrice + serviceFee) * 0.1;
-            const total = basePrice + serviceFee + vat - discount;
-            
-            document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString() + ' ₫';
-            document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
-
-            const basePricePerNight = parseFloat(document.getElementById('basePrice').getAttribute('data-base-price'));
             const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
             const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
             const roomQuantity = parseInt(document.getElementById('roomQuantity').value) || 1;
+            
             if (checkIn && checkOut && checkOut > checkIn) {
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
                 const basePrice = basePricePerNight * nights * roomQuantity;
-                const discount = basePrice * 0.1;
+                const discount = basePrice * currentDiscount;
                 const serviceFee = basePrice * 0.1;
                 const vat = (basePrice + serviceFee) * 0.1;
                 const total = basePrice + serviceFee + vat - discount;
+                
+                document.getElementById('basePrice').textContent = basePrice.toLocaleString() + ' ₫';
                 document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString() + ' ₫';
+                document.getElementById('serviceFee').textContent = serviceFee.toLocaleString() + ' ₫';
+                document.getElementById('vat').textContent = vat.toLocaleString() + ' ₫';
                 document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₫';
             }
-
         }
 
         // Form validation
@@ -269,35 +357,12 @@
             if (!isValid) {
                 e.preventDefault();
                 alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-
             }
         });
 
-        // Initial price calculation
-        calculatePrice();
-
-            }
-        });
-
-        // Initial price calculation
-        window.onload = function() {
-            // Gán giá trị gốc cho data-base-price
-            var basePriceElem = document.getElementById('basePrice');
-            if (basePriceElem && !basePriceElem.getAttribute('data-base-price')) {
-                var price = basePriceElem.textContent.replace(/[^\d]/g, '');
-                basePriceElem.setAttribute('data-base-price', price);
-            }
-            calculatePrice();
-        };
-        document.getElementById('roomQuantity').addEventListener('change', function() {
-            // Nếu có discount đang áp dụng thì tính lại discount
-            if (document.getElementById('discountRow').style.display === 'flex') {
-                calculatePriceWithDiscount();
-            } else {
-                calculatePrice();
-            }
-        });
-
+        // Event listeners
+        document.getElementById('roomQuantity').addEventListener('change', updateQuantity);
+        document.getElementById('roomQuantity').addEventListener('input', updateQuantity);
     </script>
 
     <!-- JavaScript for Hamburger Menu -->

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${room.type + ' - Chi Tiết Phòng'}">Chi Tiết Phòng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/Css/Narbar.css}">
+    <link rel="stylesheet" th:href="@{/Css/Details.css}">
+    <link rel="stylesheet" th:href="@{/Css/footer.css}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .room-header-hero {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+        .room-header-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6) blur(2px);
+            transition: transform 0.5s ease;
+        }
+        .room-header-hero:hover img {
+            transform: scale(1.05);
+        }
+        .room-header-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+        }
+        .room-header-content {
+            position: absolute;
+            bottom: 2.5rem;
+            left: 4vw;
+            color: #fff;
+            z-index: 2;
+        }
+        .room-header-content h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .room-breadcrumb {
+            font-size: 1.15rem;
+            opacity: 1;
+            margin-bottom: 1.2rem;
+            background: rgba(79,70,229,0.12);
+            border-radius: 1.2rem;
+            padding: 0.7rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.07);
+            letter-spacing: 0.2px;
+        }
+        .room-breadcrumb a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            transition: color 0.2s;
+        }
+        .room-breadcrumb a:hover {
+            color: #dc2626;
+            text-decoration: underline;
+        }
+        .room-breadcrumb .breadcrumb-sep {
+            color: #64748b;
+            font-size: 1.2em;
+            margin: 0 0.2em;
+        }
+        .room-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .room-rating .fa-star {
+            color: #facc15;
+        }
+        .main-content-room {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        .gallery-card {
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        .gallery-slider {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .gallery-slider img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .gallery-slider:hover img {
+            transform: scale(1.03);
+        }
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+        .gallery-nav button {
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .gallery-nav button:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        .gallery-thumbs {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .gallery-thumbs img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .gallery-thumbs img.active, .gallery-thumbs img:hover {
+            border: 2px solid #4f46e5;
+            transform: scale(1.08);
+        }
+        .info-card-room {
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .room-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        .room-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.05rem;
+        }
+        .room-info-item i {
+            color: #4f46e5;
+            font-size: 1.3rem;
+        }
+        .amenities-card {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        .amenity-item i {
+            color: #10b981;
+        }
+        .desc-card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .booking-card-fresh {
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 2rem;
+            position: sticky;
+            top: 1rem;
+        }
+        .booking-header-fresh {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .booking-thumb-fresh {
+            width: 80px;
+            height: 80px;
+            border-radius: 0.8rem;
+            object-fit: cover;
+        }
+        .booking-title-fresh {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .booking-price-fresh {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .booking-form-fresh .form-floating-fresh {
+            margin-bottom: 1rem;
+        }
+        .booking-form-fresh input, .booking-form-fresh textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .booking-form-fresh input:focus, .booking-form-fresh textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+        .booking-form-fresh label {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-booking-fresh {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-booking-fresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+        .btn-booking-fresh:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+        .review-section-room {
+            max-width: 1280px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        .review-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .review-header-row h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .review-filter-select {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.6rem;
+            border: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+        .review-list-room {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .review-card-room {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .review-card-room:hover {
+            transform: translateY(-4px);
+        }
+        .review-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .review-content .reviewer-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .review-content .review-rating {
+            color: #facc15;
+            font-size: 1rem;
+        }
+        .review-content .review-date {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+        .review-content .review-comment {
+            margin: 0.8rem 0;
+            font-size: 0.95rem;
+        }
+        .review-content .review-response {
+            background: #f8fafc;
+            border-radius: 0.6rem;
+            padding: 0.8rem;
+            color: #4f46e5;
+            font-size: 0.9rem;
+        }
+        .review-form-card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin-top: 2rem;
+        }
+        .review-form .star-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .review-form .stars i {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #d1d5db;
+            transition: color 0.2s;
+        }
+        .review-form .stars i.active, .review-form .stars i:hover {
+            color: #facc15;
+        }
+        .review-form .form-group {
+            margin-bottom: 1rem;
+        }
+        .review-form input, .review-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.6rem;
+            font-size: 0.95rem;
+        }
+        .submit-review-btn {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .submit-review-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+        .related-carousel-section {
+            max-width: 1280px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        .related-carousel-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+        .related-carousel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .related-room-card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .related-room-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .related-room-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .related-room-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .related-room-desc {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        .related-room-rating {
+            color: #facc15;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .related-room-price {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+        .view-detail-btn {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.6rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .view-detail-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+        @media (max-width: 1024px) {
+            .main-content-room {
+                grid-template-columns: 1fr;
+            }
+            .booking-card-fresh {
+                position: static;
+            }
+            .room-header-hero {
+                height: 320px;
+            }
+        }
+        @media (max-width: 768px) {
+            .room-header-hero {
+                height: 260px;
+            }
+            .room-header-content h1 {
+                font-size: 2rem;
+            }
+            .gallery-slider img {
+                height: 240px;
+            }
+            .gallery-thumbs img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        @media (max-width: 480px) {
+            .room-header-hero {
+                height: 200px;
+            }
+            .room-header-content h1 {
+                font-size: 1.6rem;
+            }
+            .room-breadcrumb {
+                font-size: 0.9rem;
+            }
+            .gallery-slider img {
+                height: 180px;
+            }
+            .gallery-thumbs img {
+                width: 50px;
+                height: 50px;
+            }
+            .booking-card-fresh, .info-card-room, .gallery-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{/Layout/narbar}"></div>
+    <div class="room-header-hero">
+        <img th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng">
+        <div class="room-header-overlay"></div>
+        <div class="room-header-content">
+            <div class="room-breadcrumb">
+                <a href="/" title="Trang chủ"><i class="fas fa-home"></i> Trang chủ</a>
+                <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+                <a href="/ListRoom" title="Danh sách phòng"><i class="fas fa-list"></i> Danh sách phòng</a>
+                <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+                <span th:text="${room.type}"><i class="fas fa-bed"></i> Deluxe</span>
+            </div>
+            <h1 th:text="${room.type}">Tên phòng</h1>
+            <div class="room-rating">
+                <span th:text="${#numbers.formatDecimal(room.averageRating, 1, 1)}">4.5</span>
+                <i class="fas fa-star"></i>
+                <span th:text="${reviews.size()} + ' đánh giá'">15 đánh giá</span>
+            </div>
+        </div>
+    </div>
+    <div class="main-content-room">
+        <div class="gallery-and-info">
+            <div class="gallery-card">
+                <div class="gallery-slider" id="gallerySlider">
+                    <img id="mainGalleryImg" th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng chính">
+                    <div class="gallery-nav">
+                        <button onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="gallery-thumbs" id="galleryThumbs">
+                    <img th:each="img,iter : ${room.imageUrls}"
+                         th:src="'/' + 'img/rooms/' + ${img}" 
+                         th:class="${iter.index == 0 ? 'active' : ''}"
+                         th:attr="data-img=${'/' + 'img/rooms/' + img}"
+                         onclick="changeGalleryImg(this)" alt="Ảnh phòng">
+                </div>
+            </div>
+            <div class="info-card-room">
+                <div class="room-info-grid">
+                    <div class="room-info-item"><i class="fas fa-users"></i> Sức chứa: <strong th:text="${room.capacity}">2</strong> người</div>
+                    <div class="room-info-item"><i class="fas fa-bed"></i> Loại giường: <strong th:text="${room.bedType != null ? room.bedType : 'Chưa cập nhật'}">King Bed</strong></div>
+                    <div class="room-info-item"><i class="fas fa-building"></i> Tầng: <strong th:text="${room.floor}">5</strong></div>
+                    <div class="room-info-item"><i class="fas fa-bath"></i> Phòng tắm: <strong th:text="${room.bathroomType != null ? room.bathroomType : 'Chưa cập nhật'}">Shower</strong></div>
+                    <div class="room-info-item"><i class="fas fa-smoking-ban"></i> Hút thuốc: <strong th:text="${room.isSmoking ? 'Không cho phép' : 'Cho phép'}">Không cho phép</strong></div>
+                </div>
+                <div class="amenities-card">
+                    <h3>Tiện nghi</h3>
+                    <div class="amenities-grid">
+                        <div class="amenity-item" th:each="amenity : ${room.amenities}"><i class="fas fa-check"></i> <span th:text="${amenity}">Tiện nghi</span></div>
+                    </div>
+                </div>
+                <div class="desc-card">
+                    <h3>Giới thiệu</h3>
+                    <p th:text="${room.description}">Mô tả phòng từ database</p>
+                </div>
+            </div>
+        </div>
+        <div class="booking-card-fresh">
+            <div class="booking-header-fresh">
+                <img class="booking-thumb-fresh"
+                     th:if="${currentUser != null and currentUser.avatar != null and currentUser.avatar != ''}"
+                     th:src="@{'/img/customers/' + ${currentUser.avatar}}" alt="Avatar">
+                <img class="booking-thumb-fresh"
+                     th:if="${currentUser != null and (currentUser.avatar == null or currentUser.avatar == '') and currentUser.systemUser != null and currentUser.systemUser.img != null and currentUser.systemUser.img != ''}"
+                     th:src="@{'/img/customers/' + ${currentUser.systemUser.img}}" alt="Avatar">
+                <img class="booking-thumb-fresh"
+                     th:if="${currentUser == null or ((currentUser.avatar == null or currentUser.avatar == '') and (currentUser.systemUser == null or currentUser.systemUser.img == null or currentUser.systemUser.img == ''))}"
+                     src="/img/customers/default-avatar.png" alt="Avatar">
+                <div>
+                    <h3 class="booking-title-fresh">Đặt phòng nhanh</h3>
+                    <div class="booking-price-fresh" th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">2,500,000 ₫/đêm</div>
+                </div>
+            </div>
+            <form th:if="${currentUser != null}" th:action="@{/payment}" method="post" id="bookingForm" class="booking-form-fresh">
+                <input type="hidden" name="roomId" th:value="${room.roomId}">
+                <div class="form-floating-fresh">
+                    <label for="customerName"><i class="fas fa-user"></i> Họ và tên</label>
+                    <input type="text" name="customerName" id="customerName" placeholder="Họ và tên" th:value="${currentUser != null ? currentUser.name : ''}" required>
+                </div>
+                <div class="form-floating-fresh">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" name="email" id="email" placeholder="Email" th:value="${currentUser != null ? currentUser.email : ''}" required>
+                </div>
+                <div class="form-floating-fresh">
+                    <label for="phone"><i class="fas fa-phone"></i> Số điện thoại</label>
+                    <input type="tel" name="phone" id="phone" placeholder="Số điện thoại" th:value="${currentUser != null ? currentUser.phone : ''}" required>
+                </div>
+                <div class="form-row-fresh">
+                    <div class="form-floating-fresh">
+                        <label for="checkInDate"><i class="fas fa-calendar-plus"></i> Nhận phòng</label>
+                        <input type="date" name="checkInDate" id="checkInDate" placeholder="Nhận phòng" th:value="${param.checkInDate != null ? param.checkInDate : ''}" required>
+                    </div>
+                    <div class="form-floating-fresh">
+                        <label for="checkOutDate"><i class="fas fa-calendar-minus"></i> Trả phòng</label>
+                        <input type="date" name="checkOutDate" id="checkOutDate" placeholder="Trả phòng" required>
+                    </div>
+                </div>
+                <div class="form-floating-fresh">
+                    <label for="roomQuantity"><i class="fas fa-door-open"></i> Số lượng phòng</label>
+                    <input type="number" name="roomQuantity" id="roomQuantity" min="1" th:attr="max=${roomAvailableCount != null ? roomAvailableCount : 5}" value="1" required>
+                </div>
+                <div class="room-available-info-fresh">
+                    <span th:if="${roomAvailableCount != null}">
+                        <i class="fas fa-door-open"></i> Còn <strong th:text="${roomAvailableCount}">0</strong> phòng trống
+                    </span>
+                    <span th:if="${roomAvailableCount == 0}">
+                        <i class="fas fa-door-closed"></i> Hết phòng
+                    </span>
+                </div>
+                <div class="form-floating-fresh">
+                    <label for="specialRequests"><i class="fas fa-comment"></i> Yêu cầu đặc biệt</label>
+                    <textarea name="specialRequests" id="specialRequests" placeholder="Yêu cầu đặc biệt" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn-booking-fresh" th:disabled="${roomAvailableCount == 0}">
+                    <span>Đặt phòng ngay</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div th:if="${currentUser == null}" class="login-remind-fresh">
+                <a href="/login" class="btn-login-fresh">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập để đặt phòng
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="review-section-room">
+        <div class="review-header-row">
+            <h2>Đánh giá từ khách hàng</h2>
+            <select id="ratingFilter" class="review-filter-select">
+                <option value="">Tất cả đánh giá</option>
+                <option value="5">5 sao</option>
+                <option value="4">4 sao</option>
+                <option value="3">3 sao</option>
+                <option value="2">2 sao</option>
+                <option value="1">1 sao</option>
+            </select>
+        </div>
+        <div class="review-list-room">
+            <div class="review-card-room" th:each="review : ${reviews}">
+                <div class="review-content">
+                    <span class="reviewer-name" th:text="${review.customer.name}">Tên khách hàng</span>
+                    <span class="review-rating" th:text="${review.rating} + '/5'"></span>
+                    <span class="review-date" th:text="${#temporals.format(review.reviewDate, 'dd/MM/yyyy')}"></span>
+                    <div class="review-comment" th:text="${review.comment}">Nội dung đánh giá</div>
+                    <div class="review-response" th:if="${review.response != null}">
+                        <strong>Phản hồi từ khách sạn:</strong>
+                        <span th:text="${review.response}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="review-form-card" th:if="${currentUser != null}">
+            <form class="review-form" id="reviewForm" th:action="@{/submit-review}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="roomId" th:value="${room.roomId}">
+                <div class="star-rating">
+                    <label>Đánh giá của bạn:</label>
+                    <div class="stars" id="starRating">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <span class="rating-text" id="ratingText"></span>
+                    <input type="hidden" name="rating" id="ratingValue" required>
+                </div>
+                <div class="form-group">
+                    <label for="reviewTitle">Tiêu đề đánh giá</label>
+                    <input type="text" id="reviewTitle" name="title" placeholder="Tóm tắt trải nghiệm của bạn..." required>
+                </div>
+                <div class="form-group">
+                    <label for="reviewComment">Nội dung đánh giá</label>
+                    <textarea id="reviewComment" name="comment" placeholder="Chia sẻ chi tiết về trải nghiệm của bạn tại đây..." required></textarea>
+                </div>
+                <div class="image-upload">
+                    <label>Thêm hình ảnh (tùy chọn)</label>
+                    <div class="image-upload-btn">
+                        <i class="fas fa-camera"></i>
+                        <span>Chọn hình ảnh để chia sẻ</span>
+                        <input type="file" name="images" multiple accept="image/*" onchange="previewImages(this)">
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+                <button type="submit" class="submit-review-btn" disabled>
+                    <i class="fas fa-paper-plane"></i> 
+                    <span>Gửi đánh giá</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="related-carousel-section">
+        <div class="related-carousel-title">Các phòng liên quan</div>
+        <div class="related-carousel" id="relatedCarousel">
+            <div class="related-room-card" th:each="relatedRoom : ${relatedRooms}">
+                <img th:src="'/' + 'img/rooms/' + ${relatedRoom.imageUrls != null and !relatedRoom.imageUrls.empty ? relatedRoom.imageUrls[0] : 'default-room.jpg'}" th:alt="${relatedRoom.type}">
+                <div class="related-room-title" th:text="${relatedRoom.type}">Tên phòng</div>
+                <div class="related-room-desc" th:text="${relatedRoom.description}">Mô tả phòng</div>
+                <div class="related-room-rating" th:text="${#numbers.formatDecimal(relatedRoom.averageRating, 1, 1)}">8.5</div>
+                <div class="related-room-price" th:text="${#numbers.formatDecimal(relatedRoom.price, 0, 'COMMA', 0, 'POINT')} + ' ₫/đêm'">1,800,000 ₫/đêm</div>
+                <a th:href="@{/room/{id}(id=${relatedRoom.roomId})}" class="view-detail-btn">Xem chi tiết</a>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{/Layout/footer}"></div>
+    <script>
+        let currentImgIndex = 0;
+        const images = document.querySelectorAll('#galleryThumbs img');
+
+        function changeGalleryImg(imgElem) {
+            const imgUrl = imgElem.getAttribute('data-img');
+            document.getElementById('mainGalleryImg').src = imgUrl;
+            images.forEach(thumb => thumb.classList.toggle('active', thumb === imgElem));
+            currentImgIndex = Array.from(images).indexOf(imgElem);
+        }
+
+        function prevImage() {
+            currentImgIndex = (currentImgIndex - 1 + images.length) % images.length;
+            changeGalleryImg(images[currentImgIndex]);
+        }
+
+        function nextImage() {
+            currentImgIndex = (currentImgIndex + 1) % images.length;
+            changeGalleryImg(images[currentImgIndex]);
+        }
+
+        // Star rating logic
+        document.querySelectorAll('#starRating i').forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                document.getElementById('ratingValue').value = rating;
+                document.getElementById('ratingText').textContent = `${rating} sao`;
+                document.querySelectorAll('#starRating i').forEach(s => {
+                    s.classList.toggle('active', s.getAttribute('data-rating') <= rating);
+                });
+                document.querySelector('.submit-review-btn').disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

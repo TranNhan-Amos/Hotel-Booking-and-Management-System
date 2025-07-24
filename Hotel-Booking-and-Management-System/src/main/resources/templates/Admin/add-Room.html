@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm phòng mới - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #4cc9f0;
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e6f0fa 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .add-room-container {
+            max-width: 520px;
+            margin: 48px auto 32px auto;
+            background: white;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            padding: 40px 32px 32px 32px;
+            animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: none; }
+        }
+        .add-room-title {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+            border-radius: 12px;
+            padding: 18px 0 18px 0;
+            box-shadow: 0 2px 12px #1976d220;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .add-room-title i { font-size: 2.2rem; }
+        .add-room-form label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: var(--primary);
+        }
+        .add-room-form input, .add-room-form select, .add-room-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--gray-light);
+            margin-bottom: 18px;
+            font-size: 16px;
+            background: #f7fafd;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .add-room-form input:focus, .add-room-form select:focus, .add-room-form textarea:focus {
+            border: 1.5px solid var(--primary);
+            box-shadow: 0 2px 8px #1976d220;
+            outline: none;
+        }
+        .add-room-form .form-row {
+            display: flex;
+            gap: 18px;
+        }
+        .add-room-form .form-row > div {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .add-btn-form {
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #1976d220;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .add-btn-form:hover { background: linear-gradient(90deg, var(--secondary) 60%, var(--primary) 100%); transform: scale(1.04); }
+        .reset-btn {
+            background: linear-gradient(90deg, #888 60%, var(--gray-light) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #1976d220;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .reset-btn:hover { background: linear-gradient(90deg, var(--gray-light) 60%, #888 100%); transform: scale(1.04); }
+        @media (max-width: 700px) {
+            .add-room-container { padding: 16px 4px; }
+            .add-room-form .form-row { flex-direction: column; }
+            .add-room-title { font-size: 1.3rem; padding: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="add-room-container">
+    <h2 class="add-room-title"><i class="fas fa-plus-circle"></i> Thêm phòng mới</h2>
+    <form th:action="@{/admin/rooms/save}" method="post" class="add-room-form" autocomplete="off" enctype="multipart/form-data">
+        <input type="hidden" name="roomId" value="" />
+        <input type="hidden" name="partner.id" th:value="${selectedPartnerId}" />
+        <div class="form-row">
+            <div>
+                <label for="roomNumber">Tên phòng <span style="color:red">*</span></label>
+                <input type="text" id="roomNumber" name="roomNumber" placeholder="Nhập tên phòng" required />
+            </div>
+            <div>
+                <label for="type">Loại phòng <span style="color:red">*</span></label>
+                <input type="text" id="type" name="type" placeholder="VD: Deluxe, Suite..." required />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="price">Giá (VNĐ) <span style="color:red">*</span></label>
+                <input type="number" id="price" name="price" placeholder="Nhập giá phòng" min="0" required />
+            </div>
+            <div>
+                <label for="status">Trạng thái <span style="color:red">*</span></label>
+                <select id="status" name="status" required>
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Ngừng hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="capacity">Sức chứa <span style="color:red">*</span></label>
+                <input type="number" id="capacity" name="capacity" placeholder="VD: 2" min="1" required />
+            </div>
+            <div>
+                <label for="floor">Tầng <span style="color:red">*</span></label>
+                <input type="number" id="floor" name="floor" placeholder="VD: 5" min="1" required />
+            </div>
+            <div>
+                <label for="totalRooms">Tổng số phòng <span style="color:red">*</span></label>
+                <input type="number" id="totalRooms" name="totalRooms" placeholder="VD: 10" min="1" required />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="bedType">Loại giường</label>
+                <input type="text" id="bedType" name="bedType" placeholder="VD: King, Queen..." />
+            </div>
+            <div>
+                <label for="bedCount">Số giường</label>
+                <input type="number" id="bedCount" name="bedCount" placeholder="VD: 2" min="1" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="bathroomType">Phòng tắm</label>
+                <input type="text" id="bathroomType" name="bathroomType" placeholder="VD: Shower, Bathtub..." />
+            </div>
+            <div>
+                <label for="view">View</label>
+                <input type="text" id="view" name="view" placeholder="VD: Sea, City..." />
+            </div>
+        </div>
+        <div>
+            <label for="description">Mô tả</label>
+            <textarea id="description" name="description" rows="2" placeholder="Mô tả chi tiết về phòng..."></textarea>
+        </div>
+        <div>
+            <label>Ảnh phòng</label>
+            <div id="new-image-preview-add" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
+            <input type="file" id="roomImagesAdd" name="roomImages" multiple accept="image/*" style="margin-bottom:8px;">
+            <div style="font-size:13px;color:#888;">Chọn nhiều ảnh hoặc kéo thả vào đây</div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="add-btn-form"><i class="fas fa-plus"></i> Thêm mới</button>
+            <button type="reset" class="reset-btn"><i class="fas fa-undo"></i> Đặt lại</button>
+        </div>
+    </form>
+</div>
+<script>
+// Preview ảnh mới
+const inputAdd = document.getElementById('roomImagesAdd');
+const previewAdd = document.getElementById('new-image-preview-add');
+if(inputAdd && previewAdd) {
+    inputAdd.addEventListener('change', function() {
+        previewAdd.innerHTML = '';
+        Array.from(this.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '90px'; img.style.height = '60px'; img.style.objectFit = 'cover'; img.style.borderRadius = '7px'; img.style.marginRight = '6px'; img.style.border = '1.5px solid #e2e8f0';
+                previewAdd.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+}
+</script>
+</body>
+</html> 

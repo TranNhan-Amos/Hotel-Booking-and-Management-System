@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa phòng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #4cc9f0;
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e6f0fa 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .edit-room-container {
+            max-width: 520px;
+            margin: 48px auto 32px auto;
+            background: white;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            padding: 40px 32px 32px 32px;
+            animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: none; }
+        }
+        .edit-room-title {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+            border-radius: 12px;
+            padding: 18px 0 18px 0;
+            box-shadow: 0 2px 12px #1976d220;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .edit-room-title i { font-size: 2.2rem; }
+        .edit-room-form label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: var(--primary);
+        }
+        .edit-room-form input, .edit-room-form select, .edit-room-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--gray-light);
+            margin-bottom: 18px;
+            font-size: 16px;
+            background: #f7fafd;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .edit-room-form input:focus, .edit-room-form select:focus, .edit-room-form textarea:focus {
+            border: 1.5px solid var(--primary);
+            box-shadow: 0 2px 8px #1976d220;
+            outline: none;
+        }
+        .edit-room-form .form-row {
+            display: flex;
+            gap: 18px;
+        }
+        .edit-room-form .form-row > div {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .edit-btn {
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #1976d220;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .edit-btn:hover { background: linear-gradient(90deg, var(--secondary) 60%, var(--primary) 100%); transform: scale(1.04); }
+        .cancel-btn {
+            background: linear-gradient(90deg, #888 60%, var(--gray-light) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #1976d220;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cancel-btn:hover { background: linear-gradient(90deg, var(--gray-light) 60%, #888 100%); transform: scale(1.04); }
+        @media (max-width: 700px) {
+            .edit-room-container { padding: 16px 4px; }
+            .edit-room-form .form-row { flex-direction: column; }
+            .edit-room-title { font-size: 1.3rem; padding: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="edit-room-container">
+    <h2 class="edit-room-title"><i class="fas fa-pen-to-square"></i> Sửa thông tin phòng</h2>
+    <form th:action="@{/admin/rooms/save}" method="post" class="edit-room-form" autocomplete="off" enctype="multipart/form-data">
+        <input type="hidden" name="roomId" th:value="${room != null ? room.roomId : ''}" />
+        <input type="hidden" name="partner.id" th:value="${room != null and room.partner != null ? room.partner.id : selectedPartnerId}" />
+        <div class="form-row">
+            <div>
+                <label for="roomNumber">Tên phòng <span style="color:red">*</span></label>
+                <input type="text" id="roomNumber" name="roomNumber" th:value="${room != null ? room.roomNumber : ''}" placeholder="Nhập tên phòng" required />
+            </div>
+            <div>
+                <label for="type">Loại phòng <span style="color:red">*</span></label>
+                <input type="text" id="type" name="type" th:value="${room != null ? room.type : ''}" placeholder="VD: Deluxe, Suite..." required />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="price">Giá (VNĐ) <span style="color:red">*</span></label>
+                <input type="number" id="price" name="price" th:value="${room != null ? room.price : ''}" placeholder="Nhập giá phòng" min="0" required />
+            </div>
+            <div>
+                <label for="status">Trạng thái <span style="color:red">*</span></label>
+                <select id="status" name="status" required>
+                    <option th:selected="${room == null || room.status == null}" value="">-- Chọn trạng thái --</option>
+                    <option th:selected="${room != null && room.status == 'active'}" value="active">Đang hoạt động</option>
+                    <option th:selected="${room != null && room.status == 'inactive'}" value="inactive">Ngừng hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="capacity">Sức chứa <span style="color:red">*</span></label>
+                <input type="number" id="capacity" name="capacity" th:value="${room != null ? room.capacity : ''}" placeholder="VD: 2" min="1" required />
+            </div>
+            <div>
+                <label for="floor">Tầng <span style="color:red">*</span></label>
+                <input type="number" id="floor" name="floor" th:value="${room != null ? room.floor : ''}" placeholder="VD: 5" min="1" required />
+            </div>
+            <div>
+                <label for="totalRooms">Tổng số phòng <span style="color:red">*</span></label>
+                <input type="number" id="totalRooms" name="totalRooms" th:value="${room != null ? room.totalRooms : ''}" placeholder="VD: 10" min="1" required />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="bedType">Loại giường</label>
+                <input type="text" id="bedType" name="bedType" th:value="${room != null ? room.bedType : ''}" placeholder="VD: King, Queen..." />
+            </div>
+            <div>
+                <label for="bedCount">Số giường</label>
+                <input type="number" id="bedCount" name="bedCount" th:value="${room != null ? room.bedCount : ''}" placeholder="VD: 2" min="1" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label for="bathroomType">Phòng tắm</label>
+                <input type="text" id="bathroomType" name="bathroomType" th:value="${room != null ? room.bathroomType : ''}" placeholder="VD: Shower, Bathtub..." />
+            </div>
+            <div>
+                <label for="view">View</label>
+                <input type="text" id="view" name="view" th:value="${room != null ? room.view : ''}" placeholder="VD: Sea, City..." />
+            </div>
+        </div>
+        <div>
+            <label for="description">Mô tả</label>
+            <textarea id="description" name="description" rows="2" th:text="${room != null ? room.description : ''}" placeholder="Mô tả chi tiết về phòng..."></textarea>
+        </div>
+        <div>
+            <label>Ảnh phòng</label>
+            <div style="margin-bottom:12px">
+                <div th:if="${room != null && room.imageUrls != null}">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <div th:each="img,iter : ${room.imageUrls}" style="position:relative;">
+                            <img th:src="@{'/img/rooms/' + ${img}}" style="width:100px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #eee;" />
+                            <button type="button" class="delete-img-btn" th:attr="data-index=${iter.index}" title="Xóa ảnh">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${room == null || room.imageUrls == null || room.imageUrls.isEmpty()}">
+                    <span style="color:#888;font-style:italic">Chưa có ảnh nào</span>
+                </div>
+            </div>
+            <div id="new-image-preview-edit" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
+            <input type="file" id="roomImagesEdit" name="roomImages" multiple accept="image/*" style="margin-bottom:8px;">
+            <div style="font-size:13px;color:#888;">Chọn nhiều ảnh hoặc kéo thả vào đây</div>
+            <input type="hidden" id="deletedImagesEdit" name="deletedImages" value="" />
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="edit-btn"><i class="fas fa-save"></i> Lưu</button>
+            <a th:href="@{/admin/rooms(partnerId=${room != null and room.partner != null ? room.partner.id : selectedPartnerId})}" class="cancel-btn"><i class="fas fa-times"></i> Hủy</a>
+        </div>
+    </form>
+</div>
+<script>
+// Preview ảnh mới
+const inputEdit = document.getElementById('roomImagesEdit');
+const previewEdit = document.getElementById('new-image-preview-edit');
+if(inputEdit && previewEdit) {
+    inputEdit.addEventListener('change', function() {
+        previewEdit.innerHTML = '';
+        Array.from(this.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '90px'; img.style.height = '60px'; img.style.objectFit = 'cover'; img.style.borderRadius = '7px'; img.style.marginRight = '6px'; img.style.border = '1.5px solid #e2e8f0';
+                previewEdit.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+}
+// Xóa ảnh cũ
+function removeExistingImage(btn, idx) {
+    const imgDiv = btn.parentElement;
+    imgDiv.style.display = 'none';
+    let deleted = document.getElementById('deletedImagesEdit');
+    let val = deleted.value ? deleted.value.split(',') : [];
+    val.push(idx);
+    deleted.value = val.join(',');
+}
+</script>
+</body>
+</html> 

@@ -10,7 +10,28 @@
 </head>
 <body>
   <!-- Loading Screen -->
-    <div th:replace="~{/Layout/narbar}"></div>
+
+  <!-- Floating Navigation -->
+  <nav class="nav-floating">
+      <div class="nav-content">
+          <a href="#home" class="logo">DaNang Tours</a>
+          <ul class="nav-links">
+              <li><a href="#home">Trang chủ</a></li>
+              <li><a href="#tours">Tours</a></li>
+              <li><a href="#blog">Cẩm nang</a></li>
+              <li><a href="#contact">Liên hệ</a></li>
+          </ul>
+          <div class="nav-actions">
+              <button class="nav-btn" onclick="toggleTheme()">
+                  <i class="fas fa-moon" id="themeIcon"></i>
+              </button>
+              <button class="nav-btn" onclick="toggleLanguage()">
+                  <span id="langText">EN</span>
+              </button>
+          </div>
+      </div>
+  </nav>
+
   <!-- Social Share -->
   <div class="social-share">
       <button class="social-btn social-facebook" onclick="shareToFacebook()">
@@ -2076,8 +2097,8 @@ body {
 
 .tours-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
   margin-bottom: 3rem;
 }
 
@@ -3998,9 +4019,8 @@ body {
     justify-content: center;
   }
 
-  /* Sửa lại tours-grid để luôn là lưới nhỏ gọn kể cả khi chỉ còn 1 phần tử */
   .tours-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .tour-footer {

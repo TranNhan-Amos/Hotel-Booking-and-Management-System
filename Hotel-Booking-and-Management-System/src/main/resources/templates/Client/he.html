@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa thông tin cá nhân - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #007bff; /* Blue */
+            --secondary-color: #6c757d; /* Gray */
+            --accent-color: #28a745; /* Green */
+            --bg-light: #f0f2f5;
+            --bg-panel: #ffffff;
+            --text-dark: #343a40;
+            --text-muted: #6c757d;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            overflow: hidden;
+            background-color: var(--bg-panel);
+        }
+
+        /* Left Panel (Sidebar) */
+        .left-panel {
+            flex: 0 0 300px; /* Fixed width for sidebar */
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-sidebar {
+            width: 100%;
+        }
+
+        .profile-avatar-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+        }
+
+        .main-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+            overflow: hidden;
+            border: 4px solid var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .main-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .avatar-wrapper:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .avatar-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .avatar-btn.delete {
+            background-color: rgba(220, 53, 69, 0.6);
+            border-color: rgba(220, 53, 69, 0.8);
+        }
+
+        .avatar-btn.delete:hover {
+            background-color: rgba(220, 53, 69, 0.8);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 3px solid var(--bg-panel);
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .member-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .action-btn.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .stats-mini {
+            width: 100%;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .navigation-menu {
+            width: 100%;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Right Panel (Content Area) */
+        .right-panel {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .breadcrumb {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .header-btn.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .content-body {
+            padding-top: 1rem;
+        }
+
+        .content-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block; /* Show active section */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Widget Styles */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .widget {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow-light);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .widget-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+        }
+
+        .widget-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .widget-action {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .widget-action:hover {
+            text-decoration: underline;
+        }
+
+        .info-list .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .info-list .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Booking Section Styles */
+        .booking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .booking-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-light);
+            overflow: hidden;
+        }
+
+        .booking-header {
+            background-color: var(--bg-light);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .booking-id {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .booking-body {
+            padding: 1.5rem;
+        }
+
+        .booking-room {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .room-thumbnail {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .room-info h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .room-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .booking-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .booking-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-confirmed { background-color: var(--success-color); }
+        .status-cancelled { background-color: var(--error-color); }
+        .status-pending { background-color: var(--warning-color); }
+
+        .booking-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* Security Section Styles */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .security-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-light);
+            padding: 1.5rem;
+        }
+
+        .security-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .security-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .security-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .security-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .security-content li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.2rem;
+        }
+
+        .security-content li::before {
+            content: "\f00c"; /* Font Awesome check icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--success-color);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 0.8rem;
+        }
+
+        /* Settings Section Styles */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .setting-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-light);
+            padding: 1.5rem;
+        }
+
+        .setting-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .setting-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .setting-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .toggle-switch {
+            width: 40px;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background-color: var(--accent-color);
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(20px);
+        }
+
+        .select-input {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            cursor: pointer;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none; /* Hidden by default on desktop */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -5px 15px var(--shadow-light);
+            z-index: 1000;
+        }
+
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+        }
+
+        .mobile-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-nav-item:hover {
+            color: var(--primary-color);
+        }
+
+        .mobile-nav-item.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--success-color);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            z-index: 1050;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .app-container {
+                flex-direction: column;
+                margin: 1rem auto;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .left-panel {
+                flex: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1.5rem;
+            }
+
+            .profile-avatar-section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .quick-actions, .stats-mini, .navigation-menu {
+                display: none; /* Hide desktop sidebar elements on mobile */
+            }
+
+            .right-panel {
+                padding: 1.5rem;
+            }
+
+            .content-header {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .mobile-nav {
+                display: block; /* Show mobile navigation */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .app-container {
+                margin: 0;
+            }
+            .left-panel {
+                padding: 1rem;
+            }
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            .right-panel {
+                padding: 1rem;
+            }
+            .page-title {
+                font-size: 1.8rem;
+            }
+            .widget-grid, .booking-grid, .security-grid, .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="profile-sidebar">
+                <!-- Profile Section -->
+                <div class="profile-avatar-section">
+                    <div class="avatar-wrapper">
+                        <div class="main-avatar">
+                            <div id="avatarPlaceholder" style="display: flex; align-items: center; justify-content: center;">NA</div>
+                            <img id="avatarImg" src="/placeholder.svg" alt="Avatar" style="display: none;">
+                            <div class="avatar-overlay">
+                                <label for="avatar-upload" class="avatar-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                                <button id="deleteAvatarBtn" class="avatar-btn delete" onclick="deleteAvatar()" style="display: none;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="status-dot"></div>
+                        </div>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(this)">
+                    </div>
+                    <h2 class="profile-name" id="displayName">Nguyễn Văn An</h2>
+                    <p class="profile-email" id="displayEmail">nguyenvanan@example.com</p>
+                    <div class="member-badge">
+                        <i class="fas fa-crown"></i>
+                        <span id="displayRole">VIP Member</span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="#" class="action-btn" onclick="showSection('personal-info-form', this)">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa hồ sơ</span>
+                    </a>
+                    <button class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>Đặt phòng mới</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                        <span>Tải xuống dữ liệu</span>
+                    </button>
+                </div>
+
+                <!-- Mini Stats -->
+                <div class="stats-mini">
+                    <div class="stat-row">
+                        <span class="stat-label">Tổng đặt phòng</span>
+                        <span class="stat-value">24</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Điểm tích lũy</span>
+                        <span class="stat-value">2,450</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Đánh giá TB</span>
+                        <span class="stat-value">4.9★</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Thành viên từ</span>
+                        <span class="stat-value">2021</span>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="navigation-menu">
+                    <div class="nav-section">
+                        <div class="nav-title">Tài khoản</div>
+                        <div class="nav-item active" data-section="personal-info-form" onclick="showSection('personal-info-form', this)">
+                            <i class="fas fa-user"></i>
+                            <span>Thông tin cá nhân</span>
+                        </div>
+                        <div class="nav-item" data-section="change-password-form" onclick="showSection('change-password-form', this)">
+                            <i class="fas fa-lock"></i>
+                            <span>Đổi mật khẩu</span>
+                        </div>
+                        <div class="nav-item" data-section="bookings" onclick="showSection('bookings', this)">
+                            <i class="fas fa-calendar"></i>
+                            <span>Lịch sử đặt phòng</span>
+                        </div>
+                        <div class="nav-item" data-section="security" onclick="showSection('security', this)">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Bảo mật & Điều khoản</span>
+                        </div>
+                        <div class="nav-item" data-section="settings" onclick="showSection('settings', this)">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Header -->
+            <div class="content-header">
+                <div class="header-top">
+                    <div>
+                        <h1 class="page-title" id="pageTitle">Thông tin cá nhân</h1>
+                        <div class="breadcrumb">
+                            <span>Tài khoản</span>
+                            <span class="breadcrumb-separator">/</span>
+                            <span id="breadcrumbCurrent">Thông tin cá nhân</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="header-btn">
+                            <i class="fas fa-search"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        <a href="#" class="header-btn primary" onclick="showSection('personal-info-form', this)">
+                            <i class="fas fa-edit"></i>
+                            <span>Chỉnh sửa</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="content-body">
+                <!-- Error message -->
+                <div id="errorMessage" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <!-- Personal Info Form Section -->
+                <div id="personal-info-form" class="content-section active">
+                    <form id="updateInfoForm">
+                        <div class="widget">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <div class="widget-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    Cập nhật thông tin cá nhân
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">Họ tên</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="form-label">Địa chỉ</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Cập nhật thông tin
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Change Password Form Section -->
+                <div id="change-password-form" class="content-section">
+                    <form id="updatePasswordForm">
+                        <div class="widget">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <div class="widget-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    Đổi mật khẩu
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Cập nhật mật khẩu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bookings Section (from reference) -->
+                <div id="bookings" class="content-section">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <div class="widget-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            Lịch sử đặt phòng
+                        </div>
+                    </div>
+                    <div class="booking-grid">
+                        <div class="booking-card">
+                            <div class="booking-header">
+                                <div class="booking-id">#GR2024001</div>
+                                <div class="booking-dates">15/12/2024 - 18/12/2024 • 3 đêm</div>
+                            </div>
+                            <div class="booking-body">
+                                <div class="booking-room">
+                                    <div class="room-thumbnail">
+                                        <i class="fas fa-bed"></i>
+                                    </div>
+                                    <div class="room-info">
+                                        <h4>Deluxe Ocean View</h4>
+                                        <p>Phòng 201 • 2 khách • King bed</p>
+                                    </div>
+                                </div>
+                                <div class="booking-footer">
+                                    <span class="booking-status status-confirmed">Đã xác nhận</span>
+                                    <span class="booking-price">2,400,000 VNĐ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-card">
+                            <div class="booking-header">
+                                <div class="booking-id">#GR2024002</div>
+                                <div class="booking-dates">01/01/2024 - 03/01/2024 • 2 đêm</div>
+                            </div>
+                            <div class="booking-body">
+                                <div class="booking-room">
+                                    <div class="room-thumbnail">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div class="room-info">
+                                        <h4>Presidential Suite</h4>
+                                        <p>Phòng 305 • 4 khách • 2 King beds</p>
+                                    </div>
+                                </div>
+                                <div class="booking-footer">
+                                    <span class="booking-status status-cancelled">Đã hủy</span>
+                                    <span class="booking-price">0 VNĐ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-card">
+                            <div class="booking-header">
+                                <div class="booking-id">#GR2024003</div>
+                                <div class="booking-dates">25/11/2024 - 27/11/2024 • 2 đêm</div>
+                            </div>
+                            <div class="booking-body">
+                                <div class="booking-room">
+                                    <div class="room-thumbnail">
+                                        <i class="fas fa-spa"></i>
+                                    </div>
+                                    <div class="room-info">
+                                        <h4>Spa Suite</h4>
+                                        <p>Phòng 102 • 2 khách • Queen bed</p>
+                                    </div>
+                                </div>
+                                <div class="booking-footer">
+                                    <span class="booking-status status-pending">Chờ xác nhận</span>
+                                    <span class="booking-price">1,800,000 VNĐ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section (from reference) -->
+                <div id="security" class="content-section">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <div class="widget-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            Bảo mật & Điều khoản
+                        </div>
+                    </div>
+                    <div class="security-grid">
+                        <div class="security-card">
+                            <div class="security-header">
+                                <div class="security-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <h3 class="security-title">Bảo mật tài khoản</h3>
+                            </div>
+                            <div class="security-content">
+                                <ul>
+                                    <li>Mật khẩu được mã hóa bằng thuật toán BCrypt để đảm bảo an toàn</li>
+                                    <li>Không chia sẻ thông tin đăng nhập với người khác</li>
+                                    <li>Đăng xuất khỏi tài khoản khi sử dụng thiết bị công cộng</li>
+                                    <li>Thay đổi mật khẩu định kỳ để tăng cường bảo mật</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="security-card">
+                            <div class="security-header">
+                                <div class="security-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <h3 class="security-title">Bảo vệ thông tin cá nhân</h3>
+                            </div>
+                            <div class="security-content">
+                                <ul>
+                                    <li>Thông tin cá nhân của bạn được bảo vệ theo quy định GDPR</li>
+                                    <li>Chúng tôi không chia sẻ thông tin với bên thứ ba mà không có sự đồng ý</li>
+                                    <li>Dữ liệu được lưu trữ an toàn trên hệ thống được mã hóa</li>
+                                    <li>Bạn có quyền yêu cầu xóa hoặc cập nhật thông tin cá nhân</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="security-card">
+                            <div class="security-header">
+                                <div class="security-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <h3 class="security-title">Bảo mật thanh toán</h3>
+                            </div>
+                            <div class="security-content">
+                                <ul>
+                                    <li>Thông tin thanh toán được mã hóa end-to-end</li>
+                                    <li>Chúng tôi không lưu trữ thông tin thẻ tín dụng</li>
+                                    <li>Sử dụng cổng thanh toán an toàn được chứng nhận PCI DSS</li>
+                                    <li>Mọi giao dịch đều được ghi log để theo dõi</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="security-card">
+                            <div class="security-header">
+                                <div class="security-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h3 class="security-title">Hỗ trợ 24/7</h3>
+                            </div>
+                            <div class="security-content">
+                                <p><strong>Liên hệ hỗ trợ bảo mật:</strong></p>
+                                <ul>
+                                    <li>Email: security@grandocean.com</li>
+                                    <li>Hotline: 1900-xxxx (24/7)</li>
+                                    <li>Thời gian phản hồi: Trong vòng 24 giờ</li>
+                                    <li>Chúng tôi cam kết phản hồi trong vòng 24 giờ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section (from reference) -->
+                <div id="settings" class="content-section">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <div class="widget-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            Cài đặt
+                        </div>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <h3 class="setting-title">
+                                    <div class="widget-icon">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    Thông báo
+                                </h3>
+                                <p class="setting-description">Quản lý các loại thông báo bạn muốn nhận</p>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Thông báo Email</h5>
+                                    <p>Nhận thông báo về đặt phòng qua email</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Thông báo SMS</h5>
+                                    <p>Nhận tin nhắn xác nhận đặt phòng</p>
+                                </div>
+                                <div class="toggle-switch" onclick="toggleSetting(this)"></div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Khuyến mãi</h5>
+                                    <p>Nhận thông tin về các chương trình ưu đãi</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <h3 class="setting-title">
+                                    <div class="widget-icon">
+                                        <i class="fas fa-globe"></i>
+                                    </div>
+                                    Ngôn ngữ & Khu vực
+                                </h3>
+                                <p class="setting-description">Tùy chỉnh ngôn ngữ và định dạng hiển thị</p>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Ngôn ngữ</h5>
+                                    <p>Tiếng Việt</p>
+                                </div>
+                                <select class="select-input">
+                                    <option>Tiếng Việt</option>
+                                    <option>English</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Múi giờ</h5>
+                                    <p>GMT+7 (Việt Nam)</p>
+                                </div>
+                                <select class="select-input">
+                                    <option>GMT+7 (Việt Nam)</option>
+                                    <option>GMT+8 (Singapore)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <div class="setting-header">
+                                <h3 class="setting-title">
+                                    <div class="widget-icon">
+                                        <i class="fas fa-paint-brush"></i>
+                                    </div>
+                                    Giao diện
+                                </h3>
+                                <p class="setting-description">Tùy chỉnh giao diện của trang web</p>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h5>Chế độ tối</h5>
+                                    <p>Chuyển đổi giữa giao diện sáng và tối</p>
+                                </div>
+                                <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-items">
+            <div class="mobile-nav-item active" data-section="personal-info-form" onclick="showSection('personal-info-form', this)">
+                <i class="fas fa-user"></i>
+                <span>Cá nhân</span>
+            </div>
+            <div class="mobile-nav-item" data-section="change-password-form" onclick="showSection('change-password-form', this)">
+                <i class="fas fa-lock"></i>
+                <span>Mật khẩu</span>
+            </div>
+            <div class="mobile-nav-item" data-section="bookings" onclick="showSection('bookings', this)">
+                <i class="fas fa-calendar"></i>
+                <span>Đặt phòng</span>
+            </div>
+            <div class="mobile-nav-item" data-section="settings" onclick="showSection('settings', this)">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+            <span id="toast-message">Cài đặt đã được cập nhật!</span>
+        </div>
+    </div>
+
+    <script>
+        // Mock data (replace with actual data from your backend)
+        const mockSystemUser = {
+            email: "user@example.com",
+            role: "Customer",
+            createdAt: new Date("2023-01-15T10:00:00Z"),
+            img: null, // Set to a URL like "/placeholder.svg?height=120&width=120" to test image display
+        };
+
+        const mockCustomer = {
+            name: "Nguyễn Văn A",
+            phone: "0912345678",
+            address: "123 Đường ABC, Quận XYZ, TP.HCM",
+            avatar: null, // Set to a URL like "/placeholder.svg?height=120&width=120" to test image display
+        };
+
+        // Initialize UI with mock data
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate profile sidebar info
+            document.getElementById('displayName').textContent = mockCustomer.name;
+            document.getElementById('displayEmail').textContent = mockSystemUser.email;
+            document.getElementById('displayRole').textContent = mockSystemUser.role;
+            
+            // Populate forms with current data
+            document.getElementById('fullName').value = mockCustomer.name;
+            document.getElementById('phone').value = mockCustomer.phone;
+            document.getElementById('address').value = mockCustomer.address;
+
+            updateAvatarDisplay(mockSystemUser.img || mockCustomer.avatar);
+        });
+
+        function updateAvatarDisplay(avatarUrl) {
+            const avatarImg = document.getElementById('avatarImg');
+            const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+            const deleteAvatarBtn = document.getElementById('deleteAvatarBtn');
+
+            if (avatarUrl) {
+                avatarImg.src = avatarUrl;
+                avatarImg.style.display = 'block';
+                avatarPlaceholder.style.display = 'none';
+                deleteAvatarBtn.style.display = 'inline-flex';
+            } else {
+                avatarImg.style.display = 'none';
+                avatarPlaceholder.style.display = 'flex'; // Use flex to center icon
+                deleteAvatarBtn.style.display = 'none';
+            }
+        }
+
+        // Function to show toast notifications
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`; // Reset classes
+            
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle';
+                toastIcon.style.color = 'var(--success-color)';
+            } else if (type === 'error') {
+                toastIcon.className = 'fas fa-exclamation-triangle';
+                toastIcon.style.color = 'var(--error-color)';
+            }
+
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Display error message
+        function displayError(message) {
+            const errorMessageDiv = document.getElementById('errorMessage');
+            const errorTextSpan = document.getElementById('errorText');
+            errorTextSpan.textContent = message;
+            errorMessageDiv.style.display = 'flex'; // Use flex to align icon and text
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('errorText').textContent = '';
+        }
+
+        // Tab switching with animation
+        function showSection(sectionName, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to the clicked nav item (desktop and mobile)
+            const desktopNavItem = document.querySelector(`.nav-item[data-section="${sectionName}"]`);
+            const mobileNavItem = document.querySelector(`.mobile-nav-item[data-section="${sectionName}"]`);
+            if (desktopNavItem) desktopNavItem.classList.add('active');
+            if (mobileNavItem) mobileNavItem.classList.add('active');
+
+            // Update page title and breadcrumb
+            const titles = {
+                'personal-info-form': 'Thông tin cá nhân',
+                'change-password-form': 'Đổi mật khẩu',
+                'bookings': 'Lịch sử đặt phòng',
+                'security': 'Bảo mật & Điều khoản',
+                'settings': 'Cài đặt'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName];
+            document.getElementById('breadcrumbCurrent').textContent = titles[sectionName];
+        }
+
+        // Update personal info form submission
+        const updateInfoForm = document.getElementById('updateInfoForm');
+        if (updateInfoForm) {
+            updateInfoForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                hideError();
+                
+                const formData = new FormData(this);
+                
+                try {
+                    const response = await fetch('/profile/update', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    
+                    showToast(data.success ? 'success' : 'error', data.message);
+                    
+                    if (data.success) {
+                        // Update displayed info without full reload for better UX
+                        document.getElementById('displayName').textContent = formData.get('fullName');
+                        // In a real app, you might update other displayed info here
+                    } else {
+                        displayError(data.message);
+                    }
+                } catch (error) {
+                    showToast('error', 'Có lỗi xảy ra khi cập nhật thông tin');
+                    console.error('Error:', error);
+                    displayError('Có lỗi xảy ra khi cập nhật thông tin');
+                }
+            });
+        }
+
+        // Update password form submission
+        document.getElementById('updatePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showToast('error', 'Mật khẩu mới và xác nhận mật khẩu không khớp.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('currentPassword', currentPassword);
+            formData.append('newPassword', newPassword);
+
+            try {
+                const response = await fetch('/profile/update', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    // Clear form on success
+                    this.reset();
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                showToast('error', 'Có lỗi xảy ra khi cập nhật mật khẩu');
+                console.error('Error:', error);
+                displayError('Có lỗi xảy ra khi cập nhật mật khẩu');
+            }
+        });
+  
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword !== confirmPassword) {
+                this.setCustomValidity('Mật khẩu không khớp');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            if (confirmPasswordInput.value) { // Only validate if confirm field already has input
+                if (this.value !== confirmPasswordInput.value) {
+                    confirmPasswordInput.setCustomValidity('Mật khẩu không khớp');
+                } else {
+                    confirmPasswordInput.setCustomValidity('');
+                }
+            }
+        });
+
+        // Avatar upload function
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            hideError();
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('error', 'Chỉ chấp nhận file ảnh (JPG, PNG, GIF)');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('error', 'Kích thước file không được vượt quá 5MB');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    updateAvatarDisplay(data.avatarUrl || URL.createObjectURL(file)); // Use blob URL if no server URL
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                showToast('error', 'Có lỗi xảy ra khi upload ảnh');
+                console.error('Error:', error);
+                displayError('Có lỗi xảy ra khi upload ảnh');
+            }
+        }
+
+        // Delete avatar function
+        async function deleteAvatar() {
+            if (!confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?')) {
+                return;
+            }
+
+            hideError();
+
+            try {
+                const response = await fetch('/delete-avatar', {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                if (data.success) {
+                    updateAvatarDisplay(null); // Set to null to show placeholder
+                } else {
+                    displayError(data.message);
+                }
+            } catch (error) {
+                showToast('error', 'Có lỗi xảy ra khi xóa ảnh');
+                console.error('Error:', error);
+                displayError('Có lỗi xảy ra khi xóa ảnh');
+            }
+        }
+
+        // Toggle setting function
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            showToast('success', 'Cài đặt đã được cập nhật!');
+        }
+
+        // Theme toggle function
+        function toggleTheme(element) {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            element.classList.toggle('active');
+            
+            // Save theme preference
+            localStorage.setItem('theme', newTheme);
+            
+            showToast('success', `Đã chuyển sang chế độ ${newTheme === 'dark' ? 'tối' : 'sáng'}!`);
+        }
+
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            if (savedTheme === 'dark' && themeToggle) {
+                themeToggle.classList.add('active');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            // Ensure the correct section is shown on initial load based on URL hash or default
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'personal-info-form';
+            showSection(initialSection);
+        });
+    </script>
+</body>
+</html>

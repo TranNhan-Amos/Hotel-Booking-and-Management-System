@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Integer> {
   List<BookingOrderEntity> findByEmailOrderByCreatedAtDesc(String email);
@@ -88,4 +90,39 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate);
 
+  // Thêm các phương thức cho báo cáo
+  @Query("SELECT b FROM BookingOrderEntity b WHERE b.createdAt BETWEEN :startDate AND :endDate")
+  List<BookingOrderEntity> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate);
+
+  @Query(value = """
+      SELECT 
+          r.room_id as roomId,
+          r.room_name as roomName,
+          COUNT(b.booking_id) as bookingCount,
+          SUM(b.total_price) as totalRevenue
+      FROM rooms r
+      LEFT JOIN bookingorder b ON r.room_id = b.room_id
+      WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
+      GROUP BY r.room_id, r.room_name
+      ORDER BY bookingCount DESC
+      LIMIT :limit
+      """, nativeQuery = true)
+  List<Map<String, Object>> findTopRoomsByBookingCount(@Param("limit") int limit);
+
+  @Query(value = """
+      SELECT 
+          c.customer_id as customerId,
+          c.name as customerName,
+          c.email as customerEmail,
+          COUNT(b.booking_id) as bookingCount,
+          SUM(b.total_price) as totalSpent
+      FROM customers c
+      LEFT JOIN bookingorder b ON c.customer_id = b.customer_id
+      WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
+      GROUP BY c.customer_id, c.name, c.email
+      ORDER BY bookingCount DESC
+      LIMIT :limit
+      """, nativeQuery = true)
+  List<Map<String, Object>> findTopCustomersByBookingCount(@Param("limit") int limit);
 }

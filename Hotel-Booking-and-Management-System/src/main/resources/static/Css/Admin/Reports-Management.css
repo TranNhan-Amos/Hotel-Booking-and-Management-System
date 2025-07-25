@@ -786,3 +786,142 @@
                 padding: 20px;
             }
         }
+        
+        /* Top Rooms List */
+        .top-rooms-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .room-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .room-item:last-child {
+            border-bottom: none;
+        }
+        
+        .room-item:hover {
+            background: var(--light-bg);
+        }
+        
+        .room-info {
+            flex: 1;
+        }
+        
+        .room-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .room-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .booking-count {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+        
+        .revenue {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        /* Top Customers Section */
+        .top-customers-section {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .section-title h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title h3 i {
+            color: var(--warning-color);
+        }
+        
+        .customers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .customer-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .customer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+        }
+        
+        .customer-info {
+            flex: 1;
+        }
+        
+        .customer-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .customer-email {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .customer-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+        
+        .customer-stats .booking-count {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+        
+        .customer-stats .total-spent {
+            color: var(--success-color);
+            font-weight: 600;
+        }

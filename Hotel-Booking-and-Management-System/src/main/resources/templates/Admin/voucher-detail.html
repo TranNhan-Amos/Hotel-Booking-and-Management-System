@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Voucher - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/Admin/Management-Voucher.css}">
+    <style>
+        .voucher-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        .back-btn {
+            padding: 10px 15px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        .voucher-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--white);
+        }
+        .detail-form {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-color);
+            background: var(--light-bg);
+            transition: var(--transition);
+        }
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            background: var(--white);
+        }
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-color);
+            background: var(--light-bg);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .form-select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            background: var(--white);
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-color);
+            background: var(--light-bg);
+            transition: var(--transition);
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            background: var(--white);
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        .btn-danger {
+            background: var(--danger-color);
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .btn-secondary {
+            background: var(--text-muted);
+            color: var(--white);
+        }
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card-detail {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-number-detail {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .stat-label-detail {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
+
+        <div class="main-content">
+            <div class="voucher-detail-container">
+                <div class="detail-header">
+                    <a href="/admin/vouchers" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay Lại
+                    </a>
+                    <div class="voucher-avatar-large">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div>
+                        <h2 th:text="${voucher.code}">VOUCHER_CODE</h2>
+                        <p th:text="${voucher.description}">Mô tả voucher</p>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-card-detail">
+                        <div class="stat-number-detail" th:text="${voucher.usedCount}">0</div>
+                        <div class="stat-label-detail">Lần Sử Dụng</div>
+                    </div>
+                    <div class="stat-card-detail">
+                        <div class="stat-number-detail" th:text="${voucher.usageLimit}">0</div>
+                        <div class="stat-label-detail">Giới Hạn Sử Dụng</div>
+                    </div>
+                    <div class="stat-card-detail">
+                        <div class="stat-number-detail" th:text="${#numbers.formatDecimal(voucher.usagePercentage, 1, 1)}">0</div>
+                        <div class="stat-label-detail">Phần Trăm Sử Dụng (%)</div>
+                    </div>
+                </div>
+
+                <div class="detail-form">
+                    <h3>Chỉnh Sửa Thông Tin Voucher</h3>
+                    <form id="voucherForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Mã Voucher</label>
+                                <input type="text" class="form-input" id="code" th:value="${voucher.code}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Loại Giảm Giá</label>
+                                <select class="form-select" id="discountType" onchange="toggleDiscountInputs()">
+                                    <option value="PERCENTAGE" th:selected="${voucher.discountType == 'PERCENTAGE'}">Giảm %</option>
+                                    <option value="FIXED" th:selected="${voucher.discountType == 'FIXED'}">Giảm Cố Định</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" id="percentageGroup">
+                                <label class="form-label">Phần Trăm Giảm (%)</label>
+                                <input type="number" class="form-input" id="discount" th:value="${voucher.discount}" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="form-group" id="fixedGroup" style="display: none;">
+                                <label class="form-label">Số Tiền Giảm (VNĐ)</label>
+                                <input type="number" class="form-input" id="discountAmount" th:value="${voucher.discountAmount}" min="0" step="1000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Đơn Hàng Tối Thiểu (VNĐ)</label>
+                                <input type="number" class="form-input" id="minimumOrderAmount" th:value="${voucher.minimumOrderAmount}" min="0" step="1000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Ngày Bắt Đầu</label>
+                                <input type="date" class="form-input" id="startDate" th:value="${#temporals.format(voucher.startDate, 'yyyy-MM-dd')}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ngày Kết Thúc</label>
+                                <input type="date" class="form-input" id="endDate" th:value="${#temporals.format(voucher.endDate, 'yyyy-MM-dd')}" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mô Tả</label>
+                            <textarea class="form-textarea" id="description" th:text="${voucher.description}"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Giới Hạn Sử Dụng</label>
+                                <input type="number" class="form-input" id="usageLimit" th:value="${voucher.usageLimit}" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Trạng Thái</label>
+                                <select class="form-select" id="status">
+                                    <option value="ACTIVE" th:selected="${voucher.status == 'ACTIVE'}">Hoạt Động</option>
+                                    <option value="INACTIVE" th:selected="${voucher.status == 'INACTIVE'}">Tạm Dừng</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Lưu Thay Đổi
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="deleteVoucher()">
+                                <i class="fas fa-trash"></i>
+                                Xóa Voucher
+                            </button>
+                            <a href="/admin/vouchers" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const voucherId = [[${voucher.voucherId}]];
+        const discountType = "[[${voucher.discountType}]]";
+        
+        // Khởi tạo form theo loại giảm giá
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleDiscountInputs();
+        });
+        
+        function toggleDiscountInputs() {
+            const discountType = document.getElementById('discountType').value;
+            const percentageGroup = document.getElementById('percentageGroup');
+            const fixedGroup = document.getElementById('fixedGroup');
+            
+            if (discountType === 'PERCENTAGE') {
+                percentageGroup.style.display = 'block';
+                fixedGroup.style.display = 'none';
+            } else {
+                percentageGroup.style.display = 'none';
+                fixedGroup.style.display = 'block';
+            }
+        }
+        
+        document.getElementById('voucherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateVoucher();
+        });
+
+        function updateVoucher() {
+            const discountType = document.getElementById('discountType').value;
+            const formData = {
+                code: document.getElementById('code').value,
+                description: document.getElementById('description').value,
+                discount: discountType === 'PERCENTAGE' ? document.getElementById('discount').value : null,
+                discountAmount: discountType === 'FIXED' ? document.getElementById('discountAmount').value : null,
+                minimumOrderAmount: document.getElementById('minimumOrderAmount').value || null,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                usageLimit: document.getElementById('usageLimit').value,
+                status: document.getElementById('status').value
+            };
+
+            fetch(`/admin/vouchers/update/${voucherId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('thành công')) {
+                    alert('Cập nhật thành công!');
+                    window.location.href = '/admin/vouchers';
+                } else {
+                    alert('Lỗi: ' + data);
+                }
+            })
+            .catch(error => {
+                alert('Lỗi khi cập nhật: ' + error);
+            });
+        }
+
+        function deleteVoucher() {
+            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+                fetch(`/admin/vouchers/delete/${voucherId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data.includes('thành công')) {
+                        alert('Xóa voucher thành công!');
+                        window.location.href = '/admin/vouchers';
+                    } else {
+                        alert('Lỗi: ' + data);
+                    }
+                })
+                .catch(error => {
+                    alert('Lỗi khi xóa: ' + error);
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

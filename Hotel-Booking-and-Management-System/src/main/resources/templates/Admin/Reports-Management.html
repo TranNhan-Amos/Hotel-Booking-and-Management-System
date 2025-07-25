@@ -49,10 +49,10 @@
                                     <i class="fas fa-dollar-sign"></i>
                                 </div>
                             </div>
-                            <div class="stat-value">2,450,000 ₫</div>
+                            <div class="stat-value" th:text="${summaryReport != null ? #numbers.formatDecimal(summaryReport.totalRevenue, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-arrow-up"></i>
-                                <span>+15.3% so với tháng trước</span>
+                                <span>So với tháng trước</span>
                             </div>
                         </div>
                         
@@ -63,10 +63,10 @@
                                     <i class="fas fa-calendar-check"></i>
                                 </div>
                             </div>
-                            <div class="stat-value">156</div>
+                            <div class="stat-value" th:text="${summaryReport != null ? summaryReport.totalBookings : 0}">0</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-arrow-up"></i>
-                                <span>+8.7% so với tháng trước</span>
+                                <span>Đơn đặt phòng</span>
                             </div>
                         </div>
                         
@@ -77,10 +77,10 @@
                                     <i class="fas fa-user-plus"></i>
                                 </div>
                             </div>
-                            <div class="stat-value">89</div>
-                            <div class="stat-change negative">
-                                <i class="fas fa-arrow-down"></i>
-                                <span>-3.2% so với tháng trước</span>
+                            <div class="stat-value" th:text="${summaryReport != null ? summaryReport.newCustomers : 0}">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Khách hàng mới</span>
                             </div>
                         </div>
                         
@@ -91,10 +91,10 @@
                                     <i class="fas fa-percentage"></i>
                                 </div>
                             </div>
-                            <div class="stat-value">78.5%</div>
+                            <div class="stat-value" th:text="${summaryReport != null ? #numbers.formatDecimal(summaryReport.occupancyRate, 1, 1) + '%' : '0%'}">0%</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-arrow-up"></i>
-                                <span>+5.1% so với tháng trước</span>
+                                <span>Tỷ lệ lấp đầy</span>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">Doanh Thu Theo Thời Gian</div>
-                                <div class="chart-period">Tháng 5/2025</div>
+                                <div class="chart-period" th:text="'Tháng ' + ${currentMonth} + '/' + ${currentYear}">Tháng 5/2025</div>
                             </div>
                             <div class="chart-placeholder">
                                 <i class="fas fa-chart-line"></i>
@@ -113,11 +113,19 @@
                         
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div class="chart-title">Loại Phòng Phổ Biến</div>
-                                <div class="chart-period">Tháng 5/2025</div>
+                                <div class="chart-title">Top Phòng Phổ Biến</div>
+                                <div class="chart-period" th:text="'Tháng ' + ${currentMonth} + '/' + ${currentYear}">Tháng 5/2025</div>
                             </div>
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-pie"></i>
+                            <div class="top-rooms-list">
+                                <div th:each="room : ${topRooms}" class="room-item">
+                                    <div class="room-info">
+                                        <div class="room-name" th:text="${room.get('roomName')}">Tên phòng</div>
+                                        <div class="room-stats">
+                                            <span class="booking-count" th:text="${room.get('bookingCount')} + ' đặt'">0 đặt</span>
+                                            <span class="revenue" th:text="${#numbers.formatDecimal(room.get('totalRevenue'), 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,47 +143,41 @@
                                         <th>Số Đặt Phòng</th>
                                         <th>Doanh Thu</th>
                                         <th>Tỷ Lệ Lấp Đầy</th>
-                                        <th>Xu Hướng</th>
+                                        <th>Khách Hàng Mới</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>31/05/2025</td>
-                                        <td>8</td>
-                                        <td class="revenue-value">1,200,000 ₫</td>
-                                        <td>85%</td>
-                                        <td class="trend-up"><i class="fas fa-arrow-up"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>30/05/2025</td>
-                                        <td>6</td>
-                                        <td class="revenue-value">950,000 ₫</td>
-                                        <td>72%</td>
-                                        <td class="trend-up"><i class="fas fa-arrow-up"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>29/05/2025</td>
-                                        <td>5</td>
-                                        <td class="revenue-value">750,000 ₫</td>
-                                        <td>68%</td>
-                                        <td class="trend-down"><i class="fas fa-arrow-down"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>28/05/2025</td>
-                                        <td>7</td>
-                                        <td class="revenue-value">1,100,000 ₫</td>
-                                        <td>80%</td>
-                                        <td class="trend-up"><i class="fas fa-arrow-up"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>27/05/2025</td>
-                                        <td>4</td>
-                                        <td class="revenue-value">600,000 ₫</td>
-                                        <td>55%</td>
-                                        <td class="trend-down"><i class="fas fa-arrow-down"></i></td>
+                                    <tr th:each="report : ${dailyReports}">
+                                        <td th:text="${#temporals.format(report.date, 'dd/MM/yyyy')}">01/05/2025</td>
+                                        <td th:text="${report.totalBookings}">0</td>
+                                        <td class="revenue-value" th:text="${#numbers.formatDecimal(report.totalRevenue, 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</td>
+                                        <td th:text="${#numbers.formatDecimal(report.occupancyRate, 1, 1) + '%'}">0%</td>
+                                        <td th:text="${report.newCustomers}">0</td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Customers Section -->
+                    <div class="top-customers-section">
+                        <div class="section-title">
+                            <h3><i class="fas fa-crown"></i> Khách Hàng VIP</h3>
+                        </div>
+                        <div class="customers-grid">
+                            <div th:each="customer : ${topCustomers}" class="customer-card">
+                                <div class="customer-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="customer-info">
+                                    <div class="customer-name" th:text="${customer.get('customerName')}">Tên khách hàng</div>
+                                    <div class="customer-email" th:text="${customer.get('customerEmail')}">email@example.com</div>
+                                    <div class="customer-stats">
+                                        <span class="booking-count" th:text="${customer.get('bookingCount')} + ' đặt'">0 đặt</span>
+                                        <span class="total-spent" th:text="${#numbers.formatDecimal(customer.get('totalSpent'), 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,8 +224,48 @@
                 endDate.style.display = 'none';
             }
             
-            // Simulate data update
-            console.log(`Updating reports for period: ${period}`);
+            // Gọi API để cập nhật dữ liệu
+            loadReportData(period, startDate.value, endDate.value);
+        }
+
+        // Load Report Data
+        function loadReportData(period, startDate, endDate) {
+            const url = `/admin/reports/summary`;
+            const params = new URLSearchParams({
+                startDate: startDate,
+                endDate: endDate
+            });
+
+            fetch(`${url}?${params}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateSummaryStats(data);
+            })
+            .catch(error => {
+                console.error('Error loading report data:', error);
+            });
+        }
+
+        // Update Summary Statistics
+        function updateSummaryStats(data) {
+            // Cập nhật các thống kê tổng quan
+            const revenueElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
+            const bookingsElement = document.querySelector('.stat-card:nth-child(2) .stat-value');
+            const customersElement = document.querySelector('.stat-card:nth-child(3) .stat-value');
+            const occupancyElement = document.querySelector('.stat-card:nth-child(4) .stat-value');
+
+            if (revenueElement) revenueElement.textContent = formatCurrency(data.totalRevenue);
+            if (bookingsElement) bookingsElement.textContent = data.totalBookings || 0;
+            if (customersElement) customersElement.textContent = data.newCustomers || 0;
+            if (occupancyElement) occupancyElement.textContent = (data.occupancyRate || 0).toFixed(1) + '%';
+        }
+
+        // Format Currency
+        function formatCurrency(amount) {
+            if (!amount) return '0 ₫';
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
         }
 
         // Export Report

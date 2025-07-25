@@ -7,12 +7,19 @@ import org.springframework.stereotype.Service;
 
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
+import sd19303no1.hotel_booking_and_management_system.DTO.CustomerDTO;
+import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.ReviewRepository;
 
 @Service
 public class CustomersService {
 
      @Autowired
     private CustomersRepository customerRepository;
+    @Autowired
+    private BookingOrderRepository bookingOrderRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     public List<CustomersEntity> getAllCustomers() {
         return customerRepository.findAll();
@@ -50,5 +57,65 @@ public class CustomersService {
 
     public CustomersEntity findByEmail(String email) {
         return customerRepository.findByEmail(email).orElse(null);
+    }
+
+    public List<CustomerDTO> getAllCustomerDTOs() {
+        List<CustomersEntity> customers = customerRepository.findAll();
+        List<CustomerDTO> dtos = new java.util.ArrayList<>();
+        for (CustomersEntity c : customers) {
+            CustomerDTO dto = new CustomerDTO();
+            dto.setCustomerId(c.getCustomerId());
+            dto.setName(c.getName());
+            dto.setEmail(c.getEmail());
+            dto.setPhone(c.getPhone());
+            dto.setAddress(c.getAddress());
+            dto.setCreatedDate(c.getCreatedDate());
+            dto.setStatus(c.getStatus());
+            // Booking count
+            int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail()).size();
+            dto.setBookingCount(bookingCount);
+            // Spending (tổng totalPrice các booking)
+            double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail())
+                .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
+            dto.setSpending(spending);
+            // Rating (nếu có logic rating theo customer, nếu không thì để 0)
+            dto.setRating(0);
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    public CustomerDTO getCustomerDTOById(Integer customerId) {
+        CustomersEntity customer = customerRepository.findById(customerId).orElse(null);
+        if (customer == null) return null;
+        
+        CustomerDTO dto = new CustomerDTO();
+        dto.setCustomerId(customer.getCustomerId());
+        dto.setName(customer.getName());
+        dto.setEmail(customer.getEmail());
+        dto.setPhone(customer.getPhone());
+        dto.setAddress(customer.getAddress());
+        dto.setCreatedDate(customer.getCreatedDate());
+        dto.setStatus(customer.getStatus());
+        
+        // Booking count
+        int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(customer.getEmail()).size();
+        dto.setBookingCount(bookingCount);
+        // Spending
+        double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(customer.getEmail())
+            .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
+        dto.setSpending(spending);
+        // Rating
+        dto.setRating(0);
+        
+        return dto;
+    }
+
+    public void deleteCustomer(Integer customerId) {
+        if (customerRepository.existsById(customerId)) {
+            customerRepository.deleteById(customerId);
+        } else {
+            throw new IllegalArgumentException("Không tìm thấy khách hàng để xóa!");
+        }
     }
 }

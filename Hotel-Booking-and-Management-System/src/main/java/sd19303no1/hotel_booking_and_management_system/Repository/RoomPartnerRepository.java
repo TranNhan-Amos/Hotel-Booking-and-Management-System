@@ -16,6 +16,7 @@ public interface RoomPartnerRepository extends JpaRepository<RoomPartnerEntity, 
 
 
     boolean existsByRoomNumberAndPartnerId(String roomNumber, Long partnerId);
+    boolean existsByRoomNumberIsNullAndPartnerId(Long partnerId);
 
 
 }

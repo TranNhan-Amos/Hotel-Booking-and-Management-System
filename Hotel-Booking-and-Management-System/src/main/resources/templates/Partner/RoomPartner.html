@@ -227,63 +227,15 @@
                 </div>
                 <div class="room-table-wrapper">
                     <table class="room-table">
-                        <thead>
-                            <tr>
-                                <th>Hình ảnh</th>
-                                <th>Mã phòng</th>
-                                <th>Tên phòng</th>
-                                <th>Loại giường</th>
-                                <th>Giá (VND)</th>
-                                <th>Sức chứa</th>
-                                <th>Phòng hút thuốc</th>
-                                <th>View</th>
-                                <th>Mô tả phòng</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
                         <tbody>
-                            <tr th:each="roomPartner : ${roomPartners}">
-                                <td>
-                                    <div class="room-image-container">
-                                        <img th:if="${roomPartner.imageUrls != null && !roomPartner.imageUrls.isEmpty()}" 
-                                             th:src="${roomPartner.imageUrls[0]}" alt="Room" class="room-image">
-                                        <div th:if="${roomPartner.imageUrls == null || roomPartner.imageUrls.isEmpty()}" 
-                                             class="room-image-placeholder">
-                                            <i class="fas fa-image"></i>
-                                        </div>
-                                        <button type="button" class="manage-images-btn" 
-                                                th:onclick="'openImageManager(' + ${roomPartner.roomId} + ')'">
-                                            <i class="fas fa-camera"></i>
-                                        </button>
-                                    </div>
-                                </td>    
-                                <td th:text="${roomPartner.roomNumber}"></td>                            
-                                <td th:text="${roomPartner.bathroomType}">Deluxe Ocean View</td>
-                                <td th:text="${roomPartner.bedType}">King</td>
-                                <td th:text="${roomPartner.price}"></td>                                <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
-                                <td>
-                                    <span th:classappend="${roomPartner.isSmoking ? 'smoking-yes' : 'smoking-no'}" class="room-smoking-status" th:text="${roomPartner.isSmoking ? 'Có' : 'Không'}">Không</span>
-                                </td>
-                                <th th:text="${roomPartner.view}"></th>
-                                <td th:text="${roomPartner.description}">Phòng rộng rãi, view biển đẹp</td>
-                                <td>
-                                    <span th:classappend="${roomPartner.status == 'Available' ? 'status-available' : 'status-unavailable'}" class="room-status" th:text="${roomPartner.status == 'Available' ? 'Còn trống' : 'Đã đặt'}">Còn trống</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn btn-secondary">Chỉnh sửa</button>
-                                        <button class="action-btn btn-danger">Xóa</button>
-                                    </div>
-                                </td>
-                            </tr>
+                        <thead>
                         <tr>
                             <th>Hình ảnh</th>
-                            <th>Mã phòng</th>
                             <th>Loại phòng</th>
                             <th>Loại giường</th>
                             <th>Giá (VND)</th>
                             <th>Sức chứa</th>
+                            <th>Tổng số phòng</th>
                             <th>Phòng hút thuốc</th>
                             <th>Loại phòng tắm</th>
                             <th>View</th>
@@ -349,12 +301,9 @@
                 <form th:action="@{/room/partner/add}" th:object="${roomPartner}" method="post">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Mã phòng</label>
-                            <input type="text" th:field="*{roomNumber}" placeholder="Nhập mã phòng" required>
-                        </div>
-                        <div class="form-group">
                             <label>Loại phòng</label>
                             <select th:field="*{type}">
+                                <option value="">-- Chọn loại phòng --</option>
                                 <option value="Standard">Standard</option>
                                 <option value="Deluxe">Deluxe</option>
                                 <option value="Suite">Suite</option>
@@ -363,31 +312,23 @@
                         </div>
                         <div class="form-group">
                             <label>Loại giường</label>
-                            <input type="text" th:field="*{bedType}" placeholder="Loại giường">
-                        </div>
-                        <div class="form-group">
-                            <label>Giá (VND)</label>
-                            <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required>
+                            <select th:field="*{bedType}">
+                                <option value="">-- Chọn loại giường --</option>
+                                <option value="Single bed">Single bed</option>
+                                <option value="Double bed">Double bed</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Sức chứa</label>
                             <input type="number" th:field="*{capacity}" placeholder="Số người" required>
                         </div>
                         <div class="form-group">
-                            <label>Tầng</label>
-                            <input type="number" th:field="*{floor}" placeholder="Tầng">
-                            <select th:field="*{bedType}">
-                                <option value="Single bed">Single bed</option>
-                                <option value="Double bed">Double bed</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label>Giá (VND)</label>
                             <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required min="0">
                         </div>
                         <div class="form-group">
-                            <label>Sức chứa</label>
-                            <input type="number" th:field="*{capacity}" placeholder="Số người" required min="1">
+                            <label>Tổng số phòng</label>
+                            <input type="number" th:field="*{capacity}" placeholder="Số phòng" required min="1">
                         </div>
                         <div class="form-group">
                             <label>Hút thuốc</label>
@@ -399,6 +340,7 @@
                         <div class="form-group">
                             <label>Loại phòng tắm</label>
                             <select th:field="*{bathroomType}">
+                                <option value="">-- Chọn loại phòng tắm --</option>
                                 <option value="1">Standard Bathroom</option>
                                 <option value="2">Deluxe Bathroom</option>
                                 <option value="3">Glass Bathroom</option>
@@ -407,14 +349,17 @@
                         <div class="form-group">
                             <label>View</label>
                             <select th:field="*{view}">
-                                <option value="Beach View">Beach View</option>
-                                <option value="City View">City View</option>
-                                <option value="Garden View">Garden View</option>
+                                <option value="">-- Chọn view --</option>
+                                <option value="City">City</option>
+                                <option value="Sea">Sea</option>
+                                <option value="Mountain">Mountain</option>
+                                <option value="Garden">Garden</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Trạng thái</label>
                             <select th:field="*{status}">
+                                <option value="">-- Chọn trạng thái --</option>
                                 <option value="Available">Còn trống</option>
                                 <option value="Unavailable">Đã đặt</option>
                             </select>
@@ -422,6 +367,12 @@
                         <div class="form-group full-width">
                             <label>Mô tả phòng</label>
                             <textarea th:field="*{description}" placeholder="Nhập mô tả phòng"></textarea>
+                        </div>
+                        <div>
+                            <label>Ảnh phòng</label>
+                            <div id="new-image-preview-add" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                            <input type="file" id="roomImagesAdd" name="roomImages" multiple accept="image/*" style="margin-bottom:8px;">
+                            <div style="font-size:13px;color:#888;">Chọn nhiều ảnh hoặc kéo thả vào đây</div>
                         </div>
                         <div class="form-group full-width">
                             <button class="action-btn" type="submit">Đăng tải phòng</button>

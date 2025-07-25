@@ -123,7 +123,7 @@ public class AuthController {
         return authentication.getAuthorities().stream()
                 .map(authority -> switch (authority.getAuthority()) {
                     case "ROLE_ADMIN" -> "redirect:/admin/bookings";
-                    case "ROLE_PARTNER" -> "redirect:/partner";
+                    case "ROLE_PARTNER" -> "redirect:/partner/reports";
                     case "ROLE_STAFF" -> "redirect:/staff/dashboard";
                     default -> "redirect:/";
                 })

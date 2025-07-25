@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
@@ -32,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class PartnerController {
@@ -66,7 +68,7 @@ public class PartnerController {
                 System.out.println("=== DEBUG: User is partner");
                 // Find partner information
                 PartnerEntity partner = partnerService.findBySystemUser(systemUser);
-                
+
                 System.out.println("=== DEBUG: Partner found: " + (partner != null));
 
                 if (partner != null) {
@@ -191,77 +193,84 @@ public class PartnerController {
         return ("Partner/DashboardPartner");
     }
 
-    
+    @GetMapping("/partner/reports")
+    public String viewPartnerReports(@RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            Model model) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
 
+            if (systemUser != null && systemUser.isPartner()) {
+                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
 
-  @GetMapping("/partner/reports")
-public String viewPartnerReports(@RequestParam(required = false) String startDate,
-                                 @RequestParam(required = false) String endDate,
-                                 Model model) {
-    try {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+                if (partner != null) {
+                    Long partnerId = partner.getId();
 
-        if (systemUser != null && systemUser.isPartner()) {
-            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+                    // ✅ Xử lý ngày trước
+                    DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                    String defaultDate = LocalDate.now().format(formatter);
 
-            if (partner != null) {
-                Long partnerId = partner.getId();
+                    startDate = (startDate != null && !startDate.isEmpty()) ? startDate : defaultDate;
+                    endDate = (endDate != null && !endDate.isEmpty()) ? endDate : defaultDate;
 
-                // ✅ Xử lý ngày trước
-                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-                String defaultDate = LocalDate.now().format(formatter);
+                    LocalDate start = LocalDate.parse(startDate);
+                    LocalDate end = LocalDate.parse(endDate);
 
-                startDate = (startDate != null && !startDate.isEmpty()) ? startDate : defaultDate;
-                endDate = (endDate != null && !endDate.isEmpty()) ? endDate : defaultDate;
+                    // ✅ Gọi service với ngày đã xử lý
+                    Map<LocalDate, ReportsPartnerDTO> DayReports = bookingOrderService.getDailyBookingCount(partnerId,
+                            start, end);
+                    List<Integer> availableYears = bookingOrderService.getAvailableBookingYears(partnerId);
 
-                LocalDate start = LocalDate.parse(startDate);
-                LocalDate end = LocalDate.parse(endDate);
+                    BigDecimal totalRevenue = BigDecimal.ZERO;
+                    Long totalBookings = 0L;
 
-                // ✅ Gọi service với ngày đã xử lý
-                Map<LocalDate, ReportsPartnerDTO> DayReports = bookingOrderService.getDailyBookingCount(partnerId, start, end);
+                    if (start != null && end != null) {
+                        List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
 
-                BigDecimal totalRevenue = BigDecimal.ZERO;
-                Long totalBookings = 0L;
+                        totalRevenue = (reportData != null && !reportData.isEmpty() && reportData.get(0)[0] != null)
+                                ? (BigDecimal) reportData.get(0)[0]
+                                : BigDecimal.ZERO;
+                        totalBookings = (reportData != null && !reportData.isEmpty() && reportData.get(0)[1] != null)
+                                ? ((Number) reportData.get(0)[1]).longValue()
+                                : 0L;
 
-                if (start != null && end != null) {
-                    List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
+                        System.out.println("Filtered from: " + start + " to " + end);
+                        System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
+                    }
 
-                    totalRevenue = (reportData != null && !reportData.isEmpty() && reportData.get(0)[0] != null)
-                            ? (BigDecimal) reportData.get(0)[0]
-                            : BigDecimal.ZERO;
-                    totalBookings = (reportData != null && !reportData.isEmpty() && reportData.get(0)[1] != null)
-                            ? ((Number) reportData.get(0)[1]).longValue()
-                            : 0L;
+                    model.addAttribute("totalRevenue", totalRevenue);
+                    model.addAttribute("totalBookings", totalBookings);
+                    model.addAttribute("startDate", startDate);
+                    model.addAttribute("endDate", endDate);
+                    model.addAttribute("partnerId", partnerId);
+                    model.addAttribute("DayReports", DayReports);
+                    model.addAttribute("availableYears", availableYears);
 
-                    System.out.println("Filtered from: " + start + " to " + end);
-                    System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
+                    return "Partner/ReportsPartner";
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                    return "Partner/ReportsPartner";
                 }
-
-                model.addAttribute("totalRevenue", totalRevenue);
-                model.addAttribute("totalBookings", totalBookings);
-                model.addAttribute("startDate", startDate);
-                model.addAttribute("endDate", endDate);
-                model.addAttribute("partnerId", partnerId);
-                model.addAttribute("DayReports", DayReports);
-
-                return "Partner/ReportsPartner";
             } else {
-                model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                model.addAttribute("error", "Bạn không có quyền truy cập.");
                 return "Partner/ReportsPartner";
             }
-        } else {
-            model.addAttribute("error", "Bạn không có quyền truy cập.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
             return "Partner/ReportsPartner";
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
-        return "Partner/ReportsPartner";
     }
-}
 
+    // Lấy dữ liệu doanh thu hàng tháng của đối tác theo năm
+    @GetMapping("/api/partner/monthly-revenue")
+    @ResponseBody
+    public List<MonthlyRevenueReportPartnerDTO> getMonthlyRevenue(@RequestParam Long partnerId,
+            @RequestParam Integer year) {
+        return bookingOrderService.getMonthlyRevenueReportPartner(partnerId, year);
+    }
 
     @GetMapping("/partner/reviews")
     public String viewPartnerReviews() {

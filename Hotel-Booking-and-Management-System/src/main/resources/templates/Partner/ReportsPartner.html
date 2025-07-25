@@ -78,7 +78,7 @@
                             <i class="fas fa-calendar-check"></i>
                         </div>
                     </div>
-                      <div class="stat-value" th:if="${totalBookings != null and totalBookings > 0}"
+                    <div class="stat-value" th:if="${totalBookings != null and totalBookings > 0}"
                         th:text="${totalBookings}">3.450.000đ
                     </div>
                     <div class="stat-value" th:unless="${totalBookings != null and totalBookings > 0}"
@@ -118,36 +118,10 @@
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <div class="chart-card">
-                    <div class="card-header">
-                        <div class="card-title">Doanh thu theo tháng</div>
-                        <select class="action-btn btn-secondary">
-                            <option>Năm 2024</option>
-                            <option>Năm 2023</option>
-                        </select>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <div class="card-header">
-                        <div class="card-title">Loại phòng phổ biến</div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="roomTypeChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
             <!-- Reports Table -->
             <div class="reports-section">
                 <div class="card-header">
-                    <div class="card-title">Báo cáo chi tiết 7 ngày gần nhất</div>
-                    <button class="action-btn btn-secondary">Xem tất cả</button>
+                    <div class="card-title">Báo cáo chi tiết</div>
                 </div>
 
                 <!-- Desktop Table -->
@@ -165,9 +139,11 @@
                         </thead>
                         <tbody>
                             <tr th:each="entry : ${DayReports}">
-                               <td th:text="${#temporals.format(entry.key, 'dd/MM/yyyy')}"></td>
-                               <td th:text="${entry.value.count}"></td>
-                               <td th:text="${#numbers.formatDecimal(entry.value.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td th:text="${#temporals.format(entry.key, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${entry.value.count}"></td>
+                                <td
+                                    th:text="${#numbers.formatDecimal(entry.value.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                </td>
                                 <td>78.6%</td>
                                 <td>4.7</td>
                                 <td>1</td>
@@ -175,96 +151,59 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <!-- Mobile Cards -->
-                <div class="report-cards">
-                    <div class="report-card">
-                        <div class="report-card-header">
-                            <div class="report-card-title">20/06/2024</div>
-                        </div>
-                        <div class="report-card-content">
-                            <div class="report-card-item">
-                                <div class="report-card-label">Số đặt phòng</div>
-                                <div class="report-card-value">24</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Doanh thu</div>
-                                <div class="report-card-value">18.500.000đ</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
-                                <div class="report-card-value">85.7%</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Đánh giá TB</div>
-                                <div class="report-card-value">4.8</div>
-                            </div>
-                        </div>
+            <!-- Charts Section -->
+            <div class="charts-section">
+                 <div class="chart-card">
+        <div class="card-header">
+            <div class="card-title">Doanh thu theo năm</div>
+            <select id="yearSelect" class="action-btn btn-secondary" onchange="loadChart()">
+                <option th:each="year : ${availableYears}" 
+                        th:value="${year}" 
+                        th:text="'Năm ' + ${year}"
+                        th:selected="${year} == ${selectedYear}">
+                </option>
+            </select>
+        </div>
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Loại phòng phổ biến</div>
                     </div>
-
-                    <div class="report-card">
-                        <div class="report-card-header">
-                            <div class="report-card-title">19/06/2024</div>
-                        </div>
-                        <div class="report-card-content">
-                            <div class="report-card-item">
-                                <div class="report-card-label">Số đặt phòng</div>
-                                <div class="report-card-value">22</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Doanh thu</div>
-                                <div class="report-card-value">16.800.000đ</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
-                                <div class="report-card-value">78.6%</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Đánh giá TB</div>
-                                <div class="report-card-value">4.7</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="report-card">
-                        <div class="report-card-header">
-                            <div class="report-card-title">18/06/2024</div>
-                        </div>
-                        <div class="report-card-content">
-                            <div class="report-card-item">
-                                <div class="report-card-label">Số đặt phòng</div>
-                                <div class="report-card-value">28</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Doanh thu</div>
-                                <div class="report-card-value">21.200.000đ</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Tỷ lệ lấp đầy</div>
-                                <div class="report-card-value">92.9%</div>
-                            </div>
-                            <div class="report-card-item">
-                                <div class="report-card-label">Đánh giá TB</div>
-                                <div class="report-card-value">4.9</div>
-                            </div>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="roomTypeChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            const revenueChart = new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6'],
+    <script  th:inline="javascript">
+        const partnerId = /*[[${partnerId}]]*/ 0;
+
+    let revenueChart;
+
+    function loadChart() {
+        const year = document.getElementById("yearSelect").value;
+
+        fetch(`/api/partner/monthly-revenue?partnerId=${partnerId}&year=${year}`)
+            .then(res => res.json())
+            .then(data => {
+                const labels = Array.from({length: 12}, (_, i) => `Th${i + 1}`);
+                const monthMap = new Map(data.map(item => [item.month, item.totalRevenue]));
+                const revenues = Array.from({length: 12}, (_, i) => monthMap.get(i + 1) || 0);
+
+                const chartData = {
+                    labels: labels,
                     datasets: [{
                         label: 'Doanh thu (triệu đồng)',
-                        data: [85, 110, 98, 120, 145, 186],
+                        data: revenues.map(val => val / 1_000_000), // chuyển sang triệu
                         borderColor: '#1a2980',
                         backgroundColor: 'rgba(26, 41, 128, 0.1)',
                         borderWidth: 3,
@@ -274,30 +213,35 @@
                         tension: 0.3,
                         fill: true
                     }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                };
+
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (revenueChart) revenueChart.destroy();
+                revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => value + 'tr'
+                                }
                             }
                         }
                     }
-                }
+                });
             });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadChart);
 
             // Room Type Chart
             const roomTypeCtx = document.getElementById('roomTypeChart').getContext('2d');
@@ -342,7 +286,7 @@
                     card.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
                 });
             });
-        });
+        // });
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form');
             const startDateInput = document.querySelector('input[name="startDate"]');

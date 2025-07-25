@@ -111,13 +111,13 @@ public class RoomPartnerController {
                     }
 
                     roomPartner.setPartnerId(partner.getId());
-                    boolean exists = roomPartnerService.existsByRoomNumberAndPartnerId(
-                            roomPartner.getRoomNumber(),
-                            partner.getId());
+                    // boolean exists = roomPartnerService.existsByRoomNumberAndPartnerId(
+                    //         roomPartner.getRoomNumber(),
+                    //         partner.getId());
 
-                    if (exists) {
-                        return "redirect:/room/partner?exists=true";
-                    }
+                    // if (exists) {
+                    //     return "redirect:/room/partner?exists=true";
+                    // }
                     roomPartnerService.save(roomPartner);
                     return "redirect:/room/partner?success=true";
                 } else {
@@ -154,13 +154,10 @@ public class RoomPartnerController {
                     }
 
                     RoomPartnerEntity existingRoom = roomPartnerService.findById(roomPartner.getRoomId());
-                    if (!existingRoom.getRoomNumber().equals(roomPartner.getRoomNumber())) {
-                        boolean exists = roomPartnerService.existsByRoomNumberAndPartnerId(
-                                roomPartner.getRoomNumber(), partner.getId());
-                        if (exists) {
-                            return "redirect:/room/partner?exists=true&roomNumber=" + roomPartner.getRoomNumber();
-                        }
-                    }
+                   if (existingRoom == null) {
+                    redirectAttributes.addFlashAttribute("error", "Phòng không tồn tại.");
+                    return "redirect:/room/partner?error=true";
+                }
 
                     roomPartner.setPartnerId(partner.getId());
                     roomPartnerService.updateRoomPartner(roomPartner);

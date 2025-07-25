@@ -13,7 +13,7 @@ public class RoomEntity {
     @Column(name = "room_id")
     private Integer roomId;
 
-    @Column(name = "room_number", nullable = false, unique = true, length = 20)
+    @Column(name = "room_number", nullable = true, unique = false, length = 20)
     private String roomNumber; // Số phòng (VD: P101, P102)
 
     @Column(name = "type", nullable = false, length = 50)

@@ -67,7 +67,7 @@ public class SecurityConfig {
         return authentication.getAuthorities().stream()
                 .map(authority -> switch (authority.getAuthority()) {
                     case "ROLE_ADMIN" -> "/admin/bookings";
-                    case "ROLE_PARTNER" -> "/partner";
+                    case "ROLE_PARTNER" -> "/partner/reports";
                     case "ROLE_STAFF" -> "/staff/dashboard";
                     default -> "/";
                 })

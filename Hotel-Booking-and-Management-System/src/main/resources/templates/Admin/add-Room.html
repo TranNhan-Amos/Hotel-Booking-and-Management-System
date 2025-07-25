@@ -141,25 +141,23 @@
         <input type="hidden" name="partner.id" th:value="${selectedPartnerId}" />
         <div class="form-row">
             <div>
-                <label for="roomNumber">Tên phòng <span style="color:red">*</span></label>
-                <input type="text" id="roomNumber" name="roomNumber" placeholder="Nhập tên phòng" required />
-            </div>
-            <div>
                 <label for="type">Loại phòng <span style="color:red">*</span></label>
-                <input type="text" id="type" name="type" placeholder="VD: Deluxe, Suite..." required />
+                <select id="type" name="type" required>
+                    <option value="">-- Chọn loại phòng --</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Deluxe">Deluxe</option>
+                    <option value="Suite">Suite</option>
+                    <option value="Premium">Premium</option>
+                </select>
             </div>
         </div>
         <div class="form-row">
             <div>
-                <label for="price">Giá (VNĐ) <span style="color:red">*</span></label>
-                <input type="number" id="price" name="price" placeholder="Nhập giá phòng" min="0" required />
-            </div>
-            <div>
-                <label for="status">Trạng thái <span style="color:red">*</span></label>
-                <select id="status" name="status" required>
-                    <option value="">-- Chọn trạng thái --</option>
-                    <option value="active">Đang hoạt động</option>
-                    <option value="inactive">Ngừng hoạt động</option>
+                <label for="bedType">Loại giường</label>
+                <select id="bedType" name="bedType">
+                    <option value="">-- Chọn loại giường --</option>
+                    <option value="Single bed">Single bed</option>
+                    <option value="Double bed">Double bed</option>
                 </select>
             </div>
         </div>
@@ -169,34 +167,53 @@
                 <input type="number" id="capacity" name="capacity" placeholder="VD: 2" min="1" required />
             </div>
             <div>
-                <label for="floor">Tầng <span style="color:red">*</span></label>
-                <input type="number" id="floor" name="floor" placeholder="VD: 5" min="1" required />
-            </div>
-            <div>
                 <label for="totalRooms">Tổng số phòng <span style="color:red">*</span></label>
                 <input type="number" id="totalRooms" name="totalRooms" placeholder="VD: 10" min="1" required />
             </div>
         </div>
         <div class="form-row">
             <div>
-                <label for="bedType">Loại giường</label>
-                <input type="text" id="bedType" name="bedType" placeholder="VD: King, Queen..." />
+                <label for="price">Giá (VNĐ) <span style="color:red">*</span></label>
+                <input type="number" id="price" name="price" placeholder="Nhập giá phòng" min="0" required />
             </div>
             <div>
-                <label for="bedCount">Số giường</label>
-                <input type="number" id="bedCount" name="bedCount" placeholder="VD: 2" min="1" />
+                <label for="smoking">Hút thuốc</label>
+                <select id="smoking" name="smoking">
+                    <option value="true">Có</option>
+                    <option value="false" selected>Không</option>
+                </select>
             </div>
         </div>
+
         <div class="form-row">
             <div>
                 <label for="bathroomType">Phòng tắm</label>
-                <input type="text" id="bathroomType" name="bathroomType" placeholder="VD: Shower, Bathtub..." />
+                <select id="bathroomType" name="bathroomType">
+                    <option value="">-- Chọn loại phòng tắm --</option>
+                    <option value="1">Standard Bathroom</option>
+                    <option value="2">Deluxe Bathroom</option>
+                    <option value="3">Glass Bathroom</option>
+                </select>
             </div>
             <div>
                 <label for="view">View</label>
-                <input type="text" id="view" name="view" placeholder="VD: Sea, City..." />
+                <select id="view" name="view">
+                    <option value="">-- Chọn view --</option>
+                    <option value="City">City</option>
+                    <option value="Sea">Sea</option>
+                    <option value="Mountain">Mountain</option>
+                    <option value="Garden">Garden</option>
+                </select>
             </div>
         </div>
+        <div>
+                <label for="status">Trạng thái <span style="color:red">*</span></label>
+                <select id="status" name="status" required>
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Ngừng hoạt động</option>
+                </select>
+            </div>
         <div>
             <label for="description">Mô tả</label>
             <textarea id="description" name="description" rows="2" placeholder="Mô tả chi tiết về phòng..."></textarea>

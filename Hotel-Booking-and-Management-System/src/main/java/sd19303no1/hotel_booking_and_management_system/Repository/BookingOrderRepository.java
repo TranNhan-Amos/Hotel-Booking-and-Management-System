@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -62,19 +61,6 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
                        """)
   List<BookingOrderEntity> findAllBookingsByPartner(@Param("partnerId") Long partnerId);
 
- @Query("""
-    SELECT FUNCTION('DATE', b.createdAt), COUNT(b), SUM(b.totalPrice)
-    FROM BookingOrderEntity b
-    WHERE b.room.partner.id = :partnerId
-      AND b.createdAt >= :startDate AND b.createdAt < :endDate
-    GROUP BY FUNCTION('DATE', b.createdAt)
-    ORDER BY FUNCTION('DATE', b.createdAt)
-""")
-List<Object[]> getBookingStatsInRange(@Param("partnerId") Long partnerId,
-                                      @Param("startDate") LocalDateTime startDate,
-                                      @Param("endDate") LocalDateTime endDate);
-
-
   @Query("""
       SELECT SUM(b.totalPrice)
       FROM BookingOrderEntity b
@@ -101,7 +87,5 @@ List<Object[]> getBookingStatsInRange(@Param("partnerId") Long partnerId,
   List<Object[]> getReportData(@Param("partnerId") Long partnerId,
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate);
-
-      
 
 }

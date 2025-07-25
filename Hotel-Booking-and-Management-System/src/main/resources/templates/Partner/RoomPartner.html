@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý phòng - Grand Ocean</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" th:href="@{/Css/partner/RoomPartner.css}">
     <style>
         /* Modal Styles */
@@ -174,6 +175,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -184,6 +186,7 @@
             from {
                 opacity: 1;
             }
+
             to {
                 opacity: 0;
             }
@@ -213,7 +216,7 @@
                 </div>
                 <div class="header-actions">
                     <button class="action-btn"
-                            onclick="document.getElementById('add-room-form').scrollIntoView({ behavior: 'smooth' })">
+                        onclick="document.getElementById('add-room-form').scrollIntoView({ behavior: 'smooth' })">
                         Thêm phòng mới
                     </button>
                 </div>
@@ -227,115 +230,70 @@
                 </div>
                 <div class="room-table-wrapper">
                     <table class="room-table">
-                        <thead>
-                            <tr>
-                                <th>Hình ảnh</th>
-                                <th>Mã phòng</th>
-                                <th>Tên phòng</th>
-                                <th>Loại giường</th>
-                                <th>Giá (VND)</th>
-                                <th>Sức chứa</th>
-                                <th>Phòng hút thuốc</th>
-                                <th>View</th>
-                                <th>Mô tả phòng</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
+                        <tbody>
+                            <thead>
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Loại phòng</th>
+                                    <th>Loại giường</th>
+                                    <th>Giá (VND)</th>
+                                    <th>Sức chứa</th>
+                                    <th>Tổng số phòng</th>
+                                    <th>Phòng hút thuốc</th>
+                                    <!-- <th>Loại phòng tắm</th> -->
+                                    <th>View</th>
+                                    <th>Mô tả phòng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
                         <tbody>
                             <tr th:each="roomPartner : ${roomPartners}">
-                                <td>
-                                    <div class="room-image-container">
-                                        <img th:if="${roomPartner.imageUrls != null && !roomPartner.imageUrls.isEmpty()}" 
-                                             th:src="${roomPartner.imageUrls[0]}" alt="Room" class="room-image">
-                                        <div th:if="${roomPartner.imageUrls == null || roomPartner.imageUrls.isEmpty()}" 
-                                             class="room-image-placeholder">
-                                            <i class="fas fa-image"></i>
-                                        </div>
-                                        <button type="button" class="manage-images-btn" 
-                                                th:onclick="'openImageManager(' + ${roomPartner.roomId} + ')'">
-                                            <i class="fas fa-camera"></i>
-                                        </button>
-                                    </div>
-                                </td>    
-                                <td th:text="${roomPartner.roomNumber}"></td>                            
-                                <td th:text="${roomPartner.bathroomType}">Deluxe Ocean View</td>
-                                <td th:text="${roomPartner.bedType}">King</td>
-                                <td th:text="${roomPartner.price}"></td>                                <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
-                                <td>
-                                    <span th:classappend="${roomPartner.isSmoking ? 'smoking-yes' : 'smoking-no'}" class="room-smoking-status" th:text="${roomPartner.isSmoking ? 'Có' : 'Không'}">Không</span>
+                                <td><img src="https://byvn.net/gqQ1" alt="Room" class="room-image"></td>
+                                <!-- <td th:text="${roomPartner.roomNumber}"></td> -->
+                                <td th:text="${roomPartner.type}"></td>
+                                <td th:text="${roomPartner.bedType}"></td>
+                                <td
+                                    th:text="${#numbers.formatDecimal(roomPartner.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                                 </td>
-                                <th th:text="${roomPartner.view}"></th>
-                                <td th:text="${roomPartner.description}">Phòng rộng rãi, view biển đẹp</td>
+                                <td th:text="${roomPartner.capacity + ' người'}"></td>
+                                <td th:text="${roomPartner.totalRooms}"></td>
                                 <td>
-                                    <span th:classappend="${roomPartner.status == 'Available' ? 'status-available' : 'status-unavailable'}" class="room-status" th:text="${roomPartner.status == 'Available' ? 'Còn trống' : 'Đã đặt'}">Còn trống</span>
+                                    <span th:classappend="${roomPartner.isSmoking ? 'smoking-yes' : 'smoking-no'}"
+                                        class="room-smoking-status"
+                                        th:text="${roomPartner.isSmoking ? 'Có' : 'Không'}"></span>
+                                </td>
+                                <!-- <td>
+                                    <span th:if="${roomPartner.bathroomType == 1}">Standard Bathroom</span>
+                                    <span th:if="${roomPartner.bathroomType == 2}">Deluxe Bathroom</span>
+                                    <span th:if="${roomPartner.bathroomType == 3}">Glass Bathroom</span>
+                                </td> -->
+                                <td th:text="${roomPartner.view}"></td>
+                                <td th:text="${roomPartner.description}"></td>
+                                <td>
+                                    <span
+                                        th:classappend="${roomPartner.status == 'AVAILABLE' ? 'status-available' : 'status-unavailable'}"
+                                        class="room-status"
+                                        th:text="${roomPartner.status == 'AVAILABLE' ? 'Đang hiển thị' : 'Đã ẩn'}"></span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn btn-secondary">Chỉnh sửa</button>
-                                        <button class="action-btn btn-danger">Xóa</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <tr>
-                            <th>Hình ảnh</th>
-                            <th>Mã phòng</th>
-                            <th>Loại phòng</th>
-                            <th>Loại giường</th>
-                            <th>Giá (VND)</th>
-                            <th>Sức chứa</th>
-                            <th>Phòng hút thuốc</th>
-                            <th>Loại phòng tắm</th>
-                            <th>View</th>
-                            <th>Mô tả phòng</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="roomPartner : ${roomPartners}">
-                            <td><img src="https://byvn.net/gqQ1" alt="Room" class="room-image"></td>
-                            <td th:text="${roomPartner.roomNumber}"></td>
-                            <td th:text="${roomPartner.type}"></td>
-                            <td th:text="${roomPartner.bedType}"></td>
-                             <td th:text="${#numbers.formatDecimal(roomPartner.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
-                            <td th:text="${roomPartner.capacity + ' người'}"></td>
-                            <td>
-                                <span th:classappend="${roomPartner.isSmoking ? 'smoking-yes' : 'smoking-no'}"
-                                      class="room-smoking-status"
-                                      th:text="${roomPartner.isSmoking ? 'Có' : 'Không'}"></span>
-                            </td>
-                            <td>
-                                <span th:if="${roomPartner.bathroomType == 1}">Standard Bathroom</span>
-                                <span th:if="${roomPartner.bathroomType == 2}">Deluxe Bathroom</span>
-                                <span th:if="${roomPartner.bathroomType == 3}">Glass Bathroom</span>
-                            </td>
-                            <td th:text="${roomPartner.view}"></td>
-                            <td th:text="${roomPartner.description}"></td>
-                            <td>
-                                <span th:classappend="${roomPartner.status == 'Available' ? 'status-available' : 'status-unavailable'}"
-                                      class="room-status"
-                                      th:text="${roomPartner.status == 'Available' ? 'Còn trống' : 'Đã đặt'}"></span>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn btn-secondary"
-                                            th:attr="data-room-id=${roomPartner.roomId},
+                                        <button class="action-btn btn-secondary" th:attr="data-room-id=${roomPartner.roomId},
                                                     data-room-number=${roomPartner.roomNumber},
                                                     data-type=${roomPartner.type},
                                                     data-bed-type=${roomPartner.bedType},
                                                     data-price=${roomPartner.price},
                                                     data-capacity=${roomPartner.capacity},
                                                     data-is-smoking=${roomPartner.isSmoking},
-                                                    data-bathroom-type=${roomPartner.bathroomType},
                                                     data-view=${roomPartner.view},
                                                     data-description=${roomPartner.description != null ? roomPartner.description : ''},
-                                                    data-status=${roomPartner.status}"
+                                                    data-status=${roomPartner.status},
+                                                    data-total-rooms=${roomPartner.totalRooms}"
                                             onclick="openEditModal(this)">Sửa</button>
-                                    <button class="action-btn btn-danger">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
+                                        <!-- <button class="action-btn btn-danger">Xóa</button> -->
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -348,13 +306,14 @@
                 </div>
                 <form th:action="@{/room/partner/add}" th:object="${roomPartner}" method="post">
                     <div class="form-grid">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Mã phòng</label>
-                            <input type="text" th:field="*{roomNumber}" placeholder="Nhập mã phòng" required>
-                        </div>
+                            <input type="text" th:field="*{roomNumber}" placeholder="Nhập mã phòng" required>    
+                        </div> -->
                         <div class="form-group">
                             <label>Loại phòng</label>
                             <select th:field="*{type}">
+                                <option value="">-- Chọn loại phòng --</option>
                                 <option value="Standard">Standard</option>
                                 <option value="Deluxe">Deluxe</option>
                                 <option value="Suite">Suite</option>
@@ -363,31 +322,23 @@
                         </div>
                         <div class="form-group">
                             <label>Loại giường</label>
-                            <input type="text" th:field="*{bedType}" placeholder="Loại giường">
-                        </div>
-                        <div class="form-group">
-                            <label>Giá (VND)</label>
-                            <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required>
+                            <select th:field="*{bedType}">
+                                <option value="">-- Chọn loại giường --</option>
+                                <option value="Single bed">Single bed</option>
+                                <option value="Double bed">Double bed</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Sức chứa</label>
                             <input type="number" th:field="*{capacity}" placeholder="Số người" required>
                         </div>
                         <div class="form-group">
-                            <label>Tầng</label>
-                            <input type="number" th:field="*{floor}" placeholder="Tầng">
-                            <select th:field="*{bedType}">
-                                <option value="Single bed">Single bed</option>
-                                <option value="Double bed">Double bed</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label>Giá (VND)</label>
                             <input type="number" th:field="*{price}" placeholder="Nhập giá phòng" required min="0">
                         </div>
                         <div class="form-group">
-                            <label>Sức chứa</label>
-                            <input type="number" th:field="*{capacity}" placeholder="Số người" required min="1">
+                            <label>Tổng số phòng</label>
+                            <input type="number" th:field="*{totalRooms}" placeholder="Số phòng" required min="1">
                         </div>
                         <div class="form-group">
                             <label>Hút thuốc</label>
@@ -396,32 +347,44 @@
                                 <option th:value="true">Có</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Loại phòng tắm</label>
                             <select th:field="*{bathroomType}">
+                                <option value="">-- Chọn loại phòng tắm --</option>
                                 <option value="1">Standard Bathroom</option>
                                 <option value="2">Deluxe Bathroom</option>
                                 <option value="3">Glass Bathroom</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label>View</label>
                             <select th:field="*{view}">
-                                <option value="Beach View">Beach View</option>
-                                <option value="City View">City View</option>
-                                <option value="Garden View">Garden View</option>
+                                <option value="">-- Chọn view --</option>
+                                <option value="City">City</option>
+                                <option value="Sea">Sea</option>
+                                <option value="Mountain">Mountain</option>
+                                <option value="Garden">Garden</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Trạng thái</label>
                             <select th:field="*{status}">
-                                <option value="Available">Còn trống</option>
-                                <option value="Unavailable">Đã đặt</option>
+                                <option value="">-- Chọn trạng thái --</option>
+                                <option value="AVAILABLE">Đang hiển thị</option>
+                                <option value="UNAVAILABLE">Đã ẩn</option>
                             </select>
                         </div>
                         <div class="form-group full-width">
                             <label>Mô tả phòng</label>
                             <textarea th:field="*{description}" placeholder="Nhập mô tả phòng"></textarea>
+                        </div>
+                        <div>
+                            <label>Ảnh phòng</label>
+                            <div id="new-image-preview-add"
+                                style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                            <input type="file" id="roomImagesAdd" name="roomImages" multiple accept="image/*"
+                                style="margin-bottom:8px;">
+                            <div style="font-size:13px;color:#888;">Chọn nhiều ảnh hoặc kéo thả vào đây</div>
                         </div>
                         <div class="form-group full-width">
                             <button class="action-btn" type="submit">Đăng tải phòng</button>
@@ -435,8 +398,8 @@
                 <div class="modal-content">
                     <div class="checkmark">
                         <svg viewBox="0 0 52 52">
-                            <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
-                            <path class="checkmark-check" d="M14 27l7 7 16-16"/>
+                            <circle class="checkmark-circle" cx="26" cy="26" r="25" />
+                            <path class="checkmark-check" d="M14 27l7 7 16-16" />
                         </svg>
                     </div>
                     <h3 id="successMessage">Bạn đã thêm phòng thành công!</h3>
@@ -459,10 +422,10 @@
                     <form id="editRoomForm" th:action="@{/room/partner/update}" method="post">
                         <input type="hidden" name="roomId" id="editRoomId">
                         <div class="form-grid">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label >Mã phòng</label>
                                 <input type="text" name="roomNumber" id="editRoomNumber" required readonly>
-                            </div>
+                            </div> -->
                             <div class="form-group">
                                 <label>Loại phòng</label>
                                 <select name="type" id="editType">
@@ -488,33 +451,39 @@
                                 <input type="number" name="capacity" id="editCapacity" required min="1">
                             </div>
                             <div class="form-group">
+                                <label>Tổng số phòng</label>
+                                <input type="number" name="totalRooms" id="editTotalRooms" required min="1">
+                            </div>
+                            <div class="form-group">
                                 <label>Hút thuốc</label>
                                 <select name="isSmoking" id="editIsSmoking">
                                     <option value="false">Không</option>
                                     <option value="true">Có</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>Loại phòng tắm</label>
                                 <select name="bathroomType" id="editBathroomType">
                                     <option value="1">Standard Bathroom</option>
                                     <option value="2">Deluxe Bathroom</option>
                                     <option value="3">Glass Bathroom</option>
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="form-group">
                                 <label>View</label>
                                 <select name="view" id="editView">
-                                    <option value="Beach View">Beach View</option>
-                                    <option value="City View">City View</option>
-                                    <option value="Garden View">Garden View</option>
+                                    <option value="City">City</option>
+                                    <option value="Sea">Sea</option>
+                                    <option value="Mountain">Mountain</option>
+                                    <option value="Garden">Garden</option>
                                 </select>
+
                             </div>
                             <div class="form-group">
                                 <label>Trạng thái</label>
                                 <select name="status" id="editStatus">
-                                    <option value="Available">Còn trống</option>
-                                    <option value="Unavailable">Đã đặt</option>
+                                    <option value="AVAILABLE">Đang hiển thị</option>
+                                    <option value="UNAVAILABLE">Đã ẩn</option>
                                 </select>
                             </div>
                             <div class="form-group full-width">
@@ -537,13 +506,13 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeImageManager()">&times;</span>
             <h2>Quản lý ảnh phòng</h2>
-            
+
             <div class="image-manager-content">
                 <div class="current-images-section">
                     <h3>Ảnh hiện tại</h3>
                     <div id="currentImagesContainer" class="current-images-grid"></div>
                 </div>
-                
+
                 <div class="upload-section">
                     <h3>Thêm ảnh mới</h3>
                     <div class="file-upload-area">
@@ -658,16 +627,18 @@
 
             // Populate form with room data
             form.querySelector('#editRoomId').value = button.getAttribute('data-room-id');
-            form.querySelector('#editRoomNumber').value = button.getAttribute('data-room-number');
+            // form.querySelector('#editRoomNumber').value = button.getAttribute('data-room-number');
             form.querySelector('#editType').value = button.getAttribute('data-type');
             form.querySelector('#editBedType').value = button.getAttribute('data-bed-type');
             form.querySelector('#editPrice').value = button.getAttribute('data-price');
             form.querySelector('#editCapacity').value = button.getAttribute('data-capacity');
+            form.querySelector('#editTotalRooms').value = button.getAttribute('data-total-rooms');
             form.querySelector('#editIsSmoking').value = button.getAttribute('data-is-smoking');
-            form.querySelector('#editBathroomType').value = button.getAttribute('data-bathroom-type');
+            // form.querySelector('#editBathroomType').value = button.getAttribute('data-bathroom-type');
             form.querySelector('#editView').value = button.getAttribute('data-view');
             form.querySelector('#editDescription').value = button.getAttribute('data-description') || '';
             form.querySelector('#editStatus').value = button.getAttribute('data-status');
+            
 
             modal.style.display = 'flex';
         }
@@ -686,13 +657,12 @@
             const errorMessage = document.getElementById('editErrorMessage');
             const form = this;
 
-            const roomNumber = form.querySelector('#editRoomNumber').value;
             const price = form.querySelector('#editPrice').value;
             const capacity = form.querySelector('#editCapacity').value;
 
             if (!roomNumber || price <= 0 || capacity <= 0) {
                 event.preventDefault();
-                errorMessage.innerText = 'Vui lòng kiểm tra lại mã phòng, giá và sức chứa.';
+                errorMessage.innerText = 'Vui lòng kiểm tra lại thông tin';
                 errorMessage.style.display = 'block';
             }
         });
@@ -753,7 +723,7 @@
         }
 
         // File upload handling
-        document.getElementById('roomImagesUpload').addEventListener('change', function(e) {
+        document.getElementById('roomImagesUpload').addEventListener('change', function (e) {
             selectedFiles = Array.from(e.target.files);
             displayImagePreviews(selectedFiles);
         });
@@ -761,15 +731,15 @@
         function displayImagePreviews(files) {
             const container = document.getElementById('imagePreviewContainer');
             const uploadBtn = document.getElementById('uploadImagesBtn');
-            
+
             container.innerHTML = '';
-            
+
             if (files.length > 0) {
                 uploadBtn.style.display = 'inline-block';
-                
+
                 files.forEach((file, index) => {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         const previewDiv = document.createElement('div');
                         previewDiv.className = 'image-preview-item';
                         previewDiv.innerHTML = `
@@ -793,7 +763,7 @@
         }
 
         // Upload images button click
-        document.getElementById('uploadImagesBtn').addEventListener('click', function() {
+        document.getElementById('uploadImagesBtn').addEventListener('click', function () {
             if (selectedFiles.length === 0) {
                 alert('Vui lòng chọn ít nhất một ảnh');
                 return;
@@ -801,7 +771,7 @@
 
             const formData = new FormData();
             formData.append('roomId', currentRoomId);
-            
+
             selectedFiles.forEach(file => {
                 formData.append('files', file);
             });
@@ -815,26 +785,26 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    // Reload images
-                    loadRoomImages(currentRoomId);
-                    // Clear preview
-                    selectedFiles = [];
-                    displayImagePreviews([]);
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Có lỗi xảy ra khi upload ảnh: ' + error.message);
-            })
-            .finally(() => {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Ảnh';
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        // Reload images
+                        loadRoomImages(currentRoomId);
+                        // Clear preview
+                        selectedFiles = [];
+                        displayImagePreviews([]);
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Có lỗi xảy ra khi upload ảnh: ' + error.message);
+                })
+                .finally(() => {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Ảnh';
+                });
         });
 
         function deleteRoomImage(imageUrl) {
@@ -849,19 +819,19 @@
                 },
                 body: `roomId=${currentRoomId}&imageUrl=${encodeURIComponent(imageUrl)}`
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    // Reload images
-                    loadRoomImages(currentRoomId);
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Có lỗi xảy ra khi xóa ảnh: ' + error.message);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        // Reload images
+                        loadRoomImages(currentRoomId);
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Có lỗi xảy ra khi xóa ảnh: ' + error.message);
+                });
         }
     </script>
 </body>

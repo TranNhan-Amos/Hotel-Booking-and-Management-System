@@ -28,6 +28,10 @@ public class RoomPartnerService {
         return roomPartnerRepository.save(roomPartner);
     }
 public boolean existsByRoomNumberAndPartnerId(String roomNumber, Long partnerId) {
+   if (roomNumber == null) {
+        // Nếu roomNumber là null, kiểm tra các phòng có roomNumber là null
+        return roomPartnerRepository.existsByRoomNumberIsNullAndPartnerId(partnerId);
+    }
     return roomPartnerRepository.existsByRoomNumberAndPartnerId(roomNumber, partnerId);
 }
 

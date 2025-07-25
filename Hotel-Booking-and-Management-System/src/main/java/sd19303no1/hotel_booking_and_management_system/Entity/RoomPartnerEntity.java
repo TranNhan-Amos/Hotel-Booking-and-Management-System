@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "room_partners")
+@Table(name = "rooms")
 @Getter
 @Setter
 @NoArgsConstructor 
@@ -45,7 +45,7 @@ public class RoomPartnerEntity {
     @Column(name = "price")
     private int price;
 
-    @Column(name = "room_number", unique = true)
+    @Column(name = "room_number", nullable = true, unique = false, length = 20)
     private String roomNumber;
 
     @Column(name = "status")
@@ -59,6 +59,9 @@ public class RoomPartnerEntity {
 
     @Column(name = "partner_id")
     private Long partnerId;
+    
+    @Column(name = "total_rooms", nullable = false)
+    private Integer totalRooms; 
 
     @ElementCollection
     @CollectionTable(name = "room_partner_images", joinColumns = @JoinColumn(name = "room_partner_id"))

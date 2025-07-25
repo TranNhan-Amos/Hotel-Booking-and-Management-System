@@ -3,8 +3,10 @@ package sd19303no1.hotel_booking_and_management_system.Controller.AuthPageContro
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPartnerDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
+import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
@@ -28,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class PartnerController {
@@ -62,7 +68,7 @@ public class PartnerController {
                 System.out.println("=== DEBUG: User is partner");
                 // Find partner information
                 PartnerEntity partner = partnerService.findBySystemUser(systemUser);
-                
+
                 System.out.println("=== DEBUG: Partner found: " + (partner != null));
 
                 if (partner != null) {
@@ -187,18 +193,13 @@ public class PartnerController {
         return ("Partner/DashboardPartner");
     }
 
-    
-
-
     @GetMapping("/partner/reports")
     public String viewPartnerReports(@RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
             Model model) {
         try {
-            // Lấy thông tin người dùng đã đăng nhập
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
-
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
 
             if (systemUser != null && systemUser.isPartner()) {
@@ -207,14 +208,24 @@ public class PartnerController {
                 if (partner != null) {
                     Long partnerId = partner.getId();
 
-                    // Chuyển đổi ngày từ chuỗi sang LocalDate
-                    LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
-                    LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
+                    // ✅ Xử lý ngày trước
+                    DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                    String defaultDate = LocalDate.now().format(formatter);
+
+                    startDate = (startDate != null && !startDate.isEmpty()) ? startDate : defaultDate;
+                    endDate = (endDate != null && !endDate.isEmpty()) ? endDate : defaultDate;
+
+                    LocalDate start = LocalDate.parse(startDate);
+                    LocalDate end = LocalDate.parse(endDate);
+
+                    // ✅ Gọi service với ngày đã xử lý
+                    Map<LocalDate, ReportsPartnerDTO> DayReports = bookingOrderService.getDailyBookingCount(partnerId,
+                            start, end);
+                    List<Integer> availableYears = bookingOrderService.getAvailableBookingYears(partnerId);
 
                     BigDecimal totalRevenue = BigDecimal.ZERO;
                     Long totalBookings = 0L;
 
-                    // Chỉ lấy dữ liệu nếu cả startDate và endDate đều được nhập
                     if (start != null && end != null) {
                         List<Object[]> reportData = bookingOrderService.getReportData(partnerId, start, end);
 
@@ -227,8 +238,6 @@ public class PartnerController {
 
                         System.out.println("Filtered from: " + start + " to " + end);
                         System.out.println("Total Revenue: " + totalRevenue + ", Total Bookings: " + totalBookings);
-                    } else {
-                        System.out.println("No date range selected.");
                     }
 
                     model.addAttribute("totalRevenue", totalRevenue);
@@ -236,6 +245,8 @@ public class PartnerController {
                     model.addAttribute("startDate", startDate);
                     model.addAttribute("endDate", endDate);
                     model.addAttribute("partnerId", partnerId);
+                    model.addAttribute("DayReports", DayReports);
+                    model.addAttribute("availableYears", availableYears);
 
                     return "Partner/ReportsPartner";
                 } else {
@@ -251,6 +262,14 @@ public class PartnerController {
             model.addAttribute("error", "Đã xảy ra lỗi khi tải báo cáo.");
             return "Partner/ReportsPartner";
         }
+    }
+
+    // Lấy dữ liệu doanh thu hàng tháng của đối tác theo năm
+    @GetMapping("/api/partner/monthly-revenue")
+    @ResponseBody
+    public List<MonthlyRevenueReportPartnerDTO> getMonthlyRevenue(@RequestParam Long partnerId,
+            @RequestParam Integer year) {
+        return bookingOrderService.getMonthlyRevenueReportPartner(partnerId, year);
     }
 
     @GetMapping("/partner/reviews")
@@ -320,5 +339,34 @@ public class PartnerController {
     public String viewPartnerSupport() {
         // Logic to retrieve and display partner support information can be added here
         return "Partner/SupportPartner"; // Path to your Thymeleaf template for partner support
+    }
+    @GetMapping("/partner/profile")
+    public String viewPartnerProfile(Model model) {
+        try {
+            // Get current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName(); // Assuming email is used as username
+
+            // Find system user by email
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+
+            if (systemUser != null && systemUser.isPartner()) {
+                // Find partner information
+                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+                if (partner != null) {
+                    model.addAttribute("partner", partner);
+                    model.addAttribute("systemUser", systemUser);
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                }
+            } else {
+                return "redirect:/login";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Có lỗi xảy ra khi tải thông tin đối tác");
+        }
+
+        return "Partner/ProfilePartner"; // Path to your Thymeleaf template for partner profile
     }
 }

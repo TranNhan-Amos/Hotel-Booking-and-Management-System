@@ -321,4 +321,33 @@ public class PartnerController {
         // Logic to retrieve and display partner support information can be added here
         return "Partner/SupportPartner"; // Path to your Thymeleaf template for partner support
     }
+    @GetMapping("/partner/profile")
+    public String viewPartnerProfile(Model model) {
+        try {
+            // Get current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName(); // Assuming email is used as username
+
+            // Find system user by email
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+
+            if (systemUser != null && systemUser.isPartner()) {
+                // Find partner information
+                PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+                if (partner != null) {
+                    model.addAttribute("partner", partner);
+                    model.addAttribute("systemUser", systemUser);
+                } else {
+                    model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                }
+            } else {
+                return "redirect:/login";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Có lỗi xảy ra khi tải thông tin đối tác");
+        }
+
+        return "Partner/ProfilePartner"; // Path to your Thymeleaf template for partner profile
+    }
 }

@@ -21,6 +21,8 @@ import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPa
 import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.PaymentMethod;
+import sd19303no1.hotel_booking_and_management_system.Entity.PaymentStatus;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.StatusEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
@@ -350,6 +352,61 @@ public class BookingOrderService {
             confirmedStatus = statusRepository.save(confirmedStatus);
         }
         booking.setStatus(confirmedStatus);
+
+        return bookingOrderRepository.save(booking);
+    }
+
+    /**
+     * Xử lý thanh toán booking
+     * @param bookingId ID của booking
+     * @param paymentMethodCode Mã phương thức thanh toán
+     * @return BookingOrderEntity đã được cập nhật
+     */
+    @Transactional
+    public BookingOrderEntity processPayment(Integer bookingId, String paymentMethodCode) {
+        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
+
+        // Validate payment method
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = PaymentMethod.fromCode(paymentMethodCode);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Phương thức thanh toán không hợp lệ: " + paymentMethodCode);
+        }
+
+        // Set payment method
+        booking.setPaymentMethod(paymentMethod.getCode());
+
+        // Xử lý trạng thái thanh toán và booking dựa trên phương thức
+        if (paymentMethod.requiresImmediatePayment()) {
+            // Thanh toán ngay (thẻ, MoMo, chuyển khoản)
+            booking.setPaymentStatus(PaymentStatus.PAID.getCode());
+            booking.setPaidDate(LocalDateTime.now());
+            
+            // Set booking status thành CONFIRMED (đã xác nhận)
+            StatusEntity confirmedStatus = statusRepository.findByStatusNameIgnoreCase("CONFIRMED");
+            if (confirmedStatus == null) {
+                confirmedStatus = new StatusEntity();
+                confirmedStatus.setStatusName("CONFIRMED");
+                confirmedStatus.setDescription("Đã xác nhận");
+                confirmedStatus = statusRepository.save(confirmedStatus);
+            }
+            booking.setStatus(confirmedStatus);
+        } else {
+            // Thanh toán tại khách sạn
+            booking.setPaymentStatus(PaymentStatus.PENDING.getCode());
+            
+            // Set booking status thành PENDING (chờ xác nhận)
+            StatusEntity pendingStatus = statusRepository.findByStatusNameIgnoreCase("PENDING");
+            if (pendingStatus == null) {
+                pendingStatus = new StatusEntity();
+                pendingStatus.setStatusName("PENDING");
+                pendingStatus.setDescription("Chờ xác nhận");
+                pendingStatus = statusRepository.save(pendingStatus);
+            }
+            booking.setStatus(pendingStatus);
+        }
 
         return bookingOrderRepository.save(booking);
     }

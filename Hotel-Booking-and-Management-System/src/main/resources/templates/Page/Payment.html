@@ -307,15 +307,38 @@
         function togglePaymentFields() {
             const checkedRadio = document.querySelector('input[name="paymentMethod"]:checked');
             const method = checkedRadio ? checkedRadio.value : null;
-            document.querySelectorAll('.payment-fields').forEach(field => field.style.display = 'none');
+            
+            // Hide all payment fields and disable inputs
+            document.querySelectorAll('.payment-fields').forEach(group => {
+                group.style.display = 'none';
+                group.querySelectorAll('input').forEach(input => input.disabled = true);
+            });
+            
+            // Show and enable inputs for selected method
             if (method === 'creditCard') {
-                document.getElementById('cardFields').style.display = 'block';
+                const cardFields = document.getElementById('cardFields');
+                if (cardFields) {
+                    cardFields.style.display = 'block';
+                    cardFields.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             } else if (method === 'momo') {
-                document.getElementById('momoFields').style.display = 'block';
+                const momoFields = document.getElementById('momoFields');
+                if (momoFields) {
+                    momoFields.style.display = 'block';
+                    momoFields.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             } else if (method === 'bankTransfer') {
-                document.getElementById('bankFields').style.display = 'block';
+                const bankFields = document.getElementById('bankFields');
+                if (bankFields) {
+                    bankFields.style.display = 'block';
+                    bankFields.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             } else if (method === 'payOnArrival') {
-                document.getElementById('arrivalFields').style.display = 'block';
+                const arrivalFields = document.getElementById('arrivalFields');
+                if (arrivalFields) {
+                    arrivalFields.style.display = 'block';
+                    arrivalFields.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             }
         }
 
@@ -495,12 +518,19 @@
                 if (errors.length > 0) {
                     errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
                     errorMessages.style.display = 'block';
+                    // Scroll to error messages
+                    errorMessages.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
                     errorMessages.style.display = 'none';
                     submitButton.classList.add('loading');
                     submitButton.disabled = true;
                     submitButton.textContent = 'Đang xử lý...';
-                    paymentForm.submit();
+                    console.log("Form hợp lệ, đang gửi...");
+                    
+                    // Add a small delay to show the loading state
+                    setTimeout(() => {
+                        paymentForm.submit();
+                    }, 500);
                 }
             });
         }

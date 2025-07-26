@@ -10,6 +10,8 @@ import sd19303no1.hotel_booking_and_management_system.Repository.CustomersReposi
 import sd19303no1.hotel_booking_and_management_system.DTO.CustomerDTO;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.ReviewRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepository;
+import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 
 @Service
 public class CustomersService {
@@ -20,6 +22,8 @@ public class CustomersService {
     private BookingOrderRepository bookingOrderRepository;
     @Autowired
     private ReviewRepository reviewRepository;
+    @Autowired
+    private SystemUserRepository systemUserRepository;
 
     public List<CustomersEntity> getAllCustomers() {
         return customerRepository.findAll();
@@ -33,6 +37,43 @@ public class CustomersService {
 
     public void updateCustomer(CustomersEntity customer) {
         if (customer.getCustomerId() != null && customerRepository.existsById(customer.getCustomerId())) {
+            // Lấy thông tin cũ để so sánh
+            CustomersEntity oldCustomer = customerRepository.findById(customer.getCustomerId()).orElse(null);
+            if (oldCustomer != null) {
+                // Kiểm tra xem khách hàng có liên kết với SystemUserEntity không
+                SystemUserEntity systemUser = oldCustomer.getSystemUser();
+                if (systemUser != null) {
+                    // Trường hợp 1: Có liên kết với SystemUserEntity
+                    boolean hasChanges = false;
+                    
+                    // Cập nhật email nếu thay đổi
+                    if (!oldCustomer.getEmail().equals(customer.getEmail())) {
+                        systemUser.setEmail(customer.getEmail());
+                        hasChanges = true;
+                    }
+                    
+                    // Cập nhật username nếu tên thay đổi
+                    if (!oldCustomer.getName().equals(customer.getName())) {
+                        systemUser.setUsername(customer.getName());
+                        hasChanges = true;
+                    }
+                    
+                    if (hasChanges) {
+                        systemUserRepository.save(systemUser);
+                    }
+                } else {
+                    // Trường hợp 2: Không có liên kết với SystemUserEntity
+                    // Tìm SystemUserEntity theo email cũ
+                    SystemUserEntity existingSystemUser = systemUserRepository.findByEmail(oldCustomer.getEmail()).orElse(null);
+                    if (existingSystemUser != null) {
+                        // Cập nhật SystemUserEntity nếu email thay đổi
+                        if (!oldCustomer.getEmail().equals(customer.getEmail())) {
+                            existingSystemUser.setEmail(customer.getEmail());
+                            systemUserRepository.save(existingSystemUser);
+                        }
+                    }
+                }
+            }
             customerRepository.save(customer); 
         } else {
             throw new IllegalArgumentException("Không tìm thấy khách hàng để cập nhật!");

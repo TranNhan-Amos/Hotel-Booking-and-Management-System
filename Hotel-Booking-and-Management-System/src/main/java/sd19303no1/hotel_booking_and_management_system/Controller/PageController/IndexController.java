@@ -158,4 +158,9 @@ public class IndexController {
             return (int) (Math.random() * 3);
         }
     }
+
+    @GetMapping("/test-payment")
+    public String testPayment() {
+        return "Page/test-payment";
+    }
 }

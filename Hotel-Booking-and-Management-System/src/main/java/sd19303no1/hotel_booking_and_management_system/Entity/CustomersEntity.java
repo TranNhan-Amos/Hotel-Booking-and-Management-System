@@ -40,7 +40,7 @@ public class CustomersEntity {
     @Column(name = "avatar", length = 255)
     private String avatar;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private SystemUserEntity systemUser;
 
@@ -67,6 +67,10 @@ public class CustomersEntity {
 
     public void setPassword(String password) {
         this.password = password;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setPassword(password);
+        }
     }
 
     public String getAddress() {
@@ -83,6 +87,10 @@ public class CustomersEntity {
 
     public void setName(String name) {
         this.name = name;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setUsername(name);
+        }
     }
 
     public String getPhone() {
@@ -107,6 +115,10 @@ public class CustomersEntity {
 
     public void setEmail(String email) {
         this.email = email;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setEmail(email);
+        }
     }
 
     public Date getCreatedDate() {

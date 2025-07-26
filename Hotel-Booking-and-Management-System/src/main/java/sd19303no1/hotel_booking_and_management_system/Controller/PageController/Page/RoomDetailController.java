@@ -21,10 +21,12 @@ import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.ReviewEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Service.ReviewService;
 import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
 import sd19303no1.hotel_booking_and_management_system.Service.CustomersService;
+import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 
 @Controller
 public class RoomDetailController {
@@ -42,6 +44,9 @@ public class RoomDetailController {
 
     @Autowired
     private CustomersService customersService;
+
+    @Autowired
+    private SystemUserService systemUserService;
 
     @GetMapping("/room/{id}")
     public String roomDetail(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
@@ -108,13 +113,36 @@ public class RoomDetailController {
 
             // Thêm thông tin người dùng đã đăng nhập nếu có
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            logger.info("Authentication: {}", authentication);
+            
             if (authentication != null && authentication.isAuthenticated() && 
                 !"anonymousUser".equals(authentication.getName())) {
                 String email = authentication.getName();
+                logger.info("User email: {}", email);
+                
+                // Thử tìm trong CustomersEntity trước
                 CustomersEntity customer = customersService.findByEmail(email);
                 if (customer != null) {
+                    logger.info("Found customer: {}", customer.getName());
                     model.addAttribute("currentUser", customer);
+                } else {
+                    // Nếu không tìm thấy trong CustomersEntity, thử tìm trong SystemUserEntity
+                    SystemUserEntity systemUser = systemUserService.findByEmail(email);
+                    if (systemUser != null) {
+                        logger.info("Found system user: {}", systemUser.getUsername());
+                        // Tạo một CustomersEntity tạm thời từ SystemUserEntity
+                        CustomersEntity tempCustomer = new CustomersEntity();
+                        tempCustomer.setName(systemUser.getUsername());
+                        tempCustomer.setEmail(systemUser.getEmail());
+                        tempCustomer.setPhone("Chưa cập nhật"); // SystemUserEntity không có phone
+                        tempCustomer.setSystemUser(systemUser);
+                        model.addAttribute("currentUser", tempCustomer);
+                    } else {
+                        logger.warn("No user found for email: {}", email);
+                    }
                 }
+            } else {
+                logger.info("No authenticated user found");
             }
 
 

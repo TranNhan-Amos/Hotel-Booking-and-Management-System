@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet"  th:href="@{Css/Tien5.css}">
+</head>
+<body>
+    
+   <!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <div class="footer-brand">DaNang Viet Nam</div>
+                <p class="footer-description">Khám phá vẻ đẹp Đà Nẵng cùng chúng tôi</p>
+                <div class="footer-contact">
+                    <i data-lucide="phone" class="footer-contact-icon"></i>
+                    <span class="footer-contact-text">+84 236 123 456</span>
+                </div>
+                <div class="footer-contact">
+                    <i data-lucide="mail" class="footer-contact-icon"></i>
+                    <span class="footer-contact-text">info@danangtravel.com</span>
+                </div>
+                <div class="footer-social">
+                    <a href="#" class="social-link">
+                        <i data-lucide="facebook"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i data-lucide="instagram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i data-lucide="twitter"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i data-lucide="youtube"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-section-title">Dịch vụ khach san</h4>
+                <ul class="footer-links">
+                    <li><a href="/ListRoom">Đặt phòng khách sạn</a></li>
+                    <li><a href="/tours">Tour du lịch</a></li>
+                    <li><a href="/flights">Vé máy bay</a></li>
+                    <li><a href="/car-rental">Thuê xe</a></li>
+                    <li><a href="/transfers">Đưa đón sân bay</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-section-title">Điểm đến</h4>
+                <ul class="footer-links">
+                    <li><a href="/destinations/my-khe">Bãi biển Mỹ Khê</a></li>
+                    <li><a href="/destinations/dragon-bridge">Cầu Rồng</a></li>
+                    <li><a href="/destinations/ba-na-hills">Bà Nà Hills</a></li>
+                    <li><a href="/destinations/hoi-an">Hội An</a></li>
+                    <li><a href="/destinations/son-tra">Bán đảo Sơn Trà</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-section-title">Hỗ trợ</h4>
+                <ul class="footer-links">
+                    <li><a href="/help">Trung tâm trợ giúp</a></li>
+                    <li><a href="/cancellation-policy">Chính sách hủy</a></li>
+                    <li><a href="/terms">Điều khoản sử dụng</a></li>
+                    <li><a href="/privacy">Chính sách bảo mật</a></li>
+                    <li><a href="/Contact">Liên hệ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-section-title">Về chúng tôi nhan vien</h4>
+                <ul class="footer-links">
+                    <li><a href="/About">Giới thiệu</a></li>
+                    <li><a href="/careers">Tuyển dụng</a></li>
+                    <li><a href="/press">Báo chí</a></li>
+                    <li><a href="/partners">Đối tác</a></li>
+                    <li><a href="/blog">Blog du lịch</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="footer-copyright">© 2025 DaNang Travel. Tất cả quyền được bảo lưu.</p>
+                <div class="footer-bottom-links">
+                    <a href="/terms">Điều khoản</a>
+                    <a href="/privacy">Bảo mật</a>
+                    <a href="/cookies">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+    // Initialize Lucide icons for footer
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
+

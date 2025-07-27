@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Bình Luận</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet"  th:href="@{Css/Feedback.css}">
+    <style>
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Admin Khách Sạn</div>
+        <ul>
+            <li><a href="#"><i class="fas fa-bed"></i> Quản Lý Phòng</a></li>
+            <li><a href="#"><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Quản Lý Khách Hàng</a></li>
+            <li><a href="#" class="active"><i class="fas fa-star"></i> Bình Luận & Đánh Giá</a></li>
+            <li><a href="#"><i class="fas fa-chart-bar"></i> Báo Cáo</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Cài Đặt</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hamburger" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="management-section">
+            <h2>Quản Lý Bình Luận & Đánh Giá</h2>
+            <div class="management-header">
+                <div class="search-filter">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm tên khách hàng..." oninput="filterComments()">
+                    <select id="statusFilter" onchange="filterComments()">
+                        <option value="all">Tất Cả Trạng Thái</option>
+                        <option value="approved">Đã Duyệt</option>
+                        <option value="pending">Chưa Duyệt</option>
+                    </select>
+                    <select id="ratingFilter" onchange="filterComments()">
+                        <option value="all">Tất Cả Điểm</option>
+                        <option value="5">5 Sao</option>
+                        <option value="4">4 Sao</option>
+                        <option value="3">3 Sao</option>
+                        <option value="2">2 Sao</option>
+                        <option value="1">1 Sao</option>
+                    </select>
+                </div>
+            </div>
+            <div class="comment-cards" id="commentCards">
+                <div class="comment-card">
+                    <div class="comment-info">
+                        <h3>Nguyễn Văn A</h3>
+                        <p>Email: nguyen.van.a@example.com</p>
+                        <p>Ngày: 27/05/2025</p>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p>Phòng sạch sẽ, nhân viên thân thiện, view biển tuyệt đẹp!</p>
+                    <span class="status approved">Đã Duyệt</span>
+                    <div class="actions">
+                        <button class="reply-btn" onclick="openModal('reply', this)">Trả Lời</button>
+                        <button class="delete-btn" onclick="deleteComment(this)">Xóa</button>
+                    </div>
+                </div>
+                <div class="comment-card">
+                    <div class="comment-info">
+                        <h3>Trần Thị B</h3>
+                        <p>Email: tran.thi.b@example.com</p>
+                        <p>Ngày: 26/05/2025</p>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <p>Dịch vụ tốt nhưng wifi hơi chậm.</p>
+                    <span class="status pending">Chưa Duyệt</span>
+                    <div class="actions">
+                        <button class="approve-btn" onclick="approveComment(this)">Duyệt</button>
+                        <button class="reply-btn" onclick="openModal('reply', this)">Trả Lời</button>
+                        <button class="delete-btn" onclick="deleteComment(this)">Xóa</button>
+                    </div>
+                </div>
+                <div class="comment-card">
+                    <div class="comment-info">
+                        <h3>Lê Văn C</h3>
+                        <p>Email: le.van.c@example.com</p>
+                        <p>Ngày: 25/05/2025</p>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <p>Phòng hơi nhỏ, cần cải thiện chất lượng dịch vụ.</p>
+                    <span class="status pending">Chưa Duyệt</span>
+                    <div class="actions">
+                        <button class="approve-btn" onclick="approveComment(this)">Duyệt</button>
+                        <button class="reply-btn" onclick="openModal('reply', this)">Trả Lời</button>
+                        <button class="delete-btn" onclick="deleteComment(this)">Xóa</button>
+                    </div>
+                </div>
+                <div class="comment-card">
+                    <div class="comment-info">
+                        <h3>Phạm Thị D</h3>
+                        <p>Email: pham.thi.d@example.com</p>
+                        <p>Ngày: 28/05/2025</p>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p>Trải nghiệm tuyệt vời, mọi thứ đều hoàn hảo, sẽ quay lại!</p>
+                    <span class="status approved">Đã Duyệt</span>
+                    <div class="actions">
+                        <button class="reply-btn" onclick="openModal('reply', this)">Trả Lời</button>
+                        <button class="delete-btn" onclick="deleteComment(this)">Xóa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Reply -->
+        <div class="modal" id="replyModal">
+            <div class="modal-content">
+                <h3>Trả Lời Bình Luận</h3>
+                <div class="comment-details">
+                    <p><strong>Tên:</strong> <span id="modalName"></span></p>
+                    <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                    <p><strong>Bình Luận:</strong> <span id="modalComment"></span></p>
+                    <p><strong>Điểm:</strong> <span id="modalRating"></span></p>
+                </div>
+                <div class="form-group">
+                    <label for="replyText">Trả Lời</label>
+                    <textarea id="replyText" placeholder="Nhập câu trả lời của bạn..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="save-btn" onclick="saveReply()">Gửi</button>
+                    <button class="cancel-btn" onclick="closeModal()">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Comment Management -->
+    <script>
+        let replyCard = null;
+
+        function openModal(mode, button) {
+            const modal = document.getElementById('replyModal');
+            const modalName = document.getElementById('modalName');
+            const modalEmail = document.getElementById('modalEmail');
+            const modalComment = document.getElementById('modalComment');
+            const modalRating = document.getElementById('modalRating');
+            const replyText = document.getElementById('replyText');
+
+            if (mode === 'reply') {
+                replyCard = button.parentElement.parentElement;
+                const info = replyCard.querySelector('.comment-info');
+                modalName.textContent = info.querySelector('h3').textContent;
+                modalEmail.textContent = info.querySelector('p:nth-child(2)').textContent.replace('Email: ', '');
+                modalComment.textContent = replyCard.querySelector('p').textContent;
+                modalRating.textContent = replyCard.querySelectorAll('.rating .fas.fa-star').length + ' Sao';
+                replyText.value = '';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('replyModal').style.display = 'none';
+            replyCard = null;
+        }
+
+        function saveReply() {
+            const replyText = document.getElementById('replyText').value;
+
+            if (!replyText.trim()) {
+                alert('Vui lòng nhập câu trả lời!');
+                return;
+            }
+
+            // In production, send reply to backend via API
+            alert('Trả lời đã được gửi! (Mô phỏng - cần tích hợp API)');
+            closeModal();
+        }
+
+        function deleteComment(button) {
+            if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
+                button.parentElement.parentElement.remove();
+            }
+        }
+
+        function approveComment(button) {
+            const card = button.parentElement.parentElement;
+            const status = card.querySelector('.status');
+            status.className = 'status approved';
+            status.textContent = 'Đã Duyệt';
+            button.remove(); // Remove approve button after approval
+        }
+
+        function filterComments() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            const commentCards = document.querySelectorAll('.comment-card');
+
+            commentCards.forEach(card => {
+                const name = card.querySelector('.comment-info h3').textContent.toLowerCase();
+                const status = card.querySelector('.status').classList.contains('approved') ? 'approved' : 'pending';
+                const rating = card.querySelectorAll('.rating .fas.fa-star').length;
+
+                const matchesSearch = name.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesRating = ratingFilter === 'all' || rating.toString() === ratingFilter;
+
+                if (matchesSearch && matchesStatus && matchesRating) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

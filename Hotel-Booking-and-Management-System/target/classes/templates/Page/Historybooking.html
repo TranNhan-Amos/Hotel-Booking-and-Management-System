@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch sử đặt phòng của bạn - DaNang Travel</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{Css/Historybooking.css}">
+
+</head>
+<body>
+    
+  <!-- Background decorations -->
+  <div class="bg-decoration bg-decoration-1"></div>
+  <div class="bg-decoration bg-decoration-2"></div>
+  <div class="bg-decoration bg-decoration-3"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div th:replace="~{/Layout/narbar}"></div>
+      <div class="container">
+          <div class="header-content">
+              <div class="header-top">
+                  <div class="header-title">
+                      <div class="title-icon">
+                          <i class="fas fa-calendar-alt fa-lg"></i>
+                      </div>
+                      <div>
+                          <h1 class="main-title">Lịch sử đặt phòng</h1>
+                          <p class="subtitle">Quản lý các chuyến đi tuyệt vời của bạn</p>
+                      </div>
+                  </div>
+                  <div class="header-badge">
+                      <span class="badge-number" id="totalBookingsCount">0</span>
+                      <span> chuyến đi</span>
+                  </div>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="stats-grid">
+                  <div class="stat-card">
+                      <div class="stat-content">
+                          <div class="stat-info">
+                              <h3>Tổng đặt phòng</h3>
+                              <div class="stat-number" id="statTotalBookings">0</div>
+                          </div>
+                          <div class="stat-icon blue">
+                              <i class="fas fa-calendar fa-lg"></i>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="stat-card">
+                      <div class="stat-content">
+                          <div class="stat-info">
+                              <h3>Đã xác nhận</h3>
+                              <div class="stat-number" id="statConfirmedBookings">0</div>
+                          </div>
+                          <div class="stat-icon green">
+                              <i class="fas fa-check-circle fa-lg"></i>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="stat-card">
+                      <div class="stat-content">
+                          <div class="stat-info">
+                              <h3>Hoàn thành</h3>
+                              <div class="stat-number" id="statCompletedBookings">0</div>
+                          </div>
+                          <div class="stat-icon purple">
+                              <i class="fas fa-award fa-lg"></i>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="stat-card">
+                      <div class="stat-content">
+                          <div class="stat-info">
+                              <h3>Tổng chi tiêu</h3>
+                              <div class="stat-number" id="statTotalSpent">0 ₫</div>
+                          </div>
+                          <div class="stat-icon orange">
+                              <i class="fas fa-credit-card fa-lg"></i>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container" style="padding: 2rem 1rem; position: relative; z-index: 5;">
+      <!-- Tabs -->
+      <div class="tabs-container">
+          <div class="tabs-list">
+              <button class="tab-button active" data-tab="all">
+                  <div class="tab-content">
+                      <div class="tab-label">Tất cả</div>
+                      <div class="tab-count" id="count-all">(0)</div>
+                  </div>
+              </button>
+              <button class="tab-button" data-tab="confirmed">
+                  <div class="tab-content">
+                      <div class="tab-label">Đã xác nhận</div>
+                      <div class="tab-count" id="count-confirmed">(0)</div>
+                  </div>
+              </button>
+              <button class="tab-button" data-tab="pending">
+                  <div class="tab-content">
+                      <div class="tab-label">Chờ xác nhận</div>
+                      <div class="tab-count" id="count-pending">(0)</div>
+                  </div>
+              </button>
+              <button class="tab-button" data-tab="completed">
+                  <div class="tab-content">
+                      <div class="tab-label">Hoàn thành</div>
+                      <div class="tab-count" id="count-completed">(0)</div>
+                  </div>
+              </button>
+              <button class="tab-button" data-tab="cancelled">
+                  <div class="tab-content">
+                      <div class="tab-label">Đã hủy</div>
+                      <div class="tab-count" id="count-cancelled">(0)</div>
+                  </div>
+              </button>
+          </div>
+      </div>
+
+      <!-- Booking Cards Container -->
+      <div id="bookingsGrid" class="bookings-grid">
+          <!-- Booking cards will be dynamically loaded here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state hidden">
+          <div class="empty-icon">
+              <i class="fas fa-calendar fa-3x" style="color: #3b82f6;"></i>
+          </div>
+          <h3 class="empty-title" id="emptyStateTitle">Chưa có đặt phòng nào</h3>
+          <p class="empty-description" id="emptyStateDescription">Hãy bắt đầu khám phá và đặt phòng đầu tiên của bạn!</p>
+          <button class="btn btn-primary">
+              <i class="fas fa-bolt"></i>
+              Đặt phòng ngay
+          </button>
+      </div>
+  </main>
+
+  <!-- Booking Detail Modal -->
+  <div id="bookingDetailModal" class="modal-overlay">
+      <div class="modal-content">
+          <div class="modal-header">
+              <div>
+                  <h2 class="modal-title">Chi tiết đặt phòng</h2>
+                  <p style="color: #6b7280; margin-top: 0.25rem;" id="modalBookingId"></p>
+              </div>
+              <button class="modal-close" onclick="closeModal('bookingDetailModal')">
+                  <i class="fas fa-times fa-lg"></i>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="modal-hotel-showcase">
+                  <div>
+                      <img src="/placeholder.svg" alt="Hotel" class="modal-hotel-image" id="modalHotelImage">
+                      <div class="modal-amenities" id="modalAmenities">
+                          <!-- Amenities will be loaded here -->
+                      </div>
+                  </div>
+                  <div class="modal-hotel-details">
+                      <div>
+                          <h3 class="modal-hotel-name" id="modalHotelName"></h3>
+                          <p class="modal-room-type" id="modalRoomType"></p>
+                          <div class="modal-address-info">
+                              <i class="fas fa-map-marker-alt"></i>
+                              <span id="modalAddress"></span>
+                          </div>
+                          <div class="modal-rating-status">
+                              <div class="hotel-rating" id="modalHotelRating">
+                                  <!-- Stars will be loaded here -->
+                              </div>
+                              <div class="status-badge" id="modalStatusBadge">
+                                  <!-- Status will be loaded here -->
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div class="modal-booking-info-card">
+                          <h4>Thông tin lưu trú</h4>
+                          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                              <div class="detail-row">
+                                  <span style="color: #6b7280;">Ngày đặt:</span>
+                                  <span style="font-weight: 600;" id="modalBookingDate"></span>
+                              </div>
+                              <div class="detail-row">
+                                  <span style="color: #6b7280;">Nhận phòng:</span>
+                                  <span style="font-weight: 600;" id="modalCheckInDate"></span>
+                              </div>
+                              <div class="detail-row">
+                                  <span style="color: #6b7280;">Trả phòng:</span>
+                                  <span style="font-weight: 600;" id="modalCheckOutDate"></span>
+                              </div>
+                              <div class="detail-row">
+                                  <span style="color: #6b7280;">Số đêm:</span>
+                                  <span style="font-weight: 600;" id="modalNights"></span>
+                              </div>
+                              <div class="detail-row">
+                                  <span style="color: #6b7280;">Số khách:</span>
+                                  <span style="font-weight: 600;" id="modalGuests"></span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Payment Details -->
+              <div class="modal-payment-details-card">
+                  <h4>
+                      <i class="fas fa-credit-card"></i>
+                      Chi tiết thanh toán
+                  </h4>
+                  <div style="display: flex; flex-direction: column; gap: 1rem;">
+                      <div class="detail-row">
+                          <span style="color: #6b7280;">Phương thức:</span>
+                          <span style="font-weight: 600;" id="modalPaymentMethod"></span>
+                      </div>
+                      <div class="detail-row" id="modalOriginalAmountRow" style="display: none;">
+                          <span style="color: #6b7280;">Giá gốc:</span>
+                          <span style="text-decoration: line-through; color: #9ca3af; font-size: 1.125rem;" id="modalOriginalAmount"></span>
+                      </div>
+                      <div class="detail-row" id="modalVoucherRow" style="display: none;">
+                          <span style="display: flex; align-items: center; gap: 0.5rem; color: #059669;">
+                              <i class="fas fa-gift"></i>
+                              Giảm giá (<span id="modalVoucherCode"></span>):
+                          </span>
+                          <span style="font-weight: 700;" id="modalDiscount"></span>
+                      </div>
+                      <div style="border-top: 1px solid #a7f3d0; padding-top: 1rem;">
+                          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.5rem; font-weight: 800;">
+                              <span>Tổng tiền:</span>
+                              <span style="background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="modalTotalAmount"></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="modal-action-buttons">
+                  <button class="btn btn-primary" onclick="downloadVoucher()">
+                      <i class="fas fa-download"></i>
+                      Tải voucher
+                  </button>
+                  <button class="btn btn-outline">
+                      <i class="fas fa-phone"></i>
+                      Liên hệ khách sạn
+                  </button>
+                  <button class="btn btn-outline">
+                      <i class="fas fa-share-alt"></i>
+                      Chia sẻ
+                  </button>
+                  <button class="btn btn-outline warning hidden" id="modalReviewBtn" onclick="console.log('Viết đánh giá')">
+                      <i class="fas fa-comment"></i>
+                      Viết đánh giá
+                  </button>
+                  <button class="btn btn-outline danger hidden" id="modalCancelBtn" onclick="openCancelModal()">
+                      <i class="fas fa-times-circle"></i>
+                      Hủy đặt phòng
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Cancel Confirmation Modal -->
+  <div id="cancelConfirmModal" class="modal-overlay hidden">
+      <div class="cancel-modal-content">
+          <div class="cancel-modal-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3 class="cancel-modal-title">Xác nhận hủy đặt phòng</h3>
+          <p class="cancel-modal-description">
+              Bạn có chắc chắn muốn hủy đặt phòng <strong id="cancelBookingId"></strong> tại
+              <strong id="cancelHotelName"></strong>?
+          </p>
+          <div class="cancel-modal-note">
+              <strong>Lưu ý:</strong> Việc hủy đặt phòng có thể phát sinh phí hủy theo chính sách của khách sạn.
+          </div>
+          <div class="cancel-modal-actions">
+              <button class="btn btn-secondary" onclick="closeModal('cancelConfirmModal')">
+                  Không hủy
+              </button>
+              <button class="btn btn-primary danger" onclick="handleCancelBooking()">
+                  Xác nhận hủy
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      // Mock data
+      const mockUserBookings = [
+          {
+              id: "BK001",
+              hotelName: "Ocean Breeze Resort & Spa",
+              roomType: "Deluxe Ocean View Suite",
+              address: "123 Võ Nguyên Giáp, Mỹ Khê, Đà Nẵng",
+              checkInDate: "2024-02-15",
+              checkOutDate: "2024-02-17",
+              nights: 2,
+              guests: 2,
+              totalAmount: 5000000,
+              originalAmount: 6000000,
+              status: "confirmed",
+              bookingDate: "2024-02-10",
+              voucherCode: "SUMMER25",
+              discount: 25,
+              paymentMethod: "Thẻ tín dụng",
+              image: "https://images.unsplash.com/photo-1596436889106-be35e843f974?w=600&h=400&fit=crop",
+              rating: null,
+              canCancel: true,
+              canReview: false,
+              hotelRating: 4.8,
+              amenities: ["Wifi miễn phí", "Hồ bơi", "Spa", "Gym"],
+              isLuxury: true,
+          },
+          {
+              id: "BK002",
+              hotelName: "Sunset Paradise Hotel",
+              roomType: "Superior Garden View",
+              address: "456 Trần Phú, Hải Châu, Đà Nẵng",
+              checkInDate: "2024-01-20",
+              checkOutDate: "2024-01-23",
+              nights: 3,
+              guests: 2,
+              totalAmount: 4500000,
+              originalAmount: 4500000,
+              status: "completed",
+              bookingDate: "2024-01-15",
+              voucherCode: "",
+              discount: 0,
+              paymentMethod: "Chuyển khoản",
+              image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop",
+              rating: 4.5,
+              canCancel: false,
+              canReview: false,
+              hotelRating: 4.6,
+              amenities: ["Wifi miễn phí", "Nhà hàng", "Bar"],
+              isLuxury: false,
+          },
+          {
+              id: "BK003",
+              hotelName: "Dragon Bridge Boutique",
+              roomType: "Standard City View",
+              address: "789 Lê Duẩn, Hải Châu, Đà Nẵng",
+              checkInDate: "2024-03-01",
+              checkOutDate: "2024-03-03",
+              nights: 2,
+              guests: 1,
+              totalAmount: 3000000,
+              originalAmount: 3500000,
+              status: "cancelled",
+              bookingDate: "2024-02-25",
+              voucherCode: "NEWYEAR",
+              discount: 15,
+              paymentMethod: "Ví điện tử",
+              image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop",
+              rating: null,
+              canCancel: false,
+              canReview: false,
+              hotelRating: 4.3,
+              amenities: ["Wifi miễn phí", "Nhà hàng"],
+              isLuxury: false,
+          },
+          {
+              id: "BK004",
+              hotelName: "Beachfront Villa Resort",
+              roomType: "Presidential Suite",
+              address: "321 Nguyễn Tất Thành, Liên Chiểu, Đà Nẵng",
+              checkInDate: "2024-01-05",
+              checkOutDate: "2024-01-08",
+              nights: 3,
+              guests: 4,
+              totalAmount: 12000000,
+              originalAmount: 12000000,
+              status: "completed",
+              bookingDate: "2024-01-01",
+              voucherCode: "",
+              discount: 0,
+              paymentMethod: "Thẻ tín dụng",
+              image: "https://images.unsplash.com/photo-1555400082-8dd4d78c670d?w=600&h=400&fit=crop",
+              rating: null,
+              canCancel: false,
+              canReview: true,
+              hotelRating: 4.9,
+              amenities: ["Wifi miễn phí", "Hồ bơi", "Spa", "Gym", "Butler"],
+              isLuxury: true,
+          },
+      ];
+
+      const statusConfig = {
+          confirmed: {
+              label: "Đã xác nhận",
+              colorClass: "status-confirmed",
+              iconClass: "fa-check-circle",
+              description: "Đặt phòng đã được xác nhận",
+              pulse: true,
+          },
+          pending: {
+              label: "Chờ xác nhận",
+              colorClass: "status-pending",
+              iconClass: "fa-clock",
+              description: "Đang chờ khách sạn xác nhận",
+              pulse: true,
+          },
+          cancelled: {
+              label: "Đã hủy",
+              colorClass: "status-cancelled",
+              iconClass: "fa-times-circle",
+              description: "Đặt phòng đã bị hủy",
+              pulse: false,
+          },
+          completed: {
+              label: "Hoàn thành",
+              colorClass: "status-completed",
+              iconClass: "fa-check-circle",
+              description: "Đã hoàn thành lưu trú",
+              pulse: false,
+          },
+      };
+
+      let currentSelectedBooking = null;
+
+      // Utility functions
+      const formatCurrency = (amount) => {
+          return new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+          }).format(amount);
+      };
+
+      const formatDate = (dateString) => {
+          return new Date(dateString).toLocaleDateString("vi-VN", {
+              weekday: "short",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+          });
+      };
+
+      const renderStars = (rating, containerElement) => {
+          containerElement.innerHTML = ''; // Clear existing stars
+          for (let i = 0; i < 5; i++) {
+              const starIcon = document.createElement('i');
+              starIcon.classList.add('fas', 'star');
+              if (i >= rating) {
+                  starIcon.classList.add('empty');
+              }
+              containerElement.appendChild(starIcon);
+          }
+          const ratingText = document.createElement('span');
+          ratingText.classList.add('rating-text');
+          ratingText.textContent = `(${rating}/5)`;
+          containerElement.appendChild(ratingText);
+      };
+
+      // Tab functionality
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const bookingsGrid = document.getElementById('bookingsGrid');
+      const emptyState = document.getElementById('emptyState');
+      const emptyStateTitle = document.getElementById('emptyStateTitle');
+      const emptyStateDescription = document.getElementById('emptyStateDescription');
+
+      const getFilteredBookings = (status) => {
+          if (status === "all") return mockUserBookings;
+          return mockUserBookings.filter((booking) => booking.status === status);
+      };
+
+      const updateTabCounts = () => {
+          document.getElementById('totalBookingsCount').textContent = mockUserBookings.length;
+          document.getElementById('count-all').textContent = `(${mockUserBookings.length})`;
+          document.getElementById('count-confirmed').textContent = `(${getFilteredBookings("confirmed").length})`;
+          document.getElementById('count-pending').textContent = `(${getFilteredBookings("pending").length})`;
+          document.getElementById('count-completed').textContent = `(${getFilteredBookings("completed").length})`;
+          document.getElementById('count-cancelled').textContent = `(${getFilteredBookings("cancelled").length})`;
+      };
+
+      const updateStatsCards = () => {
+          const totalBookings = mockUserBookings.length;
+          const confirmedBookings = mockUserBookings.filter(b => b.status === "confirmed").length;
+          const completedBookings = mockUserBookings.filter(b => b.status === "completed").length;
+          const totalSpent = mockUserBookings.filter(b => b.status !== "cancelled").reduce((sum, b) => sum + b.totalAmount, 0);
+
+          document.getElementById('statTotalBookings').textContent = totalBookings;
+          document.getElementById('statConfirmedBookings').textContent = confirmedBookings;
+          document.getElementById('statCompletedBookings').textContent = completedBookings;
+          document.getElementById('statTotalSpent').textContent = formatCurrency(totalSpent);
+      };
+
+      const renderBookings = (status) => {
+          const filtered = getFilteredBookings(status);
+          bookingsGrid.innerHTML = ''; // Clear existing cards
+
+          if (filtered.length === 0) {
+              emptyState.classList.remove('hidden');
+              if (status === "all") {
+                  emptyStateTitle.textContent = "Chưa có đặt phòng nào";
+                  emptyStateDescription.textContent = "Hãy bắt đầu khám phá và đặt phòng đầu tiên của bạn!";
+              } else {
+                  emptyStateTitle.textContent = `Không có đặt phòng ${statusConfig[status]?.label.toLowerCase()}`;
+                  emptyStateDescription.textContent = "Các đặt phòng sẽ xuất hiện ở đây khi có.";
+              }
+          } else {
+              emptyState.classList.add('hidden');
+              filtered.forEach((booking, index) => {
+                  const card = createBookingCard(booking);
+                  bookingsGrid.appendChild(card);
+                  // Tạm thời bỏ animation để đảm bảo hiển thị
+                  setTimeout(() => {
+                      card.classList.add('visible');
+                  }, index * 100);
+                  //card.classList.add('visible'); // Hiển thị ngay lập tức
+              });
+          }
+      };
+
+      const createBookingCard = (booking) => {
+          const card = document.createElement('div');
+          card.classList.add('booking-card');
+
+          const status = statusConfig[booking.status];
+
+          card.innerHTML = `
+              <div class="card-image-container">
+                  <img src="${booking.image || '/placeholder.svg'}" alt="${booking.hotelName}" class="card-image">
+                  <div class="image-overlay"></div>
+                  ${booking.isLuxury ? `
+                  <div class="luxury-badge">
+                      <i class="fas fa-star"></i> Luxury
+                  </div>` : ''}
+                  <div class="status-badge ${status.colorClass} ${status.pulse ? 'pulse' : ''}">
+                      <i class="fas ${status.iconClass}"></i> ${status.label}
+                  </div>
+                  <div class="booking-id">#${booking.id}</div>
+              </div>
+              <div class="card-content">
+                  <div class="hotel-info">
+                      <h3 class="hotel-name">${booking.hotelName}</h3>
+                      <p class="room-type">${booking.roomType}</p>
+                      <div class="hotel-address">
+                          <i class="fas fa-map-marker-alt"></i>
+                          <span>${booking.address}</span>
+                      </div>
+                      <div class="hotel-rating" id="hotelRating-${booking.id}">
+                          <!-- Stars will be rendered here -->
+                      </div>
+                  </div>
+
+                  <div class="amenities">
+                      ${booking.amenities.slice(0, 3).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                      ${booking.amenities.length > 3 ? `<span class="amenity-tag">+${booking.amenities.length - 3}</span>` : ''}
+                  </div>
+
+                  <div class="booking-details">
+                      <div class="detail-row">
+                          <div class="detail-label">
+                              <i class="fas fa-calendar"></i>
+                              <span>Nhận phòng</span>
+                          </div>
+                          <div class="detail-value">${formatDate(booking.checkInDate)}</div>
+                      </div>
+                      <div class="detail-row">
+                          <div class="detail-label">
+                              <i class="fas fa-calendar"></i>
+                              <span>Trả phòng</span>
+                          </div>
+                          <div class="detail-value">${formatDate(booking.checkOutDate)}</div>
+                      </div>
+                      <div class="detail-row">
+                          <div class="detail-label">
+                              <i class="fas fa-bed"></i>
+                              <span>Số đêm</span>
+                          </div>
+                          <div class="detail-value">${booking.nights} đêm</div>
+                      </div>
+                      <div class="detail-row">
+                          <div class="detail-label">
+                              <i class="fas fa-users"></i>
+                              <span>Số khách</span>
+                          </div>
+                          <div class="detail-value">${booking.guests} người</div>
+                      </div>
+                  </div>
+
+                  ${booking.voucherCode ? `
+                  <div class="voucher-info">
+                      <div class="voucher-content">
+                          <div class="voucher-label">
+                              <i class="fas fa-gift"></i>
+                              <span>Mã: ${booking.voucherCode}</span>
+                          </div>
+                          <div class="voucher-discount">-${booking.discount}%</div>
+                      </div>
+                  </div>` : ''}
+
+                  ${booking.rating ? `
+                  <div class="user-rating">
+                      <span class="rating-label">Đánh giá của bạn:</span>
+                      <div class="hotel-rating" id="userRating-${booking.id}">
+                          <!-- User stars will be rendered here -->
+                      </div>
+                  </div>` : ''}
+
+                  <div class="card-footer">
+                      <div class="price-section">
+                          <div>
+                              ${booking.originalAmount > booking.totalAmount ? `
+                              <div class="original-price">${formatCurrency(booking.originalAmount)}</div>` : ''}
+                              <div class="final-price">${formatCurrency(booking.totalAmount)}</div>
+                          </div>
+                      </div>
+                      <div class="action-buttons">
+                          <button class="btn btn-primary" onclick="openBookingDetailModal('${booking.id}')">
+                              <i class="fas fa-eye"></i>
+                              <span>Chi tiết</span>
+                              <i class="fas fa-arrow-right"></i>
+                          </button>
+                      </div>
+                      <div class="action-buttons" style="margin-top: 0.5rem;">
+                          ${booking.canCancel ? `
+                          <button class="btn btn-outline danger" onclick="openCancelModal('${booking.id}')">
+                              <i class="fas fa-times-circle"></i>
+                              <span>Hủy</span>
+                          </button>` : ''}
+                          ${booking.canReview ? `
+                          <button class="btn btn-outline warning" onclick="console.log('Viết đánh giá cho ${booking.id}')">
+                              <i class="fas fa-comment"></i>
+                              <span>Đánh giá</span>
+                          </button>` : ''}
+                          <button class="btn btn-outline" onclick="console.log('Chia sẻ ${booking.id}')">
+                              <i class="fas fa-share-alt"></i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          `;
+
+          // Render hotel rating stars
+          const hotelRatingContainer = card.querySelector(`#hotelRating-${booking.id}`);
+          if (hotelRatingContainer) {
+              renderStars(booking.hotelRating, hotelRatingContainer);
+          }
+
+          // Render user rating stars if available
+          const userRatingContainer = card.querySelector(`#userRating-${booking.id}`);
+          if (userRatingContainer && booking.rating) {
+              renderStars(booking.rating, userRatingContainer);
+          }
+
+          return card;
+      };
+
+      tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+              const tabId = button.getAttribute('data-tab');
+              
+              // Remove active class from all buttons
+              tabButtons.forEach(btn => btn.classList.remove('active'));
+              // Add active class to clicked button
+              button.classList.add('active');
+              
+              renderBookings(tabId);
+          });
+      });
+
+      // Modal functionality
+      const bookingDetailModal = document.getElementById('bookingDetailModal');
+      const cancelConfirmModal = document.getElementById('cancelConfirmModal');
+
+      function openModal(modalId) {
+          document.getElementById(modalId).classList.add('active');
+          document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal(modalId) {
+          document.getElementById(modalId).classList.remove('active');
+          document.body.style.overflow = 'auto';
+      }
+
+      // Close modal when clicking outside
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+          overlay.addEventListener('click', (e) => {
+              if (e.target === overlay) {
+                  closeModal(overlay.id);
+              }
+          });
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+              closeModal('bookingDetailModal');
+              closeModal('cancelConfirmModal');
+          }
+      });
+
+      function openBookingDetailModal(bookingId) {
+          currentSelectedBooking = mockUserBookings.find(b => b.id === bookingId);
+          if (!currentSelectedBooking) return;
+
+          document.getElementById('modalBookingId').textContent = `#${currentSelectedBooking.id}`;
+          document.getElementById('modalHotelImage').src = currentSelectedBooking.image || '/placeholder.svg';
+          document.getElementById('modalHotelName').textContent = currentSelectedBooking.hotelName;
+          document.getElementById('modalRoomType').textContent = currentSelectedBooking.roomType;
+          document.getElementById('modalAddress').textContent = currentSelectedBooking.address;
+
+          // Render hotel rating in modal
+          const modalHotelRatingContainer = document.getElementById('modalHotelRating');
+          renderStars(currentSelectedBooking.hotelRating, modalHotelRatingContainer);
+
+          // Status badge in modal
+          const modalStatusBadge = document.getElementById('modalStatusBadge');
+          const status = statusConfig[currentSelectedBooking.status];
+          modalStatusBadge.className = `status-badge ${status.colorClass}`;
+          modalStatusBadge.innerHTML = `<i class="fas ${status.iconClass}"></i> ${status.label}`;
+
+          // Amenities in modal
+          const modalAmenitiesContainer = document.getElementById('modalAmenities');
+          modalAmenitiesContainer.innerHTML = currentSelectedBooking.amenities.map(a => `<span class="amenity-tag">${a}</span>`).join('');
+
+          // Booking info in modal
+          document.getElementById('modalBookingDate').textContent = formatDate(currentSelectedBooking.bookingDate);
+          document.getElementById('modalCheckInDate').textContent = formatDate(currentSelectedBooking.checkInDate);
+          document.getElementById('modalCheckOutDate').textContent = formatDate(currentSelectedBooking.checkOutDate);
+          document.getElementById('modalNights').textContent = `${currentSelectedBooking.nights} đêm`;
+          document.getElementById('modalGuests').textContent = `${currentSelectedBooking.guests} người`;
+
+          // Payment details in modal
+          document.getElementById('modalPaymentMethod').textContent = currentSelectedBooking.paymentMethod;
+          document.getElementById('modalTotalAmount').textContent = formatCurrency(currentSelectedBooking.totalAmount);
+
+          const originalAmountRow = document.getElementById('modalOriginalAmountRow');
+          if (currentSelectedBooking.originalAmount > currentSelectedBooking.totalAmount) {
+              originalAmountRow.style.display = 'flex';
+              document.getElementById('modalOriginalAmount').textContent = formatCurrency(currentSelectedBooking.originalAmount);
+          } else {
+              originalAmountRow.style.display = 'none';
+          }
+
+          const voucherRow = document.getElementById('modalVoucherRow');
+          if (currentSelectedBooking.voucherCode) {
+              voucherRow.style.display = 'flex';
+              document.getElementById('modalVoucherCode').textContent = currentSelectedBooking.voucherCode;
+              document.getElementById('modalDiscount').textContent = `-${currentSelectedBooking.discount}%`;
+          } else {
+              voucherRow.style.display = 'none';
+          }
+
+          // Action buttons in modal
+          document.getElementById('modalReviewBtn').classList.toggle('hidden', !currentSelectedBooking.canReview);
+          document.getElementById('modalCancelBtn').classList.toggle('hidden', !currentSelectedBooking.canCancel);
+
+          openModal('bookingDetailModal');
+      }
+
+      function downloadVoucher() {
+          console.log('Downloading voucher for:', currentSelectedBooking.id);
+          // Implement actual download logic here
+      }
+
+      function openCancelModal(bookingId = null) {
+          if (bookingId) {
+              currentSelectedBooking = mockUserBookings.find(b => b.id === bookingId);
+          }
+          if (!currentSelectedBooking) return;
+
+          document.getElementById('cancelBookingId').textContent = `#${currentSelectedBooking.id}`;
+          document.getElementById('cancelHotelName').textContent = currentSelectedBooking.hotelName;
+
+          closeModal('bookingDetailModal'); // Close detail modal if open
+          openModal('cancelConfirmModal');
+      }
+
+      function handleCancelBooking() {
+          console.log('Hủy đặt phòng:', currentSelectedBooking.id);
+          // Here you would typically update the booking status in your backend
+          // For mock data, we can simulate it:
+          const index = mockUserBookings.findIndex(b => b.id === currentSelectedBooking.id);
+          if (index !== -1) {
+              mockUserBookings[index].status = 'cancelled';
+              mockUserBookings[index].canCancel = false; // Cannot cancel again
+              mockUserBookings[index].canReview = false; // Cannot review cancelled booking
+          }
+          closeModal('cancelConfirmModal');
+          renderBookings(document.querySelector('.tab-button.active').getAttribute('data-tab')); // Re-render current tab
+          updateTabCounts();
+          updateStatsCards();
+          alert(`Đặt phòng #${currentSelectedBooking.id} đã được hủy.`);
+      }
+
+      // Initial render on page load
+      document.addEventListener('DOMContentLoaded', () => {
+          updateTabCounts();
+          updateStatsCards();
+          renderBookings('all'); // Render all bookings by default
+      });
+
+      // Add ripple effect to buttons
+      document.querySelectorAll('.btn').forEach(button => {
+          button.addEventListener('click', function(e) {
+              const ripple = document.createElement('span');
+              const rect = this.getBoundingClientRect();
+              const size = Math.max(rect.width, rect.height);
+              const x = e.clientX - rect.left - size / 2;
+              const y = e.clientY - rect.top - size / 2;
+              
+              ripple.style.width = ripple.style.height = size + 'px';
+              ripple.style.left = x + 'px';
+              ripple.style.top = y + 'px';
+              ripple.classList.add('ripple');
+              
+              this.appendChild(ripple);
+              
+              setTimeout(() => {
+                  ripple.remove();
+              }, 600);
+          });
+      });
+
+      // Add CSS for ripple effect
+      const style = document.createElement('style');
+      style.textContent = `
+          .btn {
+              position: relative;
+              overflow: hidden;
+          }
+          
+          .ripple {
+              position: absolute;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.6);
+              transform: scale(0);
+              animation: ripple-animation 0.6s linear;
+              pointer-events: none;
+          }
+          
+          @keyframes ripple-animation {
+              to {
+                  transform: scale(4);
+                  opacity: 0;
+              }
+          }
+      `;
+      document.head.appendChild(style);
+  </script>
+</body>
+</html>

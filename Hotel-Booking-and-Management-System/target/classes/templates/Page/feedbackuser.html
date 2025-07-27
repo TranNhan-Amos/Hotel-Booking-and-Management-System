@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Đà Nẵng - Tour Du Lịch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: white;
+            --text-primary: #1a1a1a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: white;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --accent-color: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --accent-text: white;
+            --button-bg: #f1f5f9;
+            --button-border: #e2e8f0;
+            --button-text: #475569;
+            --input-bg: #f8fafc;
+            --input-border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --button-bg: #334155;
+            --button-border: #475569;
+            --button-text: #cbd5e1;
+            --input-bg: #334155;
+            --input-border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #06b6d4;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #cbd5e1;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: url('/placeholder.svg?height=600&width=1600') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .hero-button {
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--accent-text);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .hero-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Tour Categories */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .category-button {
+            background: var(--button-bg);
+            border: 1px solid var(--button-border);
+            color: var(--button-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-button:hover, .category-button.active {
+            background: var(--accent-color);
+            color: var(--accent-text);
+            border-color: transparent;
+        }
+
+        /* Tour Grid */
+        .tour-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .tour-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tour-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .tour-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .tour-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tour-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .tour-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .tour-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tour-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .tour-price-book {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto; /* Push to bottom */
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .tour-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #06b6d4;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .book-button {
+            background: var(--accent-color);
+            color: var(--accent-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .book-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #06b6d4;
+        }
+
+        .social-icons a {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #06b6d4;
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: none;
+            border-left: 4px solid #06b6d4;
+            min-width: 300px;
+            color: var(--text-primary);
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .nav-links a {
+                margin: 0;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .category-filter {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .category-filter::-webkit-scrollbar {
+                height: 5px;
+            }
+            .category-filter::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 5px;
+            }
+            .category-filter::-webkit-scrollbar-track {
+                background: #f0f0f0;
+            }
+            .tour-grid {
+                grid-template-columns: 1fr;
+            }
+            .tour-price-book {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            .hero {
+                padding: 60px 15px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">Đà Nẵng Tours</a>
+                <div class="nav-links">
+                    <a href="#">Trang chủ</a>
+                    <a href="#">Tour nổi bật</a>
+                    <a href="#">Liên hệ</a>
+                </div>
+                <div class="theme-toggle-wrapper">
+                    <span class="theme-toggle-label">Chế độ tối</span>
+                    <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme(this)"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Khám Phá Vẻ Đẹp Đà Nẵng</h1>
+                <p>Trải nghiệm những tour du lịch độc đáo, từ bãi biển tuyệt đẹp đến núi non hùng vĩ và ẩm thực phong phú.</p>
+                <a href="#tours" class="hero-button">Xem Tour Ngay</a>
+            </div>
+        </section>
+
+        <section class="container">
+            <h2 class="section-title">Các Tour Phổ Biến</h2>
+
+            <div class="category-filter">
+                <button class="category-button active" data-category="all">Tất cả</button>
+                <button class="category-button" data-category="beach">Biển & Đảo</button>
+                <button class="category-button" data-category="mountain">Núi & Thiên nhiên</button>
+                <button class="category-button" data-category="culture">Văn hóa & Lịch sử</button>
+                <button class="category-button" data-category="food">Ẩm thực</button>
+            </div>
+
+            <div class="tour-grid" id="tour-listings">
+                <!-- Tour Card 1 -->
+                <div class="tour-card" data-category="beach">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Bãi biển Mỹ Khê" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Tour Biển Mỹ Khê & Bán Đảo Sơn Trà</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> 1 ngày</span>
+                            <span><i class="fas fa-users"></i> Nhóm nhỏ</span>
+                        </div>
+                        <p class="tour-description">Khám phá vẻ đẹp của bãi biển Mỹ Khê, viếng Chùa Linh Ứng và ngắm nhìn toàn cảnh Đà Nẵng từ Bán đảo Sơn Trà.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">950,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tour Card 2 -->
+                <div class="tour-card" data-category="mountain">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Ngũ Hành Sơn" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Tour Ngũ Hành Sơn & Phố Cổ Hội An</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> 1 ngày</span>
+                            <span><i class="fas fa-users"></i> Gia đình</span>
+                        </div>
+                        <p class="tour-description">Tham quan Ngũ Hành Sơn với các hang động kỳ vĩ, sau đó khám phá vẻ đẹp cổ kính của Phố cổ Hội An về đêm.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">1,200,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tour Card 3 -->
+                <div class="tour-card" data-category="culture">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Cầu Rồng" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Tour Đà Nẵng Thành Phố Ánh Sáng</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> Nửa ngày</span>
+                            <span><i class="fas fa-users"></i> Cặp đôi</span>
+                        </div>
+                        <p class="tour-description">Trải nghiệm Đà Nẵng về đêm với Cầu Rồng phun lửa, Cầu Tình Yêu và du thuyền sông Hàn.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">650,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tour Card 4 -->
+                <div class="tour-card" data-category="food">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Ẩm thực Đà Nẵng" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Food Tour Đà Nẵng - Thiên Đường Ẩm Thực</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> Nửa ngày</span>
+                            <span><i class="fas fa-users"></i> Nhóm bạn</span>
+                        </div>
+                        <p class="tour-description">Thưởng thức các món đặc sản nổi tiếng của Đà Nẵng như Mì Quảng, Bún Chả Cá, Bánh Xèo và nhiều hơn nữa.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">700,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tour Card 5 -->
+                <div class="tour-card" data-category="mountain">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Bà Nà Hills" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Tour Bà Nà Hills & Cầu Vàng</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> 1 ngày</span>
+                            <span><i class="fas fa-users"></i> Gia đình</span>
+                        </div>
+                        <p class="tour-description">Khám phá khu du lịch Bà Nà Hills trên đỉnh núi Chúa, đi cáp treo dài nhất thế giới và chiêm ngưỡng Cầu Vàng độc đáo.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">1,500,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tour Card 6 -->
+                <div class="tour-card" data-category="beach">
+                    <img src="/placeholder.svg?height=220&width=400" alt="Đảo Cù Lao Chàm" class="tour-image">
+                    <div class="tour-content">
+                        <h3 class="tour-title">Tour Lặn Biển Cù Lao Chàm</h3>
+                        <div class="tour-meta">
+                            <span><i class="fas fa-clock"></i> 1 ngày</span>
+                            <span><i class="fas fa-users"></i> Phiêu lưu</span>
+                        </div>
+                        <p class="tour-description">Trải nghiệm lặn biển ngắm san hô tại Cù Lao Chàm, khám phá hệ sinh thái biển đa dạng và thưởng thức hải sản tươi ngon.</p>
+                        <div class="tour-price-book">
+                            <span class="tour-price">1,100,000 VNĐ</span>
+                            <a href="#" class="book-button">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Về chúng tôi</a>
+                <a href="#">Chính sách bảo mật</a>
+                <a href="#">Điều khoản dịch vụ</a>
+                <a href="#">FAQ</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p class="copyright">&copy; 2025 Đà Nẵng Tours. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-info-circle" style="color: #06b6d4;"></i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+    <script>
+        // Toast notification function
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            // Update icon based on type
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle';
+                toastIcon.style.color = '#10b981';
+            } else if (type === 'error') {
+                toastIcon.className = 'fas fa-times-circle';
+                toastIcon.style.color = '#ef4444';
+            } else {
+                toastIcon.className = 'fas fa-info-circle';
+                toastIcon.style.color = '#06b6d4';
+            }
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Theme toggle function
+        function toggleTheme(element) {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            element.classList.toggle('active');
+            
+            // Save theme preference
+            localStorage.setItem('theme', newTheme);
+            
+            showToast('info', `Đã chuyển sang chế độ ${newTheme === 'dark' ? 'tối' : 'sáng'}!`);
+        }
+
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            if (savedTheme === 'dark' && themeToggle) {
+                themeToggle.classList.add('active');
+            }
+        }
+
+        // Tour filtering functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+
+            const categoryButtons = document.querySelectorAll('.category-button');
+            const tourCards = document.querySelectorAll('.tour-card');
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to the clicked button
+                    button.classList.add('active');
+
+                    const selectedCategory = button.getAttribute('data-category');
+
+                    tourCards.forEach(card => {
+                        const cardCategory = card.getAttribute('data-category');
+                        if (selectedCategory === 'all' || cardCategory === selectedCategory) {
+                            card.style.display = 'flex'; // Show the card
+                        } else {
+                            card.style.display = 'none'; // Hide the card
+                        }
+                    });
+                });
+            });
+
+            console.log('Đà Nẵng Tours Page Loaded');
+        });
+    </script>
+</body>
+</html>

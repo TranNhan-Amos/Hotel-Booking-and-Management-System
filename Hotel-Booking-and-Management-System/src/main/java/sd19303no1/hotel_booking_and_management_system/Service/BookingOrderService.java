@@ -31,6 +31,7 @@ import sd19303no1.hotel_booking_and_management_system.Repository.CustomersReposi
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.StatusRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.VoucherRepository;
+import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 
 @Service
 public class BookingOrderService {
@@ -45,6 +46,8 @@ public class BookingOrderService {
     private RoomRepository roomRepository;
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private RoomService roomService;
 
     // --- PHƯƠNG THỨC CHO KHÁCH HÀNG ĐẶT PHÒNG (Sử dụng bởi BookingController) ---
     @Transactional
@@ -112,9 +115,10 @@ public class BookingOrderService {
         // }
 
         // 3. Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không
-        boolean isRoomAvailable = room.getTotalRooms() != null && room.getTotalRooms() >= roomQuantity;
+        int availableRooms = roomService.getAvailableRoomCount(roomId, checkInDate, checkOutDate);
+        boolean isRoomAvailable = availableRooms >= roomQuantity;
         if (!isRoomAvailable) {
-            throw new RuntimeException("Không đủ phòng trống để đặt. Số phòng còn lại: " + room.getTotalRooms());
+            throw new RuntimeException("Không đủ phòng có sẵn để đặt. Số phòng còn lại: " + availableRooms);
         }
 
         // 4. Lấy voucher nếu có
@@ -165,9 +169,8 @@ public class BookingOrderService {
 
         BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
 
-        // Trừ số phòng đã đặt khỏi tổng số phòng còn trống
-        room.setTotalRooms(room.getTotalRooms() - roomQuantity);
-        roomRepository.save(room);
+        // Không cần trừ totalRooms vì sẽ tính động theo booking
+        // Số phòng có sẵn sẽ được tính trong RoomService.getAvailableRoomCount()
 
         return savedBooking;
     }
@@ -259,12 +262,8 @@ public class BookingOrderService {
         booking.setRefundAmount(refundAmount);
         booking.setRefundStatus("PENDING");
 
-        // Cộng lại số phòng đã đặt vào tổng số phòng còn trống
-        RoomEntity room = booking.getRoom();
-        if (room != null && booking.getRoomQuantity() != null) {
-            room.setTotalRooms(room.getTotalRooms() + booking.getRoomQuantity());
-            roomRepository.save(room);
-        }
+        // Không cần cộng lại totalRooms vì sẽ tính động theo booking
+        // Số phòng có sẵn sẽ được tính trong RoomService.getAvailableRoomCount()
 
         return bookingOrderRepository.save(booking);
     }

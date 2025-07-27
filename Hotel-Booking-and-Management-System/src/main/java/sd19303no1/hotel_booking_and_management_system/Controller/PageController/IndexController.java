@@ -9,12 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
-import sd19303no1.hotel_booking_and_management_system.Repository.RoomPartnerRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
@@ -36,9 +34,6 @@ public class IndexController {
 
     @Autowired
     private RoomRepository roomRepository;
-
-    @Autowired
-    private RoomPartnerRepository roomPartnerRepository;
 
     @Autowired
     private VoucherRepository voucherRepository;
@@ -109,15 +104,34 @@ public class IndexController {
         model.addAttribute("roomTypes", roomTypes);
 
         // Lấy danh sách phòng nổi bật (6 phòng mới nhất)
-        List<RoomEntity> featuredRooms = roomRepository.findAll(PageRequest.of(0, 6)).getContent();
+        List<RoomEntity> featuredRooms = roomRepository.findFeaturedRooms(PageRequest.of(0, 6));
+        
+        // Tính đánh giá trung bình và load amenities cho từng phòng
+        for (RoomEntity room : featuredRooms) {
+            // Tính đánh giá trung bình
+            if (room.getReviews() != null && !room.getReviews().isEmpty()) {
+                double averageRating = room.getReviews().stream()
+                    .mapToDouble(review -> review.getRating())
+                    .average()
+                    .orElse(0.0);
+                room.setAverageRating(averageRating);
+            } else {
+                room.setAverageRating(0.0);
+            }
+            
+            // Load amenities
+            List<String> amenities = roomRepository.findAmenitiesByRoomId(room.getRoomId());
+            room.setAmenities(amenities);
+        }
+        
         model.addAttribute("featuredRooms", featuredRooms);
 
         // Lấy danh sách voucher đang hoạt động
-        List<VoucherEntity> activeVouchers = voucherRepository.findActiveVouchers(LocalDate.now());
+        List<VoucherEntity> activeVouchers = voucherRepository.findActiveVouchersOrderByDiscount(LocalDate.now());
         model.addAttribute("activeVouchers", activeVouchers);
 
         // Lấy danh sách đặt phòng gần đây (3 booking mới nhất)
-        List<BookingOrderEntity> recentBookings = bookingOrderRepository.findTopNByOrderByCreatedAtDesc(PageRequest.of(0, 3));
+        List<BookingOrderEntity> recentBookings = bookingOrderRepository.findRecentBookingsWithFullDetails(PageRequest.of(0, 3));
         model.addAttribute("recentBookings", recentBookings);
 
         // Lấy danh sách đánh giá gần đây (cho demo)
@@ -127,14 +141,16 @@ public class IndexController {
     }
 
     private List<RoomTypeDTO> getRoomTypes() {
-        List<RoomPartnerEntity> roomPartners = roomPartnerRepository.findAll();
+        List<RoomEntity> rooms = roomRepository.findAll();
         
-        return roomPartners.stream()
-            .map(roomPartner -> {
+        return rooms.stream()
+            .map(room -> {
                 RoomTypeDTO dto = new RoomTypeDTO();
-                dto.setName(roomPartner.getType());
-                dto.setDescription("Khám phá " + roomPartner.getType() + " với tiện nghi hiện đại");
-                dto.setImageUrl("https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop");
+                dto.setName(room.getType().name());
+                dto.setDescription("Khám phá " + room.getType().name() + " với tiện nghi hiện đại");
+                dto.setImageUrl(room.getImageUrls() != null && !room.getImageUrls().isEmpty() 
+                    ? room.getImageUrls().get(0) 
+                    : "https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=2070&auto=format&fit=crop");
                 return dto;
             })
             .distinct()

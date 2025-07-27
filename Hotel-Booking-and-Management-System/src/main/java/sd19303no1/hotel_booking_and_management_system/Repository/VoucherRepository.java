@@ -17,5 +17,10 @@ public interface VoucherRepository extends JpaRepository<VoucherEntity, Integer>
            "AND v.endDate >= :today AND v.status = 'ACTIVE'")
     List<VoucherEntity> findActiveVouchers(@Param("today") LocalDate today);
 
+    @Query("SELECT v FROM VoucherEntity v WHERE v.startDate <= :today " +
+           "AND v.endDate >= :today AND v.status = 'ACTIVE' " +
+           "ORDER BY v.discount DESC")
+    List<VoucherEntity> findActiveVouchersOrderByDiscount(@Param("today") LocalDate today);
+
     VoucherEntity findByCode(String code);
 }

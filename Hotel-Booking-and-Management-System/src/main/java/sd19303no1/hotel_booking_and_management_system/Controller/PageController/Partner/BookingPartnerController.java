@@ -52,18 +52,20 @@ public class BookingPartnerController {
                     model.addAttribute("bookingshomNay", bookingshomNay);
                     model.addAttribute("RoomBookingsPartner", RoomBookingsPartner);
                     model.addAttribute("sumDoanhThuToday", sumDoanhThuToday);
+                    model.addAttribute("partner", partner);
                     return "Partner/BookingsPartner";
                 } else {
                     model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
                     return "Partner/BookingsPartner";
                 }
             } else {
-
+                model.addAttribute("error", "Bạn không có quyền truy cập.");
+                return "Partner/BookingsPartner";
             }
 
         } catch (Exception e) {
-            
+            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "Partner/BookingsPartner";
         }
-        return "Partner/BookingsPartner"; 
     }
 }

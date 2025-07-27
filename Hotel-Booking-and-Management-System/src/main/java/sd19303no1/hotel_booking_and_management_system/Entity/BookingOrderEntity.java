@@ -54,6 +54,12 @@ public class BookingOrderEntity {
     @JsonIgnore
     private StatusEntity status;
 
+    // Quan hệ với PartnerEntity (booking thuộc về partner nào)
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    @JsonIgnore
+    private PartnerEntity partner;
+
     // Thêm các trường mới cho tính năng hoàn tiền và chính sách hủy
     @Column(name = "total_price", precision = 10, scale = 2)
     private BigDecimal totalPrice;
@@ -169,6 +175,14 @@ public class BookingOrderEntity {
         this.status = status;
     }
 
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
+
     // Getters and Setters cho các trường mới
     public BigDecimal getTotalPrice() {
         return totalPrice;
@@ -257,12 +271,32 @@ public class BookingOrderEntity {
     public void setRoomQuantity(Integer roomQuantity) {
         this.roomQuantity = roomQuantity;
     }
-    public String getDurationString() {
-    if (checkInDate != null && checkOutDate != null) {
-        long days = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-        long nights = days > 0 ? days - 1 : 0;
-        return days + " ngày " + nights + " đêm";
+
+    // Business methods
+    public long getNumberOfNights() {
+        if (checkInDate != null && checkOutDate != null) {
+            return ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+        }
+        return 0;
     }
-    return "0 ngày 0 đêm";
-}
+
+    public boolean isCancelled() {
+        return status != null && "CANCELLED".equals(status.getStatusName());
+    }
+
+    public boolean isConfirmed() {
+        return status != null && "CONFIRMED".equals(status.getStatusName());
+    }
+
+    public boolean isPending() {
+        return status != null && "PENDING".equals(status.getStatusName());
+    }
+
+    public boolean isCompleted() {
+        return status != null && "COMPLETED".equals(status.getStatusName());
+    }
+
+    public boolean isRefunded() {
+        return status != null && "REFUNDED".equals(status.getStatusName());
+    }
 }

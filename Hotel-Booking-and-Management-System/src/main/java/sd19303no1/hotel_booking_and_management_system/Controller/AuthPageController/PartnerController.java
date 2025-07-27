@@ -20,11 +20,11 @@ import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPa
 import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.RoomPartnerEntity;
+
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
 import sd19303no1.hotel_booking_and_management_system.Service.PartnerService;
-import sd19303no1.hotel_booking_and_management_system.Service.RoomPartnerService;
+import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,8 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class PartnerController {
 
-    @Autowired
-    private RoomPartnerService roomPartnerService;
+
 
     @Autowired
     private PartnerService partnerService;
@@ -49,6 +48,9 @@ public class PartnerController {
 
     @Autowired
     private BookingOrderService bookingOrderService;
+
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping("/partner")
     public String partnerDashboard(Model model) {
@@ -72,7 +74,7 @@ public class PartnerController {
                 System.out.println("=== DEBUG: Partner found: " + (partner != null));
 
                 if (partner != null) {
-                    long roomCount = roomPartnerService.countRoomsByPartnerId(partner.getId());
+                    long roomCount = roomService.findByPartnerId(partner.getId()).size();
                     System.out.println("=== DEBUG: Room count: " + roomCount);
                     model.addAttribute("partner", partner);
                     model.addAttribute("systemUser", systemUser);

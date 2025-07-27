@@ -19,6 +19,24 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
     // Phương thức để lấy N booking gần nhất
     List<BookingOrderEntity> findTopNByOrderByCreatedAtDesc(Pageable pageable);
 
+    // Thêm method để lấy booking gần đây với thông tin đầy đủ
+    @Query("SELECT b FROM BookingOrderEntity b " +
+           "LEFT JOIN FETCH b.customer " +
+           "LEFT JOIN FETCH b.room " +
+           "LEFT JOIN FETCH b.status " +
+           "ORDER BY b.createdAt DESC")
+    List<BookingOrderEntity> findRecentBookingsWithDetails(Pageable pageable);
+    
+    // Thêm method để lấy booking gần đây với thông tin đầy đủ hơn
+    @Query("SELECT b FROM BookingOrderEntity b " +
+           "LEFT JOIN FETCH b.customer " +
+           "LEFT JOIN FETCH b.room r " +
+           "LEFT JOIN FETCH r.partner " +
+           "LEFT JOIN FETCH b.status " +
+           "WHERE b.status.statusName IN ('CONFIRMED', 'PENDING', 'COMPLETED') " +
+           "ORDER BY b.createdAt DESC")
+    List<BookingOrderEntity> findRecentBookingsWithFullDetails(Pageable pageable);
+
     // Tìm các booking xung đột (conflicting bookings)
     @Query("SELECT b FROM BookingOrderEntity b WHERE b.room.roomId = :roomId " +
             "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED') " +

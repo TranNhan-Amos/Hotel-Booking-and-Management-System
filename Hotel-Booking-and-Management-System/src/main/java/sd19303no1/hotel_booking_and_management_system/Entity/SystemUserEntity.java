@@ -35,31 +35,15 @@ public class SystemUserEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL)
+    // Quan hệ 1-1 với PartnerEntity (mappedBy trong PartnerEntity)
+    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PartnerEntity partner;
 
-    // Thêm quan hệ 1-1 với CustomersEntity
-    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL)
+    // Quan hệ 1-1 với CustomersEntity (mappedBy trong CustomersEntity)
+    @OneToOne(mappedBy = "systemUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private CustomersEntity customer;
 
-    public CustomersEntity getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(CustomersEntity customer) {
-        this.customer = customer;
-    }
-
-
-
-    // Cập nhật getter/setter
-    public PartnerEntity getPartner() {
-        return partner;
-    }
-
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
-    }
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -116,7 +100,24 @@ public class SystemUserEntity {
         this.createdAt = createdAt;
     }
 
-        public boolean isAdmin() {
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
+    }
+
+    public CustomersEntity getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(CustomersEntity customer) {
+        this.customer = customer;
+    }
+
+    // Helper methods
+    public boolean isAdmin() {
         return this.role == Role.ADMIN;
     }
     

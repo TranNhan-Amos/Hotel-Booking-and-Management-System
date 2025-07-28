@@ -1,0 +1,315 @@
+<nav class="navbar" th:fragment="navbar">
+    <div class="navbar-brand">
+        <div class="logo-icon">
+            <i class="fas fa-water"></i>
+        </div>
+        <div class="logo-text">Dashboard</div>
+    </div>
+
+    <button class="hamburger">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="nav-menu">
+        <a href="/partner/reports" class="nav-item" data-page="reports">
+            <i class="fas fa-chart-line"></i>
+            <span>Báo cáo</span>
+        </a>    
+        <a href="/partner/rooms" class="nav-item" data-page="rooms">
+            <i class="fas fa-bed"></i>
+            <span>Quản lý phòng</span>
+        </a>
+        <a href="/partner/bookings" class="nav-item" data-page="bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Đặt phòng</span>
+        </a>
+        <a href="/partner/reviews" class="nav-item" data-page="reviews">
+            <i class="fas fa-star"></i>
+            <span>Đánh giá</span>
+        </a>
+        <a href="/partner/settings" class="nav-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Cài đặt</span>
+        </a>
+        <a href="/partner/support" class="nav-item" data-page="support">
+            <i class="fas fa-question-circle"></i>
+            <span>Hỗ trợ</span>
+        </a>
+        <div class="navbar-user">
+            <div class="dropdown">
+                <div class="user-info">
+                    <div class="user-avatar">P</div>
+                    <div class="user-details">
+                        <div class="user-name">Partner user</div>
+                        <div class="user-role">Đối tác</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                </div>
+                
+                <div class="dropdown-menu">
+                    <a href="/partner/profile" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Hồ Sơ Cá Nhân</span>
+                    </a>
+                    <a href="/partner/settings" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt Tài Khoản</span>
+                    </a>
+                    <a href="/partner/notifications" class="dropdown-item">
+                        <i class="fas fa-bell"></i>
+                        <span>Thông Báo</span>
+                    </a>
+                    <div style="border-top: 1px solid var(--border-color); margin: 5px 0;"></div>
+                    <a href="/logout" class="dropdown-item danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-nav-item">
+            <a href="/partner" class="mobile-nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/rooms" class="mobile-nav-link" data-page="rooms">
+                <i class="fas fa-bed"></i>
+                <span>Quản lý phòng</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/bookings" class="mobile-nav-link" data-page="bookings">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Đặt phòng</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/reviews" class="mobile-nav-link" data-page="reviews">
+                <i class="fas fa-star"></i>
+                <span>Đánh giá</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/settings" class="mobile-nav-link" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/partner/support" class="mobile-nav-link" data-page="support">
+                <i class="fas fa-question-circle"></i>
+                <span>Hỗ trợ</span>
+            </a>
+        </div>
+        <div class="mobile-nav-item">
+            <a href="/logout" class="mobile-nav-link" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile menu -->
+    <div class="overlay" id="overlay"></div>
+</nav>
+
+<!-- CSS for NavbarPartner -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/Css/Partner/NavbarPartner.css}">
+
+<!-- JavaScript for NavbarPartner -->
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const navbar = document.querySelector('.navbar');
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('overlay');
+    const navItems = document.querySelectorAll('.nav-item');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    const userInfo = document.querySelector('.user-info');
+    const dropdown = document.querySelector('.dropdown');
+
+    // Toggle mobile menu
+    hamburger.addEventListener('click', function() {
+        mobileMenu.classList.toggle('active');
+        hamburger.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking overlay
+    overlay.addEventListener('click', function() {
+        mobileMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    // Close mobile menu when clicking a link
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            mobileMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+    });
+
+    // Helper function to extract page from URL
+    function getPageFromUrl() {
+        const path = window.location.pathname;
+        const pageMap = {
+            '/partner/reports': 'reports',
+            '/partner': 'home',
+            '/partner/rooms': 'rooms',
+            '/partner/bookings': 'bookings',
+            '/partner/reviews': 'reviews',
+            '/partner/settings': 'settings',
+            '/partner/support': 'support',
+            '/logout': 'logout'
+        };
+        return pageMap[path] || 'home';
+    }
+
+    // Set active state based on current page
+    function setActivePage() {
+        const currentPage = getPageFromUrl();
+        
+        // Remove active from all items
+        navItems.forEach(item => item.classList.remove('active'));
+        mobileNavLinks.forEach(link => link.classList.remove('active'));
+        
+        // Add active to current page
+        const activeNavItem = document.querySelector(`[data-page="${currentPage}"]`);
+        const activeMobileLink = document.querySelector(`.mobile-nav-link[data-page="${currentPage}"]`);
+        
+        if (activeNavItem) {
+            activeNavItem.classList.add('active');
+        }
+        if (activeMobileLink) {
+            activeMobileLink.classList.add('active');
+        }
+    }
+
+    // Initialize active state
+    setActivePage();
+
+    // Handle navigation clicks
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active from all items
+            navItems.forEach(navItem => navItem.classList.remove('active'));
+            // Add active to clicked item
+            this.classList.add('active');
+        });
+    });
+
+    // Handle mobile navigation clicks
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Remove active from all mobile links
+            mobileNavLinks.forEach(mobileLink => mobileLink.classList.remove('active'));
+            // Add active to clicked link
+            this.classList.add('active');
+        });
+    });
+
+    // Lưu trạng thái active ban đầu của các nav items
+    let originalActiveStates = [];
+    
+    function saveActiveStates() {
+        originalActiveStates = [];
+        navItems.forEach((item, index) => {
+            originalActiveStates[index] = item.classList.contains('active');
+        });
+    }
+    
+    function removeAllActiveStates() {
+        navItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+    
+    function restoreActiveStates() {
+        navItems.forEach((item, index) => {
+            if (originalActiveStates[index]) {
+                item.classList.add('active');
+            }
+        });
+    }
+    
+    // Xử lý click vào user menu
+    userInfo.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!dropdown.classList.contains('active')) {
+            // Mở dropdown
+            saveActiveStates(); // Lưu trạng thái hiện tại
+            removeAllActiveStates(); // Tắt tất cả active states
+            dropdown.classList.add('active');
+            navbar.classList.add('dropdown-open');
+            overlay.classList.add('active');
+        } else {
+            // Đóng dropdown
+            dropdown.classList.remove('active');
+            navbar.classList.remove('dropdown-open');
+            overlay.classList.remove('active');
+            restoreActiveStates(); // Khôi phục trạng thái ban đầu
+        }
+    });
+    
+    // Đóng dropdown khi click outside
+    overlay.addEventListener('click', function() {
+        dropdown.classList.remove('active');
+        navbar.classList.remove('dropdown-open');
+        overlay.classList.remove('active');
+        restoreActiveStates(); // Khôi phục trạng thái ban đầu
+    });
+    
+    // Đóng dropdown khi click vào dropdown item
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function() {
+            dropdown.classList.remove('active');
+            navbar.classList.remove('dropdown-open');
+            overlay.classList.remove('active');
+            restoreActiveStates(); // Khôi phục trạng thái ban đầu
+        });
+    });
+    
+    // Đóng dropdown khi nhấn ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && dropdown.classList.contains('active')) {
+            dropdown.classList.remove('active');
+            navbar.classList.remove('dropdown-open');
+            overlay.classList.remove('active');
+            restoreActiveStates(); // Khôi phục trạng thái ban đầu
+        }
+    });
+    
+    // Xử lý click vào nav items khi dropdown đang mở
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            if (navbar.classList.contains('dropdown-open')) {
+                // Nếu dropdown đang mở, đóng nó trước
+                dropdown.classList.remove('active');
+                navbar.classList.remove('dropdown-open');
+                overlay.classList.remove('active');
+                
+                // Sau đó xử lý navigation bình thường
+                setTimeout(() => {
+                    // Remove active from all items
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    // Add active to clicked item
+                    this.classList.add('active');
+                }, 100);
+            }
+        });
+    });
+});
+</script>

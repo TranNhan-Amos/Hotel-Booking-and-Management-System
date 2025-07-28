@@ -1,0 +1,331 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Variables for consistent theming */
+:root {
+    --primary-color: #1e90ff; /* Màu xanh dương đậm */
+    --secondary-color: #f5f7fa; /* Màu xám nhạt */
+    --text-color: #2c3e50; /* Màu xám đậm */
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+    --info-color: #3498db;
+    --warning-color: #f1c40f;
+    --background-color: #ffffff; /* Nền trắng hoàn toàn */
+    --border-color: #ecf0f1;
+    --hover-color: #d3e0ea; /* Màu hover nhẹ nhàng, không xanh */
+    --active-border-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --white: #ffffff;
+    --light-bg: #f8f9fa;
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: var(--secondary-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: 70px;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+/* Navbar brand */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition);
+}
+
+.logo-icon {
+    font-size: 28px;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover .logo-icon,
+.navbar-brand:hover .logo-text {
+    color: var(--hover-color);
+}
+
+/* Nav menu */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    transition: var(--transition);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 18px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: var(--hover-color);
+    color: #2c3e50;
+    transform: translateY(-2px);
+}
+
+.nav-item.active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-bottom: 3px solid var(--active-border-color);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.nav-item i {
+    font-size: 18px;
+}
+
+/* Tắt hiệu ứng hover khi dropdown user menu đang mở */
+.navbar.dropdown-open .navbar-brand:hover .logo-icon,
+.navbar.dropdown-open .navbar-brand:hover .logo-text {
+    color: var(--primary-color); /* Giữ nguyên màu gốc */
+}
+
+.navbar.dropdown-open .nav-item:hover {
+    background-color: transparent; /* Tắt background hover */
+    color: var(--text-color); /* Giữ nguyên màu text */
+    transform: none; /* Tắt hiệu ứng nổi lên */
+}
+
+.navbar.dropdown-open .nav-item.active:hover {
+    background-color: var(--primary-color); /* Giữ nguyên cho item active */
+    color: #ffffff;
+    transform: none;
+}
+
+/* Hamburger menu */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.hamburger:hover {
+    color: var(--hover-color);
+    transform: rotate(90deg);
+}
+
+/* Tắt hiệu ứng hamburger khi dropdown mở */
+.navbar.dropdown-open .hamburger:hover {
+    color: var(--text-color);
+    transform: none;
+}
+
+/* Mobile menu */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: var(--background-color); /* Nền trắng */
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 20px 25px;
+    z-index: 999;
+    border-top: 1px solid var(--border-color);
+}
+
+.mobile-nav-item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 0;
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 6px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+    color: var(--text-color);
+    background-color: #f5f7fa; /* Hiệu ứng hover nhẹ, không xanh */
+}
+
+/* Tắt hiệu ứng mobile menu khi dropdown mở */
+.navbar.dropdown-open ~ .mobile-menu .mobile-nav-link:hover {
+    background-color: transparent;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    .hamburger {
+        display: block;
+    }
+    .mobile-menu.active {
+        display: block;
+    }
+}
+
+/* User Menu */
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    position: relative;
+}
+
+.user-info:hover {
+    background: var(--hover-color);
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--success-color), #27ae60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-role {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    z-index: 1001;
+    margin-top: 10px;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Thêm class để đánh dấu khi dropdown đang mở */
+.dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 14px;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: var(--light-bg);
+    color: var(--primary-color);
+}
+
+.dropdown-item.danger:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+/* Overlay để detect click outside */
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+}
+
+.dropdown-overlay.active {
+    display: block;
+}

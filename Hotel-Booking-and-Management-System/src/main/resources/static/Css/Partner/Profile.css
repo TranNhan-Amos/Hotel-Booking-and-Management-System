@@ -1,0 +1,119 @@
+        .gradient-bg {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #4f46e5 100%);
+        }
+        
+        .partner-gradient {
+            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .partner-logo {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+        
+        .rating-stars {
+            color: #fbbf24;
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .status-inactive {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+        
+        .tab-inactive {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        
+        .tab-inactive:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #000;
+        }
+        
+        .contract-item {
+            border-left: 4px solid #10b981;
+        }
+        
+        .notification-dot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Navbar styling */
+        .navbar-container {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Main content spacing */
+        .main-content {
+            margin-top: 2rem; /* Khoảng trắng giữa navbar và content */
+        }

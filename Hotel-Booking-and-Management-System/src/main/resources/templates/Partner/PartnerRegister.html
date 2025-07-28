@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký thông tin Đối tác - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/partner/PartnerRegister.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-building"></i> Đăng ký thông tin Đối tác</h1>
+            <p>Hoàn thiện thông tin để bắt đầu kinh doanh trên nền tảng Grand Ocean</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Success Message -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Info Box -->
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Lưu ý:</strong> Vui lòng điền đầy đủ và chính xác thông tin để chúng tôi có thể hỗ trợ bạn tốt nhất.
+            </div>
+            
+            <form th:action="@{/partner/register}" method="post" id="partnerForm">
+                <!-- Thông tin Doanh nghiệp -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-building"></i>
+                        Thông tin Doanh nghiệp
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="companyName" class="required">Tên Doanh nghiệp</label>
+                            <input type="text" id="companyName" name="companyName" 
+                                   placeholder="Nhập tên doanh nghiệp" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taxId">Mã số thuế</label>
+                            <input type="text" id="taxId" name="taxId" 
+                                   placeholder="Nhập mã số thuế (nếu có)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="required">Địa chỉ</label>
+                        <input type="text" id="address" name="address" 
+                               placeholder="Nhập địa chỉ đầy đủ của doanh nghiệp" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="businessLicense">Số giấy phép kinh doanh</label>
+                        <input type="text" id="businessLicense" name="businessLicense" 
+                               placeholder="Nhập số giấy phép kinh doanh">
+                    </div>
+                </div>
+                
+                <!-- Thông tin Liên hệ -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-address-card"></i>
+                        Thông tin Liên hệ
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactPerson" class="required">Người đại diện</label>
+                            <input type="text" id="contactPerson" name="contactPerson" 
+                                   placeholder="Họ và tên người đại diện" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="required">Số điện thoại</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   placeholder="Nhập số điện thoại liên hệ" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" 
+                               th:value="${systemUser != null ? systemUser.email : ''}" readonly>
+                        <small style="color: #666; font-size: 12px;">Email được lấy từ tài khoản đăng nhập của bạn</small>
+                    </div>
+                </div>
+                
+                <!-- Thông tin Kinh doanh -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        Thông tin Kinh doanh
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="businessmodel" class="required">Mô hình kinh doanh</label>
+                        <select id="businessmodel" name="businessmodel" required>
+                            <option value="">Chọn mô hình kinh doanh</option>
+                            <option value="HOTEL">Khách sạn</option>
+                            <option value="RESORT">Khu nghỉ dưỡng</option>
+                            <option value="HOMESTAY">Homestay</option>
+                            <option value="VILLA">Biệt thự</option>
+                            <option value="APARTMENT">Căn hộ dịch vụ</option>
+                            <option value="HOSTEL">Nhà trọ/Hostel</option>
+                            <option value="MOTEL">Motel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hotelamenities" class="required">Tiện nghi khách sạn</label>
+                        <textarea id="hotelamenities" name="hotelamenities" 
+                                  placeholder="Mô tả các tiện nghi, dịch vụ mà khách sạn của bạn cung cấp (WiFi, Hồ bơi, Nhà hàng, Spa, Gym, v.v.)" 
+                                  required></textarea>
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i>
+                        Đăng ký thông tin
+                    </button>
+                    <a href="/partner" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('partnerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Form validation
+            function validateForm() {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = '#e74c3c';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = '#ddd';
+                    }
+                });
+                
+                return isValid;
+            }
+            
+            // Phone number validation
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function() {
+                const phoneRegex = /^[0-9+\-\s()]+$/;
+                if (this.value && !phoneRegex.test(this.value)) {
+                    this.style.borderColor = '#e74c3c';
+                } else {
+                    this.style.borderColor = '#ddd';
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    alert('Vui lòng điền đầy đủ các trường bắt buộc!');
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                submitBtn.disabled = true;
+                form.classList.add('loading');
+            });
+            
+            // Auto-resize textarea
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

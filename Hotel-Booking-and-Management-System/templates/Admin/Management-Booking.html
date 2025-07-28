@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đặt Phòng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/Management-Booking.css}">
+
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{/Layout/NavbarAdmin}"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="management-section">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</h2>
+            </div>
+            
+            <div class="section-body">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Tổng Đặt Phòng</div>
+                            <div class="stat-icon total">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">156</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đã Xác Nhận</div>
+                            <div class="stat-icon confirmed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">89</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Chờ Xác Nhận</div>
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">23</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Đã Hủy</div>
+                            <div class="stat-icon cancelled">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">44</div>
+                    </div>
+                </div>
+
+                <div class="management-header">
+                    <div class="search-filter">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterBookings()">
+                        <select id="statusFilter" onchange="filterBookings()">
+                            <option value="all">Tất Cả Trạng Thái</option>
+                            <option value="confirmed">Đã Xác Nhận</option>
+                            <option value="pending">Chờ Xác Nhận</option>
+                            <option value="cancelled">Đã Hủy</option>
+                        </select>
+                        <input type="date" id="dateFilter" onchange="filterBookings()">
+                    </div>
+                </div>
+
+                <div class="booking-table">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã Đặt Phòng</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Phòng</th>
+                                    <th>Ngày Đặt</th>
+                                    <th>Giá</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingTableBody">
+                                <tr data-status="pending">
+                                    <td class="booking-id">#BK001</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Nguyễn Văn A</div>
+                                            <div class="customer-email">nguyen.van.a@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Deluxe 101</div>
+                                            <div class="room-type">Deluxe</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 25/05/2025</div>
+                                            <div class="check-out">Trả: 27/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">3,000,000 ₫</td>
+                                    <td><span class="status pending">Chờ Xác Nhận</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                            <button class="confirm-btn" onclick="confirmBooking(this)">
+                                                <i class="fas fa-check"></i> Xác Nhận
+                                            </button>
+                                            <button class="cancel-btn" onclick="cancelBooking(this)">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr data-status="confirmed">
+                                    <td class="booking-id">#BK002</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Trần Thị B</div>
+                                            <div class="customer-email">tran.thi.b@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Suite 201</div>
+                                            <div class="room-type">Suite</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 28/05/2025</div>
+                                            <div class="check-out">Trả: 30/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">5,000,000 ₫</td>
+                                    <td><span class="status confirmed">Đã Xác Nhận</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                            <button class="cancel-btn" onclick="cancelBooking(this)">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr data-status="cancelled">
+                                    <td class="booking-id">#BK003</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-name">Lê Văn C</div>
+                                            <div class="customer-email">le.van.c@example.com</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="room-info">
+                                            <div class="room-name">Phòng Superior 102</div>
+                                            <div class="room-type">Superior</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-range">
+                                            <div class="check-in">Nhận: 22/05/2025</div>
+                                            <div class="check-out">Trả: 24/05/2025</div>
+                                        </div>
+                                    </td>
+                                    <td class="price">2,400,000 ₫</td>
+                                    <td><span class="status cancelled">Đã Hủy</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="view-btn" onclick="viewBooking(this)">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle i');
+            
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                toggleBtn.className = 'fas fa-times';
+            } else {
+                toggleBtn.className = 'fas fa-bars';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Filter Bookings
+        function filterBookings() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const rows = document.querySelectorAll('#bookingTableBody tr');
+
+            rows.forEach(row => {
+                const customerName = row.querySelector('.customer-name').textContent.toLowerCase();
+                const status = row.getAttribute('data-status');
+                const checkInDate = row.querySelector('.check-in').textContent;
+
+                const matchesSearch = customerName.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesDate = !dateFilter || checkInDate.includes(dateFilter);
+
+                if (matchesSearch && matchesStatus && matchesDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Booking Actions
+        function viewBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            alert(`Xem chi tiết đặt phòng ${bookingId}`);
+        }
+
+        function confirmBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            
+            if (confirm(`Xác nhận đặt phòng ${bookingId}?`)) {
+                const statusSpan = row.querySelector('.status');
+                statusSpan.className = 'status confirmed';
+                statusSpan.textContent = 'Đã Xác Nhận';
+                row.setAttribute('data-status', 'confirmed');
+                
+                // Remove confirm button
+                button.remove();
+                
+                alert(`Đã xác nhận đặt phòng ${bookingId}`);
+            }
+        }
+
+        function cancelBooking(button) {
+            const row = button.closest('tr');
+            const bookingId = row.querySelector('.booking-id').textContent;
+            
+            if (confirm(`Hủy đặt phòng ${bookingId}?`)) {
+                const statusSpan = row.querySelector('.status');
+                statusSpan.className = 'status cancelled';
+                statusSpan.textContent = 'Đã Hủy';
+                row.setAttribute('data-status', 'cancelled');
+                
+                // Remove action buttons except view
+                const actions = row.querySelector('.actions');
+                const viewBtn = actions.querySelector('.view-btn');
+                actions.innerHTML = '';
+                actions.appendChild(viewBtn);
+                
+                alert(`Đã hủy đặt phòng ${bookingId}`);
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (window.innerWidth > 992) {
+                mobileMenu.classList.remove('active');
+                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

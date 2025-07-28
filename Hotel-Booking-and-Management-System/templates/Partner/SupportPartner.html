@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hỗ trợ - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/partner/SupportPartner.css}">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div th:replace="~{/Layout/NavbarPartner}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="page-title">
+                    <h1>Trung tâm hỗ trợ</h1>
+                    <p>Tìm câu trả lời cho các câu hỏi thường gặp và nhận hỗ trợ</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="action-btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Tạo ticket hỗ trợ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Support -->
+            <div class="quick-support">
+                <div class="support-card" onclick="openChat()">
+                    <div class="support-card-header">
+                        <div class="support-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <h3>Chat trực tuyến</h3>
+                            <p>Trò chuyện trực tiếp với đội ngũ hỗ trợ 24/7</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="support-card" onclick="callSupport()">
+                    <div class="support-card-header">
+                        <div class="support-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h3>Gọi điện thoại</h3>
+                            <p>Hotline: 1900 1234 (24/7)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="support-card" onclick="sendEmail()">
+                    <div class="support-card-header">
+                        <div class="support-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h3>Gửi email</h3>
+                            <p>support@grandocean.com</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="support-card" onclick="scheduleCall()">
+                    <div class="support-card-header">
+                        <div class="support-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div>
+                            <h3>Đặt lịch hẹn</h3>
+                            <p>Tư vấn 1-1 với chuyên gia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Content -->
+            <div class="support-content">
+                <!-- FAQ Section -->
+                <div class="faq-section">
+                    <div class="section-title">
+                        <i class="fas fa-question-circle"></i>
+                        Câu hỏi thường gặp
+                    </div>
+                    
+                    <div class="search-faq">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm câu hỏi...">
+                    </div>
+                    
+                    <div class="faq-categories">
+                        <div class="faq-category active">Tất cả</div>
+                        <div class="faq-category">Đặt phòng</div>
+                        <div class="faq-category">Thanh toán</div>
+                        <div class="faq-category">Tài khoản</div>
+                        <div class="faq-category">Kỹ thuật</div>
+                    </div>
+                    
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Làm thế nào để thêm phòng mới vào hệ thống?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Để thêm phòng mới, bạn vào mục "Quản lý phòng" > "Thêm phòng mới". Điền đầy đủ thông tin về loại phòng, giá, tiện nghi và hình ảnh. Sau khi lưu, phòng sẽ được hiển thị trên hệ thống đặt phòng.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Tại sao tôi không nhận được thông báo đặt phòng?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Kiểm tra cài đặt thông báo trong mục "Cài đặt" > "Thông báo". Đảm bảo bạn đã bật thông báo cho "Đặt phòng mới" và email/số điện thoại của bạn đã được xác thực.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Làm sao để rút tiền từ tài khoản?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Vào mục "Thanh toán" > "Yêu cầu rút tiền". Nhập số tiền muốn rút và chọn tài khoản ngân hàng. Tiền sẽ được chuyển trong 3-5 ngày làm việc sau khi yêu cầu được duyệt.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Phí hoa hồng được tính như thế nào?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Phí hoa hồng là 10% trên tổng giá trị đặt phòng (đã bao gồm VAT). Phí này được trừ tự động khi khách hàng thanh toán và số tiền còn lại sẽ được chuyển vào tài khoản của bạn.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Làm thế nào để cập nhật thông tin khách sạn?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Vào mục "Cài đặt" > "Thông tin khách sạn". Bạn có thể cập nhật tên, địa chỉ, mô tả, hình ảnh và các tiện nghi của khách sạn. Thay đổi sẽ có hiệu lực sau khi được duyệt.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <div class="section-title">
+                        <i class="fas fa-headset"></i>
+                        Liên hệ hỗ trợ
+                    </div>
+                    
+                    <div class="contact-item" onclick="openChat()">
+                        <div class="contact-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Chat trực tuyến</h4>
+                            <p>Phản hồi ngay lập tức</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item" onclick="callSupport()">
+                        <div class="contact-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Hotline</h4>
+                            <p>1900 1234 (24/7)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item" onclick="sendEmail()">
+                        <div class="contact-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Email</h4>
+                            <p>support@grandocean.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Văn phòng</h4>
+                            <p>123 Nguyễn Huệ, Q1, TP.HCM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Ticket Form -->
+            <div class="ticket-section">
+                <div class="section-title">
+                    <i class="fas fa-ticket-alt"></i>
+                    Tạo ticket hỗ trợ
+                </div>
+                
+                <form class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Tiêu đề *</label>
+                        <input type="text" class="form-input" placeholder="Mô tả ngắn gọn vấn đề..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Loại vấn đề *</label>
+                        <select class="form-select" required>
+                            <option value="">Chọn loại vấn đề</option>
+                            <option>Kỹ thuật</option>
+                            <option>Thanh toán</option>
+                            <option>Đặt phòng</option>
+                            <option>Tài khoản</option>
+                            <option>Khác</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mức độ ưu tiên</label>
+                        <select class="form-select">
+                            <option>Thấp</option>
+                            <option>Trung bình</option>
+                            <option>Cao</option>
+                            <option>Khẩn cấp</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email liên hệ *</label>
+                        <input type="email" class="form-input" value="khai.nguyen@haiauhotel.com" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label">Mô tả chi tiết *</label>
+                        <textarea class="form-input form-textarea" placeholder="Mô tả chi tiết vấn đề bạn gặp phải..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label">Đính kèm file</label>
+                        <div class="file-upload">
+                            <input type="file" multiple accept="image/*,.pdf,.doc,.docx">
+                            <div class="file-upload-btn">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Kéo thả file hoặc click để chọn</p>
+                                <small>Hỗ trợ: JPG, PNG, PDF, DOC (tối đa 10MB)</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="action-btn btn-primary" onclick="submitTicket()">
+                        <i class="fas fa-paper-plane"></i>
+                        Gửi ticket
+                    </button>
+                    <button class="action-btn btn-secondary">
+                        <i class="fas fa-save"></i>
+                        Lưu nháp
+                    </button>
+                </div>
+            </div>
+
+            <!-- Knowledge Base -->
+            <div class="knowledge-base">
+                <div class="section-title">
+                    <i class="fas fa-book"></i>
+                    Tài liệu hướng dẫn
+                </div>
+                
+                <div class="kb-categories">
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <h4>Bắt đầu</h4>
+                        <p>Hướng dẫn thiết lập tài khoản và khách sạn</p>
+                    </div>
+                    
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <h4>Quản lý phòng</h4>
+                        <p>Thêm, sửa, xóa và quản lý phòng</p>
+                    </div>
+                    
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4>Đặt phòng</h4>
+                        <p>Xử lý và quản lý đặt phòng</p>
+                    </div>
+                    
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Báo cáo</h4>
+                        <p>Xem và phân tích báo cáo</p>
+                    </div>
+                    
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(107, 72, 255, 0.1); color: #6b48ff;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h4>Thanh toán</h4>
+                        <p>Quản lý thanh toán và rút tiền</p>
+                    </div>
+                    
+                    <div class="kb-category">
+                        <div class="kb-category-icon" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h4>Cài đặt</h4>
+                        <p>Cấu hình tài khoản và hệ thống</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ functionality
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    // Close all other FAQs
+                    faqQuestions.forEach(q => {
+                        if (q !== this) {
+                            q.classList.remove('active');
+                            q.nextElementSibling.classList.remove('active');
+                            q.querySelector('i').style.transform = 'rotate(0deg)';
+                        }
+                    });
+                    
+                    // Toggle current FAQ
+                    this.classList.toggle('active');
+                    answer.classList.toggle('active');
+                    
+                    if (this.classList.contains('active')) {
+                        icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+
+            // FAQ categories
+            const faqCategories = document.querySelectorAll('.faq-category');
+            faqCategories.forEach(category => {
+                category.addEventListener('click', function() {
+                    faqCategories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter FAQ items based on category
+                    const categoryName = this.textContent;
+                    console.log('Filter by category:', categoryName);
+                    // Add filtering logic here
+                });
+            });
+
+            // Search FAQ
+            const searchInput = document.querySelector('.search-faq input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const faqItems = document.querySelectorAll('.faq-item');
+                
+                faqItems.forEach(item => {
+                    const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+                    
+                    if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // File upload
+            const fileUpload = document.querySelector('.file-upload input');
+            if (fileUpload) {
+                fileUpload.addEventListener('change', function() {
+                    const files = Array.from(this.files);
+                    const fileNames = files.map(file => file.name).join(', ');
+                    
+                    if (files.length > 0) {
+                        const uploadBtn = this.nextElementSibling;
+                        uploadBtn.innerHTML = `
+                            <i class="fas fa-check"></i>
+                            <p>Đã chọn ${files.length} file</p>
+                            <small>${fileNames}</small>
+                        `;
+                        uploadBtn.style.borderColor = 'var(--success)';
+                        uploadBtn.style.background = 'rgba(16, 185, 129, 0.1)';
+                    }
+                });
+            }
+        });
+
+        // Support functions
+        function openChat() {
+            alert('Đang mở cửa sổ chat...');
+            // Implement chat widget integration
+        }
+
+        function callSupport() {
+            window.open('tel:19001234');
+        }
+
+        function sendEmail() {
+            window.open('mailto:support@grandocean.com');
+        }
+
+        function scheduleCall() {
+            alert('Đang chuyển đến trang đặt lịch hẹn...');
+            // Implement calendar booking system
+        }
+
+        function submitTicket() {
+            const form = document.querySelector('.ticket-section form');
+            const formData = new FormData(form);
+            
+            // Basic validation
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'var(--danger)';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (isValid) {
+                alert('Ticket đã được gửi thành công! Chúng tôi sẽ phản hồi trong vòng 24h.');
+                form.reset();
+                
+                // Reset file upload display
+                const fileUpload = document.querySelector('.file-upload-btn');
+                if (fileUpload) {
+                    fileUpload.innerHTML = `
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Kéo thả file hoặc click để chọn</p>
+                        <small>Hỗ trợ: JPG, PNG, PDF, DOC (tối đa 10MB)</small>
+                    `;
+                    fileUpload.style.borderColor = '#ddd';
+                    fileUpload.style.background = '#f8f9ff';
+                }
+            } else {
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+            }
+        }
+    </script>
+</body>
+</html>

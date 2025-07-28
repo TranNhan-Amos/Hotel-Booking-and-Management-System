@@ -70,10 +70,12 @@ public class RoomPartnerController {
                     }
 
                     RoomPartnerEntity roomPartner = new RoomPartnerEntity();
+                    long countRoomsByPartnerId = roomPartnerService.countRoomsByPartnerId(partnerId);
                     roomPartner.setPartnerId(partnerId);
 
                     model.addAttribute("roomPartners", roomPartners);
                     model.addAttribute("roomPartner", roomPartner);
+                    model.addAttribute("countRoomsByPartnerId", countRoomsByPartnerId);
 
                     return "Partner/RoomPartner";
                 } else {

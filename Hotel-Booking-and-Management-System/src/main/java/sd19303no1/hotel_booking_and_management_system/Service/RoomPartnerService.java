@@ -22,7 +22,6 @@ public class RoomPartnerService {
     public long countRoomsByPartnerId(Long partnerId) {
         return roomPartnerRepository.countRoomsByPartnerId(partnerId);
     }
-
     @Transactional
     public RoomPartnerEntity save(RoomPartnerEntity roomPartner) {
         return roomPartnerRepository.save(roomPartner);

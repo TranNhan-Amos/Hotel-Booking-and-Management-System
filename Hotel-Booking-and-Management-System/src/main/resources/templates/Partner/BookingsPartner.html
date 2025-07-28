@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:temporals="http://www.thymeleaf.org/extras/temporals">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đặt phòng - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/partner/BookingsPartner.css}">
+    <style>
+        body {
+            margin-top: 70px; /* Để tránh bị navbar che */
+        }
+        .main-content {
+            padding-top: 20px;
+        }
+        
+        /* Alert styles */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Empty state styles */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #d1d5db;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div th:replace="~{Layout/NavbarPartner :: navbar}"></div>
+
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="header">
+                <div class="page-title">
+                    <h1>Quản lý đặt phòng</h1>
+                    <p>Theo dõi và quản lý tất cả đặt phòng của khách sạn</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm đặt phòng...">
+                    </div>
+                    
+                    <div class="filter-dropdown">
+                        <button class="filter-btn">
+                            <i class="fas fa-filter"></i>
+                            <span>Lọc</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tổng đặt phòng hôm nay</div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" th:text="${bookingshomNay}">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Chờ xác nhận</div>
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">8</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Đang lưu trú</div>
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">42</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Doanh thu hôm nay</div>
+                        <div class="stat-icon" style="background: rgba(26, 41, 128, 0.1); color: #1a2980;">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" th:text="${#numbers.formatDecimal(sumDoanhThuToday, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">18.5tr</div>
+                </div>
+            </div>
+
+            <!-- Bookings Table -->
+            <div class="bookings-section">
+                <div class="section-header">
+                    <div class="section-title">Danh sách đặt phòng</div>
+                    <button class="action-btn btn-primary">Xuất báo cáo</button>
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đặt phòng</th>
+                                <th>Khách hàng</th>
+                                <th>Phòng</th>
+                                <th>Ngày lưu trú</th>
+                                <th>Số khách</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="RoomBookingsPartner : ${RoomBookingsPartner}">
+                                <td>
+                                    <div class="booking-id" th:text="${RoomBookingsPartner.bookingId}">#BK001234</div>
+                                </td>
+                                <td>
+                                    <div class="guest-info">
+                                        <div class="guest-avatar">NL</div>
+                                        <div class="guest-details">
+                                            <h4 th:text="${RoomBookingsPartner.customer.name}">Nguyễn Thị Lan</h4>
+                                            <p th:text="${RoomBookingsPartner.customer.phone}">0987654321</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="room-info">
+                                        <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=100&h=70&fit=crop" alt="Room" class="room-image">
+                                        <div class="room-details">
+                                            <h4 th:text="${RoomBookingsPartner.room.type}">Deluxe Ocean View</h4>
+                                           
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="date-info">
+                                        <div class="check-in" th:text="${RoomBookingsPartner.checkInDate}">20/06/2024</div>
+                                        <div class="check-out" th:text="${RoomBookingsPartner.checkOutDate}">22/06/2024</div>
+                                        <div class="nights">2 đêm</div>
+                                    </div>
+                                </td>
+                                <td th:text="${RoomBookingsPartner.room.capacity} + ' người'">2 người</td>
+                                <td>
+                                    <div class="price" th:text="${#numbers.formatDecimal(RoomBookingsPartner.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
+                                </td>
+                                <td>
+                                    <span class="booking-status status-confirmed" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}">Đã xác nhận</span>
+                                    <span class="booking-status status-checked-in" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}">Đang lưu trú</span>
+                                    <span class="booking-status status-pending" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}">Chờ xác nhận</span>
+                                    <span class="booking-status status-cancelled" th:if="${RoomBookingsPartner.status.name() == 'CANCELLED'}">Đã hủy</span>
+                                    <span class="booking-status status-completed" th:if="${RoomBookingsPartner.status.name() == 'COMPLETED'}">Hoàn thành</span>
+                                    <span class="booking-status status-checked-out" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_OUT'}">Đã check-out</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Chi tiết</button>
+                                        <button class="action-btn btn-secondary" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Xác nhận</button>
+                                        <button class="action-btn btn-success" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-in</button>
+                                        <button class="action-btn btn-warning" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-out</button>
+                                        <button class="action-btn btn-danger" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Hủy</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${RoomBookingsPartner == null || RoomBookingsPartner.isEmpty()}" class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Chưa có đặt phòng nào</h3>
+                    <p>Chưa có đặt phòng nào được tạo</p>
+                </div>
+
+                <!-- Mobile Card View -->
+                <div class="booking-cards" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
+                    <div class="booking-card" th:each="booking : ${RoomBookingsPartner}">
+                        <div class="booking-card-header">
+                            <div class="booking-card-id" th:text="'#' + ${booking.bookingId}">#BK001234</div>
+                            <span class="booking-status" th:class="${'status-' + booking.status.name().toLowerCase()}" th:text="${booking.status.description}">Đã xác nhận</span>
+                        </div>
+                        
+                        <div class="booking-card-content">
+                            <div class="booking-card-section">
+                                <div class="booking-card-label">Khách hàng</div>
+                                <div class="booking-card-guest">
+                                    <div class="booking-card-guest-avatar" th:text="${booking.customer.name.substring(0,2).toUpperCase()}">NL</div>
+                                    <div>
+                                        <div class="booking-card-value" th:text="${booking.customer.name}">Nguyễn Thị Lan</div>
+                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${booking.customer.phone}">0987654321</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="booking-card-section">
+                                <div class="booking-card-label">Phòng</div>
+                                <div class="booking-card-room">
+                                    <img th:src="${booking.room.iconPath != null ? booking.room.iconPath : '/img/rooms/default-room.jpg'}" alt="Room" class="booking-card-room-image">
+                                    <div>
+                                        <div class="booking-card-value" th:text="${booking.room.nameNumber}">Deluxe Ocean View</div>
+                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${'Phòng ' + booking.room.roomNumber}">Phòng 101</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="booking-card-section">
+                                <div class="booking-card-label">Thời gian</div>
+                                <div class="booking-card-value" th:text="${booking.checkInDate} + ' - ' + ${booking.checkOutDate}">20/06 - 22/06/2024</div>
+                                <div style="font-size: 12px; color: var(--info);" th:text="${booking.room.capacity} + ' người'">2 người</div>
+                            </div>
+                            
+                            <div class="booking-card-section">
+                                <div class="booking-card-label">Tổng tiền</div>
+                                <div class="booking-card-price" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-card-actions">
+                            <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${booking.bookingId} + '\')'">Chi tiết</button>
+                            <button class="action-btn btn-secondary" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${booking.bookingId} + '\')'">Xác nhận</button>
+                            <button class="action-btn btn-success" th:if="${booking.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${booking.bookingId} + '\')'">Check-in</button>
+                            <button class="action-btn btn-warning" th:if="${booking.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${booking.bookingId} + '\')'">Check-out</button>
+                            <button class="action-btn btn-danger" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${booking.bookingId} + '\')'">Hủy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
+                    <button><i class="fas fa-chevron-left"></i></button>
+                    <button class="active">1</button>
+                    <button><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Chi tiết đặt phòng #BK001234</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="booking-details">
+                <div class="detail-group">
+                    <div class="detail-label">Khách hàng</div>
+                    <div class="detail-value">Nguyễn Thị Lan</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Số điện thoại</div>
+                    <div class="detail-value">0987654321</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">nguyenlan@email.com</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">CCCD/Passport</div>
+                    <div class="detail-value">123456789012</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Loại phòng</div>
+                    <div class="detail-value">Deluxe Ocean View</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Số phòng</div>
+                    <div class="detail-value">501</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Ngày nhận phòng</div>
+                    <div class="detail-value">20/06/2024 - 14:00</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Ngày trả phòng</div>
+                    <div class="detail-value">22/06/2024 - 12:00</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Số đêm</div>
+                    <div class="detail-value">2 đêm</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Số khách</div>
+                    <div class="detail-value">2 người lớn</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Giá phòng</div>
+                    <div class="detail-value">1.725.000đ/đêm</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Tổng tiền</div>
+                    <div class="detail-value">3.450.000đ</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Phương thức thanh toán</div>
+                    <div class="detail-value">Thẻ tín dụng</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Trạng thái thanh toán</div>
+                    <div class="detail-value">Đã thanh toán</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Ngày đặt</div>
+                    <div class="detail-value">15/06/2024 - 10:30</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Ghi chú</div>
+                    <div class="detail-value">Yêu cầu phòng tầng cao, view biển</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="action-btn btn-secondary" onclick="closeModal()">Đóng</button>
+                <button class="action-btn btn-primary">In hóa đơn</button>
+                <button class="action-btn btn-primary">Gửi email xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function viewBookingDetails(bookingId) {
+            document.getElementById('bookingModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('bookingModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Search functionality
+        document.querySelector('.search-box input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.bookings-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Add hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-3px)';
+                    card.style.boxShadow = '0 12px 25px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
+                });
+            });
+        });
+
+        // Status update functions
+        function confirmBooking(bookingId) {
+            if (confirm('Xác nhận đặt phòng này?')) {
+                // API call to confirm booking
+                alert('Đặt phòng đã được xác nhận!');
+                location.reload();
+            }
+        }
+
+        function cancelBooking(bookingId) {
+            if (confirm('Bạn có chắc chắn muốn hủy đặt phòng này?')) {
+                // API call to cancel booking
+                alert('Đặt phòng đã được hủy!');
+                location.reload();
+            }
+        }
+
+        function checkIn(bookingId) {
+            if (confirm('Xác nhận check-in cho khách hàng?')) {
+                // API call to check-in
+                alert('Check-in thành công!');
+                location.reload();
+            }
+        }
+
+        function checkOut(bookingId) {
+            if (confirm('Xác nhận check-out cho khách hàng?')) {
+                // API call to check-out
+                alert('Check-out thành công!');
+                location.reload();
+            }
+        }
+    </script>
+
+    <!-- Footer -->
+    <div th:replace="~{Layout/PartnerFoorter :: footer}"></div>
+</body>
+</html>

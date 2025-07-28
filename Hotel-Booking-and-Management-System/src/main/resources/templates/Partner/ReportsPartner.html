@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/partner/ReportsPartner.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 24px 32px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    text-align: center;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+
+.close-btn:hover {
+    color: #f44336;
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div th:replace="~{/Layout/NavbarPartner}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="page-title">
+                    <h1>Báo cáo</h1>
+                    <p>Phân tích hiệu suất kinh doanh và thống kê chi tiết</p>
+                </div>
+
+                <div class="header-actions">
+                    <div class="date-picker">
+                        <form th:action="@{/partner/reports}" method="get">
+                            <input type="date" name="startDate" th:value="${startDate}" required>
+                            <span>đến</span>
+                            <input type="date" name="endDate" th:value="${endDate}" required>
+                    </div>
+                    <button type="submit" class="action-btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Lọc dữ liệu
+                    </button>
+                    </form>
+                </div>
+            </div>
+
+
+            <div id="errorModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <p>Ngày kết thúc phải sau ngày bắt đầu!</p>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tổng doanh thu</div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" th:if="${totalRevenue != null and totalRevenue > 0}"
+                        th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ
+                    </div>
+                    <div class="stat-value" th:unless="${totalRevenue != null and totalRevenue > 0}"
+                        th:text="'Chưa có dữ liệu'"></div>
+                    <div class="stat-change positive">
+                        <!-- <i class="fas fa-arrow-up"></i>
+                        <span>22% so với tháng trước</span> -->
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tổng đặt phòng</div>
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" th:if="${totalBookings != null and totalBookings > 0}"
+                        th:text="${totalBookings}">3.450.000đ
+                    </div>
+                    <div class="stat-value" th:unless="${totalBookings != null and totalBookings > 0}"
+                        th:text="'Chưa có dữ liệu'"></div>
+                    <div class="stat-change positive">
+                        <!-- <i class="fas fa-arrow-up"></i>
+                        <span>18% so với tháng trước</span> -->
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tỷ lệ lấp đầy</div>
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">78.5%</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>2.1% so với tháng trước</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Đánh giá trung bình</div>
+                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">4.7</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.2 so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Table -->
+            <div class="reports-section">
+                <div class="card-header">
+                    <div class="card-title">Báo cáo chi tiết theo ngày</div>
+                </div>
+
+                <!-- Desktop Table -->
+                <div class="table-container">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Số đặt phòng</th>
+                                <th>Doanh thu</th>
+                                <th>Tỷ lệ lấp đầy</th>
+                                <th>Đánh giá TB</th>
+                                <th>Hủy phòng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="entry : ${DayReports}">
+                                <td th:text="${#temporals.format(entry.key, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${entry.value.count}"></td>
+                                <td
+                                    th:text="${#numbers.formatDecimal(entry.value.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                </td>
+                                <td>78.6%</td>
+                                <td>4.7</td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                 <div class="chart-card">
+        <div class="card-header">
+            <div class="card-title">Doanh thu theo năm</div>
+            <select id="yearSelect" class="action-btn btn-secondary" onchange="loadChart()">
+                <option th:each="year : ${availableYears}" 
+                        th:value="${year}" 
+                        th:text="'Năm ' + ${year}"
+                        th:selected="${year} == ${selectedYear}">
+                </option>
+            </select>
+        </div>
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Loại phòng phổ biến</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="roomTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script  th:inline="javascript">
+        const partnerId = /*[[${partnerId}]]*/ 0;
+
+    let revenueChart;
+
+    function loadChart() {
+        const year = document.getElementById("yearSelect").value;
+
+        fetch(`/api/partner/monthly-revenue?partnerId=${partnerId}&year=${year}`)
+            .then(res => res.json())
+            .then(data => {
+                const labels = Array.from({length: 12}, (_, i) => `Th${i + 1}`);
+                const monthMap = new Map(data.map(item => [item.month, item.totalRevenue]));
+                const revenues = Array.from({length: 12}, (_, i) => monthMap.get(i + 1) || 0);
+
+                const chartData = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (triệu đồng)',
+                        data: revenues.map(val => val / 1_000_000), // chuyển sang triệu
+                        borderColor: '#1a2980',
+                        backgroundColor: 'rgba(26, 41, 128, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 3,
+                        pointRadius: 5,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                };
+
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (revenueChart) revenueChart.destroy();
+                revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => value + 'tr'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadChart);
+
+            // Room Type Chart
+            const roomTypeCtx = document.getElementById('roomTypeChart').getContext('2d');
+            const roomTypeChart = new Chart(roomTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Deluxe', 'Suite', 'Standard', 'Premium'],
+                    datasets: [{
+                        data: [35, 25, 25, 15],
+                        backgroundColor: [
+                            'rgba(26, 41, 128, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Add hover effects
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-3px)';
+                    card.style.boxShadow = '0 12px 25px rgba(0, 0, 0, 0.15)';
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
+                });
+            });
+        // });
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const endDateInput = document.querySelector('input[name="endDate"]');
+            const modal = document.getElementById('errorModal');
+            const closeBtn = document.getElementsByClassName('close-btn')[0];
+
+            form.addEventListener('submit', function (event) {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+
+                if (startDate > endDate) {
+                    event.preventDefault(); // Ngăn form submit
+                    modal.style.display = 'flex'; // Hiển thị modal
+                    return;
+                }
+            });
+
+            closeBtn.addEventListener('click', function () {
+                modal.style.display = 'none'; // Ẩn modal khi nhấn nút đóng
+            });
+
+            // Ẩn modal khi nhấn ngoài modal
+            window.addEventListener('click', function (event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

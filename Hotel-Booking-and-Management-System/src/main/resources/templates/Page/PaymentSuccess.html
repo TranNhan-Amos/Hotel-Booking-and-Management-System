@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Thành Công - Khách Sạn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .success-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .success-title {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .booking-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .booking-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .info-value {
+            color: #2c3e50;
+        }
+
+        .check-in-instructions {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .check-in-instructions h3 {
+            color: #27ae60;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .instruction-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instruction-list li {
+            padding: 8px 0;
+            color: #2c3e50;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .instruction-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .btn-outline:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 30px 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <!-- Error Message -->
+        <div th:if="${error}" class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Lỗi</span>
+        </div>
+
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <!-- Success Title -->
+        <h1 class="success-title" th:text="${booking != null and booking.paymentStatus == 'PAID' ? 'Thanh Toán Thành Công!' : 'Đặt Phòng Thành Công!'}">
+            Thanh Toán Thành Công!
+        </h1>
+        <p class="success-message" th:text="${success != null ? success : 'Đặt phòng của bạn đã được xác nhận thành công!'}">
+            Đặt phòng của bạn đã được xác nhận thành công!
+        </p>
+
+        <!-- Booking Information -->
+        <div class="booking-info" th:if="${booking != null}">
+            <h3><i class="fas fa-info-circle"></i> Thông tin đặt phòng</h3>
+            <div class="info-row">
+                <span class="info-label">Mã đặt phòng:</span>
+                <span class="info-value" th:text="'#' + ${booking.bookingId}">#BK123456</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Loại phòng:</span>
+                <span class="info-value" th:text="${booking.room.type}">Superior</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ngày nhận phòng:</span>
+                <span class="info-value" th:text="${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'}">01/06/2025</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ngày trả phòng:</span>
+                <span class="info-value" th:text="${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">03/06/2025</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phương thức thanh toán:</span>
+                <span class="info-value" th:text="${booking.paymentMethod != null ? booking.paymentMethod : 'Thanh toán tại khách sạn'}">Thanh toán tại khách sạn</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Trạng thái thanh toán:</span>
+                <span class="info-value" th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán tại khách sạn'}">Chờ thanh toán tại khách sạn</span>
+            </div>
+        </div>
+
+        <!-- Check-in Instructions -->
+        <div class="check-in-instructions">
+            <h3><i class="fas fa-map-marker-alt"></i> Hướng dẫn check-in</h3>
+            <ul class="instruction-list">
+                <li>Vui lòng đến khách sạn vào ngày check-in từ 14:00</li>
+                <li>Mang theo giấy tờ tùy thân (CMND/CCCD/Hộ chiếu)</li>
+                <li th:if="${booking != null and booking.paymentStatus != 'PAID'}">Thanh toán đầy đủ khi check-in</li>
+                <li th:if="${booking != null and booking.paymentStatus == 'PAID'}">Đã thanh toán, chỉ cần check-in</li>
+                <li>Giờ check-out: 12:00 ngày trả phòng</li>
+                <li>Liên hệ: 0935 123 456 nếu cần hỗ trợ</li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+            <a href="/my-bookings" class="btn btn-success">
+                <i class="fas fa-list"></i> Xem đặt phòng của tôi
+            </a>
+            <a href="/rooms" class="btn btn-outline">
+                <i class="fas fa-search"></i> Tìm phòng khác
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click effect to buttons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

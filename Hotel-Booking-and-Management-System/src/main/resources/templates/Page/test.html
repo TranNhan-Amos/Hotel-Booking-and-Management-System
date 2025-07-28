@@ -1,0 +1,5699 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đà Nẵng Tours - Khám Phá Thành Phố Đáng Sống</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Loading Screen -->
+
+  <!-- Floating Navigation -->
+  <nav class="nav-floating">
+      <div class="nav-content">
+          <a href="#home" class="logo">DaNang Tours</a>
+          <ul class="nav-links">
+              <li><a href="#home">Trang chủ</a></li>
+              <li><a href="#tours">Tours</a></li>
+              <li><a href="#blog">Cẩm nang</a></li>
+              <li><a href="#contact">Liên hệ</a></li>
+          </ul>
+          <div class="nav-actions">
+              <button class="nav-btn" onclick="toggleTheme()">
+                  <i class="fas fa-moon" id="themeIcon"></i>
+              </button>
+              <button class="nav-btn" onclick="toggleLanguage()">
+                  <span id="langText">EN</span>
+              </button>
+          </div>
+      </div>
+  </nav>
+
+  <!-- Social Share -->
+  <div class="social-share">
+      <button class="social-btn social-facebook" onclick="shareToFacebook()">
+          <i class="fab fa-facebook-f"></i>
+      </button>
+      <button class="social-btn social-twitter" onclick="shareToTwitter()">
+          <i class="fab fa-twitter"></i>
+      </button>
+      <button class="social-btn social-instagram" onclick="shareToInstagram()">
+          <i class="fab fa-instagram"></i>
+      </button>
+      <button class="social-btn social-youtube" onclick="openYoutube()">
+          <i class="fab fa-youtube"></i>
+      </button>
+      <button class="social-btn social-zalo" onclick="shareToZalo()">
+          <i class="fas fa-comment"></i>
+      </button>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+      <div class="hero-video">
+          <video autoplay muted loop>
+              <source src="https://player.vimeo.com/external/342571552.sd.mp4?s=95231c8a7fe2066ffb640204591ca71c5c9c6c8c&profile_id=165&oauth2_token_id=57447761" type="video/mp4">
+          </video>
+      </div>
+      
+      <div class="floating-elements">
+          <div class="floating-card">
+              <i class="fas fa-mountain"></i>
+              <div>Bà Nà Hills</div>
+          </div>
+          <div class="floating-card">
+              <i class="fas fa-water"></i>
+              <div>Biển Mỹ Khê</div>
+          </div>
+          <div class="floating-card">
+              <i class="fas fa-temple"></i>
+              <div>Hội An</div>
+          </div>
+      </div>
+      
+      <div class="hero-content">
+          <div class="hero-badge">
+              <i class="fas fa-map-marked-alt"></i>
+              Khám phá Đà Nẵng
+          </div>
+          <h1 class="hero-title">
+              Trải Nghiệm<br>
+              <span class="gradient-text">Đà Nẵng</span><br>
+              Tuyệt Vời
+          </h1>
+          <p class="hero-subtitle">
+              Từ Bà Nà Hills huyền thoại đến Hội An cổ kính, từ bãi biển Mỹ Khê tuyệt đẹp đến Sơn Trà linh thiêng. 
+              Khám phá thành phố đáng sống với những tour chất lượng cao.
+          </p>
+          <div class="hero-cta">
+              <a href="#tours" class="btn btn-primary">
+                  <i class="fas fa-search"></i>
+                  Khám phá ngay
+              </a>
+              <button class="btn btn-secondary" onclick="playIntroVideo()">
+                  <i class="fas fa-play"></i>
+                  Xem video
+              </button>
+          </div>
+          
+          <!-- Hero Stats -->
+          <div class="hero-stats">
+              <div class="hero-stat">
+                  <div class="stat-number">50K+</div>
+                  <div class="stat-label">Khách hàng</div>
+              </div>
+              <div class="hero-stat">
+                  <div class="stat-number">100+</div>
+                  <div class="stat-label">Tours</div>
+              </div>
+              <div class="hero-stat">
+                  <div class="stat-number">4.9</div>
+                  <div class="stat-label">Đánh giá</div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+      <div class="stats-container">
+          <div class="stat-item" data-count="50000">
+              <div class="stat-icon">
+                  <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-number">0</div>
+              <div class="stat-label">Khách hàng hài lòng</div>
+          </div>
+          <div class="stat-item" data-count="100">
+              <div class="stat-icon">
+                  <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <div class="stat-number">0</div>
+              <div class="stat-label">Tour đa dạng</div>
+          </div>
+          <div class="stat-item" data-count="49">
+              <div class="stat-icon">
+                  <i class="fas fa-star"></i>
+              </div>
+              <div class="stat-number">0</div>
+              <div class="stat-label">Đánh giá 4.9/5</div>
+          </div>
+          <div class="stat-item" data-count="15">
+              <div class="stat-icon">
+                  <i class="fas fa-award"></i>
+              </div>
+              <div class="stat-number">0</div>
+              <div class="stat-label">Năm kinh nghiệm</div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+      <div class="container">
+          <!-- Search Section -->
+          <section class="search-section">
+              <div class="search-card">
+                  <div class="search-header">
+                      <h2>Tìm Tour Hoàn Hảo</h2>
+                      <p>Khám phá Đà Nẵng theo cách riêng của bạn</p>
+                  </div>
+                  
+                  <form class="search-form">
+                      <div class="form-group">
+                          <label class="form-label">
+                              <i class="fas fa-search"></i>
+                              Tìm kiếm tour
+                          </label>
+                          <input type="text" class="form-input" id="searchInput" placeholder="Nhập tên tour hoặc điểm đến...">
+                          <div class="search-suggestions" id="searchSuggestions"></div>
+                      </div>
+                      <div class="form-group">
+                          <label class="form-label">
+                              <i class="fas fa-calendar"></i>
+                              Ngày khởi hành
+                          </label>
+                          <input type="date" class="form-input" id="dateInput">
+                      </div>
+                      <div class="form-group">
+                          <label class="form-label">
+                              <i class="fas fa-users"></i>
+                              Số người
+                          </label>
+                          <select class="form-input" id="guestsInput">
+                              <option value="1">1 người</option>
+                              <option value="2">2 người</option>
+                              <option value="3">3 người</option>
+                              <option value="4">4 người</option>
+                              <option value="5+">5+ người</option>
+                          </select>
+                      </div>
+                      <button type="button" class="search-btn" onclick="filterTours()">
+                          <i class="fas fa-search"></i>
+                          Tìm kiếm
+                      </button>
+                  </form>
+                  
+                  <!-- Quick Filters -->
+                  <div class="quick-filters">
+                      <div class="quick-filter" onclick="quickFilter('featured')">
+                          <i class="fas fa-star"></i>
+                          Tour nổi bật
+                      </div>
+                      <div class="quick-filter" onclick="quickFilter('discount')">
+                          <i class="fas fa-percent"></i>
+                          Giảm giá
+                      </div>
+                      <div class="quick-filter" onclick="quickFilter('beach')">
+                          <i class="fas fa-umbrella-beach"></i>
+                          Tour biển
+                      </div>
+                      <div class="quick-filter" onclick="quickFilter('cultural')">
+                          <i class="fas fa-landmark"></i>
+                          Văn hóa
+                      </div>
+                      <div class="quick-filter" onclick="quickFilter('nature')">
+                          <i class="fas fa-mountain"></i>
+                          Thiên nhiên
+                      </div>
+                      <div class="quick-filter" onclick="quickFilter('food')">
+                          <i class="fas fa-utensils"></i>
+                          Ẩm thực
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Tour Categories -->
+          <section class="categories-section">
+              <div class="section-header">
+                  <h2 class="section-title">Danh Mục Tour</h2>
+                  <p class="section-subtitle">Chọn loại tour phù hợp với sở thích của bạn</p>
+              </div>
+              
+              <div class="categories-grid">
+                  <div class="category-card" onclick="filterByCategory('nature')">
+                      <div class="category-image">
+                          <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=400&auto=format&fit=crop" alt="Thiên nhiên">
+                          <div class="category-overlay">
+                              <i class="fas fa-mountain"></i>
+                          </div>
+                      </div>
+                      <div class="category-content">
+                          <h3>Thiên Nhiên</h3>
+                          <p>Khám phá vẻ đẹp thiên nhiên hùng vĩ</p>
+                          <span class="category-count">15 tours</span>
+                      </div>
+                  </div>
+                  
+                  <div class="category-card" onclick="filterByCategory('cultural')">
+                      <div class="category-image">
+                          <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670b?q=80&w=400&auto=format&fit=crop" alt="Văn hóa">
+                          <div class="category-overlay">
+                              <i class="fas fa-landmark"></i>
+                          </div>
+                      </div>
+                      <div class="category-content">
+                          <h3>Văn Hóa</h3>
+                          <p>Tìm hiểu lịch sử và văn hóa địa phương</p>
+                          <span class="category-count">12 tours</span>
+                      </div>
+                  </div>
+                  
+                  <div class="category-card" onclick="filterByCategory('beach')">
+                      <div class="category-image">
+                          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=400&auto=format&fit=crop" alt="Biển">
+                          <div class="category-overlay">
+                              <i class="fas fa-umbrella-beach"></i>
+                          </div>
+                      </div>
+                      <div class="category-content">
+                          <h3>Biển</h3>
+                          <p>Tận hưởng bãi biển tuyệt đẹp</p>
+                          <span class="category-count">8 tours</span>
+                      </div>
+                  </div>
+                  
+                  <div class="category-card" onclick="filterByCategory('food')">
+                      <div class="category-image">
+                          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=400&auto=format&fit=crop" alt="Ẩm thực">
+                          <div class="category-overlay">
+                              <i class="fas fa-utensils"></i>
+                          </div>
+                      </div>
+                      <div class="category-content">
+                          <h3>Ẩm Thực</h3>
+                          <p>Khám phá hương vị đặc sản địa phương</p>
+                          <span class="category-count">10 tours</span>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Filters Section -->
+          <section class="filters-section">
+              <div class="filters-toggle">
+                  <button class="filters-btn" onclick="toggleFilters()">
+                      <i class="fas fa-filter"></i>
+                      Bộ lọc nâng cao
+                  </button>
+                  <button class="filters-btn" onclick="clearAllFilters()">
+                      <i class="fas fa-times"></i>
+                      Xóa bộ lọc
+                  </button>
+                  <div class="view-toggle">
+                      <button class="view-btn active" onclick="changeView('grid')" data-view="grid">
+                          <i class="fas fa-th"></i>
+                      </button>
+                      <button class="view-btn" onclick="changeView('list')" data-view="list">
+                          <i class="fas fa-list"></i>
+                      </button>
+                      <button class="view-btn" onclick="changeView('map')" data-view="map">
+                          <i class="fas fa-map"></i>
+                      </button>
+                  </div>
+              </div>
+              
+              <div class="filters-grid" id="filtersGrid">
+                  <div class="filter-item">
+                      <label class="filter-label">Loại tour</label>
+                      <select class="filter-select" id="tourTypeFilter">
+                          <option value="">Tất cả</option>
+                          <option value="cultural">Văn hóa</option>
+                          <option value="nature">Thiên nhiên</option>
+                          <option value="beach">Biển</option>
+                          <option value="adventure">Phiêu lưu</option>
+                          <option value="food">Ẩm thực</option>
+                          <option value="spiritual">Tâm linh</option>
+                      </select>
+                  </div>
+                  <div class="filter-item">
+                      <label class="filter-label">Thời gian</label>
+                      <select class="filter-select" id="durationFilter">
+                          <option value="">Tất cả</option>
+                          <option value="half-day">Nửa ngày</option>
+                          <option value="full-day">Cả ngày</option>
+                          <option value="multi-day">Nhiều ngày</option>
+                      </select>
+                  </div>
+                  <div class="filter-item">
+                      <label class="filter-label">Giá từ (VNĐ)</label>
+                      <div class="price-range">
+                          <input type="range" class="price-slider" id="priceRange" min="0" max="2000000" value="2000000" oninput="updatePriceRange(this.value)">
+                          <div class="price-display">
+                              <span>0₫</span>
+                              <span id="maxPrice">2,000,000₫</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="filter-item">
+                      <label class="filter-label">Đánh giá</label>
+                      <div class="rating-filter">
+                          <div class="rating-option" onclick="filterByRating(5)">
+                              <div class="stars">★★★★★</div>
+                              <span>5 sao</span>
+                          </div>
+                          <div class="rating-option" onclick="filterByRating(4)">
+                              <div class="stars">★★★★☆</div>
+                              <span>4+ sao</span>
+                          </div>
+                          <div class="rating-option" onclick="filterByRating(3)">
+                              <div class="stars">★★★☆☆</div>
+                              <span>3+ sao</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Tours Section -->
+          <section class="tours-section" id="tours">
+              <div class="section-header">
+                  <h2 class="section-title">Tours Đà Nẵng Tuyệt Vời</h2>
+                  <p class="section-subtitle">
+                      Khám phá những điểm đến tuyệt vời nhất tại Đà Nẵng với các tour được thiết kế đặc biệt
+                  </p>
+                  <div class="sort-options">
+                      <select class="sort-select" onchange="sortTours(this.value)">
+                          <option value="default">Sắp xếp theo</option>
+                          <option value="price-low">Giá thấp đến cao</option>
+                          <option value="price-high">Giá cao đến thấp</option>
+                          <option value="rating">Đánh giá cao nhất</option>
+                          <option value="popular">Phổ biến nhất</option>
+                          <option value="newest">Mới nhất</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="tours-grid" id="toursGrid">
+                  <!-- Tours will be populated by JavaScript -->
+              </div>
+              
+              <!-- Load More Button -->
+              <div class="load-more-section">
+                  <button class="load-more-btn" onclick="loadMoreTours()">
+                      <i class="fas fa-plus"></i>
+                      Xem thêm tours
+                  </button>
+              </div>
+          </section>
+
+          <!-- Map Section -->
+          <section class="map-section" id="mapSection" style="display: none;">
+              <div class="section-header">
+                  <h2 class="section-title">Bản Đồ Tours</h2>
+                  <p class="section-subtitle">Khám phá vị trí các tour trên bản đồ</p>
+              </div>
+              <div class="map-container">
+                  <div id="tourMap" class="tour-map">
+                      <!-- Map will be rendered here -->
+                      <div class="map-placeholder">
+                          <i class="fas fa-map-marked-alt"></i>
+                          <p>Bản đồ tour Đà Nẵng</p>
+                      </div>
+                  </div>
+                  <div class="map-sidebar">
+                      <div class="map-filters">
+                          <h3>Lọc theo khu vực</h3>
+                          <div class="area-filters">
+                              <label class="area-filter">
+                                  <input type="checkbox" value="center" checked>
+                                  <span>Trung tâm thành phố</span>
+                              </label>
+                              <label class="area-filter">
+                                  <input type="checkbox" value="beach" checked>
+                                  <span>Khu vực bãi biển</span>
+                              </label>
+                              <label class="area-filter">
+                                  <input type="checkbox" value="mountain" checked>
+                                  <span>Khu vực núi</span>
+                              </label>
+                              <label class="area-filter">
+                                  <input type="checkbox" value="hoian" checked>
+                                  <span>Hội An</span>
+                              </label>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Blog Section -->
+          <section class="blog-section" id="blog">
+              <div class="section-header">
+                  <h2 class="section-title">Cẩm Nang Du Lịch</h2>
+                  <p class="section-subtitle">Những bài viết hữu ích cho chuyến du lịch của bạn</p>
+              </div>
+              
+              <div class="blog-grid">
+                  <article class="blog-card">
+                      <div class="blog-image">
+                          <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=400&auto=format&fit=crop" alt="Blog">
+                          <div class="blog-category">Cẩm nang</div>
+                      </div>
+                      <div class="blog-content">
+                          <div class="blog-meta">
+                              <span><i class="fas fa-calendar"></i> 15/01/2024</span>
+                              <span><i class="fas fa-user"></i> Admin</span>
+                          </div>
+                          <h3>10 Điều Cần Biết Khi Du Lịch Đà Nẵng</h3>
+                          <p>Những kinh nghiệm quý báu giúp bạn có chuyến du lịch Đà Nẵng hoàn hảo...</p>
+                          <a href="#" class="blog-link">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                      </div>
+                  </article>
+                  
+                  <article class="blog-card">
+                      <div class="blog-image">
+                          <img src="https://images.unsplash.com/photo-1555400082-8dd4d78c670b?q=80&w=400&auto=format&fit=crop" alt="Blog">
+                          <div class="blog-category">Ẩm thực</div>
+                      </div>
+                      <div class="blog-content">
+                          <div class="blog-meta">
+                              <span><i class="fas fa-calendar"></i> 12/01/2024</span>
+                              <span><i class="fas fa-user"></i> Admin</span>
+                          </div>
+                          <h3>Top 15 Món Ăn Đặc Sản Đà Nẵng</h3>
+                          <p>Khám phá hương vị đặc trưng của ẩm thực Đà Nẵng qua những món ăn nổi tiếng...</p>
+                          <a href="#" class="blog-link">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                      </div>
+                  </article>
+                  
+                  <article class="blog-card">
+                      <div class="blog-image">
+                          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=400&auto=format&fit=crop" alt="Blog">
+                          <div class="blog-category">Địa điểm</div>
+                      </div>
+                      <div class="blog-content">
+                          <div class="blog-meta">
+                              <span><i class="fas fa-calendar"></i> 10/01/2024</span>
+                              <span><i class="fas fa-user"></i> Admin</span>
+                          </div>
+                          <h3>Bãi Biển Mỹ Khê - Thiên Đường Nghỉ Dưỡng</h3>
+                          <p>Tìm hiểu về bãi biển đẹp nhất Việt Nam và những hoạt động thú vị tại đây...</p>
+                          <a href="#" class="blog-link">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                      </div>
+                  </article>
+              </div>
+          </section>
+      </div>
+  </main>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter-section">
+      <div class="newsletter-content">
+          <div class="newsletter-icon">
+              <i class="fas fa-paper-plane"></i>
+          </div>
+          <h2 class="newsletter-title">Đăng Ký Nhận Tin</h2>
+          <p class="newsletter-subtitle">
+              Nhận thông tin về các tour mới và ưu đãi đặc biệt từ chúng tôi
+          </p>
+          <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+              <div class="newsletter-input-group">
+                  <input type="email" class="newsletter-input" placeholder="Nhập email của bạn..." required>
+                  <button type="submit" class="newsletter-btn">
+                      <i class="fas fa-paper-plane"></i>
+                      Đăng ký
+                  </button>
+              </div>
+              <div class="newsletter-benefits">
+                  <div class="benefit-item">
+                      <i class="fas fa-check"></i>
+                      <span>Ưu đãi độc quyền</span>
+                  </div>
+                  <div class="benefit-item">
+                      <i class="fas fa-check"></i>
+                      <span>Tour mới nhất</span>
+                  </div>
+                  <div class="benefit-item">
+                      <i class="fas fa-check"></i>
+                      <span>Tips du lịch</span>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+      <div class="testimonials-container">
+          <div class="testimonials-header">
+              <h2 class="section-title">Khách Hàng Nói Gì</h2>
+              <p class="section-subtitle">Những trải nghiệm thực tế từ khách hàng của chúng tôi</p>
+          </div>
+          
+          <div class="testimonials-slider">
+              <div class="testimonials-track" id="testimonialsTrack">
+                  <div class="testimonial-card">
+                      <div class="testimonial-quote">"</div>
+                      <div class="testimonial-rating">
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                      </div>
+                      <p class="testimonial-content">
+                          Tour Bà Nà Hills thật sự tuyệt vời! Cầu Vàng đẹp hơn cả trong ảnh. 
+                          Hướng dẫn viên nhiệt tình, dịch vụ chuyên nghiệp. Sẽ quay lại lần nữa!
+                      </p>
+                      <div class="testimonial-author">
+                          <div class="author-avatar">
+                              <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=100&auto=format&fit=crop" alt="Mai Hương">
+                          </div>
+                          <div class="author-info">
+                              <h4>Mai Hương</h4>
+                              <p>Khách hàng VIP</p>
+                              <div class="author-location">
+                                  <i class="fas fa-map-marker-alt"></i>
+                                  Hà Nội
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="testimonial-card">
+                      <div class="testimonial-quote">"</div>
+                      <div class="testimonial-rating">
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                      </div>
+                      <p class="testimonial-content">
+                          Gia đình tôi rất hài lòng với tour Hội An. Phố cổ về đêm thật lãng mạn, 
+                          thả hoa đăng trên sông Hoài là trải nghiệm không thể quên.
+                      </p>
+                      <div class="testimonial-author">
+                          <div class="author-avatar">
+                              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" alt="Tuấn Đạt">
+                          </div>
+                          <div class="author-info">
+                              <h4>Tuấn Đạt</h4>
+                              <p>Du khách thường xuyên</p>
+                              <div class="author-location">
+                                  <i class="fas fa-map-marker-alt"></i>
+                                  TP.HCM
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="testimonial-card">
+                      <div class="testimonial-quote">"</div>
+                      <div class="testimonial-rating">
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                      </div>
+                      <p class="testimonial-content">
+                          Biển Mỹ Khê đẹp tuyệt vời! Các hoạt động thể thao nước rất thú vị. 
+                          BBQ hải sản tươi ngon. Đội ngũ phục vụ tận tâm.
+                      </p>
+                      <div class="testimonial-author">
+                          <div class="author-avatar">
+                              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop" alt="Linh Nga">
+                          </div>
+                          <div class="author-info">
+                              <h4>Linh Nga</h4>
+                              <p>Blogger du lịch</p>
+                              <div class="author-location">
+                                  <i class="fas fa-map-marker-alt"></i>
+                                  Đà Nẵng
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="testimonials-nav">
+                  <button class="testimonial-nav-btn" onclick="prevTestimonial()">
+                      <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button class="testimonial-nav-btn" onclick="nextTestimonial()">
+                      <i class="fas fa-chevron-right"></i>
+                  </button>
+              </div>
+              
+              <div class="testimonials-dots">
+                  <div class="testimonial-dot active" onclick="goToTestimonial(0)"></div>
+                  <div class="testimonial-dot" onclick="goToTestimonial(1)"></div>
+                  <div class="testimonial-dot" onclick="goToTestimonial(2)"></div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+      <div class="container">
+          <div class="section-header">
+              <h2 class="section-title">Câu Hỏi Thường Gặp</h2>
+              <p class="section-subtitle">Những thông tin hữu ích cho chuyến du lịch của bạn</p>
+          </div>
+          
+          <div class="faq-container">
+              <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFAQ(this)">
+                      <h3>Làm thế nào để đặt tour?</h3>
+                      <i class="fas fa-plus"></i>
+                  </div>
+                  <div class="faq-answer">
+                      <p>Bạn có thể đặt tour trực tiếp trên website, gọi hotline 1900-xxxx hoặc đến trực tiếp văn phòng của chúng tôi. Chúng tôi hỗ trợ đặt tour 24/7.</p>
+                  </div>
+              </div>
+              
+              <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFAQ(this)">
+                      <h3>Có thể hủy tour không?</h3>
+                      <i class="fas fa-plus"></i>
+                  </div>
+                  <div class="faq-answer">
+                      <p>Có thể hủy tour trước 24h khởi hành mà không mất phí. Hủy trong vòng 24h sẽ tính phí 50% giá tour. Hủy trong ngày khởi hành tính phí 100%.</p>
+                  </div>
+              </div>
+              
+              <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFAQ(this)">
+                      <h3>Tour có bao gồm bảo hiểm không?</h3>
+                      <i class="fas fa-plus"></i>
+                  </div>
+                  <div class="faq-answer">
+                      <p>Tất cả tour của chúng tôi đều bao gồm bảo hiểm du lịch với mức bồi thường lên đến 100 triệu đồng/người.</p>
+                  </div>
+              </div>
+              
+              <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFAQ(this)">
+                      <h3>Có hỗ trợ đưa đón tại sân bay không?</h3>
+                      <i class="fas fa-plus"></i>
+                  </div>
+                  <div class="faq-answer">
+                      <p>Chúng tôi có dịch vụ đưa đón tại sân bay Đà Nẵng với phí phụ thu. Vui lòng thông báo trước khi đặt tour.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="container">
+          <div class="footer-content">
+              <div class="footer-section">
+                  <div class="footer-logo">
+                      <h3>DaNang Tours</h3>
+                      <p>Khám phá Đà Nẵng cùng chúng tôi</p>
+                  </div>
+                  <div class="footer-social">
+                      <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                  </div>
+              </div>
+              
+              <div class="footer-section">
+                  <h4>Dịch vụ</h4>
+                  <ul>
+                      <li><a href="#">Tour trong ngày</a></li>
+                      <li><a href="#">Tour nhiều ngày</a></li>
+                      <li><a href="#">Tour ẩm thực</a></li>
+                      <li><a href="#">Tour văn hóa</a></li>
+                  </ul>
+              </div>
+              
+              <div class="footer-section">
+                  <h4>Hỗ trợ</h4>
+                  <ul>
+                      <li><a href="#">Câu hỏi thường gặp</a></li>
+                      <li><a href="#">Chính sách hủy tour</a></li>
+                      <li><a href="#">Điều khoản sử dụng</a></li>
+                      <li><a href="#">Chính sách bảo mật</a></li>
+                  </ul>
+              </div>
+              
+              <div class="footer-section">
+                  <h4>Liên hệ</h4>
+                  <div class="contact-info">
+                      <div class="contact-item">
+                          <i class="fas fa-map-marker-alt"></i>
+                          <span>123 Đường ABC, Đà Nẵng</span>
+                      </div>
+                      <div class="contact-item">
+                          <i class="fas fa-phone"></i>
+                          <span>1900-xxxx</span>
+                      </div>
+                      <div class="contact-item">
+                          <i class="fas fa-envelope"></i>
+                          <span>info@danangtours.com</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="footer-bottom">
+              <p>&copy; 2024 DaNang Tours. Tất cả quyền được bảo lưu.</p>
+              <div class="footer-links">
+                  <a href="#">Điều khoản</a>
+                  <a href="#">Bảo mật</a>
+                  <a href="#">Sitemap</a>
+              </div>
+          </div>
+      </div>
+  </footer>
+
+  <!-- Live Chat Widget -->
+  <div class="chat-widget">
+      <button class="chat-toggle" onclick="toggleChat()">
+          <i class="fas fa-comments"></i>
+          <div class="chat-notification" id="chatNotification">1</div>
+      </button>
+      <div class="chat-window" id="chatWindow">
+          <div class="chat-header">
+              <div class="chat-agent">
+                  <div class="agent-avatar">
+                      <img src="/placeholder.svg?height=50&width=50" alt="Agent">
+                      <div class="agent-status"></div>
+                  </div>
+                  <div class="agent-info">
+                      <span class="agent-name">Tư vấn viên</span>
+                      <span class="agent-status-text">Đang online</span>
+                  </div>
+              </div>
+              <button class="chat-close" onclick="toggleChat()">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+              <div class="chat-message bot-message">
+                  <div class="message-avatar">
+                      <img src="/placeholder.svg?height=30&width=30" alt="Bot">
+                  </div>
+                  <div class="message-content">
+                      <p>Xin chào! Tôi có thể giúp gì cho bạn về các tour du lịch Đà Nẵng?</p>
+                      <span class="message-time">10:30</span>
+                  </div>
+              </div>
+              <div class="chat-message bot-message">
+                  <div class="message-avatar">
+                      <img src="/placeholder.svg?height=30&width=30" alt="Bot">
+                  </div>
+                  <div class="message-content">
+                      <p>Bạn có thể hỏi về giá tour, lịch trình, hoặc bất kỳ thông tin nào khác.</p>
+                      <span class="message-time">10:30</span>
+                  </div>
+              </div>
+          </div>
+          <div class="chat-quick-replies">
+              <button class="quick-reply" onclick="sendQuickReply('Tôi muốn tìm tour Bà Nà Hills')">
+                  Tour Bà Nà Hills
+              </button>
+              <button class="quick-reply" onclick="sendQuickReply('Giá tour như thế nào?')">
+                  Hỏi giá tour
+              </button>
+              <button class="quick-reply" onclick="sendQuickReply('Tôi cần tư vấn')">
+                  Cần tư vấn
+              </button>
+          </div>
+          <div class="chat-input-area">
+              <input type="text" class="chat-input" placeholder="Nhập tin nhắn..." onkeypress="handleChatInput(event)">
+              <button class="chat-send" onclick="sendMessage()">
+                  <i class="fas fa-paper-plane"></i>
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div class="video-modal" id="videoModal">
+      <div class="video-modal-content">
+          <button class="video-close" onclick="closeVideoModal()">
+              <i class="fas fa-times"></i>
+          </button>
+          <div class="video-container">
+              <iframe id="videoFrame" src="/placeholder.svg" frameborder="0" allowfullscreen></iframe>
+          </div>
+      </div>
+  </div>
+
+  <!-- Tour Detail Modal -->
+  <div class="modal-overlay" id="tourModal">
+      <div class="modal-content">
+          <button class="modal-close" onclick="closeTourModal()">
+              <i class="fas fa-times"></i>
+          </button>
+          
+          <div class="modal-header">
+              <div class="modal-gallery" id="modalGallery">
+                  <!-- Gallery images will be populated by JavaScript -->
+              </div>
+              <button class="gallery-nav gallery-prev" onclick="prevImage()">
+                  <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="gallery-nav gallery-next" onclick="nextImage()">
+                  <i class="fas fa-chevron-right"></i>
+              </button>
+              <div class="gallery-indicators" id="galleryIndicators">
+                  <!-- Indicators will be populated by JavaScript -->
+              </div>
+          </div>
+
+          <div class="modal-body">
+              <div class="modal-tour-header">
+                  <div class="modal-tour-badges" id="modalBadges">
+                      <!-- Badges will be populated by JavaScript -->
+                  </div>
+                  <h2 class="modal-tour-title" id="modalTitle">Tour Title</h2>
+                  <div class="modal-tour-meta">
+                      <div class="modal-tour-rating" id="modalRating">
+                          <!-- Rating will be populated by JavaScript -->
+                      </div>
+                      <div class="modal-tour-price">
+                          <span class="modal-price-current" id="modalPrice">0₫</span>
+                          <span class="modal-price-old" id="modalOldPrice"></span>
+                          <span class="price-unit">/ người</span>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="modal-sections">
+                  <div class="modal-main">
+                      <div class="modal-section">
+                          <h3 class="modal-section-title">
+                              <i class="fas fa-info-circle"></i>
+                              Mô tả tour
+                          </h3>
+                          <p id="modalDescription">Tour description will be here...</p>
+                      </div>
+
+                      <div class="modal-section">
+                          <h3 class="modal-section-title">
+                              <i class="fas fa-route"></i>
+                              Lịch trình tour
+                          </h3>
+                          <div id="modalItinerary">
+                              <!-- Itinerary will be populated by JavaScript -->
+                          </div>
+                      </div>
+
+                      <div class="modal-section">
+                          <h3 class="modal-section-title">
+                              <i class="fas fa-check-circle"></i>
+                              Dịch vụ bao gồm
+                          </h3>
+                          <div class="features-grid" id="modalFeatures">
+                              <!-- Features will be populated by JavaScript -->
+                          </div>
+                      </div>
+
+                      <div class="modal-section">
+                          <h3 class="modal-section-title">
+                              <i class="fas fa-star"></i>
+                              Đánh giá từ khách hàng
+                          </h3>
+                          <div class="reviews-list" id="modalReviews">
+                              <!-- Reviews will be populated by JavaScript -->
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="modal-sidebar">
+                      <div class="booking-card">
+                          <h3 style="margin-bottom: 1rem; color: var(--primary);">Đặt tour ngay</h3>
+                          <form class="booking-form">
+                              <div class="form-group">
+                                  <label class="form-label">Ngày khởi hành</label>
+                                  <input type="date" class="form-input" id="bookingDate" required>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label">Số người lớn</label>
+                                  <select class="form-input" id="bookingAdults">
+                                      <option value="1">1 người</option>
+                                      <option value="2">2 người</option>
+                                      <option value="3">3 người</option>
+                                      <option value="4">4 người</option>
+                                      <option value="5">5 người</option>
+                                      <option value="6">6+ người</option>
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label">Số trẻ em (6-12 tuổi)</label>
+                                  <select class="form-input" id="bookingChildren">
+                                      <option value="0">0 trẻ em</option>
+                                      <option value="1">1 trẻ em</option>
+                                      <option value="2">2 trẻ em</option>
+                                      <option value="3">3 trẻ em</option>
+                                      <option value="4">4+ trẻ em</option>
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label">Họ và tên</label>
+                                  <input type="text" class="form-input" id="bookingName" placeholder="Nhập họ và tên" required>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label">Số điện thoại</label>
+                                  <input type="tel" class="form-input" id="bookingPhone" placeholder="Nhập số điện thoại" required>
+                              </div>
+                              <div class="form-group">
+                                  <label class="form-label">Email</label>
+                                  <input type="email" class="form-input" id="bookingEmail" placeholder="Nhập email" required>
+                              </div>
+                              <div class="booking-summary">
+                                  <div class="summary-row">
+                                      <span>Người lớn:</span>
+                                      <span id="summaryAdults">1 x 0₫</span>
+                                  </div>
+                                  <div class="summary-row">
+                                      <span>Trẻ em:</span>
+                                      <span id="summaryChildren">0 x 0₫</span>
+                                  </div>
+                                  <div class="summary-row">
+                                      <span>Tổng cộng:</span>
+                                      <span id="summaryTotal">0₫</span>
+                                  </div>
+                              </div>
+                              <button type="button" class="booking-btn" onclick="submitBooking()">
+                                  <i class="fas fa-credit-card"></i>
+                                  Đặt tour ngay
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+      <div class="toast-content">
+          <i class="fas fa-check-circle toast-icon" id="toastIcon"></i>
+          <span class="toast-message" id="toastMessage">Thông báo</span>
+      </div>
+      <button class="toast-close" onclick="hideToast()">
+          <i class="fas fa-times"></i>
+      </button>
+  </div>
+
+  <!-- Scroll to top button -->
+  <button class="scroll-top" onclick="scrollToTop()">
+      <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+<style>
+    :root {
+  --primary: #667eea; /* Original primary blue-purple */
+  --primary-dark: #5a67d8;
+  --secondary: #f093fb; /* Original secondary pink */
+  --accent: #4facfe; /* Original accent blue */
+  --success: #48bb78;
+  --warning: #ed8936;
+  --danger: #f56565;
+
+  --dark: #1a202c;
+  --gray-900: #171923;
+  --gray-800: #2d3748;
+  --gray-700: #4a5568;
+  --gray-600: #718096;
+  --gray-500: #a0aec0;
+  --gray-400: #cbd5e0;
+  --gray-300: #e2e8f0;
+  --gray-200: #edf2f7;
+  --gray-100: #f7fafc;
+  --white: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Original primary gradient */
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* Original secondary gradient */
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); /* Original accent gradient */
+  --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%); /* Original warm gradient */
+  --gradient-cool: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); /* Original cool gradient */
+
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05); /* Slightly more pronounced */
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.07); /* Slightly more pronounced */
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.08); /* More pronounced */
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.07); /* More pronounced */
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.3); /* More pronounced */
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --white: #1a202c;
+  --gray-100: #2d3748;
+  --gray-200: #4a5568;
+  --gray-300: #718096;
+  --gray-800: #f7fafc;
+  --gray-900: #ffffff;
+  background: var(--dark) !important;
+  color: var(--gray-100);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--gray-800);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Original background gradient */
+  overflow-x: hidden;
+  transition: var(--transition);
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  transition: var(--transition);
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  font-family: var(--font-display);
+}
+
+.loading-logo i {
+  font-size: 3rem;
+  animation: bounce 2s infinite;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  z-index: 9999;
+  transition: width 0.3s ease;
+}
+
+/* Floating Navigation */
+.nav-floating {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95); /* Original opacity */
+  backdrop-filter: blur(20px); /* Original blur */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Original border */
+  border-radius: var(--radius-full);
+  padding: 0.75rem 2rem;
+  z-index: 1000;
+  box-shadow: var(--shadow-xl); /* Original shadow */
+  transition: var(--transition);
+  max-width: 90vw;
+}
+
+.nav-floating:hover {
+  transform: translateX(-50%) translateY(-2px); /* Original lift */
+  box-shadow: var(--shadow-2xl); /* Original shadow */
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--gray-700);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  position: relative;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  transition: var(--transition);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--gray-100);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-sm); /* Added subtle shadow */
+}
+
+.nav-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md); /* Enhanced shadow on hover */
+}
+
+/* Social Share */
+.social-share {
+  position: fixed;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 999;
+}
+
+.social-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: var(--radius-full);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.social-btn:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.social-facebook {
+  background: #1877f2;
+}
+.social-twitter {
+  background: #1da1f2;
+}
+.social-instagram {
+  background: #e4405f;
+}
+.social-youtube {
+  background: #ff0000;
+}
+.social-zalo {
+  background: #0068ff;
+}
+
+/* Hero Section */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-video::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%); /* Original overlay opacity */
+}
+
+.floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.floating-card {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  color: white;
+  animation: float 6s ease-in-out infinite;
+  text-align: center;
+  box-shadow: var(--shadow-md); /* Added subtle shadow */
+}
+
+.floating-card:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-card:nth-child(2) {
+  top: 60%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+.floating-card:nth-child(3) {
+  bottom: 20%;
+  left: 15%;
+  animation-delay: 4s;
+}
+
+.floating-card i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.hero-content {
+  text-align: center;
+  color: white;
+  z-index: 3;
+  position: relative;
+  max-width: 800px;
+  padding: 0 2rem;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-title {
+  font-family: var(--font-display); /* Changed to display font for impact */
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #f093fb, #f5576c); /* Original vibrant gradient */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+  margin-bottom: 3rem;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md); /* Added subtle shadow */
+}
+
+.btn-primary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat .stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  margin-bottom: 0.25rem;
+}
+
+.hero-stat .stat-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Stats Section */
+.stats-section {
+  background: white;
+  padding: 4rem 0;
+  margin-top: -2rem;
+  position: relative;
+  z-index: 3;
+  box-shadow: var(--shadow-xl); /* Added shadow to lift it */
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0; /* Rounded top corners */
+}
+
+.stats-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  background: var(--gray-50);
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm); /* Added subtle shadow */
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-display); /* Changed to display font for impact */
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+  padding: 4rem 0;
+  position: relative;
+  background: var(--gray-100); /* Light gray background for content */
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Section Headers */
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Search Section */
+.search-section {
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.search-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--gray-200); /* Subtle border */
+}
+
+.search-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+.search-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.search-header h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.search-header p {
+  color: var(--gray-600);
+  font-size: 1.1rem;
+}
+
+.search-form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 1.5rem;
+  align-items: end;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.form-label i {
+  color: var(--primary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  transition: var(--transition);
+  background: var(--gray-50);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+.search-suggestion {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.search-suggestion:hover {
+  background: var(--gray-50);
+}
+
+.search-suggestion:last-child {
+  border-bottom: none;
+}
+
+.search-btn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Quick Filters */
+.quick-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.quick-filter {
+  padding: 0.75rem 1.5rem;
+  background: var(--gray-100);
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quick-filter:hover,
+.quick-filter.active {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-filter i {
+  font-size: 1rem;
+}
+
+/* Categories Section */
+.categories-section {
+  margin-bottom: 4rem;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.category-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-slow);
+  cursor: pointer;
+  border: 1px solid var(--gray-200); /* Subtle border */
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.category-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-slow);
+}
+
+.category-card:hover .category-image img {
+  transform: scale(1.1);
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(102, 126, 234, 0.8), rgba(240, 147, 251, 0.8));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.category-card:hover .category-overlay {
+  opacity: 1;
+}
+
+.category-overlay i {
+  font-size: 3rem;
+  color: white;
+}
+
+.category-content {
+  padding: 1.5rem;
+}
+
+.category-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.category-content p {
+  color: var(--gray-600);
+  margin-bottom: 1rem;
+}
+
+.category-count {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--gradient-accent);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Filters Section */
+.filters-section {
+  margin-bottom: 3rem;
+}
+
+.filters-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filters-btn {
+  background: white;
+  border: 2px solid var(--gray-200);
+  padding: 1rem 2rem; /* Increased padding */
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.filters-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.filters-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md); /* Added shadow for active state */
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--gray-200);
+  background: white;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.view-btn.active,
+.view-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem; /* Increased gap */
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl); /* More prominent shadow */
+  margin-top: 1rem;
+
+  /* New properties for collapsing space */
+  max-height: 0;
+  padding: 0 2rem; /* Keep horizontal padding, collapse vertical */
+  overflow: hidden; /* Crucial for hiding content that overflows max-height */
+
+  transform: translateY(-10px); /* Keep for initial animation */
+  opacity: 0;
+  visibility: hidden;
+  transition: max-height 0.5s ease-out, padding 0.5s ease-out, opacity 0.3s ease, visibility 0.3s ease, transform 0.3s
+    ease; /* Adjust transition */
+  border: 1px solid var(--gray-200);
+}
+
+.filters-grid.active {
+  max-height: 700px; /* Sufficiently large value to show all content */
+  padding: 2rem; /* Restore full padding */
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--gray-50); /* Added background for individual items */
+  padding: 1.25rem; /* Added padding for individual items */
+  border-radius: var(--radius-lg); /* Added border-radius for individual items */
+  border: 1px solid var(--gray-200); /* Added border for individual items */
+  box-shadow: var(--shadow-sm); /* Added shadow for individual items */
+  transition: var(--transition);
+}
+
+.filter-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.filter-select {
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+  transition: var(--transition);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); /* Slightly more opaque shadow */
+}
+
+.price-range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.price-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--gray-200);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.price-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.price-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.price-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+}
+
+.rating-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rating-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent; /* Added border for visual consistency */
+}
+
+.rating-option:hover {
+  background: var(--gray-100);
+}
+
+.rating-option.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary); /* Added border for active state */
+  box-shadow: var(--shadow-sm); /* Added shadow for active state */
+}
+
+.stars {
+  color: #fbbf24;
+  font-size: 0.9rem;
+}
+
+/* Tours Section */
+.tours-section {
+  margin-bottom: 4rem;
+}
+
+.sort-options {
+  margin-top: 1rem;
+  text-align: right; /* Align to right */
+}
+
+.sort-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.tours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.tours-grid.list-view {
+  grid-template-columns: 1fr;
+}
+
+.tours-grid.list-view .tour-card {
+  display: flex;
+  max-height: 300px;
+}
+
+.tours-grid.list-view .tour-image {
+  width: 300px;
+  height: auto;
+}
+
+.tours-grid.list-view .tour-content {
+  flex: 1;
+}
+
+.tour-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-slow);
+  position: relative;
+  cursor: pointer;
+  border: 1px solid var(--gray-200);
+}
+
+.tour-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+}
+
+.tour-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.tour-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-slow);
+}
+
+.tour-card:hover .tour-image img {
+  transform: scale(1.1);
+}
+
+.tour-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(102, 126, 234, 0.8), rgba(240, 147, 251, 0.8));
+  opacity: 0;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-card:hover .tour-overlay {
+  opacity: 1;
+}
+
+.overlay-content {
+  text-align: center;
+  color: white;
+  transform: translateY(20px);
+  transition: var(--transition);
+}
+
+.tour-card:hover .overlay-content {
+  transform: translateY(0);
+}
+
+.tour-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2;
+}
+
+.tour-badge {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-featured {
+  background: var(--gradient-warm);
+  color: white;
+}
+
+.badge-discount {
+  background: var(--gradient-secondary);
+  color: white;
+}
+
+.favorite-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  color: var(--gray-600);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn:hover,
+.favorite-btn.active {
+  background: var(--danger);
+  color: white;
+  transform: scale(1.1);
+}
+
+.tour-content {
+  padding: 2rem;
+}
+
+.tour-header {
+  margin-bottom: 1.5rem;
+}
+
+.tour-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--gradient-accent);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.tour-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.tour-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+}
+
+.tour-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tour-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.rating-stars i {
+  color: #fbbf24;
+  font-size: 0.9rem;
+}
+
+.rating-score {
+  background: var(--success);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tour-features {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  padding: 0.5rem 1rem;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--gray-200);
+}
+
+.feature-tag i {
+  color: var(--primary);
+}
+
+.tour-description {
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.tour-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.tour-price {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-old {
+  color: var(--gray-500);
+  text-decoration: line-through;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.price-current {
+  color: var(--gray-900);
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+}
+
+.price-unit {
+  color: var(--gray-600);
+  font-size: 0.8rem;
+}
+
+.book-btn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+}
+
+.book-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.load-more-section {
+  text-align: center;
+}
+
+.load-more-btn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.load-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Map Section */
+.map-section {
+  margin-bottom: 4rem;
+}
+
+.map-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  height: 500px;
+  background: white;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+}
+
+.tour-map {
+  background: var(--gray-100);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--gray-500);
+}
+
+.map-placeholder i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.map-sidebar {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.map-filters h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+}
+
+.area-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.area-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.area-filter input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+/* Blog Section */
+.blog-section {
+  margin-bottom: 4rem;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.blog-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  border: 1px solid var(--gray-200);
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.blog-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.blog-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.blog-card:hover .blog-image img {
+  transform: scale(1.05);
+}
+
+.blog-category {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.blog-content {
+  padding: 1.5rem;
+}
+
+.blog-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.blog-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.blog-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.blog-content p {
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.blog-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.blog-link:hover {
+  gap: 0.75rem;
+}
+
+/* Newsletter Section */
+.newsletter-section {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.newsletter-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.newsletter-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  font-size: 2rem;
+}
+
+.newsletter-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.newsletter-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.newsletter-form {
+  margin-bottom: 2rem;
+}
+
+.newsletter-input-group {
+  display: flex;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+}
+
+.newsletter-btn {
+  padding: 1rem 2rem;
+  background: white;
+  color: var(--primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.newsletter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.newsletter-benefits {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.benefit-item i {
+  color: var(--success);
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  padding: 4rem 0;
+  background: white;
+}
+
+.testimonials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.testimonials-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.testimonials-slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--gray-200);
+}
+
+.testimonials-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.testimonial-card {
+  min-width: 100%;
+  background: var(--gray-50);
+  padding: 3rem;
+  border-radius: var(--radius-2xl);
+  position: relative;
+  text-align: center;
+}
+
+.testimonial-quote {
+  font-size: 4rem;
+  color: var(--primary);
+  opacity: 0.3;
+  position: absolute;
+  top: 1rem;
+  left: 2rem;
+  font-family: var(--font-display);
+}
+
+.testimonial-rating {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  color: #fbbf24;
+}
+
+.testimonial-content {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--gray-700);
+  margin-bottom: 2rem;
+  font-style: italic;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.author-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 3px solid var(--primary);
+}
+
+.author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-info h4 {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+}
+
+.author-info p {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.author-location {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+}
+
+.testimonials-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2rem;
+  pointer-events: none;
+}
+
+.testimonial-nav-btn {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+  pointer-events: all;
+}
+
+.testimonial-nav-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.testimonials-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.testimonial-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--gray-300);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.testimonial-dot.active {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 4rem 0;
+  background: var(--gray-50);
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: white;
+  border-radius: var(--radius-xl);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border: 1px solid var(--gray-200);
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.faq-question {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.faq-question:hover {
+  background: var(--gray-50);
+}
+
+.faq-question h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.faq-question i {
+  color: var(--primary);
+  transition: var(--transition);
+}
+
+.faq-item.active .faq-question i {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 200px;
+}
+
+.faq-answer p {
+  padding: 0 1.5rem 1.5rem;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+  background: var(--gray-900);
+  color: white;
+  padding: 3rem 0 1rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.footer-logo h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-logo p {
+  color: var(--gray-400);
+  margin-bottom: 1rem;
+}
+
+.footer-social {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: var(--gray-800);
+  color: white;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.social-link:hover {
+  background: var(--primary);
+  transform: scale(1.1);
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+  color: var(--gray-400);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.footer-section ul li a:hover {
+  color: white;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray-400);
+}
+
+.contact-item i {
+  color: var(--primary);
+  width: 20px;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--gray-800);
+  padding-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-links a {
+  color: var(--gray-400);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.footer-links a:hover {
+  color: white;
+}
+
+/* Live Chat Widget */
+.chat-widget {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 1000;
+}
+
+.chat-toggle {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chat-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-xl);
+}
+
+.chat-notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: var(--danger);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.chat-window {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--gray-200);
+}
+
+.chat-window.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.chat-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-agent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.agent-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.agent-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.agent-status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--success);
+  border: 2px solid white;
+  border-radius: var(--radius-full);
+}
+
+.agent-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.agent-status-text {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.chat-close {
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: var(--radius-full);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.chat-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chat-message {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 80%;
+}
+
+.chat-message.user-message {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-content {
+  background: var(--gray-100);
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.user-message .message-content {
+  background: var(--primary);
+  color: white;
+}
+
+.message-time {
+  font-size: 0.7rem;
+  color: var(--gray-500);
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.user-message .message-time {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chat-quick-replies {
+  padding: 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.quick-reply {
+  padding: 0.5rem 1rem;
+  background: var(--gray-100);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.quick-reply:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.chat-input-area {
+  padding: 1rem;
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  resize: none;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.chat-send {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.chat-send:hover {
+  background: var(--primary-dark);
+}
+
+/* Video Modal */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+
+.video-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.video-modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+}
+
+.video-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.video-close:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.video-container {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.video-container iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tour Detail Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  padding: 2rem;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--radius-2xl);
+  max-width: 1000px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: scale(0.9) translateY(50px);
+  transition: var(--transition);
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--gray-200);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.modal-close:hover {
+  background: var(--danger);
+  color: white;
+  transform: scale(1.1);
+}
+
+.modal-header {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+}
+
+.modal-gallery {
+  display: flex;
+  height: 100%;
+  transition: var(--transition);
+}
+
+.gallery-image {
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.gallery-nav:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-prev {
+  left: 1rem;
+}
+
+.gallery-next {
+  right: 1rem;
+}
+
+.gallery-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gallery-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.gallery-dot.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-tour-header {
+  margin-bottom: 2rem;
+}
+
+.modal-tour-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.modal-tour-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+}
+
+.modal-tour-meta {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.modal-tour-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-tour-price {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modal-price-current {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+
+.modal-price-old {
+  font-size: 1.2rem;
+  color: var(--gray-500);
+  text-decoration: line-through;
+}
+
+.modal-sections {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.modal-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.modal-section {
+  background: var(--gray-50);
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+}
+
+.modal-section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-section-title i {
+  color: var(--primary);
+}
+
+.itinerary-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.itinerary-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.itinerary-time {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.itinerary-content h4 {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.itinerary-content p {
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+
+.feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.review-author {
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.review-rating {
+  display: flex;
+  gap: 2px;
+}
+
+.review-content {
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+.modal-sidebar {
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+
+.booking-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--primary);
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.booking-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-form .form-label {
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.booking-form .form-input {
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.booking-form .form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.booking-summary {
+  background: var(--gray-50);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  margin: 1rem 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-200);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.booking-btn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 1rem;
+}
+
+.booking-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  top: 100px;
+  right: 2rem;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border-left: 4px solid var(--success);
+  z-index: 9999;
+  transform: translateX(400px);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 300px;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.toast-icon {
+  color: var(--success);
+  font-size: 1.2rem;
+}
+
+.toast-message {
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.toast-close {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.toast-close:hover {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+/* Scroll to top button */
+.scroll-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.scroll-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scroll-top:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: var(--transition-slow);
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .search-form {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .tours-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .nav-floating {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    border-radius: 0;
+    margin-bottom: 0;
+  }
+
+  .weather-widget {
+    position: static;
+    margin: 1rem auto;
+    width: fit-content;
+  }
+
+  .social-share {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    margin: 2rem 0;
+    transform: none;
+  }
+
+  .modal-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-sidebar {
+    position: static;
+  }
+
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .tour-map {
+    height: 400px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-stats {
+    gap: 2rem;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .tours-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tour-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .book-btn {
+    width: 100%;
+  }
+
+  .floating-card {
+    display: none;
+  }
+
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-tour-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-input-group {
+    flex-direction: column;
+  }
+
+  .newsletter-benefits {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chat-widget {
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  .chat-window {
+    width: 280px;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .search-card,
+  .tour-content {
+    padding: 1.5rem;
+  }
+
+  .hero-content {
+    padding: 0 1rem;
+  }
+
+  .modal-header {
+    height: 250px;
+  }
+
+  .modal-tour-title {
+    font-size: 1.5rem;
+  }
+
+  .newsletter-title {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .testimonial-card {
+    padding: 2rem 1rem;
+  }
+
+  .weather-widget {
+    min-width: 180px;
+    padding: 1rem;
+  }
+
+  .toast {
+    min-width: 250px;
+    right: 1rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .nav-floating,
+  .weather-widget,
+  .social-share,
+  .chat-widget,
+  .scroll-top,
+  .toast {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .tour-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid var(--gray-300);
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --gray-100: #f0f0f0;
+    --gray-200: #e0e0e0;
+    --gray-300: #d0d0d0;
+    --gray-600: #404040;
+    --gray-700: #303030;
+    --gray-800: #202020;
+    --gray-900: #000000;
+  }
+
+  .tour-card,
+  .search-card,
+  .category-card {
+    border: 2px solid var(--gray-300);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .floating-card {
+    animation: none;
+  }
+
+  .loading-logo i {
+    animation: none;
+  }
+
+  .loading-spinner {
+    animation: none;
+    border: 4px solid var(--primary);
+  }
+}
+
+</style>
+  <script>
+    // Sample tour data with detailed information
+const tours = [
+  {
+    id: 1,
+    name: "Tour Bà Nà Hills - Cầu Vàng Huyền Thoại",
+    type: "nature",
+    duration: "full-day",
+    price: 850000,
+    oldPrice: 950000,
+    rating: 4.8,
+    reviews: 1245,
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "meal", "ticket", "insurance"],
+    description:
+      "Khám phá Bà Nà Hills với Cầu Vàng nổi tiếng thế giới, French Village và vườn hoa Le Jardin D'Amour tuyệt đẹp.",
+    detailedDescription:
+      "Bà Nà Hills là một trong những điểm đến hấp dẫn nhất tại Đà Nẵng với Cầu Vàng được mệnh danh là 'cây cầu được nâng đỡ bởi đôi bàn tay khổng lồ'. Nơi đây không chỉ có cảnh quan thiên nhiên tuyệt đẹp mà còn có khu French Village với kiến trúc Pháp cổ điển, vườn hoa Le Jardin D'Amour lãng mạn và nhiều trò chơi giải trí thú vị.",
+    itinerary: [
+      {
+        time: "07:00",
+        title: "Đón khách tại khách sạn",
+        description: "Xe và hướng dẫn viên đón khách tại khách sạn trong khu vực trung tâm Đà Nẵng",
+      },
+      {
+        time: "08:00",
+        title: "Khởi hành đến Bà Nà Hills",
+        description: "Di chuyển đến khu du lịch Bà Nà Hills, nghe hướng dẫn viên giới thiệu về lịch sử và văn hóa",
+      },
+      {
+        time: "09:00",
+        title: "Trải nghiệm cáp treo",
+        description: "Đi cáp treo lên đỉnh núi, chiêm ngưỡng toàn cảnh thành phố Đà Nẵng từ trên cao",
+      },
+      {
+        time: "10:00",
+        title: "Tham quan Cầu Vàng",
+        description: "Check-in tại Cầu Vàng nổi tiếng, chụp ảnh lưu niệm với đôi bàn tay khổng lồ",
+      },
+      {
+        time: "12:00",
+        title: "Dùng bữa trưa",
+        description: "Thưởng thức buffet tại nhà hàng với view toàn cảnh núi rừng",
+      },
+      {
+        time: "14:00",
+        title: "Khám phá French Village",
+        description: "Tham quan khu French Village với kiến trúc Pháp cổ điển, vườn hoa Le Jardin D'Amour",
+      },
+      { time: "16:00", title: "Trở về", description: "Di chuyển về trung tâm thành phố, kết thúc tour tại khách sạn" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV chuyên nghiệp, nhiệt tình" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe máy lạnh đời mới" },
+      { icon: "utensils", title: "Bữa ăn", description: "Buffet trưa tại resort" },
+      { icon: "ticket-alt", title: "Vé tham quan", description: "Vé cáp treo và các điểm tham quan" },
+      { icon: "shield-alt", title: "Bảo hiểm", description: "Bảo hiểm du lịch toàn diện" },
+    ],
+    reviews: [
+      {
+        author: "Nguyễn Văn A",
+        rating: 5,
+        content: "Tour rất tuyệt vời! Cầu Vàng thật sự ấn tượng, hướng dẫn viên nhiệt tình. Sẽ giới thiệu cho bạn bè.",
+      },
+      {
+        author: "Trần Thị B",
+        rating: 5,
+        content: "Cảnh đẹp không thể tả, dịch vụ chuyên nghiệp. Đặc biệt ấn tượng với French Village.",
+      },
+      {
+        author: "Lê Văn C",
+        rating: 4,
+        content: "Tour hay, tuy nhiên hơi đông khách vào cuối tuần. Nên đi vào ngày thường sẽ thoải mái hơn.",
+      },
+    ],
+    featured: true,
+    discount: true,
+  },
+  {
+    id: 2,
+    name: "Tour Hội An Cổ Trấn - Đêm Hoa Đăng",
+    type: "cultural",
+    duration: "half-day",
+    price: 450000,
+    rating: 4.7,
+    reviews: 892,
+    image: "https://images.unsplash.com/photo-1555400082-8dd4d78c670b?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1555400082-8dd4d78c670b?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "ticket"],
+    description: "Dạo bước trong phố cổ Hội An với những ngôi nhà cổ kính, thả hoa đăng trên sông Hoài lãng mạn.",
+    detailedDescription:
+      "Hội An là một thành phố cổ được UNESCO công nhận là Di sản Văn hóa Thế giới. Nơi đây lưu giữ nguyên vẹn nét kiến trúc cổ xưa với những ngôi nhà gỗ trăm tuổi, hội quán cổ, và chùa Cầu Nhật Bản nổi tiếng. Đặc biệt, vào buổi tối, phố cổ được thắp sáng bằng đèn lồng đầy màu sắc, tạo nên khung cảnh thơ mộng và lãng mạn.",
+    itinerary: [
+      {
+        time: "15:00",
+        title: "Đón khách tại khách sạn",
+        description: "Xe đón khách tại các khách sạn trong trung tâm Đà Nẵng",
+      },
+      {
+        time: "16:00",
+        title: "Đến Hội An",
+        description: "Khởi hành đến phố cổ Hội An, nghe giới thiệu về lịch sử văn hóa",
+      },
+      { time: "16:30", title: "Tham quan phố cổ", description: "Dạo bộ khám phá các con phố cổ, nhà cổ, hội quán" },
+      { time: "17:30", title: "Chùa Cầu Nhật Bản", description: "Tham quan biểu tượng của Hội An - chùa Cầu Nhật Bản" },
+      { time: "18:30", title: "Thưởng thức ẩm thực", description: "Dùng bữa tối với các món đặc sản Hội An" },
+      { time: "19:30", title: "Thả hoa đăng", description: "Thả hoa đăng cầu may trên sông Hoài lãng mạn" },
+      { time: "21:00", title: "Trở về", description: "Kết thúc tour, trở về Đà Nẵng" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV am hiểu văn hóa địa phương" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe máy lạnh thoải mái" },
+      { icon: "ticket-alt", title: "Vé tham quan", description: "Vé các điểm tham quan trong phố cổ" },
+    ],
+    reviews: [
+      {
+        author: "Phạm Thị D",
+        rating: 5,
+        content: "Phố cổ Hội An thật sự rất đẹp, đặc biệt là buổi tối với đèn lồng. Thả hoa đăng rất ý nghĩa.",
+      },
+      {
+        author: "Hoàng Văn E",
+        rating: 5,
+        content: "Tour tuyệt vời, hướng dẫn viên kể chuyện rất hay về lịch sử Hội An.",
+      },
+      {
+        author: "Ngô Thị F",
+        rating: 4,
+        content: "Đẹp và lãng mạn, phù hợp cho các cặp đôi. Món ăn địa phương rất ngon.",
+      },
+    ],
+    featured: true,
+    discount: false,
+  },
+  {
+    id: 3,
+    name: "Tour Biển Mỹ Khê - Thể Thao Nước",
+    type: "beach",
+    duration: "full-day",
+    price: 650000,
+    rating: 4.6,
+    reviews: 567,
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "meal", "insurance"],
+    description: "Tận hưởng bãi biển Mỹ Khê tuyệt đẹp với các hoạt động thể thao nước hấp dẫn và BBQ hải sản.",
+    detailedDescription:
+      "Bãi biển Mỹ Khê được tạp chí Forbes bình chọn là một trong 6 bãi biển quyến rũ nhất hành tinh. Với bờ cát trắng mịn, nước biển trong xanh và sóng nhẹ, đây là nơi lý tưởng để thư giãn và tham gia các hoạt động thể thao nước như lướt sóng, chèo kayak, lặn ngắm san hô.",
+    itinerary: [
+      { time: "08:00", title: "Đón khách", description: "Đón khách tại khách sạn, khởi hành đến bãi biển Mỹ Khê" },
+      { time: "09:00", title: "Đến bãi biển", description: "Tắm biển, thư giãn trên bãi cát trắng" },
+      { time: "10:00", title: "Thể thao nước", description: "Tham gia các hoạt động: lướt sóng, kayak, jet ski" },
+      { time: "12:00", title: "BBQ hải sản", description: "Thưởng thức BBQ hải sản tươi ngon ngay bên bờ biển" },
+      { time: "14:00", title: "Lặn ngắm san hô", description: "Lặn ngắm san hô tại khu vực gần bờ" },
+      { time: "16:00", title: "Tự do tắm biển", description: "Thời gian tự do tắm biển, chụp ảnh" },
+      { time: "17:30", title: "Trở về", description: "Kết thúc tour, trở về khách sạn" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV am hiểu về thể thao nước" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe đưa đón tận nơi" },
+      { icon: "utensils", title: "BBQ hải sản", description: "BBQ hải sản tươi ngon" },
+      { icon: "shield-alt", title: "Bảo hiểm", description: "Bảo hiểm an toàn thể thao nước" },
+    ],
+    reviews: [
+      {
+        author: "Vũ Văn G",
+        rating: 5,
+        content: "Bãi biển đẹp tuyệt vời, hoạt động thể thao nước rất thú vị. BBQ hải sản ngon tuyệt!",
+      },
+      {
+        author: "Đặng Thị H",
+        rating: 4,
+        content: "Tour hay, phù hợp cho gia đình. Trẻ em rất thích các hoạt động trên biển.",
+      },
+      {
+        author: "Bùi Văn I",
+        rating: 5,
+        content: "Lần đầu lướt sóng, rất hồi hộp nhưng vui. Hướng dẫn viên rất tận tình.",
+      },
+    ],
+    featured: false,
+    discount: false,
+  },
+  {
+    id: 4,
+    name: "Tour Sơn Trà - Chùa Linh Ứng",
+    type: "spiritual",
+    duration: "half-day",
+    price: 380000,
+    rating: 4.5,
+    reviews: 423,
+    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "ticket"],
+    description: "Khám phá bán đảo Sơn Trà với chùa Linh Ứng linh thiêng và tượng Phật Quan Âm cao nhất Việt Nam.",
+    detailedDescription:
+      "Bán đảo Sơn Trà được mệnh danh là 'lá phổi xanh' của thành phố Đà Nẵng với hệ sinh thái đa dạng và phong cảnh thiên nhiên tuyệt đẹp. Chùa Linh Ứng nằm trên đỉnh núi với tượng Phật Quan Âm cao 67m, là nơi tâm linh thiêng liêng và cũng là điểm ngắm toàn cảnh thành phố tuyệt vời nhất.",
+    itinerary: [
+      { time: "08:00", title: "Đón khách", description: "Đón khách tại khách sạn trong trung tâm Đà Nẵng" },
+      {
+        time: "08:30",
+        title: "Khởi hành lên Sơn Trà",
+        description: "Di chuyển lên bán đảo Sơn Trà, ngắm cảnh đẹp dọc đường",
+      },
+      {
+        time: "09:00",
+        title: "Tham quan chùa Linh Ứng",
+        description: "Thăm chùa Linh Ứng, chiêm bái tượng Phật Quan Âm",
+      },
+      { time: "10:30", title: "Ngắm toàn cảnh", description: "Ngắm toàn cảnh thành phố Đà Nẵng từ trên cao" },
+      { time: "11:00", title: "Khám phá thiên nhiên", description: "Tìm hiểu về hệ sinh thái và voọc chà vá chân nâu" },
+      { time: "11:30", title: "Trở về", description: "Kết thúc tour, trở về trung tâm thành phố" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV am hiểu về tâm linh và thiên nhiên" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe máy lạnh an toàn" },
+      { icon: "ticket-alt", title: "Vé tham quan", description: "Vé vào cửa các điểm tham quan" },
+    ],
+    reviews: [
+      {
+        author: "Cao Thị J",
+        rating: 5,
+        content:
+          "Không gian tâm linh rất thanh tịnh. Tượng Phật Quan Âm thật uy nghi. View nhìn xuống thành phố tuyệt đẹp.",
+      },
+      {
+        author: "Đinh Văn K",
+        rating: 4,
+        content: "Tour ngắn nhưng ý nghĩa. Phù hợp cho những ai muốn tìm sự bình yên.",
+      },
+      {
+        author: "Lý Thị L",
+        rating: 5,
+        content: "Hướng dẫn viên kể rất hay về lịch sử chùa và ý nghĩa tâm linh. Rất bổ ích.",
+      },
+    ],
+    featured: false,
+    discount: false,
+  },
+  {
+    id: 5,
+    name: "Tour Ẩm Thực Đà Nẵng - Đặc Sản 3 Miền",
+    type: "food",
+    duration: "half-day",
+    price: 520000,
+    oldPrice: 600000,
+    rating: 4.9,
+    reviews: 756,
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "meal"],
+    description:
+      "Thưởng thức các món ăn đặc sản Đà Nẵng: mì Quảng, bánh xèo, bánh tráng cuốn thịt heo và nhiều món ngon khác.",
+    detailedDescription:
+      "Đà Nẵng không chỉ nổi tiếng với cảnh đẹp mà còn là thiên đường ẩm thực với những món ăn đặc sắc. Tour ẩm thực sẽ đưa bạn khám phá hương vị đặc trưng của vùng đất này từ mì Quảng truyền thống, bánh xèo giòn rụm đến bánh tráng cuốn thịt heo độc đáo.",
+    itinerary: [
+      { time: "17:00", title: "Đón khách", description: "Đón khách tại khách sạn, bắt đầu hành trình ẩm thực" },
+      { time: "17:30", title: "Chợ Hàn", description: "Tham quan chợ Hàn, tìm hiểu về nguyên liệu địa phương" },
+      { time: "18:00", title: "Mì Quảng", description: "Thưởng thức mì Quảng tại quán nổi tiếng nhất thành phố" },
+      { time: "19:00", title: "Bánh xèo", description: "Học cách làm và thưởng thức bánh xèo truyền thống" },
+      { time: "20:00", title: "Bánh tráng cuốn", description: "Thử món bánh tráng cuốn thịt heo đặc sản Đà Nẵng" },
+      { time: "21:00", title: "Chè và trái cây", description: "Kết thúc với chè ngon và trái cây tươi" },
+      { time: "21:30", title: "Trở về", description: "Kết thúc tour ẩm thực, trở về khách sạn" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV am hiểu về ẩm thực địa phương" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe máy lạnh thoải mái" },
+      { icon: "utensils", title: "Các bữa ăn", description: "Tất cả món ăn trong chương trình" },
+    ],
+    reviews: [
+      {
+        author: "Phan Văn M",
+        rating: 5,
+        content: "Tour ẩm thực tuyệt vời! Được thử nhiều món ngon, đặc biệt mì Quảng rất đậm đà.",
+      },
+      {
+        author: "Trương Thị N",
+        rating: 5,
+        content: "Hướng dẫn viên rất am hiểu, giới thiệu kỹ về từng món ăn. Rất đáng trải nghiệm.",
+      },
+      {
+        author: "Võ Văn O",
+        rating: 5,
+        content: "Lần đầu ăn bánh tráng cuốn thịt heo, ngon không tưởng! Sẽ quay lại chắc chắn.",
+      },
+    ],
+    featured: true,
+    discount: true,
+  },
+  {
+    id: 6,
+    name: "Tour Ngũ Hành Sơn - Động Huyền Không",
+    type: "nature",
+    duration: "half-day",
+    price: 420000,
+    rating: 4.4,
+    reviews: 334,
+    image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=400&auto=format&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop",
+    ],
+    features: ["guide", "transport", "ticket"],
+    description: "Khám phá Ngũ Hành Sơn với những hang động kỳ bí, chùa cổ và làng nghề điêu khắc đá Non Nước.",
+    detailedDescription:
+      "Ngũ Hành Sơn là quần thể 5 ngọn núi đá vôi được đặt tên theo ngũ hành: Kim, Mộc, Thủy, Hỏa, Thổ. Nơi đây nổi tiếng với những hang động tự nhiên kỳ thú, các ngôi chùa cổ kính và làng nghề điêu khắc đá Non Nước truyền thống với lịch sử hàng trăm năm.",
+    itinerary: [
+      { time: "08:00", title: "Đón khách", description: "Đón khách tại khách sạn, khởi hành đến Ngũ Hành Sơn" },
+      { time: "08:30", title: "Làng đá Non Nước", description: "Tham quan làng nghề điêu khắc đá Non Nước" },
+      { time: "09:30", title: "Leo núi Thủy Sơn", description: "Leo lên núi Thủy Sơn, ngắm cảnh đẹp xung quanh" },
+      { time: "10:00", title: "Động Huyền Không", description: "Khám phá động Huyền Không với những nhũ đá kỳ thú" },
+      { time: "10:30", title: "Am Phật Đài", description: "Tham quan Am Phật Đài với kiến trúc độc đáo" },
+      { time: "11:30", title: "Trở về", description: "Kết thúc tour, trở về trung tâm thành phố" },
+    ],
+    included: [
+      { icon: "user-tie", title: "Hướng dẫn viên", description: "HDV am hiểu về địa chất và lịch sử" },
+      { icon: "bus", title: "Xe đưa đón", description: "Xe máy lạnh an toàn" },
+      { icon: "ticket-alt", title: "Vé tham quan", description: "Vé vào cửa Ngũ Hành Sơn" },
+    ],
+    reviews: [
+      {
+        author: "Hoàng Thị P",
+        rating: 4,
+        content: "Hang động rất đẹp và kỳ thú. Làng đá Non Nước có nhiều tác phẩm nghệ thuật ấn tượng.",
+      },
+      {
+        author: "Nguyễn Văn Q",
+        rating: 4,
+        content: "Tour hay, tuy nhiên hơi mệt vì phải leo núi. Phù hợp với người có sức khỏe tốt.",
+      },
+      {
+        author: "Lê Thị R",
+        rating: 5,
+        content: "Động Huyền Không thật sự huyền bí. Ánh sáng chiếu xuống tạo khung cảnh rất đẹp.",
+      },
+    ],
+    featured: false,
+    discount: false,
+  },
+]
+
+// Labels
+const typeLabels = {
+  cultural: "Văn hóa",
+  nature: "Thiên nhiên",
+  beach: "Biển",
+  adventure: "Phiêu lưu",
+  food: "Ẩm thực",
+  spiritual: "Tâm linh",
+}
+
+const durationLabels = {
+  "half-day": "Nửa ngày",
+  "full-day": "Cả ngày",
+  "multi-day": "Nhiều ngày",
+}
+
+const featureLabels = {
+  guide: "HDV",
+  transport: "Xe đưa đón",
+  meal: "Bữa ăn",
+  ticket: "Vé tham quan",
+  insurance: "Bảo hiểm",
+}
+
+// Global variables
+let currentGalleryIndex = 0
+let currentTour = null
+const currentFilter = null
+let currentView = "grid"
+let currentTestimonialIndex = 0
+let toursDisplayed = 6
+let isDarkTheme = false
+let currentLanguage = "vi"
+
+// Initialize app
+document.addEventListener("DOMContentLoaded", () => {
+  initializeApp()
+})
+
+function initializeApp() {
+  showLoadingScreen()
+
+  setTimeout(() => {
+    hideLoadingScreen()
+    renderTours(tours.slice(0, toursDisplayed))
+    initializeEventListeners()
+    initializeAnimations()
+    initializeProgressBar()
+    animateStats()
+    initializeTestimonialSlider()
+    updateWeather()
+  }, 2000)
+}
+
+function showLoadingScreen() {
+  const loadingScreen = document.getElementById("loadingScreen")
+  if (loadingScreen) {
+    loadingScreen.classList.remove("hidden")
+  }
+}
+
+function hideLoadingScreen() {
+  const loadingScreen = document.getElementById("loadingScreen")
+  if (loadingScreen) {
+    loadingScreen.classList.add("hidden")
+    setTimeout(() => {
+      loadingScreen.style.display = "none"
+    }, 500)
+  }
+}
+
+function initializeEventListeners() {
+  const searchInput = document.getElementById("searchInput")
+  if (searchInput) {
+    searchInput.addEventListener("input", handleSearchInput)
+    searchInput.addEventListener("focus", showSearchSuggestions)
+    searchInput.addEventListener("blur", hideSearchSuggestions)
+  }
+
+  document.getElementById("tourTypeFilter")?.addEventListener("change", filterTours)
+  document.getElementById("durationFilter")?.addEventListener("change", filterTours)
+  document.getElementById("priceRange")?.addEventListener("input", handlePriceRange)
+
+  document.getElementById("bookingAdults")?.addEventListener("change", updateBookingSummary)
+  document.getElementById("bookingChildren")?.addEventListener("change", updateBookingSummary)
+
+  document.getElementById("tourModal")?.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal-overlay")) {
+      closeTourModal()
+    }
+  })
+
+  document.addEventListener("keydown", handleKeyboardEvents)
+  window.addEventListener("scroll", handleScroll)
+  window.addEventListener("resize", handleResize)
+}
+
+function initializeAnimations() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible")
+        }
+      })
+    },
+    { threshold: 0.1 },
+  )
+
+  document.querySelectorAll(".fade-in").forEach((el) => {
+    observer.observe(el)
+  })
+}
+
+function initializeProgressBar() {
+  const progressBar = document.getElementById("progressBar")
+  if (progressBar) {
+    window.addEventListener("scroll", () => {
+      const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      progressBar.style.width = scrolled + "%"
+    })
+  }
+}
+
+function formatPrice(price) {
+  return new Intl.NumberFormat("vi-VN").format(price) + "₫"
+}
+
+function generateStars(rating) {
+  const fullStars = Math.floor(rating)
+  const hasHalfStar = rating % 1 !== 0
+  let stars = ""
+
+  for (let i = 0; i < fullStars; i++) {
+    stars += '<i class="fas fa-star"></i>'
+  }
+
+  if (hasHalfStar) {
+    stars += '<i class="fas fa-star-half-alt"></i>'
+  }
+
+  const emptyStars = 5 - Math.ceil(rating)
+  for (let i = 0; i < emptyStars; i++) {
+    stars += '<i class="far fa-star"></i>'
+  }
+
+  return stars
+}
+
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast")
+  const toastMessage = document.getElementById("toastMessage")
+  const toastIcon = document.getElementById("toastIcon")
+
+  if (!toast || !toastMessage || !toastIcon) return
+
+  toastMessage.textContent = message
+
+  if (type === "success") {
+    toastIcon.className = "fas fa-check-circle toast-icon"
+    toast.style.borderLeftColor = "var(--success)"
+  } else if (type === "error") {
+    toastIcon.className = "fas fa-exclamation-circle toast-icon"
+    toast.style.borderLeftColor = "var(--danger)"
+  } else if (type === "info") {
+    toastIcon.className = "fas fa-info-circle toast-icon"
+    toast.style.borderLeftColor = "var(--primary)"
+  }
+
+  toast.classList.add("show")
+
+  setTimeout(() => {
+    toast.classList.remove("show")
+  }, 4000)
+}
+
+function hideToast() {
+  const toast = document.getElementById("toast")
+  if (toast) {
+    toast.classList.remove("show")
+  }
+}
+
+function handleSearchInput(event) {
+  const query = event.target.value.toLowerCase()
+  if (query.length > 2) {
+    showSearchSuggestions()
+    const suggestions = tours
+      .filter(
+        (tour) =>
+          tour.name.toLowerCase().includes(query) ||
+          tour.description.toLowerCase().includes(query) ||
+          typeLabels[tour.type].toLowerCase().includes(query),
+      )
+      .slice(0, 5)
+
+    displaySearchSuggestions(suggestions)
+  } else {
+    hideSearchSuggestions()
+  }
+}
+
+function showSearchSuggestions() {
+  const suggestions = document.getElementById("searchSuggestions")
+  if (suggestions) {
+    suggestions.style.display = "block"
+  }
+}
+
+function hideSearchSuggestions() {
+  setTimeout(() => {
+    const suggestions = document.getElementById("searchSuggestions")
+    if (suggestions) {
+      suggestions.style.display = "none"
+    }
+  }, 200)
+}
+
+function displaySearchSuggestions(suggestions) {
+  const suggestionsContainer = document.getElementById("searchSuggestions")
+  if (!suggestionsContainer) return
+
+  suggestionsContainer.innerHTML = suggestions
+    .map(
+      (tour) => `
+        <div class="search-suggestion" onclick="selectSuggestion('${tour.name}')">
+            <strong>${tour.name}</strong>
+            <br>
+            <small>${typeLabels[tour.type]} - ${formatPrice(tour.price)}</small>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function selectSuggestion(tourName) {
+  const searchInput = document.getElementById("searchInput")
+  if (searchInput) {
+    searchInput.value = tourName
+    hideSearchSuggestions()
+    filterTours()
+  }
+}
+
+function renderTours(toursToRender) {
+  const toursGrid = document.getElementById("toursGrid")
+  if (!toursGrid) return
+
+  toursGrid.className = `tours-grid ${currentView === "list" ? "list-view" : ""}`
+
+  toursGrid.innerHTML = toursToRender
+    .map(
+      (tour) => `
+        <div class="tour-card fade-in" onclick="openTourModal(${tour.id})">
+            <div class="tour-image">
+                <img src="${tour.image}" alt="${tour.name}" loading="lazy">
+                <div class="tour-overlay">
+                    <div class="overlay-content">
+                        <h3>Xem chi tiết</h3>
+                        <p>Khám phá thêm về tour này</p>
+                    </div>
+                </div>
+                <div class="tour-badges">
+                    <div>
+                        ${tour.featured ? '<span class="tour-badge badge-featured">Nổi bật</span>' : ""}
+                        ${tour.discount ? '<span class="tour-badge badge-discount">Giảm giá</span>' : ""}
+                    </div>
+                    <button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(this, ${tour.id})">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="tour-content">
+                <div class="tour-header">
+                    <span class="tour-type">${typeLabels[tour.type]}</span>
+                    <h3 class="tour-name">${tour.name}</h3>
+                    <div class="tour-meta">
+                        <div class="tour-meta-item">
+                            <i class="fas fa-clock"></i>
+                            ${durationLabels[tour.duration]}
+                        </div>
+                        <div class="tour-meta-item">
+                            <i class="fas fa-users"></i>
+                            ${tour.reviews} đánh giá
+                        </div>
+                    </div>
+                    <div class="tour-rating">
+                        <div class="rating-stars">
+                            ${generateStars(tour.rating)}
+                        </div>
+                        <span class="rating-score">${tour.rating}</span>
+                    </div>
+                </div>
+                
+                <div class="tour-features">
+                    ${tour.features
+                      .map(
+                        (feature) =>
+                          `<span class="feature-tag">
+                            <i class="fas fa-check"></i>
+                            ${featureLabels[feature]}
+                        </span>`,
+                      )
+                      .join("")}
+                </div>
+                
+                <p class="tour-description">${tour.description}</p>
+                
+                <div class="tour-footer">
+                    <div class="tour-price">
+                        ${tour.oldPrice ? `<div class="price-old">${formatPrice(tour.oldPrice)}</div>` : ""}
+                        <div class="price-current">${formatPrice(tour.price)}</div>
+                        <div class="price-unit">/ người</div>
+                    </div>
+                    <button class="book-btn" onclick="event.stopPropagation(); openTourModal(${tour.id})">
+                        Xem chi tiết
+                    </button>
+                </div>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
+
+  setTimeout(() => {
+    document.querySelectorAll(".tour-card").forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add("visible")
+      }, index * 100)
+    })
+  }, 100)
+}
+
+function quickFilter(type) {
+  document.querySelectorAll(".quick-filter").forEach((filter) => {
+    filter.classList.remove("active")
+  })
+
+  event.target.classList.add("active")
+
+  let filteredTours = tours
+
+  if (type === "featured") {
+    filteredTours = tours.filter((tour) => tour.featured)
+  } else if (type === "discount") {
+    filteredTours = tours.filter((tour) => tour.discount)
+  } else if (type === "beach" || type === "cultural" || type === "nature" || type === "food") {
+    filteredTours = tours.filter((tour) => tour.type === type)
+  }
+
+  renderTours(filteredTours)
+  showToast(
+    `Đã lọc ${filteredTours.length} tour ${type === "featured" ? "nổi bật" : type === "discount" ? "giảm giá" : typeLabels[type] || type}`,
+  )
+}
+
+function filterTours() {
+  const searchQuery = document.getElementById("searchInput")?.value.toLowerCase() || ""
+  const tourType = document.getElementById("tourTypeFilter")?.value || ""
+  const duration = document.getElementById("durationFilter")?.value || ""
+  const maxPrice = Number.parseInt(document.getElementById("priceRange")?.value) || 2000000
+
+  const filteredTours = tours.filter((tour) => {
+    const matchesSearch =
+      !searchQuery ||
+      tour.name.toLowerCase().includes(searchQuery) ||
+      tour.description.toLowerCase().includes(searchQuery) ||
+      typeLabels[tour.type].toLowerCase().includes(searchQuery)
+
+    const matchesType = !tourType || tour.type === tourType
+    const matchesDuration = !duration || tour.duration === duration
+    const matchesPrice = tour.price <= maxPrice
+
+    return matchesSearch && matchesType && matchesDuration && matchesPrice
+  })
+
+  renderTours(filteredTours)
+  showToast(`Tìm thấy ${filteredTours.length} tour phù hợp`)
+}
+
+function filterByCategory(category) {
+  const filteredTours = tours.filter((tour) => tour.type === category)
+  renderTours(filteredTours)
+  showToast(`Đã lọc ${filteredTours.length} tour ${typeLabels[category]}`)
+}
+
+function filterByRating(rating) {
+  document.querySelectorAll(".rating-option").forEach((option) => {
+    option.classList.remove("active")
+  })
+  event.target.classList.add("active")
+
+  const filteredTours = tours.filter((tour) => tour.rating >= rating)
+  renderTours(filteredTours)
+  showToast(`Đã lọc ${filteredTours.length} tour từ ${rating} sao trở lên`)
+}
+
+function toggleFilters() {
+  const filtersGrid = document.getElementById("filtersGrid")
+  const filtersBtn = event.target
+
+  if (filtersGrid) {
+    filtersGrid.classList.toggle("active")
+    filtersBtn.classList.toggle("active")
+  }
+}
+
+function clearAllFilters() {
+  document.getElementById("searchInput").value = ""
+  document.getElementById("tourTypeFilter").value = ""
+  document.getElementById("durationFilter").value = ""
+  document.getElementById("priceRange").value = "2000000"
+  document.getElementById("maxPrice").textContent = "2,000,000₫"
+
+  document.querySelectorAll(".quick-filter").forEach((filter) => {
+    filter.classList.remove("active")
+  })
+
+  document.querySelectorAll(".rating-option").forEach((option) => {
+    option.classList.remove("active")
+  })
+
+  renderTours(tours.slice(0, toursDisplayed))
+  showToast("Đã xóa tất cả bộ lọc")
+}
+
+function changeView(view) {
+  currentView = view
+
+  document.querySelectorAll(".view-btn").forEach((btn) => {
+    btn.classList.remove("active")
+  })
+
+  document.querySelector(`[data-view="${view}"]`).classList.add("active")
+
+  if (view === "map") {
+    document.getElementById("toursGrid").style.display = "none"
+    document.getElementById("mapSection").style.display = "block"
+  } else {
+    document.getElementById("toursGrid").style.display = "grid"
+    document.getElementById("mapSection").style.display = "none"
+
+    const toursGrid = document.getElementById("toursGrid")
+    if (view === "list") {
+      toursGrid.classList.add("list-view")
+    } else {
+      toursGrid.classList.remove("list-view")
+    }
+  }
+
+  showToast(`Đã chuyển sang chế độ xem ${view === "grid" ? "lưới" : view === "list" ? "danh sách" : "bản đồ"}`)
+}
+
+function sortTours(sortBy) {
+  let sortedTours = [...tours]
+
+  switch (sortBy) {
+    case "price-low":
+      sortedTours.sort((a, b) => a.price - b.price)
+      break
+    case "price-high":
+      sortedTours.sort((a, b) => b.price - a.price)
+      break
+    case "rating":
+      sortedTours.sort((a, b) => b.rating - a.rating)
+      break
+    case "popular":
+      sortedTours.sort((a, b) => b.reviews - a.reviews)
+      break
+    case "newest":
+      sortedTours.sort((a, b) => b.id - a.id)
+      break
+    default:
+      sortedTours = tours
+  }
+
+  renderTours(sortedTours.slice(0, toursDisplayed))
+  showToast(
+    `Đã sắp xếp theo ${sortBy === "price-low" ? "giá thấp" : sortBy === "price-high" ? "giá cao" : sortBy === "rating" ? "đánh giá" : sortBy === "popular" ? "độ phổ biến" : "mới nhất"}`,
+  )
+}
+
+function loadMoreTours() {
+  toursDisplayed += 6
+  renderTours(tours.slice(0, toursDisplayed))
+
+  if (toursDisplayed >= tours.length) {
+    document.querySelector(".load-more-btn").style.display = "none"
+    showToast("Đã hiển thị tất cả tours")
+  } else {
+    showToast(`Đã tải thêm tours. Hiển thị ${Math.min(toursDisplayed, tours.length)}/${tours.length} tours`)
+  }
+}
+
+function updatePriceRange(value) {
+  const maxPriceElement = document.getElementById("maxPrice")
+  if (maxPriceElement) {
+    maxPriceElement.textContent = formatPrice(value)
+  }
+}
+
+function handlePriceRange(event) {
+  updatePriceRange(event.target.value)
+  filterTours()
+}
+
+function toggleFavorite(button, tourId) {
+  button.classList.toggle("active")
+  const icon = button.querySelector("i")
+
+  if (button.classList.contains("active")) {
+    icon.className = "fas fa-heart"
+    showToast("Đã thêm vào danh sách yêu thích", "success")
+  } else {
+    icon.className = "far fa-heart"
+    showToast("Đã xóa khỏi danh sách yêu thích", "info")
+  }
+}
+
+function openTourModal(tourId) {
+  currentTour = tours.find((tour) => tour.id === tourId)
+  if (!currentTour) return
+
+  const modal = document.getElementById("tourModal")
+  if (!modal) return
+
+  populateModalContent(currentTour)
+  modal.classList.add("active")
+  document.body.style.overflow = "hidden"
+}
+
+function populateModalContent(tour) {
+  document.getElementById("modalTitle").textContent = tour.name
+  document.getElementById("modalPrice").textContent = formatPrice(tour.price)
+  document.getElementById("modalOldPrice").textContent = tour.oldPrice ? formatPrice(tour.oldPrice) : ""
+  document.getElementById("modalDescription").textContent = tour.detailedDescription
+
+  const modalBadges = document.getElementById("modalBadges")
+  modalBadges.innerHTML = `
+        ${tour.featured ? '<span class="tour-badge badge-featured">Nổi bật</span>' : ""}
+        ${tour.discount ? '<span class="tour-badge badge-discount">Giảm giá</span>' : ""}
+    `
+
+  const modalRating = document.getElementById("modalRating")
+  modalRating.innerHTML = `
+        <div class="rating-stars">${generateStars(tour.rating)}</div>
+        <span class="rating-score">${tour.rating}</span>
+        <span>(${tour.reviews} đánh giá)</span>
+    `
+
+  populateGallery(tour.gallery)
+  populateItinerary(tour.itinerary)
+  populateFeatures(tour.included)
+  populateReviews(tour.reviews)
+  updateBookingSummary()
+}
+
+function populateGallery(gallery) {
+  const modalGallery = document.getElementById("modalGallery")
+  const galleryIndicators = document.getElementById("galleryIndicators")
+
+  modalGallery.innerHTML = gallery
+    .map((image) => `<img src="${image}" alt="Tour image" class="gallery-image">`)
+    .join("")
+
+  galleryIndicators.innerHTML = gallery
+    .map((_, index) => `<div class="gallery-dot ${index === 0 ? "active" : ""}" onclick="goToImage(${index})"></div>`)
+    .join("")
+
+  currentGalleryIndex = 0
+}
+
+function populateItinerary(itinerary) {
+  const modalItinerary = document.getElementById("modalItinerary")
+  modalItinerary.innerHTML = itinerary
+    .map(
+      (item) => `
+        <div class="itinerary-item">
+            <div class="itinerary-time">${item.time}</div>
+            <div class="itinerary-content">
+                <h4>${item.title}</h4>
+                <p>${item.description}</p>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function populateFeatures(features) {
+  const modalFeatures = document.getElementById("modalFeatures")
+  modalFeatures.innerHTML = features
+    .map(
+      (feature) => `
+        <div class="feature-item">
+            <div class="feature-icon">
+                <i class="fas fa-${feature.icon}"></i>
+            </div>
+            <div>
+                <h4>${feature.title}</h4>
+                <p>${feature.description}</p>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function populateReviews(reviews) {
+  const modalReviews = document.getElementById("modalReviews")
+  modalReviews.innerHTML = reviews
+    .map(
+      (review) => `
+        <div class="review-item">
+            <div class="review-header">
+                <span class="review-author">${review.author}</span>
+                <div class="review-rating">${generateStars(review.rating)}</div>
+            </div>
+            <p class="review-content">${review.content}</p>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function closeTourModal() {
+  const modal = document.getElementById("tourModal")
+  if (modal) {
+    modal.classList.remove("active")
+    document.body.style.overflow = ""
+    currentTour = null
+  }
+}
+
+function prevImage() {
+  if (!currentTour) return
+
+  currentGalleryIndex = currentGalleryIndex > 0 ? currentGalleryIndex - 1 : currentTour.gallery.length - 1
+  updateGallery()
+}
+
+function nextImage() {
+  if (!currentTour) return
+
+  currentGalleryIndex = currentGalleryIndex < currentTour.gallery.length - 1 ? currentGalleryIndex + 1 : 0
+  updateGallery()
+}
+
+function goToImage(index) {
+  currentGalleryIndex = index
+  updateGallery()
+}
+
+function updateGallery() {
+  const modalGallery = document.getElementById("modalGallery")
+  const galleryIndicators = document.getElementById("galleryIndicators")
+
+  if (modalGallery) {
+    modalGallery.style.transform = `translateX(-${currentGalleryIndex * 100}%)`
+  }
+
+  if (galleryIndicators) {
+    galleryIndicators.querySelectorAll(".gallery-dot").forEach((dot, index) => {
+      dot.classList.toggle("active", index === currentGalleryIndex)
+    })
+  }
+}
+
+function updateBookingSummary() {
+  if (!currentTour) return
+
+  const adults = Number.parseInt(document.getElementById("bookingAdults")?.value) || 1
+  const children = Number.parseInt(document.getElementById("bookingChildren")?.value) || 0
+
+  const adultPrice = currentTour.price
+  const childPrice = currentTour.price * 0.7
+
+  const adultTotal = adults * adultPrice
+  const childTotal = children * childPrice
+  const total = adultTotal + childTotal
+
+  document.getElementById("summaryAdults").textContent = `${adults} x ${formatPrice(adultPrice)}`
+  document.getElementById("summaryChildren").textContent = `${children} x ${formatPrice(childPrice)}`
+  document.getElementById("summaryTotal").textContent = formatPrice(total)
+}
+
+function submitBooking() {
+  const name = document.getElementById("bookingName")?.value
+  const phone = document.getElementById("bookingPhone")?.value
+  const email = document.getElementById("bookingEmail")?.value
+  const date = document.getElementById("bookingDate")?.value
+
+  if (!name || !phone || !email || !date) {
+    showToast("Vui lòng điền đầy đủ thông tin", "error")
+    return
+  }
+
+  showToast("Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.", "success")
+  closeTourModal()
+
+  setTimeout(() => {
+    document.getElementById("bookingName").value = ""
+    document.getElementById("bookingPhone").value = ""
+    document.getElementById("bookingEmail").value = ""
+    document.getElementById("bookingDate").value = ""
+  }, 1000)
+}
+
+function animateStats() {
+  const statItems = document.querySelectorAll(".stat-item")
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const target = Number.parseInt(entry.target.dataset.count)
+          const statNumber = entry.target.querySelector(".stat-number")
+
+          let current = 0
+          const increment = target / 100
+          const timer = setInterval(() => {
+            current += increment
+            if (current >= target) {
+              current = target
+              clearInterval(timer)
+            }
+            statNumber.textContent = Math.floor(current).toLocaleString()
+          }, 20)
+
+          observer.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.5 },
+  )
+
+  statItems.forEach((item) => observer.observe(item))
+}
+
+function subscribeNewsletter(event) {
+  event.preventDefault()
+  const email = event.target.querySelector('input[type="email"]').value
+
+  if (!email) {
+    showToast("Vui lòng nhập email", "error")
+    return
+  }
+
+  showToast("Đăng ký thành công! Cảm ơn bạn đã quan tâm.", "success")
+  event.target.querySelector('input[type="email"]').value = ""
+}
+
+function initializeTestimonialSlider() {
+  setInterval(() => {
+    nextTestimonial()
+  }, 5000)
+}
+
+function nextTestimonial() {
+  const track = document.getElementById("testimonialsTrack")
+  const dots = document.querySelectorAll(".testimonial-dot")
+
+  if (!track || !dots.length) return
+
+  currentTestimonialIndex = (currentTestimonialIndex + 1) % dots.length
+
+  track.style.transform = `translateX(-${currentTestimonialIndex * 100}%)`
+
+  dots.forEach((dot, index) => {
+    dot.classList.toggle("active", index === currentTestimonialIndex)
+  })
+}
+
+function prevTestimonial() {
+  const track = document.getElementById("testimonialsTrack")
+  const dots = document.querySelectorAll(".testimonial-dot")
+
+  if (!track || !dots.length) return
+
+  currentTestimonialIndex = currentTestimonialIndex > 0 ? currentTestimonialIndex - 1 : dots.length - 1
+
+  track.style.transform = `translateX(-${currentTestimonialIndex * 100}%)`
+
+  dots.forEach((dot, index) => {
+    dot.classList.toggle("active", index === currentTestimonialIndex)
+  })
+}
+
+function goToTestimonial(index) {
+  const track = document.getElementById("testimonialsTrack")
+  const dots = document.querySelectorAll(".testimonial-dot")
+
+  if (!track || !dots.length) return
+
+  currentTestimonialIndex = index
+
+  track.style.transform = `translateX(-${currentTestimonialIndex * 100}%)`
+
+  dots.forEach((dot, i) => {
+    dot.classList.toggle("active", i === currentTestimonialIndex)
+  })
+}
+
+function toggleFAQ(element) {
+  const faqItem = element.parentElement
+  const isActive = faqItem.classList.contains("active")
+
+  document.querySelectorAll(".faq-item").forEach((item) => {
+    item.classList.remove("active")
+  })
+
+  if (!isActive) {
+    faqItem.classList.add("active")
+  }
+}
+
+function toggleTheme() {
+  isDarkTheme = !isDarkTheme
+  const themeIcon = document.getElementById("themeIcon")
+
+  if (isDarkTheme) {
+    document.documentElement.setAttribute("data-theme", "dark")
+    themeIcon.className = "fas fa-sun"
+    showToast("Đã chuyển sang chế độ tối", "info")
+  } else {
+    document.documentElement.removeAttribute("data-theme")
+    themeIcon.className = "fas fa-moon"
+    showToast("Đã chuyển sang chế độ sáng", "info")
+  }
+}
+
+function toggleLanguage() {
+  currentLanguage = currentLanguage === "vi" ? "en" : "vi"
+  const langText = document.getElementById("langText")
+
+  if (langText) {
+    langText.textContent = currentLanguage === "vi" ? "EN" : "VI"
+  }
+
+  showToast(`Đã chuyển sang ${currentLanguage === "vi" ? "Tiếng Việt" : "English"}`, "info")
+}
+
+function updateWeather() {
+  const weatherData = {
+    temp: Math.floor(Math.random() * 10) + 25,
+    condition: ["Nắng đẹp", "Có mây", "Nắng ít mây"][Math.floor(Math.random() * 3)],
+    visibility: Math.floor(Math.random() * 5) + 8,
+    humidity: Math.floor(Math.random() * 20) + 60,
+    wind: Math.floor(Math.random() * 10) + 10,
+  }
+
+  // These elements are commented out in the HTML, so this function won't have visible effect unless uncommented.
+  // document.querySelector('.weather-temp').textContent = `${weatherData.temp}°C`;
+  // document.querySelector('.weather-desc').textContent = weatherData.condition;
+  // document.querySelector('.weather-details .weather-item:nth-child(1) span').textContent = `${weatherData.visibility}km`;
+  // document.querySelector('.weather-details .weather-item:nth-child(2) span').textContent = `${weatherData.humidity}%`;
+  // document.querySelector('.weather-details .weather-item:nth-child(3) span').textContent = `${weatherData.wind}km/h`;
+}
+
+function shareToFacebook() {
+  const url = encodeURIComponent(window.location.href)
+  const title = encodeURIComponent("Khám phá Đà Nẵng cùng DaNang Tours")
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, "_blank")
+}
+
+function shareToTwitter() {
+  const url = encodeURIComponent(window.location.href)
+  const title = encodeURIComponent("Khám phá Đà Nẵng cùng DaNang Tours")
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, "_blank")
+}
+
+function shareToInstagram() {
+  showToast("Vui lòng mở Instagram và chia sẻ link thủ công", "info")
+}
+
+function openYoutube() {
+  window.open("https://youtube.com/@danangtours", "_blank")
+}
+
+function shareToZalo() {
+  const url = encodeURIComponent(window.location.href)
+  window.open(`https://zalo.me/share?url=${url}`, "_blank")
+}
+
+function toggleChat() {
+  const chatWindow = document.getElementById("chatWindow")
+  const chatNotification = document.getElementById("chatNotification")
+
+  if (chatWindow) {
+    chatWindow.classList.toggle("active")
+
+    if (chatWindow.classList.contains("active")) {
+      chatNotification.style.display = "none"
+    }
+  }
+}
+
+function sendQuickReply(message) {
+  const chatMessages = document.getElementById("chatMessages")
+  const currentTime = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
+
+  if (chatMessages) {
+    chatMessages.innerHTML += `
+            <div class="chat-message user-message">
+                <div class="message-avatar">
+                    <img src="/placeholder.svg?height=30&width=30" alt="User">
+                </div>
+                <div class="message-content">
+                    <p>${message}</p>
+                    <span class="message-time">${currentTime}</span>
+                </div>
+            </div>
+        `
+
+    chatMessages.scrollTop = chatMessages.scrollHeight
+
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = getBotResponse(message)
+      chatMessages.innerHTML += `
+                <div class="chat-message bot-message">
+                    <div class="message-avatar">
+                        <img src="/placeholder.svg?height=30&width=30" alt="Bot">
+                    </div>
+                    <div class="message-content">
+                        <p>${botResponse}</p>
+                        <span class="message-time">${currentTime}</span>
+                    </div>
+                </div>
+            `
+      chatMessages.scrollTop = chatMessages.scrollHeight
+    }, 1000)
+  }
+}
+
+function getBotResponse(message) {
+  const responses = {
+    "Tôi muốn tìm tour Bà Nà Hills":
+      "Tour Bà Nà Hills rất phổ biến! Giá từ 850,000₫/người, bao gồm cáp treo và tham quan Cầu Vàng. Bạn muốn đặt tour không?",
+    "Giá tour như thế nào?":
+      "Giá tour dao động từ 380,000₫ - 850,000₫ tùy theo loại tour. Tour nửa ngày từ 380,000₫, tour cả ngày từ 650,000₫. Bạn quan tâm loại tour nào?",
+    "Tôi cần tư vấn": "Tôi sẵn sàng tư vấn cho bạn! Bạn muốn đi tour loại nào? Thiên nhiên, văn hóa, biển hay ẩm thực?",
+  }
+
+  return responses[message] || "Cảm ơn bạn đã liên hệ! Tôi sẽ chuyển cho tư vấn viên để hỗ trợ bạn tốt nhất."
+}
+
+function sendMessage() {
+  const chatInput = document.querySelector(".chat-input")
+  const message = chatInput.value.trim()
+
+  if (message) {
+    sendQuickReply(message)
+    chatInput.value = ""
+  }
+}
+
+function handleChatInput(event) {
+  if (event.key === "Enter") {
+    sendMessage()
+  }
+}
+
+function playIntroVideo() {
+  const videoModal = document.getElementById("videoModal")
+  const videoFrame = document.getElementById("videoFrame")
+
+  if (videoModal && videoFrame) {
+    videoFrame.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+    videoModal.classList.add("active")
+    document.body.style.overflow = "hidden"
+  }
+}
+
+function closeVideoModal() {
+  const videoModal = document.getElementById("videoModal")
+  const videoFrame = document.getElementById("videoFrame")
+
+  if (videoModal && videoFrame) {
+    videoModal.classList.remove("active")
+    videoFrame.src = ""
+    document.body.style.overflow = ""
+  }
+}
+
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  })
+}
+
+function handleScroll() {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const scrollTopBtn = document.querySelector(".scroll-top")
+
+  if (scrollTopBtn) {
+    if (scrollTop > 300) {
+      scrollTopBtn.classList.add("visible")
+    } else {
+      scrollTopBtn.classList.remove("visible")
+    }
+  }
+
+  // Parallax effect for hero section
+  const hero = document.querySelector(".hero")
+  if (hero && scrollTop < window.innerHeight) {
+    hero.style.transform = `translateY(${scrollTop * 0.5}px)`
+  }
+}
+
+function handleResize() {
+  // Update mobile navigation
+  const navContent = document.querySelector(".nav-content")
+  if (window.innerWidth <= 1024 && navContent) {
+    navContent.style.flexDirection = "column"
+  } else if (navContent) {
+    navContent.style.flexDirection = "row"
+  }
+
+  // Update chat widget position on mobile
+  const chatWidget = document.querySelector(".chat-widget")
+  if (window.innerWidth <= 480 && chatWidget) {
+    chatWidget.style.bottom = "1rem"
+    chatWidget.style.left = "1rem"
+  }
+}
+
+function handleKeyboardEvents(event) {
+  // Close modal with Escape key
+  if (event.key === "Escape") {
+    closeTourModal()
+    closeVideoModal()
+
+    const chatWindow = document.getElementById("chatWindow")
+    if (chatWindow && chatWindow.classList.contains("active")) {
+      toggleChat()
+    }
+  }
+
+  // Navigate gallery with arrow keys
+  if (document.getElementById("tourModal").classList.contains("active")) {
+    if (event.key === "ArrowLeft") {
+      prevImage()
+    } else if (event.key === "ArrowRight") {
+      nextImage()
+    }
+  }
+}
+
+// Initialize smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  anchor.addEventListener("click", function (e) {
+    e.preventDefault()
+    const target = document.querySelector(this.getAttribute("href"))
+    if (target) {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
+  })
+})
+
+// Auto-update weather every 30 minutes
+setInterval(updateWeather, 30 * 60 * 1000)
+
+// Auto-hide toast after 4 seconds
+setInterval(() => {
+  const toast = document.getElementById("toast")
+  if (toast && toast.classList.contains("show")) {
+    const showTime = toast.dataset.showTime || 0
+    if (Date.now() - showTime > 4000) {
+      hideToast()
+    }
+  }
+}, 1000)
+
+// Performance optimization: Lazy load images
+const imageObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const img = entry.target
+      if (img.dataset.src) {
+        // Check if data-src exists
+        img.src = img.dataset.src
+        img.classList.remove("lazy")
+        observer.unobserve(img)
+      }
+    }
+  })
+})
+
+document.querySelectorAll("img[data-src]").forEach((img) => {
+  imageObserver.observe(img)
+})
+
+// Service Worker registration for offline support
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then((registration) => {
+        console.log("SW registered: ", registration)
+      })
+      .catch((registrationError) => {
+        console.log("SW registration failed: ", registrationError)
+      })
+  })
+}
+
+// Error handling
+window.addEventListener("error", (event) => {
+  console.error("JavaScript error:", event.error)
+  showToast("Đã xảy ra lỗi. Vui lòng thử lại.", "error")
+})
+
+// Unhandled promise rejection handling
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Unhandled promise rejection:", event.reason)
+  showToast("Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng.", "error")
+})
+
+  </script>
+</body>
+</html>

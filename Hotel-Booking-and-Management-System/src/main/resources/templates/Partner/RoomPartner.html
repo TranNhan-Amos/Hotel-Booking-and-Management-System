@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý phòng - Partner</title>
+    <link rel="stylesheet" th:href="@{/Css/Partner/RoomPartner.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin-top: 70px; /* Để tránh bị navbar che */
+        }
+        .container {
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Layout/NavbarPartner :: navbar}"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-bed"></i> Quản lý phòng</h1>
+            <a href="/partner/rooms/add" class="btn-add">
+                <i class="fas fa-plus"></i> Thêm phòng mới
+            </a>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="alert error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Room Statistics -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <i class="fas fa-bed"></i>
+                <div class="stat-info">
+                    <h3 th:text="${roomPartners != null ? roomPartners.size() : 0}">0</h3>
+                    <p>Tổng số phòng</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <div class="stat-info">
+                    <h3 th:text="${availableRoomsCount != null ? availableRoomsCount : 0}">0</h3>
+                    <p>Phòng khả dụng</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-times-circle"></i>
+                <div class="stat-info">
+                    <h3 th:text="${unavailableRoomsCount != null ? unavailableRoomsCount : 0}">0</h3>
+                    <p>Phòng không khả dụng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room List -->
+        <div class="room-list">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Mã phòng</th>
+                            <th>Tên phòng</th>
+                            <th>Loại phòng</th>
+                            <th>Giá (VNĐ)</th>
+                            <th>Sức chứa</th>
+                            <th>Tổng số phòng</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="roomPartner : ${roomPartners}">
+                            <td class="room-image">
+                                <img th:if="${roomPartner.imageUrls != null && !roomPartner.imageUrls.isEmpty()}" 
+                                     th:src="@{'/img/rooms/' + roomPartner.imageUrls[0]}" 
+                                     alt="Room Image" class="room-thumbnail">
+                                <div th:unless="${roomPartner.imageUrls != null && !roomPartner.imageUrls.isEmpty()}" 
+                                     class="no-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            </td>
+                            <td th:text="${roomPartner.roomNumber}">R001</td>
+                            <td th:text="${roomPartner.nameNumber}">Phòng Deluxe</td>
+                            <td th:text="${roomPartner.type}">DELUXE</td>
+                            <td class="price" 
+                                th:text="${#numbers.formatDecimal(roomPartner.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                1,200,000 VNĐ
+                            </td>
+                            <td th:text="${roomPartner.capacity + ' người'}">2 người</td>
+                            <td th:text="${roomPartner.totalRooms}">10</td>
+                            <td>
+                                <span th:classappend="${roomPartner.status.name() == 'AVAILABLE' ? 'status-available' : 'status-unavailable'}"
+                                      class="status-badge">
+                                    <i th:class="${roomPartner.status.name() == 'AVAILABLE' ? 'fas fa-check' : 'fas fa-times'}"></i>
+                                    <span th:text="${roomPartner.status.description}"></span>
+                                </span>
+                            </td>
+                            <td class="actions">
+                                <button class="action-btn btn-edit" 
+                                        th:onclick="'editRoom(this)'"
+                                        th:data-room-id="${roomPartner.roomId}"
+                                        th:data-room-number="${roomPartner.roomNumber}"
+                                        th:data-name-number="${roomPartner.nameNumber}"
+                                        th:data-type="${roomPartner.type}"
+                                        th:data-price="${roomPartner.price}"
+                                        th:data-capacity="${roomPartner.capacity}"
+                                        th:data-total-rooms="${roomPartner.totalRooms}"
+                                        th:data-status="${roomPartner.status}"
+                                        th:data-description="${roomPartner.description}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn btn-delete" 
+                                        th:onclick="'deleteRoom(this)'"
+                                        th:data-room-id="${roomPartner.roomId}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${roomPartners == null || roomPartners.isEmpty()}" class="empty-state">
+            <i class="fas fa-bed"></i>
+            <h3>Chưa có phòng nào</h3>
+            <p>Bắt đầu bằng cách thêm phòng đầu tiên của bạn</p>
+            <a href="/partner/rooms/add" class="btn-add">
+                <i class="fas fa-plus"></i> Thêm phòng mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Chỉnh sửa phòng</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form th:action="@{/partner/rooms/edit}" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="editRoomId" name="roomId">
+                <div class="form-group">
+                    <label for="editRoomNumber">Mã phòng</label>
+                    <input type="text" id="editRoomNumber" name="roomNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="editNameNumber">Tên phòng</label>
+                    <input type="text" id="editNameNumber" name="nameNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="editType">Loại phòng</label>
+                    <select id="editType" name="type" required>
+                        <option value="STANDARD">Standard</option>
+                        <option value="DELUXE">Deluxe</option>
+                        <option value="SUITE">Suite</option>
+                        <option value="FAMILY">Family</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editPrice">Giá (VNĐ)</label>
+                    <input type="number" id="editPrice" name="price" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCapacity">Sức chứa</label>
+                    <input type="number" id="editCapacity" name="capacity" min="1" max="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTotalRooms">Tổng số phòng</label>
+                    <input type="number" id="editTotalRooms" name="totalRooms" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Trạng thái</label>
+                    <select id="editStatus" name="status" required>
+                        <option value="AVAILABLE">Khả dụng</option>
+                        <option value="UNAVAILABLE">Không khả dụng</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Mô tả</label>
+                    <textarea id="editDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editImages">Thêm ảnh mới</label>
+                    <input type="file" id="editImages" name="images" multiple accept="image/*">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-save">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{Layout/PartnerFoorter :: footer}"></div>
+
+    <script>
+        // Edit Room Function
+        function editRoom(button) {
+            const roomId = button.getAttribute('data-room-id');
+            const roomNumber = button.getAttribute('data-room-number');
+            const nameNumber = button.getAttribute('data-name-number');
+            const type = button.getAttribute('data-type');
+            const price = button.getAttribute('data-price');
+            const capacity = button.getAttribute('data-capacity');
+            const totalRooms = button.getAttribute('data-total-rooms');
+            const status = button.getAttribute('data-status');
+            const description = button.getAttribute('data-description');
+
+            document.getElementById('editRoomId').value = roomId;
+            document.getElementById('editRoomNumber').value = roomNumber;
+            document.getElementById('editNameNumber').value = nameNumber;
+            document.getElementById('editType').value = type;
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editCapacity').value = capacity;
+            document.getElementById('editTotalRooms').value = totalRooms;
+            document.getElementById('editStatus').value = status;
+            document.getElementById('editDescription').value = description;
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        // Delete Room Function
+        function deleteRoom(button) {
+            const roomId = button.getAttribute('data-room-id');
+            if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
+                window.location.href = `/partner/rooms/delete/${roomId}`;
+            }
+        }
+
+        // Close Modal Function
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Close modal when clicking on X
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeBtn = document.querySelector('.close');
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    closeModal();
+                }
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('editModal');
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

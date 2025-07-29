@@ -1,6 +1,7 @@
 package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import java.util.Date;
+import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
@@ -40,18 +41,19 @@ public class CustomersEntity {
     @Column(name = "avatar", length = 255)
     private String avatar;
 
-    @OneToOne
+    // Quan hệ 1-1 với SystemUserEntity
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private SystemUserEntity systemUser;
 
-    // Cập nhật getter/setter
-    public SystemUserEntity getSystemUser() {
-        return systemUser;
-    }
+    // Quan hệ 1-n với BookingOrderEntity (một customer có nhiều booking)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookingOrderEntity> bookings;
 
-    public void setSystemUser(SystemUserEntity systemUser) {
-        this.systemUser = systemUser;
-    }
+    // Quan hệ 1-n với ReviewEntity (một customer có nhiều review)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ReviewEntity> reviews;
+
     // Getters and Setters
     public Integer getCustomerId() {
         return customerId;
@@ -67,6 +69,10 @@ public class CustomersEntity {
 
     public void setPassword(String password) {
         this.password = password;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setPassword(password);
+        }
     }
 
     public String getAddress() {
@@ -83,6 +89,10 @@ public class CustomersEntity {
 
     public void setName(String name) {
         this.name = name;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setUsername(name);
+        }
     }
 
     public String getPhone() {
@@ -107,6 +117,10 @@ public class CustomersEntity {
 
     public void setEmail(String email) {
         this.email = email;
+        // Đồng bộ với SystemUserEntity nếu có
+        if (this.systemUser != null) {
+            this.systemUser.setEmail(email);
+        }
     }
 
     public Date getCreatedDate() {
@@ -131,5 +145,29 @@ public class CustomersEntity {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public SystemUserEntity getSystemUser() {
+        return systemUser;
+    }
+
+    public void setSystemUser(SystemUserEntity systemUser) {
+        this.systemUser = systemUser;
+    }
+
+    public List<BookingOrderEntity> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<BookingOrderEntity> bookings) {
+        this.bookings = bookings;
+    }
+
+    public List<ReviewEntity> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<ReviewEntity> reviews) {
+        this.reviews = reviews;
     }
 }

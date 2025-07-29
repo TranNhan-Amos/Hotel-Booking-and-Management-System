@@ -63,8 +63,8 @@ public class RoomPartnerEntity {
     @Column(name = "total_rooms", nullable = false)
     private Integer totalRooms; 
 
-    @ElementCollection
-    @CollectionTable(name = "room_partner_images", joinColumns = @JoinColumn(name = "room_partner_id"))
-    @Column(name = "image_url")
-    private List<String> imageUrls; // Danh sách URL hình ảnh
+    // @ElementCollection
+    // @CollectionTable(name = "room_partner_images", joinColumns = @JoinColumn(name = "room_partner_id"))
+    // @Column(name = "image_url")
+    // private List<String> imageUrls; // Danh sách URL hình ảnh
 }

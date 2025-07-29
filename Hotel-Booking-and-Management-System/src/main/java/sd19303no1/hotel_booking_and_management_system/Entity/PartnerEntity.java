@@ -2,6 +2,7 @@ package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Entity
@@ -37,11 +38,18 @@ public class PartnerEntity {
     private String businessmodel; // mô hình kinh doanh
 
     @Column(name = "hotelamenities")
-    private String hotelamenities; 
+    private String hotelamenities;
+
     // Quan hệ 1-1 với SystemUserEntity
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private SystemUserEntity systemUser;
 
+    // Quan hệ 1-n với RoomEntity (một partner có nhiều phòng)
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RoomEntity> rooms;
 
+    // Quan hệ 1-n với BookingOrderEntity (một partner có nhiều booking)
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookingOrderEntity> bookings;
 }

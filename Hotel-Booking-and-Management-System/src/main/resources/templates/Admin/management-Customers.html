@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Khách Hàng - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/management-Customers.css}">
-
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/Admin/management-Customers.css}">
 </head>
 <body>
     <div class="container">
@@ -16,226 +16,199 @@
         <div class="main-content">
             <div class="management-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-users"></i> Quản Lý Khách Hàng</h2>
+                    <h2><i class="fas fa-users"></i> Quản Lý Khách Hàng & Đối Tác</h2>
                 </div>
-                
-                <div class="section-body">
-                    <!-- Stats Overview -->
-                    <div class="stats-overview">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Tổng Khách Hàng</div>
-                                <div class="stat-icon total">
-                                    <i class="fas fa-users"></i>
+                <div class="tab-container">
+                    <button class="tab-btn active" id="tab-customer-btn" onclick="showTab('customer')">Khách hàng</button>
+                    <button class="tab-btn" id="tab-partner-btn" onclick="showTab('partner')">Đối tác</button>
+                </div>
+                <div id="tab-customer" class="tab-content">
+                    <!-- KHU VỰC KHÁCH HÀNG (giữ nguyên code cũ) -->
+                    <div class="section-body">
+                        <!-- Stats Overview -->
+                        <div class="stats-overview">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Tổng Khách Hàng</div>
+                                    <div class="stat-icon total">
+                                        <i class="fas fa-users"></i>
+                                    </div>
                                 </div>
+                                <div class="stat-value">1,247</div>
                             </div>
-                            <div class="stat-value">1,247</div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Đang Hoạt Động</div>
+                                    <div class="stat-icon active">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value">892</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Khách VIP</div>
+                                    <div class="stat-icon vip">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value">156</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Khách Mới</div>
+                                    <div class="stat-icon new">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value">89</div>
+                            </div>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Đang Hoạt Động</div>
-                                <div class="stat-icon active">
-                                    <i class="fas fa-user-check"></i>
+
+                        <div class="management-header">
+                            <div class="search-filter">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterCustomers()">
                                 </div>
+                                <select id="statusFilter" class="filter-select" onchange="filterCustomers()">
+                                    <option value="all">Tất Cả Loại</option>
+                                    <option value="vip">Khách VIP</option>
+                                    <option value="regular">Khách Thường</option>
+                                    <option value="new">Khách Mới</option>
+                                </select>
+                                <select id="sortFilter" class="filter-select" onchange="sortCustomers()">
+                                    <option value="name">Sắp Xếp Theo Tên</option>
+                                    <option value="bookings">Số Lần Đặt</option>
+                                    <option value="spending">Chi Tiêu</option>
+                                    <option value="date">Ngày Tham Gia</option>
+                                </select>
                             </div>
-                            <div class="stat-value">892</div>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Khách VIP</div>
-                                <div class="stat-icon vip">
-                                    <i class="fas fa-crown"></i>
+
+                        <div class="card-grid" id="customerCards">
+                            <th:block th:each="customer : ${customers}">
+                                <div class="customer-card" th:classappend="${customer.status} == 'VIP' ? 'vip' : (${customer.status} == 'NEW' ? 'new' : 'regular')" data-type="[[${customer.status?.toLowerCase()}]]" th:data-customer-id="${customer.customerId}">
+                                    <div class="card-header">
+                                        <div class="customer-avatar" th:text="${customer.name.substring(0,1)}">N</div>
+                                        <div class="customer-info">
+                                            <div class="customer-name">
+                                                <span th:text="${customer.name}">Tên khách hàng</span>
+                                                <span class="customer-badge" th:if="${customer.status} == 'VIP'" style="background:#fff4d6;color:#b88a00;">VIP</span>
+                                                <span class="customer-badge" th:if="${customer.status} == 'NEW'" style="background:#d6fff4;color:#06d6a0;">Mới</span>
+                                                <span class="customer-badge" th:if="${customer.status} == 'REGULAR'" style="background:#d6eaff;color:#118ab2;">Thường</span>
+                                            </div>
+                                            <div class="customer-email"><i class="fas fa-envelope"></i> <span th:text="${customer.email}">email</span></div>
+                                            <div class="customer-phone"><i class="fas fa-phone"></i> <span th:text="${customer.phone}">số điện thoại</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="details-grid">
+                                            <div class="detail-item">
+                                                <div class="detail-label">Ngày Tham Gia</div>
+                                                <div class="detail-value" th:text="${#dates.format(customer.createdDate, 'dd/MM/yyyy')}">01/01/2024</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Địa Chỉ</div>
+                                                <div class="detail-value" th:text="${customer.address}">Địa chỉ</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-grid">
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${customer.bookingCount}">0</div>
+                                                <div class="stat-label">Lần Đặt</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${customer.spending}">0</div>
+                                                <div class="stat-label">Chi Tiêu</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${customer.rating}">0</div>
+                                                <div class="stat-label">Đánh Giá</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="action-buttons">
+                                            <button class="action-btn view-btn" onclick="viewCustomer(this)"><i class="fas fa-eye"></i> Xem</button>
+                                            <button class="action-btn edit-btn" onclick="editCustomer(this)"><i class="fas fa-edit"></i> Sửa</button>
+                                            <button class="action-btn message-btn" onclick="messageCustomer(this)"><i class="fas fa-envelope"></i> Nhắn</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="stat-value">156</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Khách Mới</div>
-                                <div class="stat-icon new">
-                                    <i class="fas fa-user-plus"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value">89</div>
+                            </th:block>
                         </div>
                     </div>
-
-                    <div class="management-header">
-                        <div class="search-filter">
-                            <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterCustomers()">
-                            <select id="statusFilter" onchange="filterCustomers()">
-                                <option value="all">Tất Cả Loại</option>
-                                <option value="vip">Khách VIP</option>
-                                <option value="regular">Khách Thường</option>
-                                <option value="new">Khách Mới</option>
-                            </select>
-                            <select id="sortFilter" onchange="sortCustomers()">
-                                <option value="name">Sắp Xếp Theo Tên</option>
-                                <option value="bookings">Số Lần Đặt</option>
-                                <option value="spending">Chi Tiêu</option>
-                                <option value="date">Ngày Tham Gia</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="customer-cards" id="customerCards">
-                        <div class="customer-card vip" data-type="vip">
-                            <div class="customer-header">
-                                <div style="display: flex; align-items: center;">
-                                    <div class="customer-avatar">N</div>
-                                    <div class="customer-info">
-                                        <div class="customer-name">Nguyễn Văn A</div>
-                                        <div class="customer-email">nguyen.van.a@example.com</div>
-                                        <div class="customer-phone">0123 456 789</div>
+                </div>
+                <div id="tab-partner" class="tab-content hidden">
+                    <!-- KHU VỰC ĐỐI TÁC (code đã thêm ở bước trước) -->
+                    <div class="section-body">
+                        <div class="card-grid" id="partnerCards">
+                            <th:block th:each="partner : ${partners}">
+                                <div class="partner-card" th:data-partner-id="${partner.partnerId}">
+                                    <div class="card-header">
+                                        <div class="partner-avatar"><i class="fas fa-building"></i></div>
+                                        <div class="partner-info">
+                                            <div class="partner-company" th:text="${partner.companyName}">Tên công ty</div>
+                                            <div class="partner-email"><i class="fas fa-envelope"></i> <span th:text="${partner.email}">Email</span></div>
+                                            <div class="partner-phone"><i class="fas fa-phone"></i> <span th:text="${partner.phone}">Số điện thoại</span></div>
+                                        </div>
+                                        <span class="partner-badge">Đối tác</span>
+                                    </div>
+                                    <div class="partner-body">
+                                        <div class="details-grid">
+                                            <div class="detail-item">
+                                                <div class="detail-label">Mã số thuế</div>
+                                                <div class="detail-value" th:text="${partner.taxId}">Mã số thuế</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Địa chỉ</div>
+                                                <div class="detail-value" th:text="${partner.address}">Địa chỉ</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Người liên hệ</div>
+                                                <div class="detail-value" th:text="${partner.contactPerson}">Người liên hệ</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Giấy phép KD</div>
+                                                <div class="detail-value" th:text="${partner.businessLicense}">Giấy phép KD</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Mô hình KD</div>
+                                                <div class="detail-value" th:text="${partner.businessmodel}">Mô hình KD</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Tiện nghi KS</div>
+                                                <div class="detail-value" th:text="${partner.hotelamenities}">Tiện nghi KS</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-grid">
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${partner.roomCount}">0</div>
+                                                <div class="stat-label">Số Phòng</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${#numbers.formatDecimal(partner.totalRevenue, 0, 'COMMA', 0, 'POINT')}">0</div>
+                                                <div class="stat-label">Doanh Thu</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number" th:text="${partner.averageRating}">0</div>
+                                                <div class="stat-label">Đánh Giá</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="action-buttons">
+                                            <button class="action-btn view-btn" onclick="viewPartner(this)"><i class="fas fa-eye"></i> Xem</button>
+                                            <button class="action-btn edit-btn" onclick="editPartner(this)"><i class="fas fa-edit"></i> Sửa</button>
+                                            <button class="action-btn message-btn" onclick="messagePartner(this)"><i class="fas fa-envelope"></i> Nhắn</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="customer-badge vip">VIP</div>
-                            </div>
-                            
-                            <div class="customer-details">
-                                <div class="customer-detail">
-                                    <div class="detail-label">Ngày Tham Gia</div>
-                                    <div class="detail-value">15/01/2024</div>
-                                </div>
-                                <div class="customer-detail">
-                                    <div class="detail-label">Địa Chỉ</div>
-                                    <div class="detail-value">Hà Nội</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-stats">
-                                <div class="stat-item">
-                                    <div class="stat-number">23</div>
-                                    <div class="stat-label">Lần Đặt</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">45M</div>
-                                    <div class="stat-label">Chi Tiêu</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">4.8</div>
-                                    <div class="stat-label">Đánh Giá</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-actions">
-                                <button class="view-btn" onclick="viewCustomer(this)">
-                                    <i class="fas fa-eye"></i> Xem
-                                </button>
-                                <button class="edit-btn" onclick="editCustomer(this)">
-                                    <i class="fas fa-edit"></i> Sửa
-                                </button>
-                                <button class="message-btn" onclick="messageCustomer(this)">
-                                    <i class="fas fa-envelope"></i> Nhắn
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="customer-card new" data-type="new">
-                            <div class="customer-header">
-                                <div style="display: flex; align-items: center;">
-                                    <div class="customer-avatar">T</div>
-                                    <div class="customer-info">
-                                        <div class="customer-name">Trần Thị B</div>
-                                        <div class="customer-email">tran.thi.b@example.com</div>
-                                        <div class="customer-phone">0987 654 321</div>
-                                    </div>
-                                </div>
-                                <div class="customer-badge new">Mới</div>
-                            </div>
-                            
-                            <div class="customer-details">
-                                <div class="customer-detail">
-                                    <div class="detail-label">Ngày Tham Gia</div>
-                                    <div class="detail-value">20/05/2025</div>
-                                </div>
-                                <div class="customer-detail">
-                                    <div class="detail-label">Địa Chỉ</div>
-                                    <div class="detail-value">TP.HCM</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-stats">
-                                <div class="stat-item">
-                                    <div class="stat-number">2</div>
-                                    <div class="stat-label">Lần Đặt</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">3.5M</div>
-                                    <div class="stat-label">Chi Tiêu</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">5.0</div>
-                                    <div class="stat-label">Đánh Giá</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-actions">
-                                <button class="view-btn" onclick="viewCustomer(this)">
-                                    <i class="fas fa-eye"></i> Xem
-                                </button>
-                                <button class="edit-btn" onclick="editCustomer(this)">
-                                    <i class="fas fa-edit"></i> Sửa
-                                </button>
-                                <button class="message-btn" onclick="messageCustomer(this)">
-                                    <i class="fas fa-envelope"></i> Nhắn
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="customer-card" data-type="regular">
-                            <div class="customer-header">
-                                <div style="display: flex; align-items: center;">
-                                    <div class="customer-avatar">L</div>
-                                    <div class="customer-info">
-                                        <div class="customer-name">Lê Văn C</div>
-                                        <div class="customer-email">le.van.c@example.com</div>
-                                        <div class="customer-phone">0369 258 147</div>
-                                    </div>
-                                </div>
-                                <div class="customer-badge regular">Thường</div>
-                            </div>
-                            
-                            <div class="customer-details">
-                                <div class="customer-detail">
-                                    <div class="detail-label">Ngày Tham Gia</div>
-                                    <div class="detail-value">10/03/2024</div>
-                                </div>
-                                <div class="customer-detail">
-                                    <div class="detail-label">Địa Chỉ</div>
-                                    <div class="detail-value">Đà Nẵng</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-stats">
-                                <div class="stat-item">
-                                    <div class="stat-number">8</div>
-                                    <div class="stat-label">Lần Đặt</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">12M</div>
-                                    <div class="stat-label">Chi Tiêu</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-number">4.2</div>
-                                    <div class="stat-label">Đánh Giá</div>
-                                </div>
-                            </div>
-                            
-                            <div class="customer-actions">
-                                <button class="view-btn" onclick="viewCustomer(this)">
-                                    <i class="fas fa-eye"></i> Xem
-                                </button>
-                                <button class="edit-btn" onclick="editCustomer(this)">
-                                    <i class="fas fa-edit"></i> Sửa
-                                </button>
-                                <button class="message-btn" onclick="messageCustomer(this)">
-                                    <i class="fas fa-envelope"></i> Nhắn
-                                </button>
-                            </div>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -320,20 +293,37 @@
         // Customer Actions
         function viewCustomer(button) {
             const card = button.closest('.customer-card');
-            const customerName = card.querySelector('.customer-name').textContent;
-            alert(`Xem chi tiết khách hàng: ${customerName}`);
+            const customerId = card.getAttribute('data-customer-id');
+            window.location.href = `/admin/customers/${customerId}`;
         }
 
         function editCustomer(button) {
             const card = button.closest('.customer-card');
-            const customerName = card.querySelector('.customer-name').textContent;
-            alert(`Chỉnh sửa thông tin: ${customerName}`);
+            const customerId = card.getAttribute('data-customer-id');
+            window.location.href = `/admin/customers/${customerId}`;
         }
 
         function messageCustomer(button) {
             const card = button.closest('.customer-card');
             const customerName = card.querySelector('.customer-name').textContent;
             alert(`Gửi tin nhắn cho: ${customerName}`);
+        }
+
+        // Thêm các hàm xử lý cho partner nếu cần
+        function viewPartner(button) {
+            const card = button.closest('.partner-card');
+            const partnerId = card.getAttribute('data-partner-id');
+            window.location.href = `/admin/customers/partner/${partnerId}`;
+        }
+        function editPartner(button) {
+            const card = button.closest('.partner-card');
+            const partnerId = card.getAttribute('data-partner-id');
+            window.location.href = `/admin/customers/partner/${partnerId}`;
+        }
+        function messagePartner(button) {
+            const card = button.closest('.partner-card');
+            const partnerName = card.querySelector('.partner-company').textContent;
+            alert(`Gửi tin nhắn cho: ${partnerName}`);
         }
 
         // Handle window resize
@@ -355,6 +345,20 @@
                 }
             }
         });
+
+        function showTab(tab) {
+            document.getElementById('tab-customer').classList.add('hidden');
+            document.getElementById('tab-partner').classList.add('hidden');
+            document.getElementById('tab-customer-btn').classList.remove('active');
+            document.getElementById('tab-partner-btn').classList.remove('active');
+            if(tab === 'customer') {
+                document.getElementById('tab-customer').classList.remove('hidden');
+                document.getElementById('tab-customer-btn').classList.add('active');
+            } else {
+                document.getElementById('tab-partner').classList.remove('hidden');
+                document.getElementById('tab-partner-btn').classList.add('active');
+            }
+        }
     </script>
 </body>
 </html>

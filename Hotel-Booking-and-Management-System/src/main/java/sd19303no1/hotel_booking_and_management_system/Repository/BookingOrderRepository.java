@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Integer> {
         List<BookingOrderEntity> findByEmailOrderByCreatedAtDesc(String email);
@@ -18,13 +19,32 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
         // Phương thức để lấy N booking gần nhất
         List<BookingOrderEntity> findTopNByOrderByCreatedAtDesc(Pageable pageable);
 
-        // Tìm các booking xung đột (conflicting bookings)
-        @Query("SELECT b FROM BookingOrderEntity b WHERE b.room.roomId = :roomId " +
-                        "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED') " +
-                        "AND ((b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate))")
-        List<BookingOrderEntity> findConflictingBookings(@Param("roomId") Integer roomId,
-                        @Param("checkInDate") LocalDate checkInDate,
-                        @Param("checkOutDate") LocalDate checkOutDate);
+
+    // Thêm method để lấy booking gần đây với thông tin đầy đủ
+    @Query("SELECT b FROM BookingOrderEntity b " +
+           "LEFT JOIN FETCH b.customer " +
+           "LEFT JOIN FETCH b.room " +
+           "LEFT JOIN FETCH b.status " +
+           "ORDER BY b.createdAt DESC")
+    List<BookingOrderEntity> findRecentBookingsWithDetails(Pageable pageable);
+    
+    // Thêm method để lấy booking gần đây với thông tin đầy đủ hơn
+    @Query("SELECT b FROM BookingOrderEntity b " +
+           "LEFT JOIN FETCH b.customer " +
+           "LEFT JOIN FETCH b.room r " +
+           "LEFT JOIN FETCH r.partner " +
+           "LEFT JOIN FETCH b.status " +
+           "WHERE b.status.statusName IN ('CONFIRMED', 'PENDING', 'COMPLETED') " +
+           "ORDER BY b.createdAt DESC")
+    List<BookingOrderEntity> findRecentBookingsWithFullDetails(Pageable pageable);
+
+    // Tìm các booking xung đột (conflicting bookings)
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.room.roomId = :roomId " +
+            "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED') " +
+            "AND ((b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate))")
+    List<BookingOrderEntity> findConflictingBookings(@Param("roomId") Integer roomId,
+            @Param("checkInDate") LocalDate checkInDate,
+            @Param("checkOutDate") LocalDate checkOutDate);
 
         // Tìm booking theo trạng thái
         @Query("SELECT b FROM BookingOrderEntity b WHERE b.status.statusName = :statusName")
@@ -119,4 +139,37 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
         List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId,
                         @Param("year") Integer year);
 
-}
+  // Thêm các phương thức cho báo cáo
+  @Query("SELECT b FROM BookingOrderEntity b WHERE b.createdAt BETWEEN :startDate AND :endDate")
+  List<BookingOrderEntity> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate);
+
+  @Query(value = """
+      SELECT 
+          r.room_id as roomId,
+          r.room_name as roomName,
+          COUNT(b.booking_id) as bookingCount,
+          SUM(b.total_price) as totalRevenue
+      FROM rooms r
+      LEFT JOIN bookingorder b ON r.room_id = b.room_id
+      WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
+      GROUP BY r.room_id, r.room_name
+      ORDER BY bookingCount DESC
+      """, nativeQuery = true)
+  List<Map<String, Object>> findTopRoomsByBookingCount();
+
+   @Query(value = """
+      SELECT 
+          c.customer_id as customerId,
+          c.name as customerName,
+          c.email as customerEmail,
+          COUNT(b.booking_id) as bookingCount,
+          SUM(b.total_price) as totalSpent
+      FROM customers c
+      LEFT JOIN bookingorder b ON c.customer_id = b.customer_id
+      WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
+      GROUP BY c.customer_id, c.name, c.email
+      ORDER BY bookingCount DESC
+      """, nativeQuery = true)
+  List<Map<String, Object>> findTopCustomersByBookingCount();
+} 

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
@@ -44,12 +45,12 @@ public class RoomService {
     }
 
     public List<RoomTypeDTO> getRoomTypes() {
-        List<String> distinctTypes = roomRepository.findDistinctTypes();
+        List<RoomEntity.RoomType> distinctTypes = roomRepository.findDistinctTypes();
         return distinctTypes.stream()
                 .map(type -> {
                     RoomEntity sampleRoom = roomRepository.findFirstByType(type);
                     return new RoomTypeDTO(
-                        type,
+                        type.name(),
                         sampleRoom.getDescription(),
                         sampleRoom.getImageUrls() != null && !sampleRoom.getImageUrls().isEmpty() 
                             ? sampleRoom.getImageUrls().get(0) 
@@ -66,7 +67,7 @@ public class RoomService {
         return roomRepository.findAvailableRoomsByLocation(location, checkInDate, checkOutDate, PageRequest.of(0, 20));
     }
 
-    public List<RoomEntity> getRelatedRooms(String roomType, Integer excludeRoomId, int limit) {
+    public List<RoomEntity> getRelatedRooms(RoomEntity.RoomType roomType, Integer excludeRoomId, int limit) {
         return roomRepository.findRelatedRooms(roomType, excludeRoomId, PageRequest.of(0, limit));
     }
 
@@ -78,21 +79,20 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-
-        public List<RoomEntity> getAllRooms() {
+    public List<RoomEntity> getAllRooms() {
         return roomRepository.findAll();
     }
 
-        public RoomEntity getRoomById(Integer id) {
+    public RoomEntity getRoomById(Integer id) {
         Optional<RoomEntity> room = roomRepository.findById(id);
         return room.orElseThrow(() -> new RuntimeException("Room not found"));
     }
 
-        public void saveRoom(RoomEntity room) {
+    public void saveRoom(RoomEntity room) {
         roomRepository.save(room);
     }
 
-        public void deleteRoom(Integer id) {
+    public void deleteRoom(Integer id) {
         roomRepository.deleteById(id);
     }
 
@@ -108,7 +108,10 @@ public class RoomService {
         return Math.max(total - booked, 0);
     }
 
-    public List<RoomEntity> findByPartnerId(Long partnerId) {
-        return roomRepository.findByPartner_Id(partnerId);
-    }
+ public List<RoomEntity> findByPartnerId(Long partnerId) {
+    Pageable pageable = PageRequest.of(0, 100);
+    return roomRepository.findByPartnerId(partnerId, pageable).getContent();
+}
+
+
 }

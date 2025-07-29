@@ -38,7 +38,7 @@ public class RoomPartnerController {
     @Autowired
     private SystemUserService systemUserService;
 
-    @GetMapping("/room/partner")
+    @GetMapping("/partner/rooms")
     public String roomPartner(Model model) {
         try {
             // Lấy thông tin người dùng đã đăng nhập
@@ -62,7 +62,7 @@ public class RoomPartnerController {
                             RoomEntity room = roomService.getRoomById(roomPartner.getRoomId().intValue());
                             if (room != null && room.getImageUrls() != null && !room.getImageUrls().isEmpty()) {
                                 // Tạo một trường tạm thời để lưu ảnh
-                                roomPartner.setImageUrls(room.getImageUrls());
+                                // roomPartner.setImageUrls(room.getImageUrls());
                             }
                         } catch (Exception e) {
                             // Nếu không tìm thấy RoomEntity tương ứng, bỏ qua
@@ -70,12 +70,10 @@ public class RoomPartnerController {
                     }
 
                     RoomPartnerEntity roomPartner = new RoomPartnerEntity();
-                    long countRoomsByPartnerId = roomPartnerService.countRoomsByPartnerId(partnerId);
                     roomPartner.setPartnerId(partnerId);
 
                     model.addAttribute("roomPartners", roomPartners);
                     model.addAttribute("roomPartner", roomPartner);
-                    model.addAttribute("countRoomsByPartnerId", countRoomsByPartnerId);
 
                     return "Partner/RoomPartner";
                 } else {
@@ -121,17 +119,17 @@ public class RoomPartnerController {
                     //     return "redirect:/room/partner?exists=true";
                     // }
                     roomPartnerService.save(roomPartner);
-                    return "redirect:/room/partner?success=true";
+                    return "redirect:/partner/rooms?success=true";
                 } else {
                     redirectAttributes.addFlashAttribute("error", "Không tìm thấy thông tin đối tác.");
-                    return "redirect:/room/partner";
+                    return "redirect:/partner/rooms";
                 }
             } else {
                 return "redirect:/login";
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi thêm phòng: " + e.getMessage());
-            return "redirect:/room/partner";
+            return "redirect:/partner/rooms";
         }
     }
 
@@ -173,7 +171,7 @@ public class RoomPartnerController {
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi cập nhật phòng: " + e.getMessage());
-            return "redirect:/room/partner";
+            return "redirect:/partner/rooms";
         }
     }
 

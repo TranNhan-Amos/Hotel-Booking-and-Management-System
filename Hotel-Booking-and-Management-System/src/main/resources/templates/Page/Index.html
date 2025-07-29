@@ -274,7 +274,7 @@
             <div class="hotels-grid">
                 <div th:each="room, iterStat : ${featuredRooms}" class="hotel-card" th:style="'animation-delay: ' + ${0.1 * (iterStat.index + 1)} + 's;'">
                     <div class="hotel-image">
-                        <img th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" th:alt="${room.type}">
+                        <img th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" th:alt="${room.nameNumber}">
                         <div class="hotel-overlay">
                             <button class="hotel-favorite">
                                 <i data-lucide="heart"></i>
@@ -287,17 +287,21 @@
                     </div>
                     <div class="hotel-content">
                         <div class="hotel-header">
-                            <h3 class="hotel-title" th:text="${room.type}">Ocean Breeze Resort</h3>
+                            <h3 class="hotel-title" th:text="${room.nameNumber}">Phòng Deluxe Ocean View</h3>
                             <div class="hotel-location">
                                 <i data-lucide="map-pin"></i>
-                                <span>Mỹ Khê Beach</span>
+                                <span th:text="${room.partner != null ? room.partner.companyName : 'Khách sạn'}">Mỹ Khê Beach</span>
                             </div>
                         </div>
                         <p class="hotel-description" th:text="${room.description}">Khách sạn 5 sao với tầm nhìn ra biển tuyệt đẹp và tiện nghi cao cấp</p>
                         <div class="hotel-features">
-                            <span class="feature-tag">Wifi miễn phí</span>
-                            <span class="feature-tag">Hồ bơi</span>
-                            <span class="feature-tag">Spa</span>
+                            <span class="feature-tag" th:if="${room.view != null}" th:text="${room.view.description}">View biển</span>
+                            <span class="feature-tag" th:if="${room.bedType != null}" th:text="${room.bedType.description}">Giường King</span>
+                            <span class="feature-tag" th:if="${room.capacity != null}" th:text="'Tối đa ' + ${room.capacity} + ' người'">Tối đa 2 người</span>
+                            <span class="feature-tag" th:each="amenity, amenityStat : ${room.amenities}" 
+                                  th:if="${room.amenities != null and !room.amenities.empty and amenityStat.index < 2}" 
+                                  th:text="${amenity}">WiFi</span>
+                            <span class="feature-tag" th:unless="${room.amenities != null and !room.amenities.empty}">WiFi miễn phí</span>
                         </div>
                         <div class="hotel-footer">
                             <div class="hotel-price">
@@ -306,7 +310,7 @@
                             </div>
                             <button type="button" class="btn btn-primary"
                                     th:data-room-id="${room.roomId}"
-                                    th:data-room-name="${room.type}"
+                                    th:data-room-name="${room.nameNumber}"
                                     th:onclick="'goToRoomDetail(' + ${room.roomId} + ');'">
                                 Đặt ngay
                             </button>
@@ -421,7 +425,7 @@
                         </div>
                         <div class="booking-info">
                             <h4 class="booking-customer" th:text="${booking.customer != null ? booking.customer.name : 'Khách hàng'}">Nguyễn Văn A</h4>
-                            <p class="booking-hotel" th:text="${booking.room != null ? booking.room.type : 'N/A'}">Ocean Breeze Resort</p>
+                            <p class="booking-hotel" th:text="${booking.room != null ? booking.room.nameNumber : 'N/A'}">Ocean Breeze Resort</p>
                         </div>
                         <div class="booking-status" 
                              th:text="${booking.status != null ? booking.status.statusName : 'N/A'}"
@@ -435,10 +439,10 @@
                     <div class="booking-details">
                         <div class="booking-date">
                             <i data-lucide="calendar"></i>
-                                                            <span th:text="'Từ ' + ${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">Từ 15/01/2025 đến 17/01/2025</span>
+                            <span th:text="'Từ ' + ${booking.checkInDate != null ? booking.checkInDate.toString() : 'N/A'} + ' đến ' + ${booking.checkOutDate != null ? booking.checkOutDate.toString() : 'N/A'}">Từ 15/01/2025 đến 17/01/2025</span>
                         </div>
                         <div class="booking-price">
-                            <span class="price-amount" th:text="${booking.room != null ? #numbers.formatDecimal(booking.room.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">2,500,000 ₫</span>
+                            <span class="price-amount" th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">2,500,000 ₫</span>
                             <span class="price-unit">/ đêm</span>
                         </div>
                     </div>

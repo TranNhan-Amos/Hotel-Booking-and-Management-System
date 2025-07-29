@@ -86,173 +86,85 @@
                     </div>
 
                     <div class="voucher-cards" id="voucherCards">
-                        <div class="voucher-card active" data-status="active" data-type="percentage">
-                            <div class="voucher-header">
-                                <div class="voucher-code">SUMMER2025</div>
-                                <div class="voucher-name">Khuyến Mãi Mùa Hè</div>
-                                <div class="voucher-description">Giảm giá 20% cho tất cả các phòng trong mùa hè</div>
-                            </div>
-                            
-                            <div class="voucher-body">
-                                <div class="voucher-details">
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Giảm Giá</div>
-                                        <div class="detail-value discount-value">20%</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Giá Trị Tối Đa</div>
-                                        <div class="detail-value">500,000 ₫</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Bắt Đầu</div>
-                                        <div class="detail-value">01/06/2025</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Kết Thúc</div>
-                                        <div class="detail-value">31/08/2025</div>
-                                    </div>
+                        <th:block th:each="voucher : ${vouchers}">
+                            <div class="voucher-card" th:classappend="${voucher.status == 'ACTIVE' ? 'active' : 'expired'}" 
+                                 th:data-status="${voucher.status?.toLowerCase()}" 
+                                 th:data-type="${voucher.discountType?.toLowerCase()}"
+                                 th:data-voucher-id="${voucher.voucherId}">
+                                <div class="voucher-header">
+                                    <div class="voucher-code" th:text="${voucher.code}">VOUCHER_CODE</div>
+                                    <div class="voucher-name" th:text="${voucher.description}">Tên voucher</div>
+                                    <div class="voucher-description" th:text="${voucher.description}">Mô tả voucher</div>
                                 </div>
                                 
-                                <div class="voucher-progress">
-                                    <div class="progress-header">
-                                        <div class="progress-label">Đã Sử Dụng</div>
-                                        <div class="progress-text">45/100</div>
+                                <div class="voucher-body">
+                                    <div class="voucher-details">
+                                        <div class="voucher-detail">
+                                            <div class="detail-label">Giảm Giá</div>
+                                            <div class="detail-value discount-value" 
+                                                 th:text="${voucher.discountType == 'PERCENTAGE' ? voucher.discount + '%' : voucher.discountAmount + ' ₫'}">
+                                                0%
+                                            </div>
+                                        </div>
+                                        <div class="voucher-detail">
+                                            <div class="detail-label">Đơn Tối Thiểu</div>
+                                            <div class="detail-value" th:text="${voucher.minimumOrderAmount != null ? voucher.minimumOrderAmount + ' ₫' : 'Không có'}">
+                                                0 ₫
+                                            </div>
+                                        </div>
+                                        <div class="voucher-detail">
+                                            <div class="detail-label">Ngày Bắt Đầu</div>
+                                            <div class="detail-value" th:text="${#temporals.format(voucher.startDate, 'dd/MM/yyyy')}">
+                                                01/01/2025
+                                            </div>
+                                        </div>
+                                        <div class="voucher-detail">
+                                            <div class="detail-label">Ngày Kết Thúc</div>
+                                            <div class="detail-value" th:text="${#temporals.format(voucher.endDate, 'dd/MM/yyyy')}">
+                                                31/12/2025
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 45%"></div>
+                                    
+                                    <div class="voucher-progress">
+                                        <div class="progress-header">
+                                            <div class="progress-label">Đã Sử Dụng</div>
+                                            <div class="progress-text" th:text="${voucher.usedCount + '/' + voucher.usageLimit}">
+                                                0/100
+                                            </div>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" th:style="'width: ' + ${voucher.usagePercentage} + '%'"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="voucher-status">
-                                    <div class="status-badge active">Đang Hoạt Động</div>
-                                </div>
-                                
-                                <div class="voucher-actions">
-                                    <button class="copy-btn" onclick="copyVoucher(this)">
-                                        <i class="fas fa-copy"></i> Copy
-                                    </button>
-                                    <button class="edit-btn" onclick="editVoucher(this)">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
-                                    <button class="toggle-btn" onclick="toggleVoucher(this)">
-                                        <i class="fas fa-pause"></i> Tạm Dừng
-                                    </button>
-                                    <button class="delete-btn" onclick="deleteVoucher(this)">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="voucher-card active" data-status="active" data-type="fixed">
-                            <div class="voucher-header">
-                                <div class="voucher-code">WELCOME50</div>
-                                <div class="voucher-name">Chào Mừng Khách Mới</div>
-                                <div class="voucher-description">Giảm 50,000₫ cho lần đặt phòng đầu tiên</div>
-                            </div>
-                            
-                            <div class="voucher-body">
-                                <div class="voucher-details">
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Giảm Giá</div>
-                                        <div class="detail-value discount-value">50,000 ₫</div>
+                                    
+                                    <div class="voucher-status">
+                                        <div class="status-badge" 
+                                             th:classappend="${voucher.status == 'ACTIVE' ? 'active' : 'expired'}"
+                                             th:text="${voucher.status == 'ACTIVE' ? 'Đang Hoạt Động' : 'Đã Hết Hạn'}">
+                                            Trạng thái
+                                        </div>
                                     </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Đơn Tối Thiểu</div>
-                                        <div class="detail-value">200,000 ₫</div>
+                                    
+                                    <div class="voucher-actions">
+                                        <button class="copy-btn" onclick="copyVoucher(this)">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                        <button class="edit-btn" onclick="editVoucher(this)">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+                                        <button class="toggle-btn" onclick="toggleVoucher(this)">
+                                            <i class="fas fa-pause" th:if="${voucher.status == 'ACTIVE'}"></i>
+                                            <i class="fas fa-play" th:if="${voucher.status != 'ACTIVE'}"></i>
+                                            <span th:text="${voucher.status == 'ACTIVE' ? 'Tạm Dừng' : 'Kích Hoạt'}">Tạm Dừng</span>
+                                        </button>
+                                        <button class="delete-btn" onclick="deleteVoucher(this)">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
                                     </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Bắt Đầu</div>
-                                        <div class="detail-value">01/05/2025</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Kết Thúc</div>
-                                        <div class="detail-value">31/12/2025</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="voucher-progress">
-                                    <div class="progress-header">
-                                        <div class="progress-label">Đã Sử Dụng</div>
-                                        <div class="progress-text">23/50</div>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 46%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="voucher-status">
-                                    <div class="status-badge active">Đang Hoạt Động</div>
-                                </div>
-                                
-                                <div class="voucher-actions">
-                                    <button class="copy-btn" onclick="copyVoucher(this)">
-                                        <i class="fas fa-copy"></i> Copy
-                                    </button>
-                                    <button class="edit-btn" onclick="editVoucher(this)">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
-                                    <button class="toggle-btn" onclick="toggleVoucher(this)">
-                                        <i class="fas fa-pause"></i> Tạm Dừng
-                                    </button>
-                                    <button class="delete-btn" onclick="deleteVoucher(this)">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="voucher-card expired" data-status="expired" data-type="percentage">
-                            <div class="voucher-header">
-                                <div class="voucher-code">SPRING2025</div>
-                                <div class="voucher-name">Khuyến Mãi Mùa Xuân</div>
-                                <div class="voucher-description">Giảm 15% cho tất cả các phòng trong mùa xuân</div>
-                            </div>
-                            
-                            <div class="voucher-body">
-                                <div class="voucher-details">
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Giảm Giá</div>
-                                        <div class="detail-value discount-value">15%</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Giá Trị Tối Đa</div>
-                                        <div class="detail-value">300,000 ₫</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Bắt Đầu</div>
-                                        <div class="detail-value">01/03/2025</div>
-                                    </div>
-                                    <div class="voucher-detail">
-                                        <div class="detail-label">Ngày Kết Thúc</div>
-                                        <div class="detail-value">31/05/2025</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="voucher-progress">
-                                    <div class="progress-header">
-                                        <div class="progress-label">Đã Sử Dụng</div>
-                                        <div class="progress-text">75/75</div>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 100%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="voucher-status">
-                                    <div class="status-badge expired">Đã Hết Hạn</div>
-                                </div>
-                                
-                                <div class="voucher-actions">
-                                    <button class="copy-btn" onclick="copyVoucher(this)">
-                                        <i class="fas fa-copy"></i> Copy
-                                    </button>
-                                    <button class="delete-btn" onclick="deleteVoucher(this)">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        </th:block>
                     </div>
                 </div>
             </div>
@@ -321,48 +233,76 @@
 
         function editVoucher(button) {
             const card = button.closest('.voucher-card');
-            const voucherCode = card.querySelector('.voucher-code').textContent;
-            alert(`Chỉnh sửa voucher: ${voucherCode}`);
+            const voucherId = card.getAttribute('data-voucher-id');
+            window.location.href = `/admin/vouchers/${voucherId}`;
         }
 
         function toggleVoucher(button) {
             const card = button.closest('.voucher-card');
+            const voucherId = card.getAttribute('data-voucher-id');
             const voucherCode = card.querySelector('.voucher-code').textContent;
             const statusBadge = card.querySelector('.status-badge');
+            const toggleBtn = button.querySelector('span');
             
-            if (card.classList.contains('active')) {
-                if (confirm(`Tạm dừng voucher ${voucherCode}?`)) {
-                    card.classList.remove('active');
-                    card.setAttribute('data-status', 'paused');
-                    statusBadge.className = 'status-badge expired';
-                    statusBadge.textContent = 'Tạm Dừng';
-                    button.innerHTML = '<i class="fas fa-play"></i> Kích Hoạt';
-                    alert(`Đã tạm dừng voucher: ${voucherCode}`);
+            fetch(`/admin/vouchers/toggle/${voucherId}`, {
+                method: 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('thành công')) {
+                    if (card.classList.contains('active')) {
+                        card.classList.remove('active');
+                        card.setAttribute('data-status', 'inactive');
+                        statusBadge.className = 'status-badge expired';
+                        statusBadge.textContent = 'Đã Tạm Dừng';
+                        button.innerHTML = '<i class="fas fa-play"></i><span>Kích Hoạt</span>';
+                    } else {
+                        card.classList.add('active');
+                        card.setAttribute('data-status', 'active');
+                        statusBadge.className = 'status-badge active';
+                        statusBadge.textContent = 'Đang Hoạt Động';
+                        button.innerHTML = '<i class="fas fa-pause"></i><span>Tạm Dừng</span>';
+                    }
+                    alert(`Đã thay đổi trạng thái voucher: ${voucherCode}`);
+                } else {
+                    alert('Lỗi: ' + data);
                 }
-            } else {
-                if (confirm(`Kích hoạt voucher ${voucherCode}?`)) {
-                    card.classList.add('active');
-                    card.setAttribute('data-status', 'active');
-                    statusBadge.className = 'status-badge active';
-                    statusBadge.textContent = 'Đang Hoạt Động';
-                    button.innerHTML = '<i class="fas fa-pause"></i> Tạm Dừng';
-                    alert(`Đã kích hoạt voucher: ${voucherCode}`);
-                }
-            }
+            })
+            .catch(error => {
+                alert('Lỗi khi thay đổi trạng thái: ' + error);
+            });
         }
 
         function deleteVoucher(button) {
             const card = button.closest('.voucher-card');
+            const voucherId = card.getAttribute('data-voucher-id');
             const voucherCode = card.querySelector('.voucher-code').textContent;
             
             if (confirm(`Bạn có chắc muốn xóa voucher ${voucherCode}?`)) {
-                card.remove();
-                alert(`Đã xóa voucher: ${voucherCode}`);
+                fetch(`/admin/vouchers/delete/${voucherId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data.includes('thành công')) {
+                        card.remove();
+                        alert(`Đã xóa voucher: ${voucherCode}`);
+                    } else {
+                        alert('Lỗi: ' + data);
+                    }
+                })
+                .catch(error => {
+                    alert('Lỗi khi xóa: ' + error);
+                });
             }
         }
 
         function openModal(mode) {
-            alert(`Mở modal ${mode === 'add' ? 'tạo voucher mới' : 'chỉnh sửa voucher'}`);
+            if (mode === 'add') {
+                window.location.href = '/admin/vouchers/create';
+            } else {
+                alert('Chức năng chỉnh sửa voucher');
+            }
         }
 
         // Handle window resize

@@ -245,7 +245,9 @@
         </div>
 
         <!-- Success Title -->
-        <h1 class="success-title">Thanh Toán Thành Công!</h1>
+        <h1 class="success-title" th:text="${booking != null and booking.paymentStatus == 'PAID' ? 'Thanh Toán Thành Công!' : 'Đặt Phòng Thành Công!'}">
+            Thanh Toán Thành Công!
+        </h1>
         <p class="success-message" th:text="${success != null ? success : 'Đặt phòng của bạn đã được xác nhận thành công!'}">
             Đặt phòng của bạn đã được xác nhận thành công!
         </p>
@@ -273,6 +275,10 @@
                 <span class="info-label">Phương thức thanh toán:</span>
                 <span class="info-value" th:text="${booking.paymentMethod != null ? booking.paymentMethod : 'Thanh toán tại khách sạn'}">Thanh toán tại khách sạn</span>
             </div>
+            <div class="info-row">
+                <span class="info-label">Trạng thái thanh toán:</span>
+                <span class="info-value" th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán tại khách sạn'}">Chờ thanh toán tại khách sạn</span>
+            </div>
         </div>
 
         <!-- Check-in Instructions -->
@@ -281,7 +287,8 @@
             <ul class="instruction-list">
                 <li>Vui lòng đến khách sạn vào ngày check-in từ 14:00</li>
                 <li>Mang theo giấy tờ tùy thân (CMND/CCCD/Hộ chiếu)</li>
-                <li>Thanh toán đầy đủ khi check-in</li>
+                <li th:if="${booking != null and booking.paymentStatus != 'PAID'}">Thanh toán đầy đủ khi check-in</li>
+                <li th:if="${booking != null and booking.paymentStatus == 'PAID'}">Đã thanh toán, chỉ cần check-in</li>
                 <li>Giờ check-out: 12:00 ngày trả phòng</li>
                 <li>Liên hệ: 0935 123 456 nếu cần hỗ trợ</li>
             </ul>

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -51,6 +52,9 @@ public class BookingController {
 
     @Autowired
     private BookingOrderRepository bookingOrderRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Hiển thị trang chi tiết đặt phòng
     @GetMapping("/bookings")
@@ -550,12 +554,12 @@ public class BookingController {
                     return response;
                 }
                 // TODO: Use proper password encoder
-                if (!systemUser.getPassword().equals(currentPassword)) {
+                if (!passwordEncoder.matches(currentPassword, systemUser.getPassword())) {
                     response.put("success", false);
                     response.put("message", "Mật khẩu hiện tại không đúng");
                     return response;
                 }
-                systemUser.setPassword(newPassword);
+                systemUser.setPassword(passwordEncoder.encode(newPassword));
                 systemUserService.save(systemUser);
             }
             response.put("success", true);

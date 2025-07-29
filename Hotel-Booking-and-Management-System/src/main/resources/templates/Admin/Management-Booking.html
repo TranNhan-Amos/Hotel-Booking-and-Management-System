@@ -346,6 +346,42 @@
             color: #721c24;
         }
 
+        /* Payment Status Styles */
+        .payment-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .payment-status.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .payment-status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Additional Stat Icon Styles */
+        .stat-icon.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-icon.pending-payment {
+            background: #fff3cd;
+            color: #856404;
+        }
+
         .price-value {
             color: #4CAF50;
             font-weight: 600;
@@ -418,6 +454,26 @@
                         </div>
                         <div class="stat-value" th:text="${#lists.size(bookings.?[status.statusName == 'CANCELLED'])}">0</div>
                     </div>
+                    
+                    <div class="stat-card" id="paidBookings">
+                        <div class="stat-header">
+                            <div class="stat-title">Đã Thanh Toán</div>
+                            <div class="stat-icon paid">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" th:text="${#lists.size(bookings.?[paymentStatus == 'PAID'])}">0</div>
+                    </div>
+                    
+                    <div class="stat-card" id="pendingPaymentBookings">
+                        <div class="stat-header">
+                            <div class="stat-title">Chờ Thanh Toán Tại KS</div>
+                            <div class="stat-icon pending-payment">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" th:text="${#lists.size(bookings.?[paymentStatus == 'PENDING'])}">0</div>
+                    </div>
                 </div>
 
                 <div class="management-header">
@@ -428,6 +484,12 @@
                             <option value="confirmed">Đã Xác Nhận</option>
                             <option value="pending">Chờ Xác Nhận</option>
                             <option value="cancelled">Đã Hủy</option>
+                        </select>
+                        <select id="paymentFilter" onchange="filterBookings()">
+                            <option value="all">Tất Cả Thanh Toán</option>
+                            <option value="paid">Đã Thanh Toán</option>
+                            <option value="pending-payment">Chờ Thanh Toán</option>
+                            <option value="failed">Thanh Toán Thất Bại</option>
                         </select>
                         <input type="date" id="dateFilter" onchange="filterBookings()">
                     </div>
@@ -444,6 +506,7 @@
                                     <th>Ngày Đặt</th>
                                     <th>Giá</th>
                                     <th>Trạng Thái</th>
+                                    <th>Thanh Toán</th>
                                     <th>Thao Tác</th>
                                 </tr>
                             </thead>
@@ -481,14 +544,18 @@
                                         </span>
                                     </td>
                                     <td>
+                                        <span th:class="'payment-status ' + ${booking.paymentStatus != null ? booking.paymentStatus.toLowerCase() : 'pending'}" 
+                                              th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 
+                                                        booking.paymentStatus == 'PENDING' ? 'Chờ thanh toán tại khách sạn' : 
+                                                        booking.paymentStatus == 'FAILED' ? 'Thanh toán thất bại' : 
+                                                        'Chưa thanh toán'}">
+                                            Trạng thái thanh toán
+                                        </span>
+                                    </td>
+                                    <td>
                                         <div class="actions">
                                             <button class="view-btn" onclick="viewBooking(this)">
                                                 <i class="fas fa-eye"></i> Xem
-                                            </button>
-                                            <button th:if="${booking.status.statusName == 'PENDING'}" 
-                                                    class="confirm-btn" 
-                                                    th:onclick="'confirmBooking(this, ' + ${booking.bookingId != null ? booking.bookingId : 0} + ')'">
-                                                <i class="fas fa-check"></i> Xác Nhận
                                             </button>
                                             <button th:if="${booking.status.statusName != 'CANCELLED'}" 
                                                     class="cancel-btn" 
@@ -501,7 +568,7 @@
                                 
                                 <!-- Hiển thị thông báo khi không có dữ liệu -->
                                 <tr th:if="${#lists.isEmpty(bookings)}">
-                                    <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                                    <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
                                         <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
                                         <div style="font-size: 16px; margin-bottom: 8px;">Chưa có đặt phòng nào</div>
                                         <div style="font-size: 14px; opacity: 0.7;">Hệ thống sẽ hiển thị đặt phòng ở đây khi có dữ liệu</div>
@@ -654,12 +721,16 @@
                     const confirmedBookings = bookings.filter(b => b.status && b.status.statusName === 'CONFIRMED').length;
                     const pendingBookings = bookings.filter(b => b.status && b.status.statusName === 'PENDING').length;
                     const cancelledBookings = bookings.filter(b => b.status && b.status.statusName === 'CANCELLED').length;
+                    const paidBookings = bookings.filter(b => b.paymentStatus === 'PAID').length;
+                    const pendingPaymentBookings = bookings.filter(b => b.paymentStatus === 'PENDING').length;
                     
                     // Update values with animation
                     updateStatValue('totalBookings', totalBookings);
                     updateStatValue('confirmedBookings', confirmedBookings);
                     updateStatValue('pendingBookings', pendingBookings);
                     updateStatValue('cancelledBookings', cancelledBookings);
+                    updateStatValue('paidBookings', paidBookings);
+                    updateStatValue('pendingPaymentBookings', pendingPaymentBookings);
                 }
             })
             .catch(error => {
@@ -669,11 +740,15 @@
                 const confirmedBookings = document.querySelectorAll('#bookingTableBody tr[data-status="confirmed"]').length;
                 const pendingBookings = document.querySelectorAll('#bookingTableBody tr[data-status="pending"]').length;
                 const cancelledBookings = document.querySelectorAll('#bookingTableBody tr[data-status="cancelled"]').length;
+                const paidBookings = document.querySelectorAll('#bookingTableBody tr .payment-status.paid').length;
+                const pendingPaymentBookings = document.querySelectorAll('#bookingTableBody tr .payment-status.pending').length;
                 
                 updateStatValue('totalBookings', totalBookings);
                 updateStatValue('confirmedBookings', confirmedBookings);
                 updateStatValue('pendingBookings', pendingBookings);
                 updateStatValue('cancelledBookings', cancelledBookings);
+                updateStatValue('paidBookings', paidBookings);
+                updateStatValue('pendingPaymentBookings', pendingPaymentBookings);
             });
     }
     
@@ -721,19 +796,45 @@
     function filterBookings() {
         const searchInput = document.getElementById('searchInput').value.toLowerCase();
         const statusFilter = document.getElementById('statusFilter').value;
+        const paymentFilter = document.getElementById('paymentFilter').value;
         const dateFilter = document.getElementById('dateFilter').value;
         const rows = document.querySelectorAll('#bookingTableBody tr');
 
         rows.forEach(row => {
             const customerName = row.querySelector('.customer-name').textContent.toLowerCase();
             const status = row.getAttribute('data-status');
+            const paymentStatusElement = row.querySelector('.payment-status');
+            let paymentStatus = 'pending';
+            
+            if (paymentStatusElement) {
+                const paymentClass = paymentStatusElement.getAttribute('class');
+                if (paymentClass.includes('paid')) {
+                    paymentStatus = 'paid';
+                } else if (paymentClass.includes('pending')) {
+                    paymentStatus = 'pending-payment';
+                } else if (paymentClass.includes('failed')) {
+                    paymentStatus = 'failed';
+                }
+            }
+            
             const checkInDate = row.querySelector('.check-in').textContent;
 
             const matchesSearch = customerName.includes(searchInput);
-            const matchesStatus = statusFilter === 'all' || status === statusFilter;
+            
+            // Logic filter status đơn giản
+            let matchesStatus = statusFilter === 'all';
+            if (statusFilter === 'confirmed') {
+                matchesStatus = status === 'confirmed';
+            } else if (statusFilter === 'pending') {
+                matchesStatus = status === 'pending';
+            } else if (statusFilter === 'cancelled') {
+                matchesStatus = status === 'cancelled';
+            }
+            
+            const matchesPayment = paymentFilter === 'all' || paymentStatus === paymentFilter;
             const matchesDate = !dateFilter || checkInDate.includes(dateFilter);
 
-            if (matchesSearch && matchesStatus && matchesDate) {
+            if (matchesSearch && matchesStatus && matchesPayment && matchesDate) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
@@ -859,7 +960,7 @@
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Trạng thái thanh toán:</span>
-                                        <span class="value status-badge ${booking.paymentStatus === 'PAID' ? 'confirmed' : 'pending'}">${booking.paymentStatus === 'PAID' ? 'Đã thanh toán' : (booking.paymentStatus === 'PENDING' ? 'Chờ thanh toán' : 'Chưa thanh toán')}</span>
+                                        <span class="value status-badge ${booking.paymentStatus === 'PAID' ? 'confirmed' : 'pending'}">${booking.paymentStatus === 'PAID' ? 'Đã thanh toán' : (booking.paymentStatus === 'PENDING' ? 'Chờ thanh toán tại khách sạn' : 'Chưa thanh toán')}</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Ngày thanh toán:</span>
@@ -868,6 +969,10 @@
                                     <div class="detail-item">
                                         <span class="label">Mã giao dịch:</span>
                                         <span class="value">${booking.bookingId ? 'TXN' + booking.bookingId.toString().padStart(8, '0') : 'Chưa có'}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Thông báo:</span>
+                                        <span class="value">${booking.paymentStatus === 'PAID' ? 'Đã thanh toán, chờ nhận phòng' : (booking.paymentStatus === 'PENDING' ? 'Đặt phòng thành công! Chờ thanh toán tại khách sạn' : 'Chưa xác định')}</span>
                                     </div>
                                 </div>
                             </div>

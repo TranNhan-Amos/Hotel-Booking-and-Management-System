@@ -1,10 +1,14 @@
 package sd19303no1.hotel_booking_and_management_system.Service;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import sd19303no1.hotel_booking_and_management_system.DTO.AdminBookingRequestDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPartnerDTO;
+import sd19303no1.hotel_booking_and_management_system.DTO.ReportsPartnerDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.PaymentMethod;
+import sd19303no1.hotel_booking_and_management_system.Entity.PaymentStatus;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.StatusEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
@@ -23,7 +31,7 @@ import sd19303no1.hotel_booking_and_management_system.Repository.CustomersReposi
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.StatusRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.VoucherRepository;
-
+import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 
 @Service
 public class BookingOrderService {
@@ -38,28 +46,29 @@ public class BookingOrderService {
     private RoomRepository roomRepository;
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private RoomService roomService;
 
     // --- PHƯƠNG THỨC CHO KHÁCH HÀNG ĐẶT PHÒNG (Sử dụng bởi BookingController) ---
     @Transactional
     public BookingOrderEntity createBooking(String customerName, String email, String phone, String address,
-                                            Integer roomId, LocalDate checkInDate, LocalDate checkOutDate,
-                                            Integer voucherId, String specialRequests, Integer roomQuantity) {
+            Integer roomId, LocalDate checkInDate, LocalDate checkOutDate,
+            Integer voucherId, String specialRequests, Integer roomQuantity) {
         System.out.println("=== SERVICE DEBUG: createBooking started ===");
 
-        
         // Validate đầu vào cơ bản
         if (checkInDate == null || checkOutDate == null) {
             throw new IllegalArgumentException("Ngày nhận phòng và trả phòng không được để trống.");
         }
-        
+
         if (checkInDate.isAfter(checkOutDate)) {
             throw new IllegalArgumentException("Ngày trả phòng phải sau ngày nhận phòng.");
         }
-        
+
         if (checkInDate.isEqual(checkOutDate)) {
             throw new IllegalArgumentException("Ngày trả phòng phải khác ngày nhận phòng (ít nhất 1 đêm).");
         }
-        
+
         // Kiểm tra ngày nhận phòng không được trong quá khứ
         if (checkInDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Ngày nhận phòng không thể là ngày trong quá khứ.");
@@ -94,21 +103,23 @@ public class BookingOrderService {
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + roomId));
 
-
         System.out.println("=== SERVICE DEBUG: Room found: " + room.getRoomId() + " ===");
 
-        // TODO: Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không? (QUAN TRỌNG)
-        // boolean isRoomAvailable = checkRoomAvailability(roomId, checkInDate, checkOutDate);
+        // TODO: Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không? (QUAN
+        // TRỌNG)
+        // boolean isRoomAvailable = checkRoomAvailability(roomId, checkInDate,
+        // checkOutDate);
         // if (!isRoomAvailable) {
-        //     throw new RuntimeException("Phòng " + roomId + " không còn trống trong khoảng thời gian đã chọn.");
+        // throw new RuntimeException("Phòng " + roomId + " không còn trống trong khoảng
+        // thời gian đã chọn.");
         // }
 
         // 3. Kiểm tra phòng có sẵn trong khoảng thời gian đã chọn không
-        boolean isRoomAvailable = room.getTotalRooms() != null && room.getTotalRooms() >= roomQuantity;
+        int availableRooms = roomService.getAvailableRoomCount(roomId, checkInDate, checkOutDate);
+        boolean isRoomAvailable = availableRooms >= roomQuantity;
         if (!isRoomAvailable) {
-            throw new RuntimeException("Không đủ phòng trống để đặt. Số phòng còn lại: " + room.getTotalRooms());
+            throw new RuntimeException("Không đủ phòng có sẵn để đặt. Số phòng còn lại: " + availableRooms);
         }
-
 
         // 4. Lấy voucher nếu có
         VoucherEntity voucherEntity = null;
@@ -131,7 +142,6 @@ public class BookingOrderService {
             newStatus.setDescription("Chờ xác nhận");
             status = statusRepository.save(newStatus);
         }
-
 
         System.out.println("=== SERVICE DEBUG: Status found/created: " + status.getStatusId() + " ===");
 
@@ -158,37 +168,38 @@ public class BookingOrderService {
         booking.setRoomQuantity(roomQuantity);
 
         BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
-        
-        // Trừ số phòng đã đặt khỏi tổng số phòng còn trống
-        room.setTotalRooms(room.getTotalRooms() - roomQuantity);
-        roomRepository.save(room);
-        
+
+        // Không cần trừ totalRooms vì sẽ tính động theo booking
+        // Số phòng có sẵn sẽ được tính trong RoomService.getAvailableRoomCount()
+
         return savedBooking;
     }
 
     // Kiểm tra phòng có sẵn không
     public boolean checkRoomAvailability(Integer roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        // Kiểm tra xem có booking nào đã tồn tại cho phòng này trong khoảng thời gian này không
+        // Kiểm tra xem có booking nào đã tồn tại cho phòng này trong khoảng thời gian
+        // này không
         List<BookingOrderEntity> conflictingBookings = bookingOrderRepository.findConflictingBookings(
-            roomId, checkInDate, checkOutDate);
-        
+                roomId, checkInDate, checkOutDate);
+
         return conflictingBookings.isEmpty();
     }
 
     // Kiểm tra voucher có hợp lệ không
     public boolean isVoucherValid(VoucherEntity voucher, LocalDate checkInDate) {
-        if (voucher == null) return false;
-        
+        if (voucher == null)
+            return false;
+
         // Kiểm tra voucher còn hạn không
         if (voucher.getExpiryDate() != null && checkInDate.isAfter(voucher.getExpiryDate())) {
             return false;
         }
-        
+
         // Kiểm tra voucher còn số lượng không
         if (voucher.getUsageLimit() != null && voucher.getUsedCount() >= voucher.getUsageLimit()) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -199,16 +210,17 @@ public class BookingOrderService {
         
         // Giá cơ bản (nhân với số lượng phòng)
         BigDecimal basePrice = roomPrice.multiply(BigDecimal.valueOf(nights)).multiply(BigDecimal.valueOf(roomQuantity));
-        
+    
+
         // Phí dịch vụ (10%)
         BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
-        
+
         // Thuế VAT (10%)
         BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
-        
+
         // Tổng cộng
         BigDecimal total = basePrice.add(serviceFee).add(vat);
-        
+
         // Áp dụng voucher nếu có
         if (voucher != null && voucher.getDiscountAmount() != null) {
             BigDecimal discount = voucher.getDiscountAmount();
@@ -217,7 +229,7 @@ public class BookingOrderService {
                 total = BigDecimal.ZERO;
             }
         }
-        
+
         return total;
     }
 
@@ -226,15 +238,15 @@ public class BookingOrderService {
     public BookingOrderEntity cancelBooking(Integer bookingId, String reason) {
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
-        
+
         // Kiểm tra xem có thể hủy không
         if (!canCancelBooking(booking)) {
             throw new RuntimeException("Không thể hủy đặt phòng này. Vui lòng kiểm tra chính sách hủy phòng.");
         }
-        
+
         // Tính toán số tiền hoàn lại
         BigDecimal refundAmount = calculateRefundAmount(booking);
-        
+
         // Cập nhật trạng thái
         StatusEntity cancelledStatus = statusRepository.findByStatusNameIgnoreCase("CANCELLED");
         if (cancelledStatus == null) {
@@ -243,20 +255,16 @@ public class BookingOrderService {
             cancelledStatus.setDescription("Đã hủy");
             cancelledStatus = statusRepository.save(cancelledStatus);
         }
-        
+
         booking.setStatus(cancelledStatus);
         booking.setCancellationDate(LocalDateTime.now());
         booking.setCancellationReason(reason);
         booking.setRefundAmount(refundAmount);
         booking.setRefundStatus("PENDING");
-        
-        // Cộng lại số phòng đã đặt vào tổng số phòng còn trống
-        RoomEntity room = booking.getRoom();
-        if (room != null && booking.getRoomQuantity() != null) {
-            room.setTotalRooms(room.getTotalRooms() + booking.getRoomQuantity());
-            roomRepository.save(room);
-        }
-        
+
+        // Không cần cộng lại totalRooms vì sẽ tính động theo booking
+        // Số phòng có sẵn sẽ được tính trong RoomService.getAvailableRoomCount()
+
         return bookingOrderRepository.save(booking);
     }
 
@@ -264,10 +272,10 @@ public class BookingOrderService {
     public boolean canCancelBooking(BookingOrderEntity booking) {
         LocalDate today = LocalDate.now();
         LocalDate checkInDate = booking.getCheckInDate();
-        
+
         // Tính số ngày trước ngày check-in
         long daysBeforeCheckIn = ChronoUnit.DAYS.between(today, checkInDate);
-        
+
         // Chính sách hủy phòng:
         // - Hủy trước 24h: hoàn 100%
         // - Hủy trước 48h: hoàn 50%
@@ -279,9 +287,9 @@ public class BookingOrderService {
     public BigDecimal calculateRefundAmount(BookingOrderEntity booking) {
         LocalDate today = LocalDate.now();
         LocalDate checkInDate = booking.getCheckInDate();
-        
+
         long daysBeforeCheckIn = ChronoUnit.DAYS.between(today, checkInDate);
-        
+
         if (daysBeforeCheckIn > 2) {
             // Hủy trước 48h: hoàn 100%
             return booking.getTotalPrice();
@@ -299,19 +307,19 @@ public class BookingOrderService {
     public BookingOrderEntity processRefund(Integer bookingId) {
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
-        
+
         if (!"CANCELLED".equals(booking.getStatus().getStatusName())) {
             throw new RuntimeException("Chỉ có thể hoàn tiền cho đặt phòng đã hủy.");
         }
-        
+
         if ("COMPLETED".equals(booking.getRefundStatus())) {
             throw new RuntimeException("Đã hoàn tiền cho đặt phòng này.");
         }
-        
+
         // Cập nhật trạng thái hoàn tiền
         booking.setRefundStatus("COMPLETED");
         booking.setRefundDate(LocalDateTime.now());
-        
+
         // Cập nhật trạng thái booking thành REFUNDED
         StatusEntity refundedStatus = statusRepository.findByStatusNameIgnoreCase("REFUNDED");
         if (refundedStatus == null) {
@@ -321,7 +329,7 @@ public class BookingOrderService {
             refundedStatus = statusRepository.save(refundedStatus);
         }
         booking.setStatus(refundedStatus);
-        
+
         return bookingOrderRepository.save(booking);
     }
 
@@ -330,10 +338,10 @@ public class BookingOrderService {
     public BookingOrderEntity confirmPayment(Integer bookingId) {
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
-        
+
         booking.setPaymentStatus("PAID");
         booking.setPaidDate(LocalDateTime.now());
-        
+
         // Cập nhật trạng thái thành CONFIRMED
         StatusEntity confirmedStatus = statusRepository.findByStatusNameIgnoreCase("CONFIRMED");
         if (confirmedStatus == null) {
@@ -343,7 +351,62 @@ public class BookingOrderService {
             confirmedStatus = statusRepository.save(confirmedStatus);
         }
         booking.setStatus(confirmedStatus);
-        
+
+        return bookingOrderRepository.save(booking);
+    }
+
+    /**
+     * Xử lý thanh toán booking
+     * @param bookingId ID của booking
+     * @param paymentMethodCode Mã phương thức thanh toán
+     * @return BookingOrderEntity đã được cập nhật
+     */
+    @Transactional
+    public BookingOrderEntity processPayment(Integer bookingId, String paymentMethodCode) {
+        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
+
+        // Validate payment method
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = PaymentMethod.fromCode(paymentMethodCode);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Phương thức thanh toán không hợp lệ: " + paymentMethodCode);
+        }
+
+        // Set payment method
+        booking.setPaymentMethod(paymentMethod.getCode());
+
+        // Xử lý trạng thái thanh toán và booking dựa trên phương thức
+        if (paymentMethod.requiresImmediatePayment()) {
+            // Thanh toán ngay (thẻ, MoMo, chuyển khoản)
+            booking.setPaymentStatus(PaymentStatus.PAID.getCode());
+            booking.setPaidDate(LocalDateTime.now());
+            
+            // Set booking status thành CONFIRMED (đã xác nhận)
+            StatusEntity confirmedStatus = statusRepository.findByStatusNameIgnoreCase("CONFIRMED");
+            if (confirmedStatus == null) {
+                confirmedStatus = new StatusEntity();
+                confirmedStatus.setStatusName("CONFIRMED");
+                confirmedStatus.setDescription("Đã xác nhận");
+                confirmedStatus = statusRepository.save(confirmedStatus);
+            }
+            booking.setStatus(confirmedStatus);
+        } else {
+            // Thanh toán tại khách sạn
+            booking.setPaymentStatus(PaymentStatus.PENDING.getCode());
+            
+            // Set booking status thành PENDING (chờ xác nhận)
+            StatusEntity pendingStatus = statusRepository.findByStatusNameIgnoreCase("PENDING");
+            if (pendingStatus == null) {
+                pendingStatus = new StatusEntity();
+                pendingStatus.setStatusName("PENDING");
+                pendingStatus.setDescription("Chờ xác nhận");
+                pendingStatus = statusRepository.save(pendingStatus);
+            }
+            booking.setStatus(pendingStatus);
+        }
+
         return bookingOrderRepository.save(booking);
     }
 
@@ -368,11 +431,11 @@ public class BookingOrderService {
     public BookingOrderEntity checkIn(Integer bookingId) {
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
-        
+
         if (!"CONFIRMED".equals(booking.getStatus().getStatusName())) {
             throw new RuntimeException("Chỉ có thể check-in cho đặt phòng đã xác nhận.");
         }
-        
+
         StatusEntity checkedInStatus = statusRepository.findByStatusNameIgnoreCase("CHECKED_IN");
         if (checkedInStatus == null) {
             checkedInStatus = new StatusEntity();
@@ -381,7 +444,7 @@ public class BookingOrderService {
             checkedInStatus = statusRepository.save(checkedInStatus);
         }
         booking.setStatus(checkedInStatus);
-        
+
         return bookingOrderRepository.save(booking);
     }
 
@@ -390,11 +453,11 @@ public class BookingOrderService {
     public BookingOrderEntity checkOut(Integer bookingId) {
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
-        
+
         if (!"CHECKED_IN".equals(booking.getStatus().getStatusName())) {
             throw new RuntimeException("Chỉ có thể check-out cho đặt phòng đã check-in.");
         }
-        
+
         StatusEntity checkedOutStatus = statusRepository.findByStatusNameIgnoreCase("CHECKED_OUT");
         if (checkedOutStatus == null) {
             checkedOutStatus = new StatusEntity();
@@ -404,30 +467,35 @@ public class BookingOrderService {
         }
         booking.setStatus(checkedOutStatus);
 
-
         BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
-        System.out.println("=== SERVICE DEBUG: Booking saved successfully with ID: " + savedBooking.getBookingId() + " ===");
-        
+        System.out.println(
+                "=== SERVICE DEBUG: Booking saved successfully with ID: " + savedBooking.getBookingId() + " ===");
+
         return savedBooking;
     }
 
-    // --- PHƯƠNG THỨC CHO ADMIN QUẢN LÝ CRUD (Sử dụng bởi AdminBookingApiController) ---
+    // --- PHƯƠNG THỨC CHO ADMIN QUẢN LÝ CRUD (Sử dụng bởi
+    // AdminBookingApiController) ---
 
     @Transactional
-    public BookingOrderEntity adminCreateOrUpdateBooking(Integer existingBookingId, AdminBookingRequestDTO dto, boolean isCustomerFlowTriggered) {
+    public BookingOrderEntity adminCreateOrUpdateBooking(Integer existingBookingId, AdminBookingRequestDTO dto,
+            boolean isCustomerFlowTriggered) {
         System.out.println("[SERVICE DEBUG] adminCreateOrUpdateBooking - existingBookingId: " + existingBookingId);
         System.out.println("[SERVICE DEBUG] adminCreateOrUpdateBooking - DTO received: " + dto.toString());
 
         if (dto.getCustomerEmail() != null) {
-            System.out.println("[SERVICE DEBUG] adminCreateOrUpdateBooking - DTO Customer Email: " + dto.getCustomerEmail());
+            System.out.println(
+                    "[SERVICE DEBUG] adminCreateOrUpdateBooking - DTO Customer Email: " + dto.getCustomerEmail());
             if (dto.getCustomerEmail().equalsIgnoreCase("0.email")) {
-                System.err.println("[SERVICE CRITICAL DEBUG] DTO contains '0.email' for customerEmail in service method!");
+                System.err.println(
+                        "[SERVICE CRITICAL DEBUG] DTO contains '0.email' for customerEmail in service method!");
             }
         }
 
         // Validation
         if (dto.getCheckInDate() == null || dto.getCheckOutDate() == null ||
-            dto.getCheckInDate().isAfter(dto.getCheckOutDate()) || dto.getCheckInDate().isEqual(dto.getCheckOutDate())) {
+                dto.getCheckInDate().isAfter(dto.getCheckOutDate())
+                || dto.getCheckInDate().isEqual(dto.getCheckOutDate())) {
             throw new IllegalArgumentException("Ngày nhận phòng và trả phòng không hợp lệ.");
         }
         if (dto.getRoomId() == null) {
@@ -446,13 +514,17 @@ public class BookingOrderService {
             customer = booking.getCustomer();
 
             if (dto.getCustomerId() != null && dto.getCustomerId().equals(customer.getCustomerId())) {
-                 if(dto.getCustomerName() != null && !dto.getCustomerName().isEmpty()) customer.setName(dto.getCustomerName());
-                 if(dto.getCustomerPhone() != null) customer.setPhone(dto.getCustomerPhone());
-                 if(dto.getCustomerAddress() != null) customer.setAddress(dto.getCustomerAddress());
-                 customersRepository.save(customer);
+                if (dto.getCustomerName() != null && !dto.getCustomerName().isEmpty())
+                    customer.setName(dto.getCustomerName());
+                if (dto.getCustomerPhone() != null)
+                    customer.setPhone(dto.getCustomerPhone());
+                if (dto.getCustomerAddress() != null)
+                    customer.setAddress(dto.getCustomerAddress());
+                customersRepository.save(customer);
             } else if (dto.getCustomerId() != null) {
-                 customer = customersRepository.findById(dto.getCustomerId())
-                    .orElseThrow(() -> new RuntimeException("Khách hàng với ID: " + dto.getCustomerId() + " không tồn tại."));
+                customer = customersRepository.findById(dto.getCustomerId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Khách hàng với ID: " + dto.getCustomerId() + " không tồn tại."));
             }
         } else {
             booking = new BookingOrderEntity();
@@ -460,7 +532,8 @@ public class BookingOrderService {
 
             if (dto.getCustomerId() != null) {
                 customer = customersRepository.findById(dto.getCustomerId())
-                        .orElseThrow(() -> new RuntimeException("Khách hàng với ID: " + dto.getCustomerId() + " không tồn tại."));
+                        .orElseThrow(() -> new RuntimeException(
+                                "Khách hàng với ID: " + dto.getCustomerId() + " không tồn tại."));
             } else {
                 customer = customersRepository.findByEmail(dto.getCustomerEmail().toLowerCase())
                         .orElseGet(() -> {
@@ -573,23 +646,61 @@ public class BookingOrderService {
         return bookingOrderRepository.findByStatusName(statusName);
     }
 
-    //Đếm phòng booking hôm nay theo partner
+    // Đếm phòng booking hôm nay theo partner
     public long countTodayBookingsByPartner(Long partnerId) {
         return bookingOrderRepository.countTodayBookingsByPartner(partnerId);
     }
 
-    //Hiện tất cả booking của partner
+    // Hiện tất cả booking của partner
     public List<BookingOrderEntity> findAllBookingsByPartner(Long partnerId) {
         return bookingOrderRepository.findAllBookingsByPartner(partnerId);
     }
 
-    //Doanh thu hôm nay theo partner
+    public Map<LocalDate, ReportsPartnerDTO> getDailyBookingCount(Long partnerId, LocalDate start, LocalDate end) {
+        LocalDateTime fromDate = start.atStartOfDay();
+        LocalDateTime toDate = end.plusDays(1).atStartOfDay(); // để lấy trọn cả ngày cuối cùng
+
+        List<Object[]> rawResults = bookingOrderRepository.getBookingStatsInRange(partnerId, fromDate, toDate);
+
+        Map<LocalDate, ReportsPartnerDTO> result = new LinkedHashMap<>();
+
+        for (Object[] row : rawResults) {
+            Date date = (Date) row[0];
+            Long count = (Long) row[1];
+            BigDecimal total = (BigDecimal) row[2];
+
+            result.put(date.toLocalDate(), new ReportsPartnerDTO(count, total));
+        }
+
+        return result;
+    }
+
+    // Lấy dữ liệu doanh thu hàng tháng của đối tác theo năm
+    public List<MonthlyRevenueReportPartnerDTO> getMonthlyRevenueReportPartner(Long partnerId, int year) {
+        List<Object[]> rows = bookingOrderRepository.getMonthlyRevenueReportPartner(partnerId, year);
+        List<MonthlyRevenueReportPartnerDTO> result = new ArrayList<>();
+
+        for (Object[] row : rows) {
+            int month = (int) row[0];
+            BigDecimal revenue = (BigDecimal) row[1];
+            result.add(new MonthlyRevenueReportPartnerDTO(month, revenue));
+        }
+
+        return result;
+    }
+
+    // Doanh thu hôm nay theo partner
     public Integer sumDoanhThuToday(Long partnerId) {
         return bookingOrderRepository.sumDoanhThuToday(partnerId);
     }
 
-    //DataReport for Partner
-    public List<Object[]> getReportData(Long partnerId ,LocalDate startDate, LocalDate endDate) {
-        return bookingOrderRepository.getReportData(partnerId ,startDate, endDate);
+    // DataReport for Partner
+    public List<Object[]> getReportData(Long partnerId, LocalDate startDate, LocalDate endDate) {
+        return bookingOrderRepository.getReportData(partnerId, startDate, endDate);
     }
+
+    public List<Integer> getAvailableBookingYears(Long partnerId) {
+        return bookingOrderRepository.findAvailableBookingYears(partnerId);
+    }
+
 }

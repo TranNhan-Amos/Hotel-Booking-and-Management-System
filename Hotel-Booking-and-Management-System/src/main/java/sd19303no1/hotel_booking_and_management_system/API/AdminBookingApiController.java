@@ -185,7 +185,7 @@ public class AdminBookingApiController {
                 dto.setCustomerEmail(booking.getCustomer() != null ? booking.getCustomer().getEmail() : booking.getEmail());
                 dto.setCustomerPhone(booking.getCustomer() != null ? booking.getCustomer().getPhone() : "N/A");
                 dto.setRoomNumber(booking.getRoom() != null ? booking.getRoom().getRoomNumber() : "N/A");
-                dto.setRoomType(booking.getRoom() != null ? booking.getRoom().getType() : "N/A");
+                dto.setRoomType(booking.getRoom() != null && booking.getRoom().getType() != null ? booking.getRoom().getType().name() : "N/A");
                 dto.setRoomQuantity(booking.getRoomQuantity());
                 dto.setCheckInDate(booking.getCheckInDate());
                 dto.setCheckOutDate(booking.getCheckOutDate());

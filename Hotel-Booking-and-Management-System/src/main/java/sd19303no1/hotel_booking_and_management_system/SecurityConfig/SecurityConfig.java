@@ -34,7 +34,7 @@ public class SecurityConfig {
                     "/", "/login", "/register", "/css/**", "/Css/**", "/js/**", 
                     "/images/**", "/img/rooms/**", "/room/**", "/search", "/rooms", "/details/**",
                     "/bookings", "/payment", "/booking-confirmation", "/error", "/process-payment", "/test-data",
-                    "/search-rooms"
+                    "/search-rooms", "/test-payment"
                 ).permitAll()
                 .requestMatchers("/profile", "/profile/**", "/update-profile", "/my-bookings", "/book-room", "/cancel-booking", "/booking-detail/**", "/upload-avatar", "/delete-avatar", "/upload-room-images", "/delete-room-image", "/room-images/**").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -67,7 +67,7 @@ public class SecurityConfig {
         return authentication.getAuthorities().stream()
                 .map(authority -> switch (authority.getAuthority()) {
                     case "ROLE_ADMIN" -> "/admin/bookings";
-                    case "ROLE_PARTNER" -> "/partner";
+                    case "ROLE_PARTNER" -> "/partner/reports";
                     case "ROLE_STAFF" -> "/staff/dashboard";
                     default -> "/";
                 })

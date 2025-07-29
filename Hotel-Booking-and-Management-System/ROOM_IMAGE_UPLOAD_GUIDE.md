@@ -35,7 +35,7 @@ Hệ thống đã được tích hợp tính năng upload và quản lý ảnh c
 
 ### 4. Cập Nhật CSS
 - **Admin**: `src/main/resources/static/Css/Admin/management-Room.css`
-- **Partner**: `src/main/resources/static/Css/Partner/RoomPartner.css`
+
 - **Details**: `src/main/resources/static/Css/Details.css`
 
 ### 5. Cập Nhật Security

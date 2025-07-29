@@ -19,6 +19,7 @@ import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Controller
@@ -52,21 +53,24 @@ public class PaymentController {
             model.addAttribute("booking", booking);
             model.addAttribute("bookingId", bookingId);
             model.addAttribute("room", booking.getRoom());
-            model.addAttribute("customerName", booking.getCustomer() != null ? booking.getCustomer().getName() : booking.getEmail());
+            model.addAttribute("customerName",
+                    booking.getCustomer() != null ? booking.getCustomer().getName() : booking.getEmail());
             model.addAttribute("email", booking.getEmail());
-            model.addAttribute("phone", booking.getCustomer() != null ? booking.getCustomer().getPhone() : booking.getEmail());
+            model.addAttribute("phone",
+                    booking.getCustomer() != null ? booking.getCustomer().getPhone() : booking.getEmail());
             model.addAttribute("customerCCCD", booking.getCustomer() != null ? booking.getCustomer().getCccd() : "");
 
             // Calculate nights
             if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
                 long nights = java.time.temporal.ChronoUnit.DAYS.between(
-                    booking.getCheckInDate(), booking.getCheckOutDate());
+                        booking.getCheckInDate(), booking.getCheckOutDate());
                 model.addAttribute("nights", nights);
             }
 
             // Calculate prices
             if (booking.getRoom() != null && booking.getRoom().getPrice() != null) {
-                BigDecimal basePrice = booking.getRoom().getPrice().multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
+                BigDecimal basePrice = booking.getRoom().getPrice()
+                        .multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
                 BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
                 BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
                 BigDecimal total = basePrice.add(serviceFee).add(vat);
@@ -96,7 +100,7 @@ public class PaymentController {
             @RequestParam(required = false) String cvv,
             @RequestParam(required = false) String cardHolderName,
             @RequestParam(required = false) String momoNumber,
-            Model model) {
+            Model model, RedirectAttributes redirectAttributes) {
 
         System.out.println("=== PROCESS PAYMENT DEBUG START ===");
         System.out.println("bookingId: " + bookingId);
@@ -128,7 +132,8 @@ public class PaymentController {
             return "Page/Payment";
         }
         if (paymentMethod.equals("creditCard")) {
-            if (cardNumber == null || cardNumber.replaceAll("\\s", "").length() < 13 || cardNumber.replaceAll("\\s", "").length() > 19) {
+            if (cardNumber == null || cardNumber.replaceAll("\\s", "").length() < 13
+                    || cardNumber.replaceAll("\\s", "").length() > 19) {
                 model.addAttribute("error", "Số thẻ không hợp lệ");
                 return "Page/Payment";
             }
@@ -161,7 +166,8 @@ public class PaymentController {
         BookingOrderEntity booking = bookingOpt.get();
 
         // Validate booking details
-        if (booking.getRoom() == null || booking.getCheckInDate() == null || booking.getCheckOutDate() == null || booking.getRoomQuantity() == null || booking.getRoomQuantity() <= 0) {
+        if (booking.getRoom() == null || booking.getCheckInDate() == null || booking.getCheckOutDate() == null
+                || booking.getRoomQuantity() == null || booking.getRoomQuantity() <= 0) {
             model.addAttribute("error", "Thông tin đặt phòng không đầy đủ");
             return "Page/Payment";
         }
@@ -177,17 +183,40 @@ public class PaymentController {
         customer.setCccd(customerCCCD);
         customersService.save(customer);
 
-        // Update booking
+        // Update customer information
         booking.setCustomer(customer);
-        booking.setPaymentMethod(paymentMethod);
-        StatusEntity status = statusRepository.findByStatusNameIgnoreCase(paymentMethod.equalsIgnoreCase("payOnArrival") ? "PENDING" : "COMPLETED");
-        if (status != null) {
-            booking.setStatus(status);
+        
+        // Process payment using service method
+        booking = bookingOrderService.processPayment(bookingId, paymentMethod);
+        
+        // Calculate and set total price
+        if (booking.getRoom() != null && booking.getRoom().getPrice() != null && booking.getRoomQuantity() != null) {
+            BigDecimal basePrice = booking.getRoom().getPrice().multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
+            BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1")); // Phí dịch vụ 10%
+            BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1")); // VAT 10%
+            BigDecimal total = basePrice.add(serviceFee).add(vat);
+
+            booking.setTotalPrice(total);
         }
+        
         bookingOrderRepository.save(booking);
 
         // TODO: Integrate payment gateway for creditCard/momo/bankTransfer
-        System.out.println("=== PROCESS PAYMENT DEBUG: Payment processed successfully ===");
+        System.out.println("===== PROCESS PAYMENT DEBUG: Payment processed successfully ===");
+        System.out.println("Booking ID: " + bookingId);
+        System.out.println("Payment Method: " + paymentMethod);
+        System.out.println("Payment Status: " + booking.getPaymentStatus());
+        System.out.println("Total Price: " + booking.getTotalPrice());
+        
+        // Set success message based on payment method
+        String successMessage;
+        if (paymentMethod.equalsIgnoreCase("payOnArrival")) {
+            successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
+        } else {
+            successMessage = "Đã thanh toán, chờ nhận phòng.";
+        }
+        
+        redirectAttributes.addFlashAttribute("success", successMessage);
         return "redirect:/payment-success?bookingId=" + bookingId;
     }
 
@@ -198,12 +227,18 @@ public class PaymentController {
             if (bookingOpt.isPresent()) {
                 BookingOrderEntity booking = bookingOpt.get();
                 model.addAttribute("booking", booking);
-                model.addAttribute("success", booking.getPaymentMethod().equalsIgnoreCase("payOnArrival") 
-                    ? "Đặt phòng thành công! Vui lòng thanh toán tại khách sạn khi check-in." 
-                    : "Thanh toán thành công! Vui lòng đến khách sạn để check-in.");
+                            // Set success message based on payment status and method
+            String successMessage;
+            if (booking.getPaymentStatus().equals("PAID")) {
+                successMessage = "Đã thanh toán, chờ nhận phòng.";
+            } else {
+                successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
+            }
+            model.addAttribute("success", successMessage);
                 // Calculate prices for display
                 if (booking.getRoom() != null && booking.getRoom().getPrice() != null) {
-                    BigDecimal basePrice = booking.getRoom().getPrice().multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
+                    BigDecimal basePrice = booking.getRoom().getPrice()
+                            .multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
                     BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
                     BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
                     BigDecimal total = basePrice.add(serviceFee).add(vat);
@@ -223,17 +258,16 @@ public class PaymentController {
 
     @PostMapping("/payment")
     public String handlePaymentPost(
-        @RequestParam Integer roomId,
-        @RequestParam String customerName,
-        @RequestParam String email,
-        @RequestParam String phone,
-        @RequestParam String checkInDate,
-        @RequestParam String checkOutDate,
-        @RequestParam Integer roomQuantity,
-        @RequestParam(required = false) String specialRequests,
-        Model model,
-        RedirectAttributes redirectAttributes
-    ) {
+            @RequestParam Integer roomId,
+            @RequestParam String customerName,
+            @RequestParam String email,
+            @RequestParam String phone,
+            @RequestParam String checkInDate,
+            @RequestParam String checkOutDate,
+            @RequestParam Integer roomQuantity,
+            @RequestParam(required = false) String specialRequests,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         RoomEntity room = roomService.findById(roomId);
         if (room == null) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy phòng");

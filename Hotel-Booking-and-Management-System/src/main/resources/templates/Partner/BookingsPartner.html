@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:temporals="http://www.thymeleaf.org/extras/temporals">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +7,80 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/partner/BookingsPartner.css}">
+    <style>
+        body {
+            margin-top: 70px; /* Để tránh bị navbar che */
+        }
+        .main-content {
+            padding-top: 20px;
+        }
+        
+        /* Alert styles */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
 
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Empty state styles */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #d1d5db;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <div th:replace="~{/Layout/NavbarPartner}"></div>
+        <div th:replace="~{Layout/NavbarPartner :: navbar}"></div>
 
 
         <!-- Main Content -->
         <div class="main-content">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
             <div class="header">
                 <div class="page-title">
                     <h1>Quản lý đặt phòng</h1>
@@ -130,7 +195,7 @@
                                     <div class="date-info">
                                         <div class="check-in" th:text="${RoomBookingsPartner.checkInDate}">20/06/2024</div>
                                         <div class="check-out" th:text="${RoomBookingsPartner.checkOutDate}">22/06/2024</div>
-                                      <div class="nights" th:text="${RoomBookingsPartner.getDurationString()}">2 ngày 1 đêm</div>
+                                        <div class="nights">2 đêm</div>
                                     </div>
                                 </td>
                                 <td th:text="${RoomBookingsPartner.room.capacity} + ' người'">2 người</td>
@@ -138,106 +203,20 @@
                                     <div class="price" th:text="${#numbers.formatDecimal(RoomBookingsPartner.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
                                 </td>
                                 <td>
-                                    <span class="booking-status status-confirmed" th:if="${RoomBookingsPartner.status == 1}">Đã xác nhận</span>
-                                    <span class="booking-status status-checked-in" th:if="${RoomBookingsPartner.status == 2}">Đang lưu trú</span>
-                                    <span class="booking-status status-pending" th:if="${RoomBookingsPartner.status == 3}">Chờ xác nhận</span>
-                                    <span class="booking-status status-cancelled" th:if="${RoomBookingsPartner.status == 4}">Đã hủy</span>
+                                    <span class="booking-status status-confirmed" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}">Đã xác nhận</span>
+                                    <span class="booking-status status-checked-in" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}">Đang lưu trú</span>
+                                    <span class="booking-status status-pending" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}">Chờ xác nhận</span>
+                                    <span class="booking-status status-cancelled" th:if="${RoomBookingsPartner.status.name() == 'CANCELLED'}">Đã hủy</span>
+                                    <span class="booking-status status-completed" th:if="${RoomBookingsPartner.status.name() == 'COMPLETED'}">Hoàn thành</span>
+                                    <span class="booking-status status-checked-out" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_OUT'}">Đã check-out</span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001234')">Chi tiết</button>
-                                        <button class="action-btn btn-secondary">Check-in</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td>
-                                    <div class="booking-id">#BK001235</div>
-                                </td>
-                                <td>
-                                    <div class="guest-info">
-                                        <div class="guest-avatar">TH</div>
-                                        <div class="guest-details">
-                                            <h4>Trần Văn Hoàng</h4>
-                                            <p>0912345678</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="room-info">
-                                        <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=100&h=70&fit=crop" alt="Room" class="room-image">
-                                        <div class="room-details">
-                                            <h4>Suite Family</h4>
-                                            <p>Tầng 8 - Phòng 801</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="date-info">
-                                        <div class="check-in">19/06/2024</div>
-                                        <div class="check-out">23/06/2024</div>
-                                        <div class="nights">4 đêm</div>
-                                    </div>
-                                </td>
-                                <td>4 người</td>
-                                <td>
-                                    <div class="price">8.800.000đ</div>
-                                    <div class="price-details">2.200.000đ/đêm</div>
-                                </td>
-                                <td>
-                                    <span class="booking-status status-checked-in">Đang lưu trú</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001235')">Chi tiết</button>
-                                        <button class="action-btn btn-secondary">Check-out</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td>
-                                    <div class="booking-id">#BK001236</div>
-                                </td>
-                                <td>
-                                    <div class="guest-info">
-                                        <div class="guest-avatar">PM</div>
-                                        <div class="guest-details">
-                                            <h4>Phạm Thị Minh</h4>
-                                            <p>0976543210</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="room-info">
-                                        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=100&h=70&fit=crop" alt="Room" class="room-image">
-                                        <div class="room-details">
-                                            <h4>Standard Double</h4>
-                                            <p>Tầng 3 - Phòng 302</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="date-info">
-                                        <div class="check-in">21/06/2024</div>
-                                        <div class="check-out">22/06/2024</div>
-                                        <div class="nights">1 đêm</div>
-                                    </div>
-                                </td>
-                                <td>2 người</td>
-                                <td>
-                                    <div class="price">1.200.000đ</div>
-                                    <div class="price-details">1.200.000đ/đêm</div>
-                                </td>
-                                <td>
-                                    <span class="booking-status status-pending">Chờ xác nhận</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001236')">Chi tiết</button>
-                                        <button class="action-btn btn-secondary">Xác nhận</button>
-                                        <button class="action-btn btn-danger">Từ chối</button>
+                                        <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Chi tiết</button>
+                                        <button class="action-btn btn-secondary" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Xác nhận</button>
+                                        <button class="action-btn btn-success" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-in</button>
+                                        <button class="action-btn btn-warning" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-out</button>
+                                        <button class="action-btn btn-danger" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Hủy</button>
                                     </div>
                                 </td>
                             </tr>
@@ -245,22 +224,29 @@
                     </table>
                 </div>
 
+                <!-- Empty State -->
+                <div th:if="${RoomBookingsPartner == null || RoomBookingsPartner.isEmpty()}" class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Chưa có đặt phòng nào</h3>
+                    <p>Chưa có đặt phòng nào được tạo</p>
+                </div>
+
                 <!-- Mobile Card View -->
-                <div class="booking-cards">
-                    <div class="booking-card">
+                <div class="booking-cards" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
+                    <div class="booking-card" th:each="booking : ${RoomBookingsPartner}">
                         <div class="booking-card-header">
-                            <div class="booking-card-id">#BK001234</div>
-                            <span class="booking-status status-confirmed booking-card-status">Đã xác nhận</span>
+                            <div class="booking-card-id" th:text="'#' + ${booking.bookingId}">#BK001234</div>
+                            <span class="booking-status" th:class="${'status-' + booking.status.name().toLowerCase()}" th:text="${booking.status.description}">Đã xác nhận</span>
                         </div>
                         
                         <div class="booking-card-content">
                             <div class="booking-card-section">
                                 <div class="booking-card-label">Khách hàng</div>
                                 <div class="booking-card-guest">
-                                    <div class="booking-card-guest-avatar">NL</div>
+                                    <div class="booking-card-guest-avatar" th:text="${booking.customer.name.substring(0,2).toUpperCase()}">NL</div>
                                     <div>
-                                        <div class="booking-card-value">Nguyễn Thị Lan</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">0987654321</div>
+                                        <div class="booking-card-value" th:text="${booking.customer.name}">Nguyễn Thị Lan</div>
+                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${booking.customer.phone}">0987654321</div>
                                     </div>
                                 </div>
                             </div>
@@ -268,139 +254,40 @@
                             <div class="booking-card-section">
                                 <div class="booking-card-label">Phòng</div>
                                 <div class="booking-card-room">
-                                    <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=100&h=70&fit=crop" alt="Room" class="booking-card-room-image">
+                                    <img th:src="${booking.room.iconPath != null ? booking.room.iconPath : '/img/rooms/default-room.jpg'}" alt="Room" class="booking-card-room-image">
                                     <div>
-                                        <div class="booking-card-value">Deluxe Ocean View</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">Phòng 501</div>
+                                        <div class="booking-card-value" th:text="${booking.room.nameNumber}">Deluxe Ocean View</div>
+                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${'Phòng ' + booking.room.roomNumber}">Phòng 101</div>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="booking-card-section">
                                 <div class="booking-card-label">Thời gian</div>
-                                <div class="booking-card-value">20/06 - 22/06/2024</div>
-                                <div style="font-size: 12px; color: var(--info);">2 đêm • 2 người</div>
+                                <div class="booking-card-value" th:text="${booking.checkInDate} + ' - ' + ${booking.checkOutDate}">20/06 - 22/06/2024</div>
+                                <div style="font-size: 12px; color: var(--info);" th:text="${booking.room.capacity} + ' người'">2 người</div>
                             </div>
                             
                             <div class="booking-card-section">
                                 <div class="booking-card-label">Tổng tiền</div>
-                                <div class="booking-card-price">3.450.000đ</div>
-                                <div style="font-size: 12px; color: var(--text-gray);">1.725.000đ/đêm</div>
+                                <div class="booking-card-price" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
                             </div>
                         </div>
                         
                         <div class="booking-card-actions">
-                            <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001234')">Chi tiết</button>
-                            <button class="action-btn btn-secondary">Check-in</button>
-                        </div>
-                    </div>
-                    
-                    <div class="booking-card">
-                        <div class="booking-card-header">
-                            <div class="booking-card-id">#BK001235</div>
-                            <span class="booking-status status-checked-in booking-card-status">Đang lưu trú</span>
-                        </div>
-                        
-                        <div class="booking-card-content">
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Khách hàng</div>
-                                <div class="booking-card-guest">
-                                    <div class="booking-card-guest-avatar">TH</div>
-                                    <div>
-                                        <div class="booking-card-value">Trần Văn Hoàng</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">0912345678</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Phòng</div>
-                                <div class="booking-card-room">
-                                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=100&h=70&fit=crop" alt="Room" class="booking-card-room-image">
-                                    <div>
-                                        <div class="booking-card-value">Suite Family</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">Phòng 801</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Thời gian</div>
-                                <div class="booking-card-value">19/06 - 23/06/2024</div>
-                                <div style="font-size: 12px; color: var(--info);">4 đêm • 4 người</div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Tổng tiền</div>
-                                <div class="booking-card-price">8.800.000đ</div>
-                                <div style="font-size: 12px; color: var(--text-gray);">2.200.000đ/đêm</div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-card-actions">
-                            <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001235')">Chi tiết</button>
-                            <button class="action-btn btn-secondary">Check-out</button>
-                        </div>
-                    </div>
-                    
-                    <div class="booking-card">
-                        <div class="booking-card-header">
-                            <div class="booking-card-id">#BK001236</div>
-                            <span class="booking-status status-pending booking-card-status">Chờ xác nhận</span>
-                        </div>
-                        
-                        <div class="booking-card-content">
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Khách hàng</div>
-                                <div class="booking-card-guest">
-                                    <div class="booking-card-guest-avatar">PM</div>
-                                    <div>
-                                        <div class="booking-card-value">Phạm Thị Minh</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">0976543210</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Phòng</div>
-                                <div class="booking-card-room">
-                                    <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=100&h=70&fit=crop" alt="Room" class="booking-card-room-image">
-                                    <div>
-                                        <div class="booking-card-value">Standard Double</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);">Phòng 302</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Thời gian</div>
-                                <div class="booking-card-value">21/06 - 22/06/2024</div>
-                                <div style="font-size: 12px; color: var(--info);">1 đêm • 2 người</div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Tổng tiền</div>
-                                <div class="booking-card-price">1.200.000đ</div>
-                                <div style="font-size: 12px; color: var(--text-gray);">1.200.000đ/đêm</div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-card-actions">
-                            <button class="action-btn btn-primary" onclick="viewBookingDetails('BK001236')">Chi tiết</button>
-                            <button class="action-btn btn-secondary">Xác nhận</button>
-                            <button class="action-btn btn-danger">Từ chối</button>
+                            <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${booking.bookingId} + '\')'">Chi tiết</button>
+                            <button class="action-btn btn-secondary" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${booking.bookingId} + '\')'">Xác nhận</button>
+                            <button class="action-btn btn-success" th:if="${booking.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${booking.bookingId} + '\')'">Check-in</button>
+                            <button class="action-btn btn-warning" th:if="${booking.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${booking.bookingId} + '\')'">Check-out</button>
+                            <button class="action-btn btn-danger" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${booking.bookingId} + '\')'">Hủy</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Pagination -->
-                <div class="pagination">
+                <div class="pagination" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
                     <button><i class="fas fa-chevron-left"></i></button>
                     <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>4</button>
-                    <button>5</button>
                     <button><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
@@ -586,5 +473,8 @@
             }
         }
     </script>
+
+    <!-- Footer -->
+    <div th:replace="~{Layout/PartnerFoorter :: footer}"></div>
 </body>
 </html>

@@ -2,12 +2,19 @@ package sd19303no1.hotel_booking_and_management_system.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
 @Table(name = "rooms")
 public class RoomEntity {
 
@@ -95,6 +102,7 @@ public class RoomEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 
     // Quan hệ với đối tác (partner) nếu phòng do đối tác quản lý
     @ManyToOne
@@ -555,4 +563,5 @@ public class RoomEntity {
             return iconClass;
         }
     }
+    
 }

@@ -239,12 +239,12 @@ public class ReportService {
 
     // Thống kê top phòng được đặt nhiều nhất
     public List<Map<String, Object>> getTopRooms(int limit) {
-        return bookingOrderRepository.findTopRoomsByBookingCount(limit);
+        return bookingOrderRepository.findTopRoomsByBookingCount();
     }
 
     // Thống kê khách hàng VIP (đặt nhiều nhất)
     public List<Map<String, Object>> getTopCustomers(int limit) {
-        return bookingOrderRepository.findTopCustomersByBookingCount(limit);
+        return bookingOrderRepository.findTopCustomersByBookingCount();
     }
 
     // Tạo dữ liệu mẫu cho testing

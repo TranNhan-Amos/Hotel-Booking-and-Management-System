@@ -3,6 +3,7 @@ package sd19303no1.hotel_booking_and_management_system.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -73,4 +74,14 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
            "GROUP BY r " +
            "ORDER BY r.createdAt DESC")
     List<Object[]> findFeaturedRoomsWithRating(Pageable pageable);
+    
+Page<RoomEntity> findByPartnerId(Long partnerId, Pageable pageable);
+
+    @Query("SELECT COUNT(r.roomId) FROM RoomEntity r WHERE r.partner.id = :partner")
+    long countRoomsByPartnerId(@Param("partnerId") Long partner);
+
+
+    boolean existsByRoomNumberAndPartnerId(String roomNumber, Long partnerId);
+    boolean existsByRoomNumberIsNullAndPartnerId(Long partnerId);
+
 }

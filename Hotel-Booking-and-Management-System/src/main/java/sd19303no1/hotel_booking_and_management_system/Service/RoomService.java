@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
@@ -107,7 +108,10 @@ public class RoomService {
         return Math.max(total - booked, 0);
     }
 
-    public List<RoomEntity> findByPartnerId(Long partnerId) {
-        return roomRepository.findByPartner_Id(partnerId);
-    }
+ public List<RoomEntity> findByPartnerId(Long partnerId) {
+    Pageable pageable = PageRequest.of(0, 100);
+    return roomRepository.findByPartnerId(partnerId, pageable).getContent();
+}
+
+
 }

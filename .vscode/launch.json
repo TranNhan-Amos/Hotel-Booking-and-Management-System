@@ -1,4 +1,15 @@
 {
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-HotelBookingAndManagementSystemApplication<hotel-booking-and-management-system>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "sd19303no1.hotel_booking_and_management_system.HotelBookingAndManagementSystemApplication",
+            "projectName": "hotel-booking-and-management-system",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387

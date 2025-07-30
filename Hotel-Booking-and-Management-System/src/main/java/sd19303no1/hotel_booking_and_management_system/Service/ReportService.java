@@ -21,6 +21,8 @@ import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository.TopRoomProjection;
+import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository.TopCustomerProjection;
 
 @Service
 public class ReportService {
@@ -238,13 +240,13 @@ public class ReportService {
     }
 
     // Thống kê top phòng được đặt nhiều nhất
-    public List<Map<String, Object>> getTopRooms(int limit) {
-        return bookingOrderRepository.findTopRoomsByBookingCount(limit);
+public List<Map<String, Object>> getTopRooms(int limit) {
+        return bookingOrderRepository.findTopRoomsByBookingCount();
     }
 
     // Thống kê khách hàng VIP (đặt nhiều nhất)
     public List<Map<String, Object>> getTopCustomers(int limit) {
-        return bookingOrderRepository.findTopCustomersByBookingCount(limit);
+        return bookingOrderRepository.findTopCustomersByBookingCount();
     }
 
     // Tạo dữ liệu mẫu cho testing

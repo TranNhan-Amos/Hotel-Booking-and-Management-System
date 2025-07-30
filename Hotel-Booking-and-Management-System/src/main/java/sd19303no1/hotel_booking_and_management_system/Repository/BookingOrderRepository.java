@@ -143,7 +143,23 @@ List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId
   List<BookingOrderEntity> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
       @Param("endDate") LocalDateTime endDate);
 
-  @Query(value = """
+  // Định nghĩa projection cho phòng
+  public interface TopRoomProjection {
+      Integer getRoomId();
+      String getRoomName();
+      Long getBookingCount();
+      java.math.BigDecimal getTotalRevenue();
+  }
+  // Định nghĩa projection cho khách hàng
+  public interface TopCustomerProjection {
+      Integer getCustomerId();
+      String getCustomerName();
+      String getCustomerEmail();
+      Long getBookingCount();
+      java.math.BigDecimal getTotalSpent();
+  }
+
+@Query(value = """
       SELECT 
           r.room_id as roomId,
           r.room_name as roomName,
@@ -154,11 +170,10 @@ List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId
       WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
       GROUP BY r.room_id, r.room_name
       ORDER BY bookingCount DESC
-      LIMIT :limit
       """, nativeQuery = true)
-  List<Map<String, Object>> findTopRoomsByBookingCount(@Param("limit") int limit);
+  List<Map<String, Object>> findTopRoomsByBookingCount();
 
-  @Query(value = """
+   @Query(value = """
       SELECT 
           c.customer_id as customerId,
           c.name as customerName,
@@ -170,7 +185,6 @@ List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId
       WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
       GROUP BY c.customer_id, c.name, c.email
       ORDER BY bookingCount DESC
-      LIMIT :limit
       """, nativeQuery = true)
-  List<Map<String, Object>> findTopCustomersByBookingCount(@Param("limit") int limit);
+  List<Map<String, Object>> findTopCustomersByBookingCount();
 }

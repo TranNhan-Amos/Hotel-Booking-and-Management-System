@@ -6,6 +6,7 @@
     <title>Quản lý phòng - Partner</title>
     <link rel="stylesheet" th:href="@{/Css/Partner/RoomPartner.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         body {
             margin-top: 70px; /* Để tránh bị navbar che */
@@ -17,7 +18,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <div th:replace="~{Layout/NavbarPartner :: navbar}"></div>
+    <div th:replace="~{/Layout/NavbarPartner}"></div>
 
     <div class="container">
         <div class="header">
@@ -204,8 +205,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <div th:replace="~{Layout/PartnerFoorter :: footer}"></div>
 
     <script>
         // Edit Room Function

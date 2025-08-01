@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -28,18 +29,50 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
+                // Public endpoints - không cần xác thực
                 .requestMatchers(
-                    "/", "/login", "/register", "/css/**", "/Css/**", "/js/**", 
-                    "/images/**", "/img/rooms/**", "/room/**", "/search", "/rooms", "/details/**",
-                    "/bookings", "/payment", "/booking-confirmation", "/error", "/process-payment", "/test-data",
-                    "/search-rooms", "/test-payment"
+                    "/", "/login", "/register", "/logout",
+                    "/css/**", "/Css/**", "/js/**", "/images/**", "/img/**", "/room-images/**",
+                    "/room/**", "/rooms", "/room-detail", "/details/**",
+                    "/search-rooms", "/search", "/ListRoom", "/favoriteroom",
+                    "/About", "/Contact", "/Feedback", "/Notification",
+                    "/error", "/test-payment", "/test-data", "/booking-confirmation",
+                    "/partner/register", "/partner", "/api/admin/bookings/**",
+                    "/favicon.ico", "/robots.txt", "/test-csrf", "/test-logout"
                 ).permitAll()
-                .requestMatchers("/profile", "/profile/**", "/update-profile", "/my-bookings", "/book-room", "/cancel-booking", "/booking-detail/**", "/upload-avatar", "/delete-avatar", "/upload-room-images", "/delete-room-image", "/room-images/**").authenticated()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/partner/**").hasRole("PARTNER")
+                
+                // Customer authenticated endpoints
+                .requestMatchers(
+                    "/bookings", "/booking-details", "/my-bookings", 
+                    "/booking-detail/**", "/profile", "/profile/**",
+                    "/upload-avatar", "/upload-room-images", "/update-profile",
+                    "/payment", "/process-payment", "/payment-success",
+                    "/historybooking", "/feedbackuser", "/Waller",
+                    "/book-room", "/cancel-booking", "/delete-avatar", 
+                    "/delete-room-image"
+                ).hasRole("CUSTOMER")
+                
+                // Admin endpoints
+                .requestMatchers(
+                    "/admin/**", "/admin/rooms/**", "/admin/bookings/**",
+                    "/admin/customers/**", "/admin/vouchers/**", 
+                    "/admin/reports/**", "/admin/settings/**",
+                    "/admin/profile", "/admin/Evaluate"
+                ).hasRole("ADMIN")
+                
+                // Partner endpoints
+                .requestMatchers(
+                    "/partner/**", "/partner/rooms/**", "/partner/bookings/**",
+                    "/partner/reports", "/partner/reviews", "/partner/payments",
+                    "/partner/settings/**", "/partner/support", "/partner/profile",
+                    "/dashboard/partner", "/api/partner/**"
+                ).hasRole("PARTNER")
+                
+                // Staff endpoints
                 .requestMatchers("/staff/**").hasRole("STAFF")
+                
+                // Default - require authentication for everything else
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -58,6 +91,29 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
+            )
+            // CSRF protection với cấu hình an toàn
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers(
+                    "/api/**", "/process-payment", 
+                    "/css/**", "/Css/**", "/js/**", "/images/**", 
+                    "/img/**", "/room-images/**", "/favicon.ico",
+                    "/login", "/register", "/partner/register"
+                )
+            )
+            // Session management
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/login?expired")
+            )
+            // Exception handling
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/error?code=403")
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendRedirect("/login?unauthorized");
+                })
             );
 
         return http.build();
@@ -69,6 +125,7 @@ public class SecurityConfig {
                     case "ROLE_ADMIN" -> "/admin/bookings";
                     case "ROLE_PARTNER" -> "/partner/reports";
                     case "ROLE_STAFF" -> "/staff/dashboard";
+                    case "ROLE_CUSTOMER" -> "/";
                     default -> "/";
                 })
                 .findFirst()

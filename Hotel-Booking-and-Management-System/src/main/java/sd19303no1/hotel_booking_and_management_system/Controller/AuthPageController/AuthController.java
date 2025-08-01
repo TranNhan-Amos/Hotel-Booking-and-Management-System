@@ -16,6 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AuthController {
@@ -35,30 +37,36 @@ public class AuthController {
     @GetMapping("/login")
     public String showLoginPage(Model model,
                                 @RequestParam(value = "error", required = false) String error,
-                                @RequestParam(value = "logout", required = false) String logout) {
+                                @RequestParam(value = "logout", required = false) String logout,
+                                HttpServletRequest request) {
         if (error != null) {
             model.addAttribute("error", "Email hoặc mật khẩu không hợp lệ.");
         }
         if (logout != null) {
             model.addAttribute("logoutMessage", "Bạn đã đăng xuất thành công.");
         }
+        
+        // Đảm bảo session được tạo
+        HttpSession session = request.getSession(true);
+        
         return "Auth/login";
     }
 
-    @PostMapping("/login")
-    public String processLogin(@RequestParam String email,
-                              @RequestParam String password,
-                              Model model) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(email.toLowerCase(), password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            return getRedirectUrl(authentication);
-        } catch (AuthenticationException e) {
-            model.addAttribute("error", "Email hoặc mật khẩu không đúng!");
-            return "Auth/login";
-        }
-    }
+    // Xóa @PostMapping("/login") vì Spring Security sẽ xử lý
+    // @PostMapping("/login")
+    // public String processLogin(@RequestParam String email,
+    //                           @RequestParam String password,
+    //                           Model model) {
+    //     try {
+    //         Authentication authentication = authenticationManager.authenticate(
+    //                 new UsernamePasswordAuthenticationToken(email.toLowerCase(), password));
+    //         SecurityContextHolder.getContext().setAuthentication(authentication);
+    //         return getRedirectUrl(authentication);
+    //     } catch (AuthenticationException e) {
+    //         model.addAttribute("error", "Email hoặc mật khẩu không đúng!");
+    //         return "Auth/login";
+    //     }
+    // }
 
     @PostMapping("/register")
     public String processRegister(@RequestParam String username,

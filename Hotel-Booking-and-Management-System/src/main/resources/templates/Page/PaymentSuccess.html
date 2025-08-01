@@ -261,7 +261,7 @@
             </div>
             <div class="info-row">
                 <span class="info-label">Loại phòng:</span>
-                <span class="info-value" th:text="${booking.room.type}">Superior</span>
+                <span class="info-value" th:text="${booking.room.type != null ? booking.room.type.description : 'Chưa có'}">Superior</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Ngày nhận phòng:</span>

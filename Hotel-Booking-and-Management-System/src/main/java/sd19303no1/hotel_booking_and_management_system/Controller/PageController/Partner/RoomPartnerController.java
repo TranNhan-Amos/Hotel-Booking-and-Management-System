@@ -1,4 +1,4 @@
-package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Partner;
+             package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Partner;
 
 import java.io.File;
 import java.io.IOException;

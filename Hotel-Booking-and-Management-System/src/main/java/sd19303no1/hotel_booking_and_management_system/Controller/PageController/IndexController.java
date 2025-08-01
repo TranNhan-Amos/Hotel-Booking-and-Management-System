@@ -1,12 +1,14 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
@@ -104,7 +106,8 @@ public class IndexController {
         model.addAttribute("roomTypes", roomTypes);
 
         // Lấy danh sách phòng nổi bật (6 phòng mới nhất)
-        List<RoomEntity> featuredRooms = roomRepository.findFeaturedRooms(PageRequest.of(0, 6));
+        Page<RoomEntity> featuredRoomsPage = roomRepository.findFeaturedRooms(PageRequest.of(0, 6));
+        List<RoomEntity> featuredRooms = featuredRoomsPage.getContent();
         
         // Tính đánh giá trung bình và load amenities cho từng phòng
         for (RoomEntity room : featuredRooms) {
@@ -178,5 +181,20 @@ public class IndexController {
     @GetMapping("/test-payment")
     public String testPayment() {
         return "Page/test-payment";
+    }
+    
+    @GetMapping("/test-csrf")
+    public String testCsrf() {
+        return "test-csrf";
+    }
+    
+    @PostMapping("/test-csrf")
+    public String testCsrfPost() {
+        return "redirect:/?csrf-success=true";
+    }
+
+    @GetMapping("/test-logout")
+    public String testLogout() {
+        return "test-logout";
     }
 }

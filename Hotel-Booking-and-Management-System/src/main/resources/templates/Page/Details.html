@@ -532,7 +532,7 @@
 <body>
     <div th:replace="~{/Layout/narbar}"></div>
     <div class="room-header-hero">
-        <img th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng">
+        <img th:src="${not #lists.isEmpty(room.imageUrls) and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng">
         <div class="room-header-overlay"></div>
         <div class="room-header-content">
             <div class="room-breadcrumb">
@@ -554,7 +554,7 @@
         <div class="gallery-and-info">
             <div class="gallery-card">
                 <div class="gallery-slider" id="gallerySlider">
-                    <img id="mainGalleryImg" th:src="${room.imageUrls != null and !room.imageUrls.empty and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng chính">
+                    <img id="mainGalleryImg" th:src="${not #lists.isEmpty(room.imageUrls) and #strings.isEmpty(room.imageUrls[0]) == false} ? '/img/rooms/' + ${#strings.replace(room.imageUrls[0], '^/+', '')} : '/img/rooms/default-room.jpg'" alt="Ảnh phòng chính">
                     <div class="gallery-nav">
                         <button onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
                         <button onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
@@ -724,7 +724,7 @@
         <div class="related-carousel-title">Các phòng liên quan</div>
         <div class="related-carousel" id="relatedCarousel">
             <div class="related-room-card" th:each="relatedRoom : ${relatedRooms}">
-                <img th:src="'/' + 'img/rooms/' + ${relatedRoom.imageUrls != null and !relatedRoom.imageUrls.empty ? relatedRoom.imageUrls[0] : 'default-room.jpg'}" th:alt="${relatedRoom.type}">
+                <img th:src="'/' + 'img/rooms/' + ${not #lists.isEmpty(relatedRoom.imageUrls) ? relatedRoom.imageUrls[0] : 'default-room.jpg'}" th:alt="${relatedRoom.type}">
                 <div class="related-room-title" th:text="${relatedRoom.type}">Tên phòng</div>
                 <div class="related-room-desc" th:text="${relatedRoom.description}">Mô tả phòng</div>
                 <div class="related-room-rating" th:text="${#numbers.formatDecimal(relatedRoom.averageRating, 1, 1)}">8.5</div>

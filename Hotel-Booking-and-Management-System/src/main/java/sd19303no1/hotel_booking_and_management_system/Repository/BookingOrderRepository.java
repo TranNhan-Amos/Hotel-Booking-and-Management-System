@@ -49,6 +49,10 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
     @Query("SELECT b FROM BookingOrderEntity b WHERE b.status.statusName = :statusName")
     List<BookingOrderEntity> findByStatusName(@Param("statusName") String statusName);
 
+    // Tìm booking theo booking_status field
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.bookingStatus = :bookingStatus")
+    List<BookingOrderEntity> findByBookingStatus(@Param("bookingStatus") String bookingStatus);
+
     // Tìm booking theo khoảng thời gian
     @Query("SELECT b FROM BookingOrderEntity b WHERE b.checkInDate >= :startDate AND b.checkInDate <= :endDate")
     List<BookingOrderEntity> findByCheckInDateBetween(@Param("startDate") LocalDate startDate,

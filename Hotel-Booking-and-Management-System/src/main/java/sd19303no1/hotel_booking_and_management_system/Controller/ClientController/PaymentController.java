@@ -186,10 +186,7 @@ public class PaymentController {
         // Update customer information
         booking.setCustomer(customer);
         
-        // Process payment using service method
-        booking = bookingOrderService.processPayment(bookingId, paymentMethod);
-        
-        // Calculate and set total price
+        // Calculate and set total price first
         if (booking.getRoom() != null && booking.getRoom().getPrice() != null && booking.getRoomQuantity() != null) {
             BigDecimal basePrice = booking.getRoom().getPrice().multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
             BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1")); // Phí dịch vụ 10%
@@ -199,21 +196,25 @@ public class PaymentController {
             booking.setTotalPrice(total);
         }
         
+        // Process payment using service method (đã bao gồm xác nhận cho thanh toán ngay lập tức)
+        booking = bookingOrderService.processPayment(bookingId, paymentMethod);
+        
+        // Save booking with total price
         bookingOrderRepository.save(booking);
 
-        // TODO: Integrate payment gateway for creditCard/momo/bankTransfer
         System.out.println("===== PROCESS PAYMENT DEBUG: Payment processed successfully ===");
         System.out.println("Booking ID: " + bookingId);
         System.out.println("Payment Method: " + paymentMethod);
         System.out.println("Payment Status: " + booking.getPaymentStatus());
         System.out.println("Total Price: " + booking.getTotalPrice());
+        System.out.println("Booking Status: " + (booking.getStatus() != null ? booking.getStatus().getStatusName() : "null"));
         
         // Set success message based on payment method
         String successMessage;
         if (paymentMethod.equalsIgnoreCase("payOnArrival")) {
             successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
         } else {
-            successMessage = "Đã thanh toán, chờ nhận phòng.";
+            successMessage = "Đã thanh toán thành công, chờ nhận phòng.";
         }
         
         redirectAttributes.addFlashAttribute("success", successMessage);
@@ -228,13 +229,13 @@ public class PaymentController {
                 BookingOrderEntity booking = bookingOpt.get();
                 model.addAttribute("booking", booking);
                             // Set success message based on payment status and method
-            String successMessage;
-            if (booking.getPaymentStatus().equals("PAID")) {
-                successMessage = "Đã thanh toán, chờ nhận phòng.";
-            } else {
-                successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
-            }
-            model.addAttribute("success", successMessage);
+                String successMessage;
+                if (booking.getPaymentStatus().equals("PAID")) {
+                    successMessage = "Đã thanh toán thành công, chờ nhận phòng.";
+                } else {
+                    successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
+                }
+                model.addAttribute("success", successMessage);
                 // Calculate prices for display
                 if (booking.getRoom() != null && booking.getRoom().getPrice() != null) {
                     BigDecimal basePrice = booking.getRoom().getPrice()
@@ -268,11 +269,12 @@ public class PaymentController {
             @RequestParam(required = false) String specialRequests,
             Model model,
             RedirectAttributes redirectAttributes) {
-        RoomEntity room = roomService.findById(roomId);
-        if (room == null) {
+        Optional<RoomEntity> roomOpt = roomService.findById(roomId);
+        if (roomOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy phòng");
             return "redirect:/bookings?roomId=" + roomId;
         }
+        RoomEntity room = roomOpt.get();
         // Tạo booking tạm thời (status PENDING, chưa thanh toán)
         BookingOrderEntity booking = new BookingOrderEntity();
         booking.setRoom(room);

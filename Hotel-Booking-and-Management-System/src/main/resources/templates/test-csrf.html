@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CSRF Token</title>
+    <link rel="stylesheet" th:href="@{/Css/index.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Test CSRF Token</h1>
+        
+        <!-- CSRF Token Info -->
+        <div sec:authorize="isAuthenticated()">
+            <h2>CSRF Token Information</h2>
+            <p><strong>Token:</strong> <span th:text="${_csrf.token}">N/A</span></p>
+            <p><strong>Header Name:</strong> <span th:text="${_csrf.headerName}">N/A</span></p>
+            <p><strong>Parameter Name:</strong> <span th:text="${_csrf.parameterName}">N/A</span></p>
+        </div>
+        
+        <!-- Test Form with CSRF -->
+        <form th:action="@{/test-csrf}" method="post" th:object="${_csrf}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">Test CSRF Protected Form</button>
+        </form>
+        
+        <!-- Test Form without CSRF (should be ignored) -->
+        <form th:action="@{/api/test}" method="post">
+            <button type="submit">Test API Form (No CSRF)</button>
+        </form>
+        
+        <div>
+            <a href="/">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html> 

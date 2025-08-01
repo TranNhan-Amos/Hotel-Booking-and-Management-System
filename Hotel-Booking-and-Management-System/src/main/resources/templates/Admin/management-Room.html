@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin KS - Quản Lý Phòng</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- CSRF tokens removed as CSRF is disabled for development -->
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #4f46e5 100%);
@@ -63,7 +64,7 @@
             right: 0;
         }
         
-        .dropdown:hover .dropdown-content {
+        .dropdown:hover .dropdown-content, .dropdown.active .dropdown-content {
             display: block;
         }
         
@@ -140,8 +141,12 @@
                             <div class="text-sm text-purple-100">Đã đặt</div>
                         </div>
                         <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
-                            <div class="text-2xl font-bold text-red-300" th:text="${stats != null ? stats.maintenanceRooms : 0}">22</div>
+                            <div class="text-2xl font-bold text-orange-300" th:text="${stats != null ? stats.maintenanceRooms : 0}">22</div>
                             <div class="text-sm text-purple-100">Bảo trì</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur p-4 rounded-xl text-center">
+                            <div class="text-2xl font-bold text-gray-300" th:text="${stats != null ? stats.outOfServiceRooms : 0}">0</div>
+                            <div class="text-sm text-purple-100">Ngừng hoạt động</div>
                         </div>
                     </div>
                 </div>
@@ -151,8 +156,8 @@
             <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                 <form method="get" action="/admin/rooms" class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <select name="partnerId" class="select-custom w-full sm:w-64 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
-                            <option value="">🏢 Tất cả công ty</option>
+                        <select name="partnerId" class="select-custom w-full sm:w-64 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedPartnerId == null}">🏢 Tất cả công ty</option>
                             <option th:each="partner : ${partners}" 
                                     th:value="${partner.id}" 
                                     th:text="${partner.companyName}"
@@ -161,19 +166,25 @@
                             </option>
                         </select>
 
-                        <select name="status" class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
-                            <option value="">📊 Tất cả trạng thái</option>
-                            <option value="available" th:selected="${selectedStatus == 'available'}">✅ Còn trống</option>
-                            <option value="occupied" th:selected="${selectedStatus == 'occupied'}">🔴 Đã đặt</option>
-                            <option value="maintenance" th:selected="${selectedStatus == 'maintenance'}">🔧 Bảo trì</option>
+                        <select name="status" class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedStatus == null}">📊 Tất cả trạng thái</option>
+                            <option value="available" th:selected="${selectedStatus == 'available'}">✅ Vẫn Còn Phòng</option>
+                            <option value="occupied" th:selected="${selectedStatus == 'occupied'}">🔴 Đã Hết phòng</option>
+                            <option value="maintenance" th:selected="${selectedStatus == 'maintenance'}">🔧 Đang bảo trì</option>
+                            <option value="out_of_service" th:selected="${selectedStatus == 'out_of_service'}">🚫 Ngừng Hoạt Động</option>
                         </select>
 
-                        <select name="type" class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none">
-                            <option value="">🏠 Tất cả loại</option>
-                            <option value="standard" th:selected="${selectedType == 'standard'}">Standard</option>
-                            <option value="deluxe" th:selected="${selectedType == 'deluxe'}">Deluxe</option>
-                            <option value="suite" th:selected="${selectedType == 'suite'}">Suite</option>
-                            <option value="premium" th:selected="${selectedType == 'premium'}">Premium</option>
+                        <select name="type" class="select-custom w-full sm:w-48 h-12 px-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedType == null}">🏠 Tất cả loại</option>
+                            <option value="single" th:selected="${selectedType == 'single'}">Phòng đơn</option>
+                            <option value="double" th:selected="${selectedType == 'double'}">Phòng đôi</option>
+                            <option value="triple" th:selected="${selectedType == 'triple'}">Phòng ba</option>
+                            <option value="quad" th:selected="${selectedType == 'quad'}">Phòng bốn</option>
+                            <option value="suite" th:selected="${selectedType == 'suite'}">Phòng sang trọng</option>
+                            <option value="vip" th:selected="${selectedType == 'vip'}">Phòng VIP</option>
+                            <option value="standard" th:selected="${selectedType == 'standard'}">Phòng tiêu chuẩn</option>
+                            <option value="deluxe" th:selected="${selectedType == 'deluxe'}">Phòng cao cấp</option>
+                            <option value="family" th:selected="${selectedType == 'family'}">Phòng gia đình</option>
                         </select>
                     </div>
 
@@ -208,13 +219,13 @@
                 <!-- Room Cards -->
                 <div th:each="room : ${rooms}" class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden border border-gray-100">
                     <div class="relative">
-                        <img th:if="${room.imageUrls != null and !room.imageUrls.empty}"
+                        <img th:if="${not #lists.isEmpty(room.imageUrls)}"
                              th:src="@{'/img/rooms/' + ${room.imageUrls[0]}}"
                              th:alt="${room.nameNumber}"
                              class="w-full h-48 object-cover image-hover"
-                             onerror="this.src='https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=300&h=200&fit=crop'"/>
-                        <img th:unless="${room.imageUrls != null and !room.imageUrls.empty}"
-                             src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=300&h=200&fit=crop"
+                             onerror="this.src='/img/rooms/default.jpg'"/>
+                        <img th:unless="${not #lists.isEmpty(room.imageUrls)}"
+                             src="/img/rooms/default.jpg"
                              th:alt="${room.nameNumber}"
                              class="w-full h-48 object-cover image-hover"/>
                         
@@ -222,15 +233,19 @@
                         <div class="absolute top-3 left-3">
                             <span th:if="${room.status.name() == 'AVAILABLE'}" 
                                   class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                ✅ Còn trống
+                                ✅ Vẫn Còn Phòng
                             </span>
                             <span th:if="${room.status.name() == 'OCCUPIED'}" 
                                   class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                🔴 Đã đặt
+                                🔴 Đã Hết phòng
                             </span>
                             <span th:if="${room.status.name() == 'MAINTENANCE'}" 
                                   class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                🔧 Bảo trì
+                                🔧 Đang bảo trì
+                            </span>
+                            <span th:if="${room.status.name() == 'OUT_OF_SERVICE'}" 
+                                  class="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                🚫 Ngừng Hoạt Động
                             </span>
                         </div>
                         
@@ -303,6 +318,12 @@
                                         <i data-lucide="wrench" class="w-4 h-4 inline mr-2"></i>
                                         Đặt trạng thái: Bảo trì
                                     </button>
+                                    <button th:onclick="'updateRoomStatus(' + ${room.roomId} + ', \'out_of_service\')'" 
+                                            th:if="${room.status.name() != 'OUT_OF_SERVICE'}"
+                                            class="dropdown-item w-full text-left">
+                                        <i data-lucide="x-circle" class="w-4 h-4 inline mr-2"></i>
+                                        Đặt trạng thái: Ngừng hoạt động
+                                    </button>
                                     <hr class="my-2">
                                     <a th:href="@{'/admin/rooms/delete/' + ${room.roomId}}" 
                                        class="dropdown-item text-red-600"
@@ -320,11 +341,11 @@
                 <div th:if="${rooms == null or rooms.empty}" class="col-span-full text-center py-12">
                     <div class="bg-white rounded-2xl p-8 shadow-lg">
                         <i data-lucide="bed" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
-                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Không có phòng nào</h3>
-                        <p class="text-gray-500 mb-6">Chưa có phòng nào được thêm vào hệ thống.</p>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Không tìm thấy phòng</h3>
+                        <p class="text-gray-500 mb-6" th:text="${selectedPartnerId != null} ? 'Không có phòng nào thuộc đối tác đã chọn.' : 'Chưa có phòng nào được thêm vào hệ thống.'"></p>
                         <a th:href="@{'/admin/rooms/add'(partnerId=${selectedPartnerId})}" class="add-btn">
                             <i data-lucide="plus" class="w-5 h-5"></i>
-                            Thêm phòng đầu tiên
+                            Thêm phòng mới
                         </a>
                     </div>
                 </div>
@@ -336,13 +357,16 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
-        // Update room status function
+        // Update room status function with CSRF
         function updateRoomStatus(roomId, status) {
             if (confirm('Bạn có chắc chắn muốn cập nhật trạng thái phòng?')) {
+                const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
                 fetch('/admin/rooms/update-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
+                        [csrfHeader]: csrfToken
                     },
                     body: `roomId=${roomId}&status=${status}`
                 })
@@ -369,6 +393,25 @@
                 message.style.display = 'none';
             });
         }, 5000);
+
+        // Toggle dropdown on click for mobile devices
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const content = this.querySelector('.dropdown-content');
+                content.classList.toggle('active');
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+            }
+        });
     </script>
 </body>
 </html>

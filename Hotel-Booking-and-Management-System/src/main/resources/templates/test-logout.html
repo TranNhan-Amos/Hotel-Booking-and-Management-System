@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Logout Functionality</title>
+    <link rel="stylesheet" th:href="@{/Css/index.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Test Logout Functionality</h1>
+        
+        <!-- Authentication Status -->
+        <div sec:authorize="isAuthenticated()">
+            <h2>Trạng thái xác thực</h2>
+            <p><strong>Đã đăng nhập:</strong> <span th:text="${#authentication.authenticated}">false</span></p>
+            <p><strong>Username:</strong> <span th:text="${#authentication.principal.username}">N/A</span></p>
+            <p><strong>Roles:</strong> <span th:text="${#authentication.authorities}">N/A</span></p>
+            
+                                    <!-- Logout Form -->
+                        <h3>Test Logout</h3>
+                        <form th:action="@{/logout}" method="post" style="margin: 20px 0;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                Đăng xuất (POST)
+                            </button>
+                        </form>
+            
+            <a href="/logout" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+                Đăng xuất (GET)
+            </a>
+        </div>
+        
+        <div sec:authorize="!isAuthenticated()">
+            <h2>Chưa đăng nhập</h2>
+            <p>Bạn chưa đăng nhập. Vui lòng <a href="/login">đăng nhập</a> để test chức năng logout.</p>
+        </div>
+        
+        <!-- Test Results -->
+        <div th:if="${param.logout}" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3>✅ Logout thành công!</h3>
+            <p>Bạn đã đăng xuất thành công và được chuyển hướng về trang này.</p>
+        </div>
+        
+        <div th:if="${param.error}" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3>❌ Có lỗi xảy ra</h3>
+            <p>Đã có lỗi trong quá trình logout.</p>
+        </div>
+        
+        <div>
+            <a href="/" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

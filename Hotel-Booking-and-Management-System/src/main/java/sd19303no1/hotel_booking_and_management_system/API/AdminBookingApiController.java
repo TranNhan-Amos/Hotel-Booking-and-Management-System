@@ -10,6 +10,7 @@ import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
 
 import java.util.Map;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/admin/bookings")
@@ -125,7 +126,7 @@ public class AdminBookingApiController {
         }
     }
 
-    // CONFIRM Payment (by Admin)
+    // CONFIRM Payment (by Admin) - cho thanh toán online
     @PostMapping("/{bookingId}/confirm-payment")
     public ResponseEntity<?> adminConfirmPayment(@PathVariable Integer bookingId) {
         try {
@@ -137,6 +138,107 @@ public class AdminBookingApiController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Lỗi khi xác nhận thanh toán: " + e.getMessage()));
+        }
+    }
+
+    // CONFIRM Payment at Hotel (by Admin) - cho thanh toán tại khách sạn
+    @PostMapping("/{bookingId}/confirm-payment-hotel")
+    public ResponseEntity<?> adminConfirmPaymentAtHotel(@PathVariable Integer bookingId) {
+        try {
+            BookingOrderEntity confirmedBooking = bookingOrderService.confirmPaymentAtHotel(bookingId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Xác nhận thanh toán tại khách sạn thành công.",
+                "booking", confirmedBooking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi xác nhận thanh toán tại khách sạn: " + e.getMessage()));
+        }
+    }
+
+    // UPDATE Booking Details (by Admin) - chức năng chỉnh sửa đặt phòng
+    @PutMapping("/{bookingId}/update")
+    public ResponseEntity<?> adminUpdateBookingDetails(@PathVariable Integer bookingId,
+                                                       @RequestBody Map<String, Object> updateData) {
+        try {
+            BookingOrderEntity updatedBooking = bookingOrderService.updateBookingDetails(bookingId, updateData);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Cập nhật đặt phòng thành công.",
+                "booking", updatedBooking
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Không tìm thấy đặt phòng")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+                ));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                        "success", false,
+                        "message", "Lỗi khi cập nhật đặt phòng: " + e.getMessage()
+                    ));
+        }
+    }
+
+    // SEND Notification (by Admin) - chức năng gửi thông báo
+    @PostMapping("/{bookingId}/send-notification")
+    public ResponseEntity<?> adminSendNotification(@PathVariable Integer bookingId,
+                                                   @RequestBody Map<String, Object> notificationData) {
+        try {
+            String notificationType = (String) notificationData.get("notificationType");
+            String title = (String) notificationData.get("title");
+            String content = (String) notificationData.get("content");
+            Boolean sendEmail = (Boolean) notificationData.get("sendEmail");
+            Boolean sendSMS = (Boolean) notificationData.get("sendSMS");
+
+            if (title == null || title.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Tiêu đề thông báo không được để trống."
+                ));
+            }
+
+            if (content == null || content.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Nội dung thông báo không được để trống."
+                ));
+            }
+
+            // Gọi service để gửi thông báo
+            boolean sent = bookingOrderService.sendNotification(bookingId, notificationType, title, content, sendEmail, sendSMS);
+            
+            if (sent) {
+                return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Đã gửi thông báo thành công."
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of(
+                            "success", false,
+                            "message", "Không thể gửi thông báo."
+                        ));
+            }
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Không tìm thấy đặt phòng")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+                ));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                        "success", false,
+                        "message", "Lỗi khi gửi thông báo: " + e.getMessage()
+                    ));
         }
     }
 
@@ -179,30 +281,35 @@ public class AdminBookingApiController {
                 BookingOrderEntity booking = bookingOpt.get();
                 BookingDetailDTO dto = new BookingDetailDTO();
                 
-                // Map booking data to DTO
+                // Map booking data to DTO với xử lý null safety
                 dto.setBookingId(booking.getBookingId());
-                dto.setCustomerName(booking.getCustomer() != null ? booking.getCustomer().getName() : "N/A");
-                dto.setCustomerEmail(booking.getCustomer() != null ? booking.getCustomer().getEmail() : booking.getEmail());
-                dto.setCustomerPhone(booking.getCustomer() != null ? booking.getCustomer().getPhone() : "N/A");
-                dto.setRoomNumber(booking.getRoom() != null ? booking.getRoom().getRoomNumber() : "N/A");
-                dto.setRoomType(booking.getRoom() != null && booking.getRoom().getType() != null ? booking.getRoom().getType().name() : "N/A");
-                dto.setRoomQuantity(booking.getRoomQuantity());
+                dto.setCustomerName(booking.getCustomer() != null ? booking.getCustomer().getName() : "Chưa có");
+                dto.setCustomerEmail(booking.getCustomer() != null ? booking.getCustomer().getEmail() : 
+                    (booking.getEmail() != null ? booking.getEmail() : "Chưa có"));
+                dto.setCustomerPhone(booking.getCustomer() != null ? booking.getCustomer().getPhone() : "Chưa cập nhật");
+                dto.setRoomNumber(booking.getRoom() != null ? booking.getRoom().getRoomNumber() : "Chưa có");
+                dto.setRoomType(booking.getRoom() != null && booking.getRoom().getType() != null ? 
+                    booking.getRoom().getType().getDescription() : "Chưa có");
+                dto.setRoomQuantity(booking.getRoomQuantity() != null ? booking.getRoomQuantity() : 1);
                 dto.setCheckInDate(booking.getCheckInDate());
                 dto.setCheckOutDate(booking.getCheckOutDate());
                 dto.setBookingDate(booking.getBookingDate());
-                dto.setTotalPrice(booking.getTotalPrice());
-                dto.setStatusName(booking.getStatus() != null ? booking.getStatus().getStatusName() : "N/A");
-                dto.setPaymentMethod(booking.getPaymentMethod());
-                dto.setPaymentStatus(booking.getPaymentStatus());
+                dto.setTotalPrice(booking.getTotalPrice() != null ? booking.getTotalPrice() : BigDecimal.ZERO);
+                
+                // Sử dụng booking_status từ BookingOrderEntity như yêu cầu
+                dto.setStatusName(booking.getBookingStatus() != null ? booking.getBookingStatus() : "Chưa xác định");
+                
+                dto.setPaymentMethod(booking.getPaymentMethod() != null ? booking.getPaymentMethod() : "Chưa xác định");
+                dto.setPaymentStatus(booking.getPaymentStatus() != null ? booking.getPaymentStatus() : "Chưa xác định");
                 dto.setPaidDate(booking.getPaidDate());
-                dto.setSpecialRequests(booking.getSpecialRequests());
+                dto.setSpecialRequests(booking.getSpecialRequests() != null ? booking.getSpecialRequests() : "Không có");
                 dto.setCancellationDate(booking.getCancellationDate());
-                dto.setCancellationReason(booking.getCancellationReason());
-                dto.setRefundAmount(booking.getRefundAmount());
-                dto.setRefundStatus(booking.getRefundStatus());
+                dto.setCancellationReason(booking.getCancellationReason() != null ? booking.getCancellationReason() : "Không có");
+                dto.setRefundAmount(booking.getRefundAmount() != null ? booking.getRefundAmount() : BigDecimal.ZERO);
+                dto.setRefundStatus(booking.getRefundStatus() != null ? booking.getRefundStatus() : "Chưa xác định");
                 dto.setRefundDate(booking.getRefundDate());
-                dto.setVoucherCode(booking.getVoucher() != null ? booking.getVoucher().getCode() : null);
-                dto.setVoucherDiscount(booking.getVoucher() != null ? booking.getVoucher().getDiscountAmount() : null);
+                dto.setVoucherCode(booking.getVoucher() != null ? booking.getVoucher().getCode() : "Không có");
+                dto.setVoucherDiscount(booking.getVoucher() != null ? booking.getVoucher().getDiscountAmount() : BigDecimal.ZERO);
                 
                 return ResponseEntity.ok(dto);
             } else {
@@ -248,6 +355,30 @@ public class AdminBookingApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Lỗi khi lấy đặt phòng theo trạng thái: " + e.getMessage()));
+        }
+    }
+
+    // GET Bookings by Booking Status (sử dụng booking_status field)
+    @GetMapping("/booking-status/{bookingStatus}")
+    public ResponseEntity<?> getBookingsByBookingStatus(@PathVariable String bookingStatus) {
+        try {
+            var bookings = bookingOrderService.findByBookingStatus(bookingStatus);
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy đặt phòng theo booking status: " + e.getMessage()));
+        }
+    }
+
+    // GET Statistics
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getBookingStatistics() {
+        try {
+            var stats = bookingOrderService.getBookingStatistics();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Lỗi khi lấy thống kê đặt phòng: " + e.getMessage()));
         }
     }
 }

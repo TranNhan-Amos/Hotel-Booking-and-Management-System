@@ -104,24 +104,27 @@ public class CustomersService {
         List<CustomersEntity> customers = customerRepository.findAll();
         List<CustomerDTO> dtos = new java.util.ArrayList<>();
         for (CustomersEntity c : customers) {
-            CustomerDTO dto = new CustomerDTO();
-            dto.setCustomerId(c.getCustomerId());
-            dto.setName(c.getName());
-            dto.setEmail(c.getEmail());
-            dto.setPhone(c.getPhone());
-            dto.setAddress(c.getAddress());
-            dto.setCreatedDate(c.getCreatedDate());
-            dto.setStatus(c.getStatus());
-            // Booking count
-            int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail()).size();
-            dto.setBookingCount(bookingCount);
-            // Spending (tổng totalPrice các booking)
-            double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail())
-                .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
-            dto.setSpending(spending);
-            // Rating (nếu có logic rating theo customer, nếu không thì để 0)
-            dto.setRating(0);
-            dtos.add(dto);
+            // Chỉ lấy customers có SystemUserEntity với role CUSTOMER
+            if (c.getSystemUser() != null && c.getSystemUser().getRole() == sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.CUSTOMER) {
+                CustomerDTO dto = new CustomerDTO();
+                dto.setCustomerId(c.getCustomerId());
+                dto.setName(c.getName());
+                dto.setEmail(c.getEmail());
+                dto.setPhone(c.getPhone());
+                dto.setAddress(c.getAddress());
+                dto.setCreatedDate(c.getCreatedDate());
+                dto.setStatus(c.getStatus());
+                // Booking count
+                int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail()).size();
+                dto.setBookingCount(bookingCount);
+                // Spending (tổng totalPrice các booking)
+                double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail())
+                    .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
+                dto.setSpending(spending);
+                // Rating (nếu có logic rating theo customer, nếu không thì để 0)
+                dto.setRating(0);
+                dtos.add(dto);
+            }
         }
         return dtos;
     }
@@ -129,6 +132,11 @@ public class CustomersService {
     public CustomerDTO getCustomerDTOById(Integer customerId) {
         CustomersEntity customer = customerRepository.findById(customerId).orElse(null);
         if (customer == null) return null;
+        
+        // Chỉ trả về customer nếu có SystemUserEntity với role CUSTOMER
+        if (customer.getSystemUser() == null || customer.getSystemUser().getRole() != sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.CUSTOMER) {
+            return null;
+        }
         
         CustomerDTO dto = new CustomerDTO();
         dto.setCustomerId(customer.getCustomerId());

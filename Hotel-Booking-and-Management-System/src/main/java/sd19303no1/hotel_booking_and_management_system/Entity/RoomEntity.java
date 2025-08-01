@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "rooms")
@@ -87,6 +88,8 @@ public class RoomEntity {
     @Column(name = "is_pet_friendly", nullable = false)
     private Boolean isPetFriendly = false; // Cho phép mang thú cưng
 
+
+
     @Column(name = "icon_path", length = 255)
     private String iconPath; // Đường dẫn đến icon tùy chỉnh
 
@@ -117,6 +120,8 @@ public class RoomEntity {
     public RoomEntity() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.imageUrls = new ArrayList<>();
+        this.amenities = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -177,6 +182,9 @@ public class RoomEntity {
     }
 
     public List<String> getAmenities() {
+        if (amenities == null) {
+            amenities = new ArrayList<>();
+        }
         return amenities;
     }
 
@@ -185,6 +193,9 @@ public class RoomEntity {
     }
 
     public List<String> getImageUrls() {
+        if (imageUrls == null) {
+            imageUrls = new ArrayList<>();
+        }
         return imageUrls;
     }
 
@@ -264,6 +275,8 @@ public class RoomEntity {
         this.isPetFriendly = isPetFriendly;
     }
 
+
+
     public String getIconPath() {
         return iconPath;
     }
@@ -325,7 +338,7 @@ public class RoomEntity {
         if (canBook(quantity)) {
             totalRooms -= quantity;
             if (totalRooms == 0) {
-                status = RoomStatus.FULL;
+                status = RoomStatus.OCCUPIED;
             }
             updatedAt = LocalDateTime.now();
         } else {
@@ -335,7 +348,7 @@ public class RoomEntity {
 
     public void releaseRoom(Integer quantity) {
         totalRooms += quantity;
-        if (status == RoomStatus.FULL && totalRooms > 0) {
+        if (status == RoomStatus.OCCUPIED && totalRooms > 0) {
             status = RoomStatus.AVAILABLE;
         }
         updatedAt = LocalDateTime.now();
@@ -427,12 +440,10 @@ public class RoomEntity {
 
     // Enum cho trạng thái phòng
     public enum RoomStatus {
-        AVAILABLE("Còn trống", "fas fa-check-circle text-success"),
-        OCCUPIED("Đã có khách", "fas fa-user text-warning"),
+        AVAILABLE("Vẫn Còn Phòng", "fas fa-check-circle text-success"),
+        OCCUPIED("Đã Hết phòng", "fas fa-user text-warning"),
         MAINTENANCE("Đang bảo trì", "fas fa-tools text-danger"),
-        CLEANING("Đang dọn dẹp", "fas fa-broom text-info"),
-        RESERVED("Đã được đặt trước", "fas fa-calendar-check text-primary"),
-        FULL("Hết phòng", "fas fa-times-circle text-danger");
+        OUT_OF_SERVICE("Ngừng Hoạt Động", "fas fa-times-circle text-danger");
 
         private final String description;
         private final String iconClass;

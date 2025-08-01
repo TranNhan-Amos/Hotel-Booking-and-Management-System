@@ -1,0 +1,53 @@
+/* CSS cho xử lý ảnh mặc định */
+.room-image {
+    transition: opacity 0.3s ease;
+}
+
+.room-image.error {
+    opacity: 0.7;
+}
+
+.room-image.loading {
+    opacity: 0.5;
+}
+
+.room-image.default {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Animation cho ảnh loading */
+@keyframes imageLoading {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.3; }
+}
+
+.room-image.loading {
+    animation: imageLoading 1.5s infinite;
+}
+
+/* Fallback cho ảnh bị lỗi */
+.room-image-fallback {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 12px;
+    text-align: center;
+    min-height: 200px;
+}
+
+.room-image-fallback::before {
+    content: "🖼️";
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+} 

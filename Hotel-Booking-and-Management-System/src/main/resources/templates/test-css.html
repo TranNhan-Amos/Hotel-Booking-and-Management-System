@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CSS Loading</title>
+    
+    <!-- Test CSS loading -->
+    <link rel="stylesheet" th:href="@{/Css/index.css}">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>CSS Loading Test</h1>
+        
+        <div class="test-item success">
+            <h3>✅ Static Resources</h3>
+            <p>CSS files should be accessible without authentication</p>
+            <ul>
+                <li>/css/** - ✅ Should work</li>
+                <li>/Css/** - ✅ Should work</li>
+                <li>/js/** - ✅ Should work</li>
+                <li>/img/** - ✅ Should work</li>
+            </ul>
+        </div>
+        
+        <div class="test-item warning">
+            <h3>⚠️ CSS Loading Check</h3>
+            <p>Checking if main CSS file loads properly...</p>
+            <div id="css-status">Checking...</div>
+        </div>
+        
+        <div class="test-item">
+            <h3>🔧 Security Configuration</h3>
+            <p>Current security settings:</p>
+            <ul>
+                <li>CSRF: Disabled (for development)</li>
+                <li>Static Resources: Permitted</li>
+                <li>Public Pages: Permitted</li>
+                <li>Authentication: Required for protected pages</li>
+            </ul>
+        </div>
+        
+        <div class="test-item">
+            <h3>📋 Test Links</h3>
+            <p>Test these links to verify security:</p>
+            <ul>
+                <li><a href="/">Home Page</a> - Should work</li>
+                <li><a href="/login">Login Page</a> - Should work</li>
+                <li><a href="/profile">Profile Page</a> - Should redirect to login</li>
+                <li><a href="/admin/bookings">Admin Page</a> - Should redirect to login</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Check CSS loading
+        function checkCSS() {
+            const styleSheets = document.styleSheets;
+            let cssLoaded = false;
+            let cssFiles = [];
+            
+            for (let i = 0; i < styleSheets.length; i++) {
+                try {
+                    const href = styleSheets[i].href;
+                    if (href) {
+                        cssFiles.push(href);
+                        const rules = styleSheets[i].cssRules || styleSheets[i].rules;
+                        if (rules && rules.length > 0) {
+                            cssLoaded = true;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Cross-origin stylesheet:', e);
+                }
+            }
+            
+            const statusDiv = document.getElementById('css-status');
+            if (cssLoaded) {
+                statusDiv.innerHTML = '<span style="color: green;">✅ CSS loaded successfully!</span>';
+                statusDiv.innerHTML += '<br><small>Loaded files: ' + cssFiles.join(', ') + '</small>';
+            } else {
+                statusDiv.innerHTML = '<span style="color: red;">❌ CSS failed to load</span>';
+                statusDiv.innerHTML += '<br><small>Attempted files: ' + cssFiles.join(', ') + '</small>';
+            }
+        }
+        
+        // Check after page loads
+        window.addEventListener('load', checkCSS);
+        
+        // Also check immediately
+        setTimeout(checkCSS, 1000);
+    </script>
+</body>
+</html> 

@@ -91,6 +91,9 @@ public class BookingOrderEntity {
     @Column(name = "paid_date")
     private LocalDateTime paidDate;
 
+    @Column(name = "booking_status")
+    private String bookingStatus; // PENDING, CONFIRMED, CANCELLED
+
     @Column(name = "room_quantity")
     private Integer roomQuantity;
 
@@ -262,6 +265,14 @@ public class BookingOrderEntity {
 
     public void setPaidDate(LocalDateTime paidDate) {
         this.paidDate = paidDate;
+    }
+
+    public String getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(String bookingStatus) {
+        this.bookingStatus = bookingStatus;
     }
 
     public Integer getRoomQuantity() {

@@ -88,8 +88,10 @@ public class VoucherService {
             // Xác định loại giảm giá
             if (v.getDiscount() != null && v.getDiscountAmount() == null) {
                 dto.setDiscountType("PERCENTAGE");
-            } else {
+            } else if (v.getDiscountAmount() != null) {
                 dto.setDiscountType("FIXED");
+            } else {
+                dto.setDiscountType("UNKNOWN");
             }
             
             // Tính phần trăm sử dụng
@@ -125,8 +127,10 @@ public class VoucherService {
         // Xác định loại giảm giá
         if (voucher.getDiscount() != null && voucher.getDiscountAmount() == null) {
             dto.setDiscountType("PERCENTAGE");
-        } else {
+        } else if (voucher.getDiscountAmount() != null) {
             dto.setDiscountType("FIXED");
+        } else {
+            dto.setDiscountType("UNKNOWN");
         }
         
         // Tính phần trăm sử dụng
@@ -170,5 +174,35 @@ public class VoucherService {
         }
         
         voucherRepository.save(voucher);
+    }
+    
+    // Kiểm tra voucher có còn hiệu lực không
+    public boolean isVoucherExpired(VoucherEntity voucher) {
+        if (voucher == null) return true;
+        
+        LocalDate today = LocalDate.now();
+        
+        // Kiểm tra ngày kết thúc
+        if (voucher.getEndDate() != null && today.isAfter(voucher.getEndDate())) {
+            return true;
+        }
+        
+        // Kiểm tra ngày bắt đầu
+        if (voucher.getStartDate() != null && today.isBefore(voucher.getStartDate())) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Kiểm tra voucher có đạt giới hạn sử dụng không
+    public boolean isVoucherUsageLimitReached(VoucherEntity voucher) {
+        if (voucher == null) return true;
+        
+        if (voucher.getUsageLimit() != null && voucher.getUsedCount() >= voucher.getUsageLimit()) {
+            return true;
+        }
+        
+        return false;
     }
 }

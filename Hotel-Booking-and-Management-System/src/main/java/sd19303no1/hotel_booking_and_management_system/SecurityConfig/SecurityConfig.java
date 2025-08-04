@@ -39,7 +39,8 @@ public class SecurityConfig {
                     "/About", "/Contact", "/Feedback", "/Notification",
                     "/error", "/test-payment", "/test-data", "/booking-confirmation",
                     "/partner/register", "/partner", "/api/admin/bookings/**",
-                    "/favicon.ico", "/robots.txt", "/test-csrf", "/test-logout"
+                    "/favicon.ico", "/robots.txt", "/test-csrf", "/test-logout",
+                    "/test-csrf", "/test/**"
                 ).permitAll()
                 
                 // Customer authenticated endpoints
@@ -66,7 +67,7 @@ public class SecurityConfig {
                     "/partner/**", "/partner/rooms/**", "/partner/bookings/**",
                     "/partner/reports", "/partner/reviews", "/partner/payments",
                     "/partner/settings/**", "/partner/support", "/partner/profile",
-                    "/dashboard/partner", "/api/partner/**"
+                    "/dashboard/partner", "/api/partner/**", "/api/partner/reports/**"
                 ).hasRole("PARTNER")
                 
                 // Staff endpoints
@@ -99,7 +100,23 @@ public class SecurityConfig {
                     "/api/**", "/process-payment", 
                     "/css/**", "/Css/**", "/js/**", "/images/**", 
                     "/img/**", "/room-images/**", "/favicon.ico",
-                    "/login", "/register", "/partner/register"
+                    "/login", "/register", "/partner/register",
+                    "/admin/customers/update/**", "/admin/customers/delete/**",
+                    "/admin/customers/partner/update/**", "/admin/customers/partner/delete/**",
+                    "/admin/reviews/approve", "/admin/reviews/reject", "/admin/reviews/reply",
+                    "/admin/vouchers/create", "/admin/vouchers/update/**", "/admin/vouchers/delete/**", "/admin/vouchers/toggle/**",
+                    "/admin/rooms/save", "/admin/rooms/update-status",
+                    "/admin/reports/summary", "/admin/reports/daily", "/admin/reports/weekly", "/admin/reports/monthly", "/admin/reports/top-rooms", "/admin/reports/top-customers",
+                    "/upload-avatar", "/upload-room-images", "/update-profile", "/profile/upload-avatar", "/profile/update",
+                    "/book-room", "/cancel-booking", "/process-booking",
+                    "/partner/rooms/add", "/partner/rooms/edit",
+                    "/partner/settings/update",
+                    "/payment", "/process-payment",
+                    "/api/admin/bookings/**",
+                    "/api/admin/bookings/*/cancel", "/api/admin/bookings/*/refund", 
+                    "/api/admin/bookings/*/confirm-payment", "/api/admin/bookings/*/confirm-payment-hotel",
+                    "/api/admin/bookings/*/send-notification", "/api/admin/bookings/*/check-in", "/api/admin/bookings/*/check-out",
+                    "/api/partner/reports/summary", "/api/partner/reports/daily", "/api/partner/reports/top-customers", "/api/partner/reports/monthly-revenue"
                 )
             )
             // Session management

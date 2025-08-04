@@ -1,478 +1,733 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:temporals="http://www.thymeleaf.org/extras/temporals">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý đặt phòng - Grand Ocean</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/partner/BookingsPartner.css}">
     <style>
+        /* Modern Design Styles matching RoomPartner */
         body {
-            margin-top: 70px; /* Để tránh bị navbar che */
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding-top: 70px; /* Add padding to account for fixed navbar */
         }
+
+        .dashboard-container {
+            display: block; /* Change from flex to block for top navbar layout */
+            min-height: calc(100vh - 70px); /* Subtract navbar height */
+        }
+
         .main-content {
-            padding-top: 20px;
+            width: 100%; /* Full width */
+            padding: 30px;
+            margin-left: 0; /* No left margin */
         }
-        
-        /* Alert styles */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 16px;
+            padding: 25px 30px;
+            box-shadow: 0 8px 32px rgba(0, 198, 207, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            backdrop-filter: blur(10px);
+            width: 100%; /* Ensure full width */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #324b4c;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 500;
+            gap: 12px;
         }
 
-        .alert.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .page-title p {
+            margin: 8px 0 0 0;
+            color: #666;
+            font-size: 14px;
         }
 
-        .alert.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
         }
-        
-        /* Empty state styles */
+
+        .header-info span {
+            color: #00c6cf;
+            font-weight: 600;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 198, 207, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 198, 207, 0.15);
+        }
+
+        .stat-card i {
+            font-size: 32px;
+            color: #00c6cf;
+            background: rgba(0, 198, 207, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .stat-info h3 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #324b4c;
+        }
+
+        .stat-info p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Search and Filter Section */
+        .search-filter-section {
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 198, 207, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-filter-container input,
+        .search-filter-container select {
+            padding: 12px 18px;
+            border: 2px solid rgba(0, 198, 207, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 198, 207, 0.05);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-filter-container input:focus,
+        .search-filter-container select:focus {
+            outline: none;
+            border-color: #00c6cf;
+            box-shadow: 0 0 0 4px rgba(0, 198, 207, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-filter-container input[type="text"] {
+            min-width: 300px;
+        }
+
+        /* Booking List Section */
+        .booking-list {
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 198, 207, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .table-container {
+            overflow-x: auto !important;
+            border-radius: 8px !important;
+            background: white !important;
+        }
+
+        /* Ensure table is properly displayed */
+        .booking-list table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-top: 10px !important;
+            background: white !important;
+        }
+
+        .booking-list th {
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%) !important;
+            color: white !important;
+            padding: 15px 12px !important;
+            text-align: left !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+        }
+
+        .booking-list td {
+            padding: 15px 12px !important;
+            border-bottom: 1px solid rgba(0, 198, 207, 0.1) !important;
+            vertical-align: middle !important;
+            background: white !important;
+        }
+
+        .booking-list tr:hover {
+            background: rgba(0, 198, 207, 0.05) !important;
+        }
+
+        /* Customer Info */
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #324b4c;
+            font-size: 14px;
+        }
+
+        .customer-email {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Room Info */
+        .room-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .room-name {
+            font-weight: 600;
+            color: #324b4c;
+            font-size: 14px;
+        }
+
+        .room-type {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Date Range */
+        .date-range {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .check-in,
+        .check-out {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Price */
+        .price {
+            font-weight: 600;
+            color: #00c6cf;
+            font-size: 14px;
+        }
+
+        /* Booking ID */
+        .booking-id {
+            font-weight: 600;
+            color: #324b4c;
+            font-size: 14px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 6px 12px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            min-width: 120px !important;
+            justify-content: center !important;
+        }
+
+        .status-badge i {
+            font-size: 14px !important;
+        }
+
+        .status-badge span {
+            white-space: nowrap !important;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: #f59e0b !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+        }
+
+        .status-confirmed {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .status-completed {
+            background: rgba(59, 130, 246, 0.1) !important;
+            color: #3b82f6 !important;
+            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+        }
+
+        /* Payment Status */
+        .payment-status {
+            padding: 6px 12px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            min-width: 120px !important;
+            justify-content: center !important;
+        }
+
+        .payment-status.paid {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .payment-status.pending {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: #f59e0b !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+        }
+
+        .payment-status.failed {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex !important;
+            gap: 8px !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .action-btn {
+            padding: 8px 16px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+        }
+
+        .action-btn i {
+            font-size: 14px !important;
+        }
+
+        .btn-detail {
+            background: rgba(0, 198, 207, 0.1) !important;
+            color: #00c6cf !important;
+            border: 1px solid rgba(0, 198, 207, 0.2) !important;
+        }
+
+        .btn-detail:hover {
+            background: rgba(0, 198, 207, 0.2) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 2px 8px rgba(0, 198, 207, 0.3) !important;
+        }
+
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #6b7280;
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 198, 207, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            backdrop-filter: blur(10px);
         }
-        
+
         .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: #d1d5db;
+            font-size: 64px;
+            color: #00c6cf;
+            margin-bottom: 20px;
         }
-        
+
         .empty-state h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #374151;
+            margin: 0 0 10px 0;
+            color: #324b4c;
+            font-size: 24px;
         }
-        
+
         .empty-state p {
-            font-size: 14px;
-            color: #6b7280;
+            margin: 0 0 30px 0;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-filter-container input[type="text"] {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .page-title h1 {
+                font-size: 24px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-card i {
+                font-size: 24px;
+                padding: 12px;
+            }
+
+            .stat-info h3 {
+                font-size: 24px;
+            }
+
+            .booking-list {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Sidebar -->
         <div th:replace="~{/Layout/NavbarPartner}"></div>
-
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Success/Error Messages -->
-            <div th:if="${success}" class="alert success">
-                <i class="fas fa-check-circle"></i>
-                <span th:text="${success}"></span>
-            </div>
-            <div th:if="${error}" class="alert error">
-                <i class="fas fa-exclamation-circle"></i>
-                <span th:text="${error}"></span>
-            </div>
-
             <div class="header">
                 <div class="page-title">
-                    <h1>Quản lý đặt phòng</h1>
-                    <p>Theo dõi và quản lý tất cả đặt phòng của khách sạn</p>
+                    <h1><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</h1>
+                    <p>Quản lý và theo dõi tất cả đặt phòng của bạn</p>
                 </div>
-                
-                <div class="header-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Tìm kiếm đặt phòng...">
+                <div class="header-info">
+                    <div><i class="fas fa-hotel"></i> Khách sạn: <span th:text="${partner != null ? partner.companyName : 'N/A'}">N/A</span></div>
+                    <div><i class="fas fa-user"></i> Đối tác: <span th:text="${partner != null ? partner.contactPerson : 'N/A'}">N/A</span></div>
+                </div>
+            </div>
+
+            <!-- Booking Statistics -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? RoomBookingsPartner.size() : 0}">0</h3>
+                        <p>Tổng đặt phòng</p>
                     </div>
-                    
-                    <div class="filter-dropdown">
-                        <button class="filter-btn">
-                            <i class="fas fa-filter"></i>
-                            <span>Lọc</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? #lists.size(RoomBookingsPartner.?[status.statusName == 'CONFIRMED']) : 0}">0</h3>
+                        <p>Đã xác nhận</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? #lists.size(RoomBookingsPartner.?[status.statusName == 'PENDING']) : 0}">0</h3>
+                        <p>Chờ xác nhận</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-times-circle"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? #lists.size(RoomBookingsPartner.?[status.statusName == 'CANCELLED']) : 0}">0</h3>
+                        <p>Đã hủy</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-credit-card"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? #lists.size(RoomBookingsPartner.?[paymentStatus == 'PAID']) : 0}">0</h3>
+                        <p>Đã thanh toán</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-hourglass-half"></i>
+                    <div class="stat-info">
+                        <h3 th:text="${RoomBookingsPartner != null ? #lists.size(RoomBookingsPartner.?[paymentStatus == 'PENDING']) : 0}">0</h3>
+                        <p>Chờ thanh toán</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title">Tổng đặt phòng hôm nay</div>
-                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" th:text="${bookingshomNay}">0</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title">Chờ xác nhận</div>
-                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">8</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title">Đang lưu trú</div>
-                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">42</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title">Doanh thu hôm nay</div>
-                        <div class="stat-icon" style="background: rgba(26, 41, 128, 0.1); color: #1a2980;">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" th:text="${#numbers.formatDecimal(sumDoanhThuToday, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">18.5tr</div>
+            <!-- Search and Filter -->
+            <div class="search-filter-section">
+                <div class="search-filter-container">
+                    <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên, email khách hàng..." oninput="filterBookings()">
+                    <select id="statusFilter" onchange="filterBookings()">
+                        <option value="all">📊 Tất Cả Trạng Thái</option>
+                        <option value="pending">⏳ Chờ Xác Nhận</option>
+                        <option value="confirmed">✅ Đã Xác Nhận</option>
+                        <option value="cancelled">❌ Đã Hủy</option>
+                        <option value="completed">🏁 Hoàn Thành</option>
+                    </select>
+                    <select id="paymentFilter" onchange="filterBookings()">
+                        <option value="all">💳 Tất Cả Thanh Toán</option>
+                        <option value="paid">💰 Đã Thanh Toán</option>
+                        <option value="pending-payment">⏰ Chờ Thanh Toán</option>
+                        <option value="failed">❌ Thanh Toán Thất Bại</option>
+                    </select>
+                    <input type="date" id="dateFilter" onchange="filterBookings()">
                 </div>
             </div>
 
-            <!-- Bookings Table -->
-            <div class="bookings-section">
-                <div class="section-header">
-                    <div class="section-title">Danh sách đặt phòng</div>
-                    <button class="action-btn btn-primary">Xuất báo cáo</button>
-                </div>
-
-                <!-- Desktop Table View -->
+            <!-- Booking List -->
+            <div class="booking-list">
                 <div class="table-container">
-                    <table class="bookings-table">
+                    <table>
                         <thead>
                             <tr>
-                                <th>Mã đặt phòng</th>
-                                <th>Khách hàng</th>
+                                <th>Mã Đặt Phòng</th>
+                                <th>Khách Hàng</th>
                                 <th>Phòng</th>
-                                <th>Ngày lưu trú</th>
-                                <th>Số khách</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
+                                <th>Ngày Đặt</th>
+                                <th>Giá</th>
+                                <th>Trạng Thái</th>
+                                <th>Thanh Toán</th>
+                                <th>Thao Tác</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="RoomBookingsPartner : ${RoomBookingsPartner}">
+                        <tbody id="bookingTableBody">
+                            <tr th:each="booking : ${RoomBookingsPartner}" 
+                                th:data-status="${booking.status != null ? booking.status.statusName.toLowerCase() : 'pending'}"
+                                th:data-booking-id="${booking.bookingId}">
+                                <td class="booking-id" th:text="'#' + ${booking.bookingId}">#BK001</td>
                                 <td>
-                                    <div class="booking-id" th:text="${RoomBookingsPartner.bookingId}">#BK001234</div>
-                                </td>
-                                <td>
-                                    <div class="guest-info">
-                                        <div class="guest-avatar">NL</div>
-                                        <div class="guest-details">
-                                            <h4 th:text="${RoomBookingsPartner.customer.name}">Nguyễn Thị Lan</h4>
-                                            <p th:text="${RoomBookingsPartner.customer.phone}">0987654321</p>
-                                        </div>
+                                    <div class="customer-info">
+                                        <div class="customer-name" th:text="${booking.customer != null ? booking.customer.name : 'Chưa có'}">Khách hàng</div>
+                                        <div class="customer-email" th:text="${booking.customer != null ? booking.customer.email : 'Chưa có'}">email@example.com</div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="room-info">
-                                        <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=100&h=70&fit=crop" alt="Room" class="room-image">
-                                        <div class="room-details">
-                                            <h4 th:text="${RoomBookingsPartner.room.type}">Deluxe Ocean View</h4>
-                                           
-                                        </div>
+                                        <div class="room-name" th:text="${booking.room != null ? booking.room.nameNumber : 'Chưa có'}">Tên phòng</div>
+                                        <div class="room-type" th:text="${booking.room != null && booking.room.type != null ? booking.room.type : 'Chưa có'}">Loại phòng</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="date-info">
-                                        <div class="check-in" th:text="${RoomBookingsPartner.checkInDate}">20/06/2024</div>
-                                        <div class="check-out" th:text="${RoomBookingsPartner.checkOutDate}">22/06/2024</div>
-                                        <div class="nights">2 đêm</div>
+                                    <div class="date-range">
+                                        <div class="check-in" th:text="'Nhận: ' + ${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : 'N/A'}">Nhận: 25/05/2025</div>
+                                        <div class="check-out" th:text="'Trả: ' + ${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : 'N/A'}">Trả: 27/05/2025</div>
                                     </div>
                                 </td>
-                                <td th:text="${RoomBookingsPartner.room.capacity} + ' người'">2 người</td>
+                                <td class="price" th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">3,000,000 ₫</td>
                                 <td>
-                                    <div class="price" th:text="${#numbers.formatDecimal(RoomBookingsPartner.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
+                                    <span th:class="'status-badge status-' + ${booking.status != null ? booking.status.statusName.toLowerCase() : 'pending'}" 
+                                          th:attr="data-status=${booking.status != null ? booking.status.statusName.toLowerCase() : 'pending'}">
+                                        <i th:class="${booking.status != null ? 
+                                                      (booking.status.statusName == 'CONFIRMED' ? 'fas fa-check-circle' : 
+                                                       booking.status.statusName == 'PENDING' ? 'fas fa-clock' : 
+                                                       booking.status.statusName == 'CANCELLED' ? 'fas fa-times-circle' : 
+                                                       'fas fa-info-circle') : 'fas fa-info-circle'}"></i>
+                                        <span th:text="${booking.status != null ? booking.status.statusName : 'Chưa xác định'}">Trạng thái</span>
+                                    </span>
                                 </td>
                                 <td>
-                                    <span class="booking-status status-confirmed" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}">Đã xác nhận</span>
-                                    <span class="booking-status status-checked-in" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}">Đang lưu trú</span>
-                                    <span class="booking-status status-pending" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}">Chờ xác nhận</span>
-                                    <span class="booking-status status-cancelled" th:if="${RoomBookingsPartner.status.name() == 'CANCELLED'}">Đã hủy</span>
-                                    <span class="booking-status status-completed" th:if="${RoomBookingsPartner.status.name() == 'COMPLETED'}">Hoàn thành</span>
-                                    <span class="booking-status status-checked-out" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_OUT'}">Đã check-out</span>
+                                    <span th:class="'payment-status ' + ${booking.paymentStatus != null ? booking.paymentStatus.toLowerCase() : 'pending'}" 
+                                          th:attr="data-payment-status=${booking.paymentStatus != null ? booking.paymentStatus.toLowerCase() : 'pending'}">
+                                        <i th:class="${booking.paymentStatus != null ? 
+                                                      (booking.paymentStatus == 'PAID' ? 'fas fa-check-circle' : 
+                                                       booking.paymentStatus == 'PENDING' ? 'fas fa-clock' : 
+                                                       'fas fa-times-circle') : 'fas fa-clock'}"></i>
+                                        <span th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 
+                                                      booking.paymentStatus == 'PENDING' ? 'Chờ thanh toán' : 
+                                                      booking.paymentStatus == 'FAILED' ? 'Thanh toán thất bại' : 
+                                                      'Chưa thanh toán'}">Trạng thái thanh toán</span>
+                                    </span>
                                 </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Chi tiết</button>
-                                        <button class="action-btn btn-secondary" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Xác nhận</button>
-                                        <button class="action-btn btn-success" th:if="${RoomBookingsPartner.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-in</button>
-                                        <button class="action-btn btn-warning" th:if="${RoomBookingsPartner.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Check-out</button>
-                                        <button class="action-btn btn-danger" th:if="${RoomBookingsPartner.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${RoomBookingsPartner.bookingId} + '\')'">Hủy</button>
-                                    </div>
+                                <td class="actions">
+                                    <a th:href="@{/partner/bookings/{bookingId}(bookingId=${booking.bookingId})}" class="action-btn btn-detail">
+                                        <i class="fas fa-eye"></i>
+                                        Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                            
+                            <!-- Hiển thị thông báo khi không có dữ liệu -->
+                            <tr th:if="${#lists.isEmpty(RoomBookingsPartner)}">
+                                <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
+                                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                                    <div style="font-size: 16px; margin-bottom: 8px;">Chưa có đặt phòng nào</div>
+                                    <div style="font-size: 14px; opacity: 0.7;">Chưa có đặt phòng nào được tạo cho khách sạn của bạn</div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Empty State -->
-                <div th:if="${RoomBookingsPartner == null || RoomBookingsPartner.isEmpty()}" class="empty-state">
-                    <i class="fas fa-calendar-times"></i>
-                    <h3>Chưa có đặt phòng nào</h3>
-                    <p>Chưa có đặt phòng nào được tạo</p>
-                </div>
-
-                <!-- Mobile Card View -->
-                <div class="booking-cards" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
-                    <div class="booking-card" th:each="booking : ${RoomBookingsPartner}">
-                        <div class="booking-card-header">
-                            <div class="booking-card-id" th:text="'#' + ${booking.bookingId}">#BK001234</div>
-                            <span class="booking-status" th:class="${'status-' + booking.status.name().toLowerCase()}" th:text="${booking.status.description}">Đã xác nhận</span>
-                        </div>
-                        
-                        <div class="booking-card-content">
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Khách hàng</div>
-                                <div class="booking-card-guest">
-                                    <div class="booking-card-guest-avatar" th:text="${booking.customer.name.substring(0,2).toUpperCase()}">NL</div>
-                                    <div>
-                                        <div class="booking-card-value" th:text="${booking.customer.name}">Nguyễn Thị Lan</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${booking.customer.phone}">0987654321</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Phòng</div>
-                                <div class="booking-card-room">
-                                    <img th:src="${booking.room.iconPath != null ? booking.room.iconPath : '/img/rooms/default-room.jpg'}" alt="Room" class="booking-card-room-image">
-                                    <div>
-                                        <div class="booking-card-value" th:text="${booking.room.nameNumber}">Deluxe Ocean View</div>
-                                        <div style="font-size: 12px; color: var(--text-gray);" th:text="${'Phòng ' + booking.room.roomNumber}">Phòng 101</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Thời gian</div>
-                                <div class="booking-card-value" th:text="${booking.checkInDate} + ' - ' + ${booking.checkOutDate}">20/06 - 22/06/2024</div>
-                                <div style="font-size: 12px; color: var(--info);" th:text="${booking.room.capacity} + ' người'">2 người</div>
-                            </div>
-                            
-                            <div class="booking-card-section">
-                                <div class="booking-card-label">Tổng tiền</div>
-                                <div class="booking-card-price" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">3.450.000đ</div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-card-actions">
-                            <button class="action-btn btn-primary" th:onclick="'viewBookingDetails(\'' + ${booking.bookingId} + '\')'">Chi tiết</button>
-                            <button class="action-btn btn-secondary" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'confirmBooking(\'' + ${booking.bookingId} + '\')'">Xác nhận</button>
-                            <button class="action-btn btn-success" th:if="${booking.status.name() == 'CONFIRMED'}" th:onclick="'checkIn(\'' + ${booking.bookingId} + '\')'">Check-in</button>
-                            <button class="action-btn btn-warning" th:if="${booking.status.name() == 'CHECKED_IN'}" th:onclick="'checkOut(\'' + ${booking.bookingId} + '\')'">Check-out</button>
-                            <button class="action-btn btn-danger" th:if="${booking.status.name() == 'PENDING'}" th:onclick="'cancelBooking(\'' + ${booking.bookingId} + '\')'">Hủy</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pagination -->
-                <div class="pagination" th:if="${RoomBookingsPartner != null && !RoomBookingsPartner.isEmpty()}">
-                    <button><i class="fas fa-chevron-left"></i></button>
-                    <button class="active">1</button>
-                    <button><i class="fas fa-chevron-right"></i></button>
-                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Booking Details Modal -->
-    <div class="modal" id="bookingModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Chi tiết đặt phòng #BK001234</h3>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            
-            <div class="booking-details">
-                <div class="detail-group">
-                    <div class="detail-label">Khách hàng</div>
-                    <div class="detail-value">Nguyễn Thị Lan</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Số điện thoại</div>
-                    <div class="detail-value">0987654321</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Email</div>
-                    <div class="detail-value">nguyenlan@email.com</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">CCCD/Passport</div>
-                    <div class="detail-value">123456789012</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Loại phòng</div>
-                    <div class="detail-value">Deluxe Ocean View</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Số phòng</div>
-                    <div class="detail-value">501</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Ngày nhận phòng</div>
-                    <div class="detail-value">20/06/2024 - 14:00</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Ngày trả phòng</div>
-                    <div class="detail-value">22/06/2024 - 12:00</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Số đêm</div>
-                    <div class="detail-value">2 đêm</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Số khách</div>
-                    <div class="detail-value">2 người lớn</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Giá phòng</div>
-                    <div class="detail-value">1.725.000đ/đêm</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Tổng tiền</div>
-                    <div class="detail-value">3.450.000đ</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Phương thức thanh toán</div>
-                    <div class="detail-value">Thẻ tín dụng</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Trạng thái thanh toán</div>
-                    <div class="detail-value">Đã thanh toán</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Ngày đặt</div>
-                    <div class="detail-value">15/06/2024 - 10:30</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Ghi chú</div>
-                    <div class="detail-value">Yêu cầu phòng tầng cao, view biển</div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button class="action-btn btn-secondary" onclick="closeModal()">Đóng</button>
-                <button class="action-btn btn-primary">In hóa đơn</button>
-                <button class="action-btn btn-primary">Gửi email xác nhận</button>
+            <!-- Empty State -->
+            <div th:if="${RoomBookingsPartner == null || RoomBookingsPartner.isEmpty()}" class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>Chưa có đặt phòng nào</h3>
+                <p>Chưa có đặt phòng nào được tạo cho khách sạn của bạn</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Modal functions
-        function viewBookingDetails(bookingId) {
-            document.getElementById('bookingModal').classList.add('show');
-        }
+        // Filter Bookings
+        function filterBookings() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const paymentFilter = document.getElementById('paymentFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const rows = document.querySelectorAll('#bookingTableBody tr[data-booking-id]');
 
-        function closeModal() {
-            document.getElementById('bookingModal').classList.remove('show');
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('bookingModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Search functionality
-        document.querySelector('.search-box input').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.bookings-table tbody tr');
-            
             rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
+                const customerName = row.querySelector('.customer-name').textContent.toLowerCase();
+                const status = row.getAttribute('data-status');
+                const paymentStatusElement = row.querySelector('.payment-status');
+                let paymentStatus = 'pending';
+                
+                if (paymentStatusElement) {
+                    const paymentClass = paymentStatusElement.getAttribute('class');
+                    if (paymentClass.includes('paid')) {
+                        paymentStatus = 'paid';
+                    } else if (paymentClass.includes('pending')) {
+                        paymentStatus = 'pending-payment';
+                    } else if (paymentClass.includes('failed')) {
+                        paymentStatus = 'failed';
+                    }
+                }
+                
+                const checkInDate = row.querySelector('.check-in').textContent;
+
+                const matchesSearch = customerName.includes(searchInput);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesPayment = paymentFilter === 'all' || paymentStatus === paymentFilter;
+                const matchesDate = !dateFilter || checkInDate.includes(dateFilter);
+
+                if (matchesSearch && matchesStatus && matchesPayment && matchesDate) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
                 }
             });
-        });
+        }
 
-        // Add hover effects
+        // DOM Content Loaded
         document.addEventListener('DOMContentLoaded', function() {
-            const statCards = document.querySelectorAll('.stat-card');
-            statCards.forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.transform = 'translateY(-3px)';
-                    card.style.boxShadow = '0 12px 25px rgba(0, 0, 0, 0.15)';
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'translateY(0)';
-                    card.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
-                });
-            });
+            console.log('BookingsPartner page loaded');
         });
-
-        // Status update functions
-        function confirmBooking(bookingId) {
-            if (confirm('Xác nhận đặt phòng này?')) {
-                // API call to confirm booking
-                alert('Đặt phòng đã được xác nhận!');
-                location.reload();
-            }
-        }
-
-        function cancelBooking(bookingId) {
-            if (confirm('Bạn có chắc chắn muốn hủy đặt phòng này?')) {
-                // API call to cancel booking
-                alert('Đặt phòng đã được hủy!');
-                location.reload();
-            }
-        }
-
-        function checkIn(bookingId) {
-            if (confirm('Xác nhận check-in cho khách hàng?')) {
-                // API call to check-in
-                alert('Check-in thành công!');
-                location.reload();
-            }
-        }
-
-        function checkOut(bookingId) {
-            if (confirm('Xác nhận check-out cho khách hàng?')) {
-                // API call to check-out
-                alert('Check-out thành công!');
-                location.reload();
-            }
-        }
     </script>
-
 </body>
 </html>

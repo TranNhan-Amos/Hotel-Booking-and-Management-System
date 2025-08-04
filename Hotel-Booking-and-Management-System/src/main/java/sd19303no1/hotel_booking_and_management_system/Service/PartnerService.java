@@ -66,7 +66,7 @@ public class PartnerService {
                 dto.setRoomCount(roomCount);
                 
                 // Total revenue
-                double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(p.getId())
+                double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(p.getId(), p.getEmail())
                     .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
                 dto.setTotalRevenue(totalRevenue);
                 
@@ -107,7 +107,7 @@ public class PartnerService {
         dto.setRoomCount(roomCount);
         
         // Total revenue
-        double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(partner.getId())
+        double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(partner.getId(), partner.getEmail())
             .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
         dto.setTotalRevenue(totalRevenue);
         

@@ -242,7 +242,7 @@
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         const customerId = [[${customer.customerId}]];
         
         document.getElementById('customerForm').addEventListener('submit', function(e) {
@@ -262,11 +262,16 @@
             fetch(`/admin/customers/update/${customerId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
             .then(data => {
                 if (data.includes('thành công')) {
                     alert('Cập nhật thành công!');
@@ -276,7 +281,8 @@
                 }
             })
             .catch(error => {
-                alert('Lỗi khi cập nhật: ' + error);
+                console.error('Error:', error);
+                alert('Lỗi khi cập nhật: ' + error.message);
             });
         }
 
@@ -285,7 +291,12 @@
                 fetch(`/admin/customers/delete/${customerId}`, {
                     method: 'POST'
                 })
-                .then(response => response.text())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
                 .then(data => {
                     if (data.includes('thành công')) {
                         alert('Xóa khách hàng thành công!');
@@ -295,7 +306,8 @@
                     }
                 })
                 .catch(error => {
-                    alert('Lỗi khi xóa: ' + error);
+                    console.error('Error:', error);
+                    alert('Lỗi khi xóa: ' + error.message);
                 });
             }
         }

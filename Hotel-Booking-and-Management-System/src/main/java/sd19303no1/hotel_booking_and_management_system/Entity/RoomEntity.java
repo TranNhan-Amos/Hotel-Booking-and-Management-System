@@ -330,29 +330,8 @@ public class RoomEntity {
         return status == RoomStatus.AVAILABLE && totalRooms > 0;
     }
 
-    public boolean canBook(Integer quantity) {
-        return isAvailable() && totalRooms >= quantity;
-    }
-
-    public void bookRoom(Integer quantity) {
-        if (canBook(quantity)) {
-            totalRooms -= quantity;
-            if (totalRooms == 0) {
-                status = RoomStatus.OCCUPIED;
-            }
-            updatedAt = LocalDateTime.now();
-        } else {
-            throw new IllegalStateException("Không đủ phòng để đặt");
-        }
-    }
-
-    public void releaseRoom(Integer quantity) {
-        totalRooms += quantity;
-        if (status == RoomStatus.OCCUPIED && totalRooms > 0) {
-            status = RoomStatus.AVAILABLE;
-        }
-        updatedAt = LocalDateTime.now();
-    }
+    // Logic tính toán số phòng khả dụng được xử lý trong RoomService.getAvailableRoomCount()
+    // để đảm bảo tính toán chính xác dựa trên booking thực tế
 
     // Icon utility methods
     public String getDisplayIcon() {

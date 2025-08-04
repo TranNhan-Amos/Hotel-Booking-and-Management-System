@@ -24,39 +24,42 @@ public class AdminManagementBookingController {
 
     @GetMapping("/admin/bookings")
     public String viewBookingManagementPage(Model model) {
-        // Use the method intended for admin to view all bookings
-        List<BookingOrderEntity> bookings = bookingOrderService.findAllBookingsForAdmin();
+        // Chỉ lấy những booking có trạng thái CONFIRMED (đã đặt phòng thành công)
+        List<BookingOrderEntity> allBookings = bookingOrderService.findAllBookingsForAdmin();
+        List<BookingOrderEntity> confirmedBookings = allBookings.stream()
+                .filter(booking -> booking.getBookingStatus() != null && "CONFIRMED".equals(booking.getBookingStatus()))
+                .toList();
         
-        // Tính toán thống kê
+        // Tính toán thống kê chỉ cho những booking đã xác nhận
         Map<String, Long> stats = new HashMap<>();
-        long totalBookings = bookings.size();
-        long confirmedBookings = bookings.stream()
-                .filter(booking -> booking.getStatus() != null && "CONFIRMED".equals(booking.getStatus().getStatusName()))
+        long totalBookings = confirmedBookings.size();
+        long confirmedBookingsCount = confirmedBookings.stream()
+                .filter(booking -> booking.getBookingStatus() != null && "CONFIRMED".equals(booking.getBookingStatus()))
                 .count();
-        long pendingBookings = bookings.stream()
-                .filter(booking -> booking.getStatus() != null && "PENDING".equals(booking.getStatus().getStatusName()))
+        long pendingBookings = confirmedBookings.stream()
+                .filter(booking -> booking.getBookingStatus() != null && "PENDING".equals(booking.getBookingStatus()))
                 .count();
-        long cancelledBookings = bookings.stream()
-                .filter(booking -> booking.getStatus() != null && "CANCELLED".equals(booking.getStatus().getStatusName()))
+        long cancelledBookings = confirmedBookings.stream()
+                .filter(booking -> booking.getBookingStatus() != null && "CANCELLED".equals(booking.getBookingStatus()))
                 .count();
-        long paidBookings = bookings.stream()
+        long paidBookings = confirmedBookings.stream()
                 .filter(booking -> "PAID".equals(booking.getPaymentStatus()))
                 .count();
-        long pendingPaymentBookings = bookings.stream()
+        long pendingPaymentBookings = confirmedBookings.stream()
                 .filter(booking -> "PENDING".equals(booking.getPaymentStatus()))
                 .count();
         
         stats.put("totalBookings", totalBookings);
-        stats.put("confirmedBookings", confirmedBookings);
+        stats.put("confirmedBookings", confirmedBookingsCount);
         stats.put("pendingBookings", pendingBookings);
         stats.put("cancelledBookings", cancelledBookings);
         stats.put("paidBookings", paidBookings);
         stats.put("pendingPaymentBookings", pendingPaymentBookings);
         
-        model.addAttribute("bookings", bookings);
+        model.addAttribute("bookings", confirmedBookings);
         model.addAttribute("stats", stats);
         // The 'allBookings' JS variable in HTML will use this 'bookings' model attribute
-        model.addAttribute("allBookingsJson", bookings); // Pass for JS if needed, or use Thymeleaf's JS inlining
+        model.addAttribute("allBookingsJson", confirmedBookings); // Pass for JS if needed, or use Thymeleaf's JS inlining
         return "Admin/Management-Booking"; // Path to your Thymeleaf template
     }
 

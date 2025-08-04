@@ -492,7 +492,10 @@
     <div class="main-content">
         <div class="management-section">
             <div class="section-header">
-                <h2><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng</h2>
+                <h2><i class="fas fa-calendar-check"></i> Quản Lý Đặt Phòng Đã Thành Công</h2>
+                <p style="color: #666; margin-top: 8px; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> Chỉ hiển thị những đặt phòng có trạng thái "Đã đặt phòng thành công" (CONFIRMED)
+                </p>
             </div>
             
             <div class="section-body">
@@ -500,7 +503,7 @@
                 <div class="stats-overview">
                     <div class="stat-card" id="totalBookings">
                         <div class="stat-header">
-                            <div class="stat-title">Tổng Đặt Phòng</div>
+                            <div class="stat-title">Tổng Đặt Phòng Thành Công</div>
                             <div class="stat-icon total">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
@@ -510,7 +513,7 @@
                     
                     <div class="stat-card" id="confirmedBookings">
                         <div class="stat-header">
-                            <div class="stat-title">Đã Xác Nhận</div>
+                            <div class="stat-title">Đã Xác Nhận (CONFIRMED)</div>
                             <div class="stat-icon confirmed">
                                 <i class="fas fa-check-circle"></i>
                             </div>
@@ -518,7 +521,7 @@
                         <div class="stat-value" th:text="${stats != null ? stats.confirmedBookings : #lists.size(bookings.?[bookingStatus == 'CONFIRMED'])}">0</div>
                     </div>
                     
-                    <div class="stat-card" id="pendingBookings">
+                    <div class="stat-card" id="pendingBookings" style="display: none;">
                         <div class="stat-header">
                             <div class="stat-title">Chờ Xác Nhận</div>
                             <div class="stat-icon pending">
@@ -528,7 +531,7 @@
                         <div class="stat-value" th:text="${stats != null ? stats.pendingBookings : #lists.size(bookings.?[bookingStatus == 'PENDING'])}">0</div>
                     </div>
                     
-                    <div class="stat-card" id="cancelledBookings">
+                    <div class="stat-card" id="cancelledBookings" style="display: none;">
                         <div class="stat-header">
                             <div class="stat-title">Đã Hủy</div>
                             <div class="stat-icon cancelled">
@@ -564,9 +567,7 @@
                         <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterBookings()">
                         <select id="statusFilter" onchange="filterBookings()">
                             <option value="all">Tất Cả Trạng Thái</option>
-                            <option value="confirmed">Đã Xác Nhận</option>
-                            <option value="pending">Chờ Xác Nhận</option>
-                            <option value="cancelled">Đã Hủy</option>
+                            <option value="confirmed">Đã Xác Nhận (CONFIRMED)</option>
                         </select>
                         <select id="paymentFilter" onchange="filterBookings()">
                             <option value="all">Tất Cả Thanh Toán</option>
@@ -649,8 +650,8 @@
                                 <tr th:if="${#lists.isEmpty(bookings)}">
                                     <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
                                         <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                                        <div style="font-size: 16px; margin-bottom: 8px;">Chưa có đặt phòng nào</div>
-                                        <div style="font-size: 14px; opacity: 0.7;">Hệ thống sẽ hiển thị đặt phòng ở đây khi có dữ liệu</div>
+                                        <div style="font-size: 16px; margin-bottom: 8px;">Chưa có đặt phòng thành công nào</div>
+                                        <div style="font-size: 14px; opacity: 0.7;">Chỉ hiển thị những đặt phòng có trạng thái "Đã đặt phòng thành công" (CONFIRMED)</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -886,16 +887,8 @@
                         console.log(`Booking ${index + 1}: ID=${booking.bookingId}, Status=${booking.bookingStatus}, Payment=${booking.paymentStatus}`);
                     });
                     
-                    // Ensure consistent status values (case-insensitive)
-                    const confirmedBookings = bookings.filter(b => 
-                        b.bookingStatus && b.bookingStatus.toUpperCase() === 'CONFIRMED'
-                    );
-                    const pendingBookings = bookings.filter(b => 
-                        b.bookingStatus && b.bookingStatus.toUpperCase() === 'PENDING'
-                    );
-                    const cancelledBookings = bookings.filter(b => 
-                        b.bookingStatus && b.bookingStatus.toUpperCase() === 'CANCELLED'
-                    );
+                    // Tất cả booking đều là CONFIRMED (đã được filter ở backend)
+                    const confirmedBookings = bookings; // Tất cả booking đều là CONFIRMED
                     const paidBookings = bookings.filter(b => 
                         b.paymentStatus && b.paymentStatus.toUpperCase() === 'PAID'
                     );
@@ -903,19 +896,15 @@
                         b.paymentStatus && b.paymentStatus.toUpperCase() === 'PENDING'
                     );
                     
-                    console.log('📈 Filtered results:');
+                    console.log('📈 Filtered results (chỉ CONFIRMED):');
                     console.log('- Total:', totalBookings);
                     console.log('- Confirmed:', confirmedBookings.length, confirmedBookings.map(b => b.bookingId));
-                    console.log('- Pending:', pendingBookings.length, pendingBookings.map(b => b.bookingId));
-                    console.log('- Cancelled:', cancelledBookings.length, cancelledBookings.map(b => b.bookingId));
                     console.log('- Paid:', paidBookings.length);
                     console.log('- Pending Payment:', pendingPaymentBookings.length);
                     
                     // Update values with animation
                     updateStatValue('totalBookings', totalBookings);
                     updateStatValue('confirmedBookings', confirmedBookings.length);
-                    updateStatValue('pendingBookings', pendingBookings.length);
-                    updateStatValue('cancelledBookings', cancelledBookings.length);
                     updateStatValue('paidBookings', paidBookings.length);
                     updateStatValue('pendingPaymentBookings', pendingPaymentBookings.length);
                     
@@ -931,23 +920,17 @@
                 
                 const totalBookings = document.querySelectorAll('#bookingTableBody tr[data-booking-id]').length;
                 const confirmedBookings = document.querySelectorAll('#bookingTableBody tr[data-status="confirmed"]').length;
-                const pendingBookings = document.querySelectorAll('#bookingTableBody tr[data-status="pending"]').length;
-                const cancelledBookings = document.querySelectorAll('#bookingTableBody tr[data-status="cancelled"]').length;
                 const paidBookings = document.querySelectorAll('#bookingTableBody tr .payment-status.paid').length;
                 const pendingPaymentBookings = document.querySelectorAll('#bookingTableBody tr .payment-status.pending').length;
                 
-                console.log('📊 DOM-based results:');
+                console.log('📊 DOM-based results (chỉ CONFIRMED):');
                 console.log('- Total:', totalBookings);
                 console.log('- Confirmed:', confirmedBookings);
-                console.log('- Pending:', pendingBookings);
-                console.log('- Cancelled:', cancelledBookings);
                 console.log('- Paid:', paidBookings);
                 console.log('- Pending Payment:', pendingPaymentBookings);
                 
                 updateStatValue('totalBookings', totalBookings);
                 updateStatValue('confirmedBookings', confirmedBookings);
-                updateStatValue('pendingBookings', pendingBookings);
-                updateStatValue('cancelledBookings', cancelledBookings);
                 updateStatValue('paidBookings', paidBookings);
                 updateStatValue('pendingPaymentBookings', pendingPaymentBookings);
             });
@@ -1022,15 +1005,12 @@
 
             const matchesSearch = customerName.includes(searchInput);
             
-            // Logic filter status đơn giản
+            // Logic filter status - chỉ có booking CONFIRMED được hiển thị
             let matchesStatus = statusFilter === 'all';
             if (statusFilter === 'confirmed') {
                 matchesStatus = status === 'confirmed';
-            } else if (statusFilter === 'pending') {
-                matchesStatus = status === 'pending';
-            } else if (statusFilter === 'cancelled') {
-                matchesStatus = status === 'cancelled';
             }
+            // Tất cả booking hiển thị đều là CONFIRMED, nên không cần filter pending/cancelled
             
             const matchesPayment = paymentFilter === 'all' || paymentStatus === paymentFilter;
             const matchesDate = !dateFilter || checkInDate.includes(dateFilter);

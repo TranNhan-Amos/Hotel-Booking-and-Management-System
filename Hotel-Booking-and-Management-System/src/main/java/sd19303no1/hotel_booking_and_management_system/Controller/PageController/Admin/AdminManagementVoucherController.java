@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 
 import sd19303no1.hotel_booking_and_management_system.DTO.VoucherDTO;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
@@ -32,7 +31,7 @@ public class AdminManagementVoucherController {
     public String viewVoucherManagementPage(Model model) {
         List<VoucherDTO> vouchers = voucherService.getAllVoucherDTOs();
         model.addAttribute("vouchers", vouchers);
-        return "admin/Management-Voucher";
+        return "Admin/Management-Voucher";
     }
 
     @GetMapping("/{voucherId}")
@@ -43,7 +42,7 @@ public class AdminManagementVoucherController {
                 return "redirect:/admin/vouchers?error=Không tìm thấy voucher";
             }
             model.addAttribute("voucher", voucher);
-            return "admin/voucher-detail";
+            return "Admin/voucher-detail";
         } catch (Exception e) {
             return "redirect:/admin/vouchers?error=Lỗi khi tải thông tin voucher";
         }
@@ -51,27 +50,48 @@ public class AdminManagementVoucherController {
 
     @GetMapping("/create")
     public String showCreateVoucherPage() {
-        return "admin/voucher-create";
+        return "Admin/voucher-create";
     }
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<String> createVoucher(@RequestBody String jsonData) {
+    public ResponseEntity<String> createVoucher(@RequestBody VoucherDTO voucherData) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
+            // Validation
+            if (voucherData.getCode() == null || voucherData.getCode().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Mã voucher không được để trống");
+            }
             
-            VoucherDTO voucherData = mapper.readValue(jsonData, VoucherDTO.class);
+            if (voucherData.getDescription() == null || voucherData.getDescription().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Mô tả voucher không được để trống");
+            }
+            
+            // Kiểm tra mã voucher đã tồn tại
+            if (voucherService.findByCode(voucherData.getCode().trim().toUpperCase()) != null) {
+                return ResponseEntity.badRequest().body("Mã voucher đã tồn tại");
+            }
+            
+            if (voucherData.getStartDate() == null || voucherData.getEndDate() == null) {
+                return ResponseEntity.badRequest().body("Ngày bắt đầu và kết thúc không được để trống");
+            }
+            
+            if (voucherData.getStartDate().isAfter(voucherData.getEndDate())) {
+                return ResponseEntity.badRequest().body("Ngày bắt đầu phải trước ngày kết thúc");
+            }
+            
+            if (voucherData.getUsageLimit() <= 0) {
+                return ResponseEntity.badRequest().body("Giới hạn sử dụng phải lớn hơn 0");
+            }
             
             VoucherEntity voucher = new VoucherEntity();
-            voucher.setCode(voucherData.getCode());
-            voucher.setDescription(voucherData.getDescription());
+            voucher.setCode(voucherData.getCode().trim().toUpperCase());
+            voucher.setDescription(voucherData.getDescription().trim());
             voucher.setDiscount(voucherData.getDiscount());
             voucher.setDiscountAmount(voucherData.getDiscountAmount());
             voucher.setMinimumOrderAmount(voucherData.getMinimumOrderAmount());
             voucher.setStartDate(voucherData.getStartDate());
             voucher.setEndDate(voucherData.getEndDate());
-            voucher.setExpiryDate(voucherData.getEndDate()); // Sử dụng endDate làm expiryDate
+            voucher.setExpiryDate(voucherData.getEndDate());
             voucher.setStatus("ACTIVE");
             voucher.setUsageLimit(voucherData.getUsageLimit());
             voucher.setUsedCount(0);
@@ -88,30 +108,52 @@ public class AdminManagementVoucherController {
     @PostMapping("/update/{voucherId}")
     @ResponseBody
     public ResponseEntity<String> updateVoucher(@PathVariable Integer voucherId, 
-                                              @RequestBody String jsonData) {
+                                              @RequestBody VoucherDTO voucherData) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
+            // Validation
+            if (voucherData.getCode() == null || voucherData.getCode().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Mã voucher không được để trống");
+            }
             
-            VoucherDTO voucherData = mapper.readValue(jsonData, VoucherDTO.class);
+            if (voucherData.getDescription() == null || voucherData.getDescription().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Mô tả voucher không được để trống");
+            }
             
-            VoucherEntity voucher = voucherService.findById(voucherId);
-            if (voucher == null) {
+            VoucherEntity existingVoucher = voucherService.findById(voucherId);
+            if (existingVoucher == null) {
                 return ResponseEntity.badRequest().body("Không tìm thấy voucher");
             }
             
-            // Cập nhật thông tin
-            voucher.setCode(voucherData.getCode());
-            voucher.setDescription(voucherData.getDescription());
-            voucher.setDiscount(voucherData.getDiscount());
-            voucher.setDiscountAmount(voucherData.getDiscountAmount());
-            voucher.setMinimumOrderAmount(voucherData.getMinimumOrderAmount());
-            voucher.setStartDate(voucherData.getStartDate());
-            voucher.setEndDate(voucherData.getEndDate());
-            voucher.setExpiryDate(voucherData.getEndDate());
-            voucher.setUsageLimit(voucherData.getUsageLimit());
+            // Kiểm tra mã voucher đã tồn tại (trừ voucher hiện tại)
+            VoucherEntity duplicateVoucher = voucherService.findByCode(voucherData.getCode().trim().toUpperCase());
+            if (duplicateVoucher != null && !duplicateVoucher.getVoucherId().equals(voucherId)) {
+                return ResponseEntity.badRequest().body("Mã voucher đã tồn tại");
+            }
             
-            voucherService.updateVoucher(voucher);
+            if (voucherData.getStartDate() == null || voucherData.getEndDate() == null) {
+                return ResponseEntity.badRequest().body("Ngày bắt đầu và kết thúc không được để trống");
+            }
+            
+            if (voucherData.getStartDate().isAfter(voucherData.getEndDate())) {
+                return ResponseEntity.badRequest().body("Ngày bắt đầu phải trước ngày kết thúc");
+            }
+            
+            if (voucherData.getUsageLimit() <= 0) {
+                return ResponseEntity.badRequest().body("Giới hạn sử dụng phải lớn hơn 0");
+            }
+            
+            // Cập nhật thông tin
+            existingVoucher.setCode(voucherData.getCode().trim().toUpperCase());
+            existingVoucher.setDescription(voucherData.getDescription().trim());
+            existingVoucher.setDiscount(voucherData.getDiscount());
+            existingVoucher.setDiscountAmount(voucherData.getDiscountAmount());
+            existingVoucher.setMinimumOrderAmount(voucherData.getMinimumOrderAmount());
+            existingVoucher.setStartDate(voucherData.getStartDate());
+            existingVoucher.setEndDate(voucherData.getEndDate());
+            existingVoucher.setExpiryDate(voucherData.getEndDate());
+            existingVoucher.setUsageLimit(voucherData.getUsageLimit());
+            
+            voucherService.updateVoucher(existingVoucher);
             
             return ResponseEntity.ok("Cập nhật thành công");
         } catch (Exception e) {

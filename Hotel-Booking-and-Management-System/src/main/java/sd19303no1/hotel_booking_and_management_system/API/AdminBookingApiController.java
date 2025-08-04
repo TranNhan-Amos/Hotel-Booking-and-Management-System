@@ -322,12 +322,15 @@ public class AdminBookingApiController {
         }
     }
 
-    // GET All Bookings
+    // GET All Bookings (chỉ những booking đã đặt phòng thành công - CONFIRMED)
     @GetMapping
     public ResponseEntity<?> getAllBookings() {
         try {
-            var bookings = bookingOrderService.findAllBookingsForAdmin();
-            return ResponseEntity.ok(bookings);
+            var allBookings = bookingOrderService.findAllBookingsForAdmin();
+            var confirmedBookings = allBookings.stream()
+                    .filter(booking -> booking.getBookingStatus() != null && "CONFIRMED".equals(booking.getBookingStatus()))
+                    .toList();
+            return ResponseEntity.ok(confirmedBookings);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Lỗi khi lấy danh sách đặt phòng: " + e.getMessage()));

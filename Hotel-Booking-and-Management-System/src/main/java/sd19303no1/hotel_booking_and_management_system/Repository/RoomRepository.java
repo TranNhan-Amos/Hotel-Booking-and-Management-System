@@ -96,7 +96,7 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     Page<Object[]> findFeaturedRoomsWithRating(Pageable pageable);
 
     // Đếm số phòng đã được đặt trong khoảng thời gian
-    @Query("SELECT COUNT(b) FROM BookingOrderEntity b " +
+    @Query("SELECT COALESCE(SUM(b.roomQuantity), 0) FROM BookingOrderEntity b " +
            "WHERE b.room.roomId = :roomId " +
            "AND b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate " +
            "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED')")
@@ -107,4 +107,8 @@ public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     // Tìm phòng theo partner ID
     @Query("SELECT r FROM RoomEntity r WHERE r.partner.id = :partnerId")
     List<RoomEntity> findByPartner_Id(@Param("partnerId") Long partnerId);
+    
+    // Đếm tổng số phòng
+    @Query("SELECT COUNT(r) FROM RoomEntity r")
+    Long countTotalRooms();
 }

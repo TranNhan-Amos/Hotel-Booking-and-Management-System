@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Phòng Mới - Partner Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .form-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #324b4c;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(0, 198, 207, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00c6cf;
+            box-shadow: 0 0 0 3px rgba(0, 198, 207, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Amenities Grid */
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border: 1px solid rgba(0, 198, 207, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .amenity-item:hover {
+            border-color: #00c6cf;
+            background: rgba(0, 198, 207, 0.05);
+        }
+
+        .amenity-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #00c6cf;
+        }
+
+        .amenity-item label {
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #324b4c;
+            margin: 0;
+        }
+
+        .amenity-item i {
+            color: #00c6cf;
+            font-size: 14px;
+        }
+
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-group .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group input.error + .error-message,
+        .form-group select.error + .error-message,
+        .form-group textarea.error + .error-message {
+            display: block;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(0, 198, 207, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(0, 198, 207, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: #00c6cf;
+            background: rgba(0, 198, 207, 0.1);
+        }
+
+        .file-upload-area i {
+            font-size: 48px;
+            color: #00c6cf;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-area p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 198, 207, 0.1);
+        }
+
+        .btn-cancel {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: #e9ecef;
+            color: #495057;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(135deg, #068488 0%, #324b4c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 198, 207, 0.3);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-save.loading {
+            pointer-events: none;
+        }
+
+        .btn-save.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .form-content {
+                padding: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-cancel,
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .form-header {
+                padding: 20px;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+
+            .form-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div th:replace="~{/Layout/NavbarPartner}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="form-container">
+                <div class="form-header">
+                    <h1><i class="fas fa-plus-circle"></i> Thêm Phòng Mới</h1>
+                    <p>Điền thông tin chi tiết để tạo phòng mới</p>
+                </div>
+
+                <form th:action="@{/partner/rooms/add}" method="post" enctype="multipart/form-data" id="addRoomForm">
+                    <div class="form-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="roomNumber">Mã phòng *</label>
+                                <input type="text" id="roomNumber" name="roomNumber" required>
+                                <small class="error-message" id="roomNumberError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nameNumber">Tên phòng *</label>
+                                <input type="text" id="nameNumber" name="nameNumber" required>
+                                <small class="error-message" id="nameNumberError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="type">Loại phòng *</label>
+                                <select id="type" name="type" required>
+                                    <option value="">Chọn loại phòng</option>
+                                    <option value="STANDARD">Phòng tiêu chuẩn</option>
+                                    <option value="DELUXE">Phòng cao cấp</option>
+                                    <option value="SUITE">Phòng sang trọng</option>
+                                    <option value="FAMILY">Phòng gia đình</option>
+                                    <option value="SINGLE">Phòng đơn</option>
+                                    <option value="DOUBLE">Phòng đôi</option>
+                                    <option value="TRIPLE">Phòng ba</option>
+                                    <option value="QUAD">Phòng bốn</option>
+                                    <option value="VIP">Phòng VIP</option>
+                                </select>
+                                <small class="error-message" id="typeError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price">Giá (VNĐ) *</label>
+                                <input type="number" id="price" name="price" min="0" required>
+                                <small class="error-message" id="priceError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacity">Sức chứa *</label>
+                                <input type="number" id="capacity" name="capacity" min="1" max="10" required>
+                                <small class="error-message" id="capacityError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="totalRooms">Tổng số phòng *</label>
+                                <input type="number" id="totalRooms" name="totalRooms" min="1" required>
+                                <small class="error-message" id="totalRoomsError"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status">Trạng thái *</label>
+                                <select id="status" name="status" required>
+                                    <option value="">Chọn trạng thái</option>
+                                    <option value="AVAILABLE">Vẫn Còn Phòng</option>
+                                    <option value="OCCUPIED">Đã Hết phòng</option>
+                                    <option value="MAINTENANCE">Đang bảo trì</option>
+                                    <option value="OUT_OF_SERVICE">Ngừng Hoạt Động</option>
+                                </select>
+                                <small class="error-message" id="statusError"></small>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="description">Mô tả</label>
+                                <textarea id="description" name="description" rows="4" placeholder="Mô tả chi tiết về phòng..."></textarea>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Tiện nghi</label>
+                                <div class="amenities-grid">
+                                    <div th:each="amenity : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.Amenity).values()}" 
+                                         class="amenity-item">
+                                        <input type="checkbox" 
+                                               th:id="'amenity-' + ${amenity.name()}"
+                                               th:name="amenities" 
+                                               th:value="${amenity.name()}">
+                                        <label th:for="'amenity-' + ${amenity.name()}">
+                                            <i th:class="${amenity.iconClass}"></i>
+                                            <span th:text="${amenity.description}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-3">Chọn các tiện nghi có sẵn trong phòng</p>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Hình ảnh phòng</label>
+                                <div class="file-upload-area" onclick="document.getElementById('images').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Nhấp để chọn hình ảnh</p>
+                                    <small>Chọn nhiều hình ảnh (JPG, PNG, GIF, WEBP, tối đa 5MB mỗi ảnh)</small>
+                                    <input type="file" id="images" name="images" multiple accept="image/*" onchange="handleFileSelect(this)">
+                                </div>
+                                <div id="fileList" style="margin-top: 15px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="/partner/rooms" class="btn-cancel">
+                                <i class="fas fa-times"></i>
+                                Hủy
+                            </a>
+                            <button type="submit" class="btn-save" id="submitBtn">
+                                <i class="fas fa-save"></i>
+                                Thêm phòng
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle file selection
+        function handleFileSelect(input) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (input.files.length > 0) {
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                
+                for (let i = 0; i < input.files.length; i++) {
+                    const file = input.files[i];
+                    
+                    // Validate file type
+                    if (!allowedTypes.includes(file.type)) {
+                        alert(`File ${file.name} không phải là hình ảnh hợp lệ. Chỉ chấp nhận JPG, PNG, GIF, WEBP.`);
+                        input.value = '';
+                        fileList.innerHTML = '';
+                        return;
+                    }
+                    
+                    // Validate file size
+                    if (file.size > maxSize) {
+                        alert(`File ${file.name} quá lớn. Kích thước tối đa là 5MB.`);
+                        input.value = '';
+                        fileList.innerHTML = '';
+                        return;
+                    }
+                    
+                    // Display file info
+                    const fileInfo = document.createElement('div');
+                    fileInfo.style.cssText = `
+                        padding: 10px;
+                        margin: 5px 0;
+                        background: rgba(0, 198, 207, 0.1);
+                        border-radius: 8px;
+                        border: 1px solid rgba(0, 198, 207, 0.2);
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    `;
+                    fileInfo.innerHTML = `
+                        <i class="fas fa-image" style="color: #00c6cf;"></i>
+                        <span>${file.name}</span>
+                        <small style="color: #666;">(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>
+                    `;
+                    fileList.appendChild(fileInfo);
+                }
+            }
+        }
+
+        // Form validation
+        document.getElementById('addRoomForm').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            // Clear previous errors
+            requiredFields.forEach(field => {
+                field.classList.remove('error');
+                const errorElement = field.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('error-message')) {
+                    errorElement.textContent = '';
+                }
+            });
+
+            // Validate required fields
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                    const errorElement = field.nextElementSibling;
+                    if (errorElement && errorElement.classList.contains('error-message')) {
+                        errorElement.textContent = 'Trường này là bắt buộc';
+                    }
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+        });
+
+        // Auto-hide alerts
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            }, 5000);
+        });
+    </script>
+</body>
+</html> 

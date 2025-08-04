@@ -212,9 +212,9 @@ public class PaymentController {
         // Set success message based on payment method
         String successMessage;
         if (paymentMethod.equalsIgnoreCase("payOnArrival")) {
-            successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
+            successMessage = "Đặt phòng thành công! Vui lòng thanh toán khi nhận phòng tại khách sạn.";
         } else {
-            successMessage = "Đã thanh toán thành công, chờ nhận phòng.";
+            successMessage = "Đặt phòng và thanh toán thành công! Chờ nhận phòng.";
         }
         
         redirectAttributes.addFlashAttribute("success", successMessage);
@@ -231,9 +231,9 @@ public class PaymentController {
                             // Set success message based on payment status and method
                 String successMessage;
                 if (booking.getPaymentStatus().equals("PAID")) {
-                    successMessage = "Đã thanh toán thành công, chờ nhận phòng.";
+                    successMessage = "Đặt phòng và thanh toán thành công! Chờ nhận phòng.";
                 } else {
-                    successMessage = "Đặt phòng thành công! Chờ thanh toán tại khách sạn.";
+                    successMessage = "Đặt phòng thành công! Vui lòng thanh toán khi nhận phòng tại khách sạn.";
                 }
                 model.addAttribute("success", successMessage);
                 // Calculate prices for display

@@ -245,7 +245,10 @@
             const toggleBtn = button.querySelector('span');
             
             fetch(`/admin/vouchers/toggle/${voucherId}`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             })
             .then(response => response.text())
             .then(data => {
@@ -280,7 +283,10 @@
             
             if (confirm(`Bạn có chắc muốn xóa voucher ${voucherCode}?`)) {
                 fetch(`/admin/vouchers/delete/${voucherId}`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 })
                 .then(response => response.text())
                 .then(data => {

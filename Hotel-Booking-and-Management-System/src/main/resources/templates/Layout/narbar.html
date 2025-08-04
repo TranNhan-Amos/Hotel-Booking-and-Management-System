@@ -55,7 +55,7 @@
                                 <img th:src="${session.avatarPath != null and session.avatarPath != ''} ? ${session.avatarPath} : '/img/customers/default-avatar.png'" alt="Avatar"/>
                             </div>
                             <div class="user-info" style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0;">
-                                <span class="user-name" id="user-name" th:text="${#authentication.principal.username}" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Nguyễn Văn An</span>
+                                <span class="user-name" id="user-name" th:text="${currentUser != null ? currentUser.name : #authentication.principal.username}" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Nguyễn Văn An</span>
                                 <div class="user-role">
                                     <span id="user-role-text" sec:authorize="hasRole('CUSTOMER')">Khách hàng</span>
                                     <div class="admin-badge" id="admin-badge" sec:authorize="hasRole('ADMIN')">
@@ -74,8 +74,8 @@
                         <!-- Dropdown Menu -->
                         <div class="dropdown-menu" id="dropdown-menu">
                             <div class="dropdown-header">
-                                <div class="dropdown-user-name" id="dropdown-user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</div>
-                                <div class="dropdown-user-email" id="dropdown-user-email" th:text="${#authentication.principal.email}">nguyenvanan@example.com</div>
+                                <div class="dropdown-user-name" id="dropdown-user-name" th:text="${currentUser != null ? currentUser.name : #authentication.principal.username}">Nguyễn Văn An</div>
+                                <div class="dropdown-user-email" id="dropdown-user-email" th:text="${currentUser != null ? currentUser.email : #authentication.principal.email}">nguyenvanan@example.com</div>
                             </div>
 
                             <div class="dropdown-section">
@@ -220,7 +220,7 @@
                     <img th:src="${session.avatarPath != null and session.avatarPath != ''} ? ${session.avatarPath} : '/img/customers/default-avatar.png'" alt="Avatar"/>
                 </div>
                 <div class="mobile-user-details">
-                    <span class="mobile-user-name" th:text="${#authentication.principal.username}">Nguyễn Văn An</span>
+                    <span class="mobile-user-name" th:text="${currentUser != null ? currentUser.name : #authentication.principal.username}">Nguyễn Văn An</span>
                     <span class="mobile-user-role" sec:authorize="hasRole('CUSTOMER')">Khách hàng</span>
                 </div>
             </div>

@@ -39,11 +39,34 @@ public class AdminManagementCustomersController {
     private PartnerService partnerService;
 
      @GetMapping
-    public String viewCustomesrManagementPage(Model model) {
-        List<CustomerDTO> customers = customersService.getAllCustomerDTOs();
+    public String viewCustomesrManagementPage(Model model, 
+                                        @RequestParam(defaultValue = "1") int page,
+                                        @RequestParam(defaultValue = "12") int size) {
+        List<CustomerDTO> allCustomers = customersService.getAllCustomerDTOs();
         List<PartnerDTO> partners = partnerService.getAllPartnerDTOs();
+        
+        // Calculate pagination
+        int totalCustomers = allCustomers.size();
+        int totalPages = (int) Math.ceil((double) totalCustomers / size);
+        
+        // Ensure page is within valid range
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+        
+        // Get customers for current page
+        int startIndex = (page - 1) * size;
+        int endIndex = Math.min(startIndex + size, totalCustomers);
+        List<CustomerDTO> customers = allCustomers.subList(startIndex, endIndex);
+        
         model.addAttribute("customers", customers);
         model.addAttribute("partners", partners);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalCustomers", totalCustomers);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
+        
         return "admin/management-Customers";
     }
 
@@ -64,13 +87,14 @@ public class AdminManagementCustomersController {
     @PostMapping("/update/{customerId}")
     @ResponseBody
     public ResponseEntity<String> updateCustomer(@PathVariable Integer customerId, 
-                                               @RequestBody String jsonData) {
+                                               @RequestBody CustomerDTO customerData) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            CustomerDTO customerData = mapper.readValue(jsonData, CustomerDTO.class);
+            System.out.println("Updating customer with ID: " + customerId);
+            System.out.println("Customer data: " + customerData.getName() + ", " + customerData.getEmail());
             
             CustomersEntity customer = customersService.getCustomerById(customerId);
             if (customer == null) {
+                System.out.println("Customer not found with ID: " + customerId);
                 return ResponseEntity.badRequest().body("Không tìm thấy khách hàng");
             }
             
@@ -83,8 +107,11 @@ public class AdminManagementCustomersController {
             
             customersService.updateCustomer(customer);
             
+            System.out.println("Customer updated successfully");
             return ResponseEntity.ok("Cập nhật thành công");
         } catch (Exception e) {
+            System.err.println("Error updating customer: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Lỗi khi cập nhật: " + e.getMessage());
         }
     }
@@ -117,11 +144,8 @@ public class AdminManagementCustomersController {
     @PostMapping("/partner/update/{partnerId}")
     @ResponseBody
     public ResponseEntity<String> updatePartner(@PathVariable Long partnerId, 
-                                              @RequestBody String jsonData) {
+                                              @RequestBody PartnerDTO partnerData) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            PartnerDTO partnerData = mapper.readValue(jsonData, PartnerDTO.class);
-            
             PartnerEntity partner = partnerService.findById(partnerId);
             if (partner == null) {
                 return ResponseEntity.badRequest().body("Không tìm thấy đối tác");

@@ -277,8 +277,17 @@
                         <i data-lucide="building"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">200+</div>
+                        <div class="stat-number" th:text="${totalHotels != null ? totalHotels + '+' : '0+'}">0+</div>
                         <div class="stat-label">Khách sạn</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i data-lucide="bed"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" th:text="${totalAvailableRooms != null ? totalAvailableRooms + '/' + totalRooms : '0/0'}">0/0</div>
+                        <div class="stat-label">Phòng khả dụng</div>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -286,7 +295,7 @@
                         <i data-lucide="users"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">50K+</div>
+                        <div class="stat-number" th:text="${totalCustomers != null ? totalCustomers + '+' : '0+'}">0+</div>
                         <div class="stat-label">Khách hàng</div>
                     </div>
                 </div>
@@ -295,7 +304,7 @@
                         <i data-lucide="star"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">4.9★</div>
+                        <div class="stat-number" th:text="${averageRating != null ? #numbers.formatDecimal(averageRating, 1, 1) + '★' : '0.0★'}">0.0★</div>
                         <div class="stat-label">Đánh giá</div>
                     </div>
                 </div>
@@ -498,6 +507,7 @@
                                 <i data-lucide="star"></i>
                                 <span th:text="${room.averageRating}">4.8</span>
                             </div>
+
                         </div>
                     </div>
                     <div class="hotel-content">

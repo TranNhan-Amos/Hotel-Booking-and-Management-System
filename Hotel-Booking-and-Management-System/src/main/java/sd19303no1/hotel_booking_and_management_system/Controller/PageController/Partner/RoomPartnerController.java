@@ -1,12 +1,13 @@
-             package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Partner;
+package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Partner;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +44,13 @@ public class RoomPartnerController {
     @Autowired
     private SystemUserService systemUserService;
 
-    // Đường dẫn upload ảnh phòng
-    private static final String ROOM_IMAGE_UPLOAD_DIR = "F:/Githup/DUANTOTNGHIEP/Hotel-Booking-and-Management-System/Hotel-Booking-and-Management-System/src/main/resources/static/img/rooms";
+
 
     @GetMapping("/partner/rooms")
     public String viewPartnerRooms(Model model) {
         try {
-            // Lấy thông tin người dùng đã đăng nhập
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
-
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
 
             if (systemUser != null && systemUser.isPartner()) {
@@ -62,19 +60,15 @@ public class RoomPartnerController {
                     Long partnerId = partner.getId();
                     List<RoomEntity> roomPartners = roomService.findByPartnerId(partnerId);
 
-                    // Lấy RoomEntity tương ứng cho mỗi RoomPartnerEntity để có thông tin ảnh
                     for (RoomEntity roomPartner : roomPartners) {
-                        // Khởi tạo amenities để tránh lỗi lazy loading
                         if (roomPartner.getAmenities() == null) {
                             roomPartner.setAmenities(new ArrayList<>());
                         }
                     }
 
-                    // Tính toán thống kê
                     long availableRoomsCount = roomPartners.stream()
                             .filter(room -> room.getStatus() == RoomEntity.RoomStatus.AVAILABLE)
                             .count();
-                    
                     long unavailableRoomsCount = roomPartners.stream()
                             .filter(room -> room.getStatus() != RoomEntity.RoomStatus.AVAILABLE)
                             .count();
@@ -101,22 +95,66 @@ public class RoomPartnerController {
 
     @GetMapping("/partner/rooms/add")
     public String showAddRoomForm(Model model) {
-        RoomEntity roomPartner = new RoomEntity();
-        model.addAttribute("roomPartner", roomPartner);
-        return "Partner/add-RoomPartner";
+        return "redirect:/partner/rooms?action=add";
+    }
+
+    @GetMapping("/partner/rooms/edit/{id}")
+    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+            if (partner == null) {
+                model.addAttribute("error", "Không tìm thấy thông tin đối tác.");
+                return "redirect:/partner/rooms";
+            }
+
+            RoomEntity room = roomService.getRoomById(id);
+            if (room == null) {
+                model.addAttribute("error", "Không tìm thấy phòng.");
+                return "redirect:/partner/rooms";
+            }
+
+            if (room.getPartner() == null || !room.getPartner().getId().equals(partner.getId())) {
+                model.addAttribute("error", "Bạn không có quyền chỉnh sửa phòng này.");
+                return "redirect:/partner/rooms";
+            }
+
+            // Lấy danh sách ảnh từ database (đã có sẵn trong room object)
+            if (room.getImageUrls() == null) {
+                room.setImageUrls(new ArrayList<>());
+            }
+
+            // Debug logging
+            System.out.println("Room ID: " + room.getRoomId());
+            System.out.println("Room Name: " + room.getNameNumber());
+            System.out.println("Image URLs: " + room.getImageUrls());
+            System.out.println("Image URLs Size: " + (room.getImageUrls() != null ? room.getImageUrls().size() : 0));
+
+            model.addAttribute("room", room);
+            return "Partner/edit-RoomPartner";
+
+        } catch (Exception e) {
+            System.err.println("Error in showEditRoomForm: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/partner/rooms";
+        }
     }
 
     @PostMapping("/partner/rooms/add")
     public String addRoom(@ModelAttribute("roomPartner") @Valid RoomEntity roomPartner,
                          BindingResult result,
-                         @RequestParam("images") MultipartFile[] images,
+                         @RequestParam(value = "images", required = false) MultipartFile[] images,
                          RedirectAttributes redirectAttributes) {
         try {
             if (result.hasErrors()) {
-                return "Partner/add-RoomPartner";
+                redirectAttributes.addFlashAttribute("error", "Dữ liệu không hợp lệ.");
+                return "redirect:/partner/rooms";
             }
 
-            // Lấy thông tin partner hiện tại
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
@@ -127,32 +165,38 @@ public class RoomPartnerController {
                 return "redirect:/partner/rooms";
             }
 
-            // Set partner cho phòng
             roomPartner.setPartner(partner);
+            roomService.saveRoom(roomPartner);
 
-            // Xử lý upload ảnh
-            List<String> imageUrls = new ArrayList<>();
+            // Upload ảnh nếu có
             if (images != null && images.length > 0) {
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+                File uploadDirectory = new File(uploadDir);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdirs();
+                }
+                
+                List<String> imageUrls = new ArrayList<>();
                 for (MultipartFile image : images) {
                     if (!image.isEmpty()) {
-                        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-                        Path uploadPath = Paths.get(ROOM_IMAGE_UPLOAD_DIR);
-                        
-                        if (!Files.exists(uploadPath)) {
-                            Files.createDirectories(uploadPath);
+                        try {
+                            String originalFilename = image.getOriginalFilename();
+                            String newFilename = System.currentTimeMillis() + "_" + originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
+                            
+                            File destFile = new File(uploadDirectory, newFilename);
+                            image.transferTo(destFile);
+                            
+                            imageUrls.add(newFilename);
+                            
+                        } catch (IOException e) {
+                            System.err.println("Error saving image " + image.getOriginalFilename() + ": " + e.getMessage());
+                            redirectAttributes.addFlashAttribute("error", "Lỗi khi lưu ảnh " + image.getOriginalFilename());
                         }
-                        
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(image.getInputStream(), filePath);
-                        
-                        imageUrls.add(fileName);
                     }
                 }
+                
+                roomPartner.setImageUrls(imageUrls);
             }
-            roomPartner.setImageUrls(imageUrls);
-
-            // Lưu phòng
-            roomService.saveRoom(roomPartner);
 
             redirectAttributes.addFlashAttribute("success", "Thêm phòng thành công!");
             return "redirect:/partner/rooms";
@@ -163,24 +207,18 @@ public class RoomPartnerController {
         }
     }
 
-    @GetMapping("/partner/rooms/edit/{id}")
-    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
-        try {
-            RoomEntity roomPartner = roomService.getRoomById(id);
-            if (roomPartner == null) {
-                return "redirect:/partner/rooms?error=notfound";
-            }
-            model.addAttribute("roomPartner", roomPartner);
-            return "Partner/edit-RoomPartner";
-        } catch (Exception e) {
-            return "redirect:/partner/rooms?error=error";
-        }
-    }
-
     @PostMapping("/partner/rooms/edit")
     public String updateRoom(@ModelAttribute RoomEntity roomPartner,
-                           @RequestParam("images") MultipartFile[] images,
+                           @RequestParam(value = "roomImages", required = false) MultipartFile[] roomImages,
+                           @RequestParam(value = "deletedImages", required = false) String deletedImages,
+                           @RequestParam(value = "amenities", required = false) String[] amenities,
                            RedirectAttributes redirectAttributes) {
+        System.out.println("=== UPDATE ROOM REQUEST ===");
+        System.out.println("Room ID: " + roomPartner.getRoomId());
+        System.out.println("deletedImages: " + deletedImages);
+        System.out.println("roomImages count: " + (roomImages != null ? roomImages.length : 0));
+        System.out.println("amenities: " + (amenities != null ? Arrays.toString(amenities) : "null"));
+        
         try {
             RoomEntity existingRoom = roomService.getRoomById(roomPartner.getRoomId());
 
@@ -190,52 +228,129 @@ public class RoomPartnerController {
             }
 
             // Cập nhật thông tin phòng
+            existingRoom.setRoomNumber(roomPartner.getRoomNumber());
             existingRoom.setNameNumber(roomPartner.getNameNumber());
             existingRoom.setType(roomPartner.getType());
             existingRoom.setPrice(roomPartner.getPrice());
             existingRoom.setStatus(roomPartner.getStatus());
             existingRoom.setDescription(roomPartner.getDescription());
-            existingRoom.setCapacity(roomPartner.getCapacity());
             existingRoom.setService(roomPartner.getService());
-            existingRoom.setView(roomPartner.getView());
+            existingRoom.setCapacity(roomPartner.getCapacity());
+            existingRoom.setTotalRooms(roomPartner.getTotalRooms());
             existingRoom.setBedType(roomPartner.getBedType());
             existingRoom.setBathroomType(roomPartner.getBathroomType());
-            existingRoom.setTotalRooms(roomPartner.getTotalRooms());
+            existingRoom.setView(roomPartner.getView());
             existingRoom.setIsSmoking(roomPartner.getIsSmoking());
             existingRoom.setIsPetFriendly(roomPartner.getIsPetFriendly());
 
-            // Xử lý upload ảnh mới nếu có
-            if (images != null && images.length > 0) {
-                List<String> newImageUrls = new ArrayList<>();
-                for (MultipartFile image : images) {
-                    if (!image.isEmpty()) {
-                        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-                        Path uploadPath = Paths.get(ROOM_IMAGE_UPLOAD_DIR);
+            if (amenities != null) {
+                existingRoom.setAmenities(new ArrayList<>(Arrays.asList(amenities)));
+            } else {
+                existingRoom.setAmenities(new ArrayList<>());
+            }
+
+            // Xử lý ảnh bị xóa
+            System.out.println("=== PROCESSING DELETED IMAGES ===");
+            System.out.println("deletedImages parameter: " + deletedImages);
+            
+            if (deletedImages != null && !deletedImages.isEmpty()) {
+                String[] deletedImageUrls = deletedImages.split(",");
+                System.out.println("Split deleted images: " + Arrays.toString(deletedImageUrls));
+                
+                List<String> currentImages = existingRoom.getImageUrls();
+                if (currentImages == null) {
+                    currentImages = new ArrayList<>();
+                }
+                System.out.println("Current images before deletion: " + currentImages);
+                
+                for (String imageUrl : deletedImageUrls) {
+                    if (!imageUrl.trim().isEmpty()) {
+                        System.out.println("Processing deletion for: " + imageUrl.trim());
                         
-                        if (!Files.exists(uploadPath)) {
-                            Files.createDirectories(uploadPath);
+                        // Xóa file từ filesystem
+                        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+                        File imageFile = new File(uploadDir, imageUrl.trim());
+                        System.out.println("Attempting to delete file: " + imageFile.getAbsolutePath());
+                        
+                        if (imageFile.exists()) {
+                            if (imageFile.delete()) {
+                                System.out.println("Successfully deleted file: " + imageFile.getAbsolutePath());
+                            } else {
+                                System.err.println("Failed to delete file: " + imageFile.getAbsolutePath());
+                            }
+                        } else {
+                            System.out.println("File not found: " + imageFile.getAbsolutePath());
                         }
                         
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(image.getInputStream(), filePath);
-                        
-                        newImageUrls.add(fileName);
+                        // Xóa khỏi danh sách ảnh
+                        boolean removed = currentImages.removeIf(img -> img.equals(imageUrl.trim()));
+                        System.out.println("Removed from list: " + removed);
+                        System.out.println("Image to remove: '" + imageUrl.trim() + "'");
+                        System.out.println("Current images after removal attempt: " + currentImages);
                     }
                 }
                 
-                // Thêm ảnh mới vào danh sách hiện tại
-                if (existingRoom.getImageUrls() == null) {
-                    existingRoom.setImageUrls(new ArrayList<>());
-                }
-                existingRoom.getImageUrls().addAll(newImageUrls);
+                System.out.println("Current images after deletion: " + currentImages);
+                existingRoom.setImageUrls(currentImages);
+            } else {
+                System.out.println("No images to delete");
             }
 
+            // Upload ảnh mới
+            if (roomImages != null && roomImages.length > 0) {
+                System.out.println("=== UPLOADING NEW IMAGES ===");
+                System.out.println("Room ID: " + existingRoom.getRoomId());
+                System.out.println("Images count: " + roomImages.length);
+                
+                // Xử lý upload trực tiếp thay vì gọi API
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+                File uploadDirectory = new File(uploadDir);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdirs();
+                }
+                
+                List<String> newImageUrls = new ArrayList<>();
+                for (MultipartFile image : roomImages) {
+                    if (!image.isEmpty()) {
+                        try {
+                            String originalFilename = image.getOriginalFilename();
+                            String newFilename = System.currentTimeMillis() + "_" + originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
+                            
+                            System.out.println("Processing image: " + originalFilename + " -> " + newFilename);
+                            
+                            File destFile = new File(uploadDirectory, newFilename);
+                            image.transferTo(destFile);
+                            
+                            newImageUrls.add(newFilename);
+                            System.out.println("Image saved: " + destFile.getAbsolutePath());
+                            
+                        } catch (IOException e) {
+                            System.err.println("Error saving image " + image.getOriginalFilename() + ": " + e.getMessage());
+                            redirectAttributes.addFlashAttribute("error", "Lỗi khi lưu ảnh " + image.getOriginalFilename());
+                        }
+                    }
+                }
+                
+                // Cập nhật danh sách ảnh trong database
+                if (!newImageUrls.isEmpty()) {
+                    List<String> currentImages = existingRoom.getImageUrls();
+                    if (currentImages == null) {
+                        currentImages = new ArrayList<>();
+                    }
+                    currentImages.addAll(newImageUrls);
+                    existingRoom.setImageUrls(currentImages);
+                    System.out.println("Updated room images: " + currentImages);
+                }
+            }
+
+            existingRoom.setUpdatedAt(LocalDateTime.now());
             roomService.saveRoom(existingRoom);
 
             redirectAttributes.addFlashAttribute("success", "Cập nhật phòng thành công!");
             return "redirect:/partner/rooms";
 
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             return "redirect:/partner/rooms";
         }
@@ -244,6 +359,22 @@ public class RoomPartnerController {
     @GetMapping("/partner/rooms/delete/{id}")
     public String deleteRoom(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+            PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+
+            RoomEntity room = roomService.getRoomById(id);
+            if (room == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy phòng.");
+                return "redirect:/partner/rooms";
+            }
+
+            if (room.getPartner() == null || !room.getPartner().getId().equals(partner.getId())) {
+                redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xóa phòng này.");
+                return "redirect:/partner/rooms";
+            }
+
             roomService.deleteRoom(id);
             redirectAttributes.addFlashAttribute("success", "Xóa phòng thành công!");
         } catch (Exception e) {
@@ -251,4 +382,4 @@ public class RoomPartnerController {
         }
         return "redirect:/partner/rooms";
     }
-} 
+}

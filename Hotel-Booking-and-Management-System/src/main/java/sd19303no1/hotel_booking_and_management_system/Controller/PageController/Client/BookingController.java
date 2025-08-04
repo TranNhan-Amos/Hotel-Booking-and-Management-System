@@ -302,9 +302,12 @@ public class BookingController {
                 return response;
             }
             RoomEntity room = roomOpt.get();
-            if (room.getTotalRooms() == null || room.getTotalRooms() < roomQuantity) {
+            
+            // Kiểm tra số phòng khả dụng sử dụng logic tính toán động
+            int availableRooms = roomService.getAvailableRoomCount(roomId, checkIn, checkOut);
+            if (availableRooms < roomQuantity) {
                 response.put("success", false);
-                response.put("message", "Không đủ phòng trống");
+                response.put("message", "Không đủ phòng trống. Số phòng còn lại: " + availableRooms);
                 return response;
             }
 

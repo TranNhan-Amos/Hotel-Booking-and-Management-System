@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cài Đặt - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/Settings-Management.css}">
-    
+    <link rel="stylesheet" th:href="@{/Css/Admin/Settings-Management.css}">
 </head>
 <body>
     <div class="container">
@@ -19,13 +18,7 @@
                 <div class="settings-sidebar">
                     <ul class="settings-nav">
                         <li class="settings-nav-item">
-                            <a href="#general" class="settings-nav-link active" onclick="showSection('general')">
-                                <i class="fas fa-cog"></i>
-                                <span>Cài Đặt Chung</span>
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#hotel" class="settings-nav-link" onclick="showSection('hotel')">
+                            <a href="#hotel" class="settings-nav-link active" onclick="showSection('hotel')">
                                 <i class="fas fa-hotel"></i>
                                 <span>Thông Tin Khách Sạn</span>
                             </a>
@@ -49,15 +42,9 @@
                             </a>
                         </li>
                         <li class="settings-nav-item">
-                            <a href="#security" class="settings-nav-link" onclick="showSection('security')">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Bảo Mật</span>
-                            </a>
-                        </li>
-                        <li class="settings-nav-item">
-                            <a href="#backup" class="settings-nav-link" onclick="showSection('backup')">
-                                <i class="fas fa-database"></i>
-                                <span>Sao Lưu</span>
+                            <a href="#system" class="settings-nav-link" onclick="showSection('system')">
+                                <i class="fas fa-cog"></i>
+                                <span>Hệ Thống</span>
                             </a>
                         </li>
                     </ul>
@@ -66,84 +53,12 @@
                 <!-- Settings Content -->
                 <div class="settings-content">
                     <div class="settings-header">
-                        <h2 id="settingsTitle"><i class="fas fa-cog"></i> Cài Đặt Chung</h2>
+                        <h2 id="settingsTitle"><i class="fas fa-hotel"></i> Thông Tin Khách Sạn</h2>
                     </div>
                     
                     <div class="settings-body">
-                        <!-- General Settings -->
-                        <div id="general-section" class="settings-section">
-                            <div class="section-title">
-                                <i class="fas fa-cog"></i>
-                                Cài Đặt Hệ Thống
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <div>
-                                        <label class="form-label">Ngôn Ngữ Hệ Thống</label>
-                                        <select class="form-select">
-                                            <option value="vi" selected>Tiếng Việt</option>
-                                            <option value="en">English</option>
-                                            <option value="zh">中文</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Múi Giờ</label>
-                                        <select class="form-select">
-                                            <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
-                                            <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
-                                            <option value="Asia/Singapore">GMT+8 (Singapore)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <div>
-                                        <label class="form-label">Định Dạng Ngày</label>
-                                        <select class="form-select">
-                                            <option value="dd/mm/yyyy" selected>DD/MM/YYYY</option>
-                                            <option value="mm/dd/yyyy">MM/DD/YYYY</option>
-                                            <option value="yyyy-mm-dd">YYYY-MM-DD</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Đơn Vị Tiền Tệ</label>
-                                        <select class="form-select">
-                                            <option value="VND" selected>VND (₫)</option>
-                                            <option value="USD">USD ($)</option>
-                                            <option value="EUR">EUR (€)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="toggle-group">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Chế Độ Bảo Trì</div>
-                                    <div class="toggle-description">Tạm thời tắt website để bảo trì</div>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="toggle-group">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Cho Phép Đăng Ký</div>
-                                    <div class="toggle-description">Cho phép khách hàng tạo tài khoản mới</div>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Hotel Information -->
-                        <div id="hotel-section" class="settings-section" style="display: none;">
+                        <div id="hotel-section" class="settings-section">
                             <div class="section-title">
                                 <i class="fas fa-hotel"></i>
                                 Thông Tin Khách Sạn
@@ -230,6 +145,19 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div>
+                                        <label class="form-label">Số Phòng Tối Đa/Đơn</label>
+                                        <input type="number" class="form-input" value="10" min="1" max="20">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Số Đêm Tối Đa</label>
+                                        <input type="number" class="form-input" value="30" min="1" max="90">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="toggle-group">
                                 <div class="toggle-info">
                                     <div class="toggle-title">Tự Động Xác Nhận</div>
@@ -255,6 +183,17 @@
                             <div class="form-group">
                                 <label class="form-label">Thời Hạn Hủy Phòng (giờ)</label>
                                 <input type="number" class="form-input" value="24" min="0" placeholder="Số giờ trước khi check-in">
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Hiển Thị Số Phòng Còn Trống</div>
+                                    <div class="toggle-description">Hiển thị số lượng phòng còn trống cho khách hàng</div>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
                         </div>
 
@@ -309,6 +248,17 @@
                                 <label class="form-label">Tỷ Lệ Đặt Cọc (%)</label>
                                 <input type="number" class="form-input" value="30" min="0" max="100" placeholder="Phần trăm số tiền cần đặt cọc">
                             </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Thanh Toán Trả Góp</div>
+                                    <div class="toggle-description">Cho phép khách hàng thanh toán trả góp</div>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- Notification Settings -->
@@ -355,19 +305,72 @@
                                 <label class="form-label">Email Nhận Thông Báo</label>
                                 <input type="email" class="form-input" value="admin@grandhotel.com" placeholder="Nhập email nhận thông báo">
                             </div>
-                        </div>
 
-                        <!-- Security Settings -->
-                        <div id="security-section" class="settings-section" style="display: none;">
-                            <div class="section-title">
-                                <i class="fas fa-shield-alt"></i>
-                                Cài Đặt Bảo Mật
-                            </div>
-                            
                             <div class="toggle-group">
                                 <div class="toggle-info">
-                                    <div class="toggle-title">Xác Thực 2 Bước</div>
-                                    <div class="toggle-description">Bật xác thực 2 bước cho tài khoản admin</div>
+                                    <div class="toggle-title">Thông Báo Phòng Sắp Hết</div>
+                                    <div class="toggle-description">Thông báo khi số phòng còn lại ít</div>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- System Settings -->
+                        <div id="system-section" class="settings-section" style="display: none;">
+                            <div class="section-title">
+                                <i class="fas fa-cog"></i>
+                                Cài Đặt Hệ Thống
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div>
+                                        <label class="form-label">Ngôn Ngữ Hệ Thống</label>
+                                        <select class="form-select">
+                                            <option value="vi" selected>Tiếng Việt</option>
+                                            <option value="en">English</option>
+                                            <option value="zh">中文</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Múi Giờ</label>
+                                        <select class="form-select">
+                                            <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                                            <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
+                                            <option value="Asia/Singapore">GMT+8 (Singapore)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div>
+                                        <label class="form-label">Định Dạng Ngày</label>
+                                        <select class="form-select">
+                                            <option value="dd/mm/yyyy" selected>DD/MM/YYYY</option>
+                                            <option value="mm/dd/yyyy">MM/DD/YYYY</option>
+                                            <option value="yyyy-mm-dd">YYYY-MM-DD</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Đơn Vị Tiền Tệ</label>
+                                        <select class="form-select">
+                                            <option value="VND" selected>VND (₫)</option>
+                                            <option value="USD">USD ($)</option>
+                                            <option value="EUR">EUR (€)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Chế Độ Bảo Trì</div>
+                                    <div class="toggle-description">Tạm thời tắt website để bảo trì</div>
                                 </div>
                                 <label class="toggle-switch">
                                     <input type="checkbox">
@@ -377,8 +380,8 @@
 
                             <div class="toggle-group">
                                 <div class="toggle-info">
-                                    <div class="toggle-title">Đăng Nhập Bằng Google</div>
-                                    <div class="toggle-description">Cho phép đăng nhập bằng tài khoản Google</div>
+                                    <div class="toggle-title">Cho Phép Đăng Ký</div>
+                                    <div class="toggle-description">Cho phép khách hàng tạo tài khoản mới</div>
                                 </div>
                                 <label class="toggle-switch">
                                     <input type="checkbox" checked>
@@ -397,59 +400,6 @@
                                         <input type="number" class="form-input" value="5" min="1" max="10">
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Mật Khẩu Mới</label>
-                                <input type="password" class="form-input" placeholder="Nhập mật khẩu mới">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Xác Nhận Mật Khẩu</label>
-                                <input type="password" class="form-input" placeholder="Nhập lại mật khẩu mới">
-                            </div>
-                        </div>
-
-                        <!-- Backup Settings -->
-                        <div id="backup-section" class="settings-section" style="display: none;">
-                            <div class="section-title">
-                                <i class="fas fa-database"></i>
-                                Sao Lưu & Khôi Phục
-                            </div>
-                            
-                            <div class="toggle-group">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Sao Lưu Tự Động</div>
-                                    <div class="toggle-description">Tự động sao lưu dữ liệu hàng ngày</div>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <div>
-                                        <label class="form-label">Thời Gian Sao Lưu</label>
-                                        <input type="time" class="form-input" value="02:00">
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Lưu Trữ Tối Đa (ngày)</label>
-                                        <input type="number" class="form-input" value="30" min="1" max="365">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="btn-group">
-                                <button class="btn btn-primary" onclick="createBackup()">
-                                    <i class="fas fa-download"></i>
-                                    Tạo Sao Lưu Ngay
-                                </button>
-                                <button class="btn btn-success" onclick="restoreBackup()">
-                                    <i class="fas fa-upload"></i>
-                                    Khôi Phục Dữ Liệu
-                                </button>
                             </div>
                         </div>
 
@@ -470,31 +420,6 @@
         </div>
     </div>
     <script>
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const toggleBtn = document.querySelector('.mobile-toggle i');
-            
-            mobileMenu.classList.toggle('active');
-            
-            if (mobileMenu.classList.contains('active')) {
-                toggleBtn.className = 'fas fa-times';
-            } else {
-                toggleBtn.className = 'fas fa-bars';
-            }
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const toggleBtn = document.querySelector('.mobile-toggle');
-            
-            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
-                mobileMenu.classList.remove('active');
-                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
-            }
-        });
-
         // Show Settings Section
         function showSection(sectionName) {
             // Hide all sections
@@ -522,23 +447,19 @@
             
             // Update title
             const titles = {
-                'general': 'Cài Đặt Chung',
                 'hotel': 'Thông Tin Khách Sạn',
                 'booking': 'Cài Đặt Đặt Phòng',
                 'payment': 'Thanh Toán',
                 'notifications': 'Thông Báo',
-                'security': 'Bảo Mật',
-                'backup': 'Sao Lưu'
+                'system': 'Hệ Thống'
             };
             
             const icons = {
-                'general': 'fas fa-cog',
                 'hotel': 'fas fa-hotel',
                 'booking': 'fas fa-calendar-check',
                 'payment': 'fas fa-credit-card',
                 'notifications': 'fas fa-bell',
-                'security': 'fas fa-shield-alt',
-                'backup': 'fas fa-database'
+                'system': 'fas fa-cog'
             };
             
             const titleElement = document.getElementById('settingsTitle');
@@ -558,39 +479,9 @@
             }
         }
 
-        function createBackup() {
-            alert('Đang tạo sao lưu dữ liệu...');
-        }
-
-        function restoreBackup() {
-            if (confirm('Bạn có chắc muốn khôi phục dữ liệu từ sao lưu?')) {
-                alert('Đang khôi phục dữ liệu...');
-            }
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            if (window.innerWidth > 992) {
-                mobileMenu.classList.remove('active');
-                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
-            }
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const mobileMenu = document.getElementById('mobileMenu');
-                if (mobileMenu.classList.contains('active')) {
-                    toggleMobileMenu();
-                }
-            }
-        });
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            showSection('general');
+            showSection('hotel');
         });
     </script>
 </body>

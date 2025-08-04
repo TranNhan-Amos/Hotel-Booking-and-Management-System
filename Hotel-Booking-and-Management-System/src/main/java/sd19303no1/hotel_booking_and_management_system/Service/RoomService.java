@@ -132,12 +132,47 @@ public class RoomService {
         RoomEntity room = roomOpt.get();
         int totalRooms = room.getTotalRooms() != null ? room.getTotalRooms() : 1;
         
-        // Đếm số booking đã có trong khoảng thời gian này
+        // Đếm số phòng đã được đặt trong khoảng thời gian này (bao gồm roomQuantity)
         long bookedRooms = roomRepository.countBookedRoomsInDateRange(roomId, checkInDate, checkOutDate);
         
         int availableRooms = (int) (totalRooms - bookedRooms);
         logger.info("Available rooms for roomId {}: {} (total: {}, booked: {})", 
                 roomId, availableRooms, totalRooms, bookedRooms);
+        
+        return Math.max(0, availableRooms);
+    }
+
+    // Tính số phòng có sẵn cho khoảng thời gian tùy chỉnh
+    public int getAvailableRoomCountForDateRange(Integer roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        logger.info("Getting available room count for roomId: {} from {} to {}", roomId, checkInDate, checkOutDate);
+        
+        // Validate input
+        if (checkInDate == null || checkOutDate == null) {
+            logger.warn("Invalid date range: checkIn={}, checkOut={}", checkInDate, checkOutDate);
+            return 0;
+        }
+        
+        if (checkInDate.isAfter(checkOutDate)) {
+            logger.warn("Invalid date range: checkIn is after checkOut");
+            return 0;
+        }
+        
+        // Lấy tổng số phòng của loại phòng này
+        Optional<RoomEntity> roomOpt = roomRepository.findById(roomId);
+        if (roomOpt.isEmpty()) {
+            logger.warn("Room not found for roomId: {}", roomId);
+            return 0;
+        }
+        
+        RoomEntity room = roomOpt.get();
+        int totalRooms = room.getTotalRooms() != null ? room.getTotalRooms() : 1;
+        
+        // Đếm số phòng đã được đặt trong khoảng thời gian này (bao gồm roomQuantity)
+        long bookedRooms = roomRepository.countBookedRoomsInDateRange(roomId, checkInDate, checkOutDate);
+        
+        int availableRooms = (int) (totalRooms - bookedRooms);
+        logger.info("Available rooms for roomId {} from {} to {}: {} (total: {}, booked: {})", 
+                roomId, checkInDate, checkOutDate, availableRooms, totalRooms, bookedRooms);
         
         return Math.max(0, availableRooms);
     }

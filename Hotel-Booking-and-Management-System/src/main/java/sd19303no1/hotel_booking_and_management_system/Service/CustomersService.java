@@ -37,44 +37,38 @@ public class CustomersService {
 
     public void updateCustomer(CustomersEntity customer) {
         if (customer.getCustomerId() != null && customerRepository.existsById(customer.getCustomerId())) {
-            // Lấy thông tin cũ để so sánh
-            CustomersEntity oldCustomer = customerRepository.findById(customer.getCustomerId()).orElse(null);
-            if (oldCustomer != null) {
-                // Kiểm tra xem khách hàng có liên kết với SystemUserEntity không
-                SystemUserEntity systemUser = oldCustomer.getSystemUser();
-                if (systemUser != null) {
-                    // Trường hợp 1: Có liên kết với SystemUserEntity
-                    boolean hasChanges = false;
-                    
-                    // Cập nhật email nếu thay đổi
-                    if (!oldCustomer.getEmail().equals(customer.getEmail())) {
-                        systemUser.setEmail(customer.getEmail());
-                        hasChanges = true;
-                    }
-                    
-                    // Cập nhật username nếu tên thay đổi
-                    if (!oldCustomer.getName().equals(customer.getName())) {
-                        systemUser.setUsername(customer.getName());
-                        hasChanges = true;
-                    }
-                    
-                    if (hasChanges) {
-                        systemUserRepository.save(systemUser);
-                    }
-                } else {
-                    // Trường hợp 2: Không có liên kết với SystemUserEntity
-                    // Tìm SystemUserEntity theo email cũ
-                    SystemUserEntity existingSystemUser = systemUserRepository.findByEmail(oldCustomer.getEmail()).orElse(null);
-                    if (existingSystemUser != null) {
-                        // Cập nhật SystemUserEntity nếu email thay đổi
+            try {
+                // Lấy thông tin cũ để so sánh
+                CustomersEntity oldCustomer = customerRepository.findById(customer.getCustomerId()).orElse(null);
+                if (oldCustomer != null) {
+                    // Kiểm tra xem khách hàng có liên kết với SystemUserEntity không
+                    SystemUserEntity systemUser = oldCustomer.getSystemUser();
+                    if (systemUser != null) {
+                        // Cập nhật SystemUserEntity nếu có thay đổi
+                        boolean hasChanges = false;
+                        
                         if (!oldCustomer.getEmail().equals(customer.getEmail())) {
-                            existingSystemUser.setEmail(customer.getEmail());
-                            systemUserRepository.save(existingSystemUser);
+                            systemUser.setEmail(customer.getEmail());
+                            hasChanges = true;
+                        }
+                        
+                        if (!oldCustomer.getName().equals(customer.getName())) {
+                            systemUser.setUsername(customer.getName());
+                            hasChanges = true;
+                        }
+                        
+                        if (hasChanges) {
+                            systemUserRepository.save(systemUser);
                         }
                     }
                 }
+                
+                // Lưu thông tin customer
+                customerRepository.save(customer);
+                
+            } catch (Exception e) {
+                throw new RuntimeException("Lỗi khi cập nhật khách hàng: " + e.getMessage(), e);
             }
-            customerRepository.save(customer); 
         } else {
             throw new IllegalArgumentException("Không tìm thấy khách hàng để cập nhật!");
         }

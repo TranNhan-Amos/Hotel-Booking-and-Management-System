@@ -19,7 +19,8 @@ import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Controller
@@ -62,24 +63,26 @@ public class PaymentController {
 
             // Calculate nights
             if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
-                long nights = java.time.temporal.ChronoUnit.DAYS.between(
-                        booking.getCheckInDate(), booking.getCheckOutDate());
+                long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
                 model.addAttribute("nights", nights);
-            }
 
-            // Calculate prices
-            if (booking.getRoom() != null && booking.getRoom().getPrice() != null) {
-                BigDecimal basePrice = booking.getRoom().getPrice()
-                        .multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
-                BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
-                BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
-                BigDecimal total = basePrice.add(serviceFee).add(vat);
-                model.addAttribute("basePrice", basePrice);
-                model.addAttribute("serviceFee", serviceFee);
-                model.addAttribute("vat", vat);
-                model.addAttribute("total", total);
+                // Calculate prices
+                if (booking.getRoom() != null && booking.getRoom().getPrice() != null && booking.getRoomQuantity() != null) {
+                    BigDecimal basePrice = booking.getRoom().getPrice()
+                            .multiply(BigDecimal.valueOf(booking.getRoomQuantity()))
+                            .multiply(BigDecimal.valueOf(nights));
+                    BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
+                    BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
+                    BigDecimal total = basePrice.add(serviceFee).add(vat);
+                    model.addAttribute("basePrice", basePrice);
+                    model.addAttribute("serviceFee", serviceFee);
+                    model.addAttribute("vat", vat);
+                    model.addAttribute("total", total);
+                } else {
+                    model.addAttribute("error", "Không thể tính toán chi phí do thiếu thông tin phòng hoặc số lượng");
+                }
             } else {
-                model.addAttribute("error", "Không thể tính toán chi phí do thiếu thông tin phòng");
+                model.addAttribute("error", "Không thể tính toán số đêm do thiếu thông tin ngày nhận/trả phòng");
             }
         } else {
             model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
@@ -185,20 +188,30 @@ public class PaymentController {
 
         // Update customer information
         booking.setCustomer(customer);
-        
-        // Calculate and set total price first
-        if (booking.getRoom() != null && booking.getRoom().getPrice() != null && booking.getRoomQuantity() != null) {
-            BigDecimal basePrice = booking.getRoom().getPrice().multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
+
+        // Calculate and set total price
+        if (booking.getRoom() != null && booking.getRoom().getPrice() != null && booking.getRoomQuantity() != null
+                && booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
+            long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+            if (nights <= 0) {
+                model.addAttribute("error", "Ngày trả phòng phải sau ngày nhận phòng");
+                return "Page/Payment";
+            }
+            BigDecimal basePrice = booking.getRoom().getPrice()
+                    .multiply(BigDecimal.valueOf(booking.getRoomQuantity()))
+                    .multiply(BigDecimal.valueOf(nights));
             BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1")); // Phí dịch vụ 10%
             BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1")); // VAT 10%
             BigDecimal total = basePrice.add(serviceFee).add(vat);
-
             booking.setTotalPrice(total);
+        } else {
+            model.addAttribute("error", "Không thể tính giá do thiếu thông tin phòng, số lượng hoặc ngày");
+            return "Page/Payment";
         }
-        
-        // Process payment using service method (đã bao gồm xác nhận cho thanh toán ngay lập tức)
+
+        // Process payment using service method
         booking = bookingOrderService.processPayment(bookingId, paymentMethod);
-        
+
         // Save booking with total price
         bookingOrderRepository.save(booking);
 
@@ -208,7 +221,7 @@ public class PaymentController {
         System.out.println("Payment Status: " + booking.getPaymentStatus());
         System.out.println("Total Price: " + booking.getTotalPrice());
         System.out.println("Booking Status: " + (booking.getStatus() != null ? booking.getStatus().getStatusName() : "null"));
-        
+
         // Set success message based on payment method
         String successMessage;
         if (paymentMethod.equalsIgnoreCase("payOnArrival")) {
@@ -216,7 +229,7 @@ public class PaymentController {
         } else {
             successMessage = "Đặt phòng và thanh toán thành công! Chờ nhận phòng.";
         }
-        
+
         redirectAttributes.addFlashAttribute("success", successMessage);
         return "redirect:/payment-success?bookingId=" + bookingId;
     }
@@ -228,7 +241,7 @@ public class PaymentController {
             if (bookingOpt.isPresent()) {
                 BookingOrderEntity booking = bookingOpt.get();
                 model.addAttribute("booking", booking);
-                            // Set success message based on payment status and method
+                // Set success message based on payment status and method
                 String successMessage;
                 if (booking.getPaymentStatus().equals("PAID")) {
                     successMessage = "Đặt phòng và thanh toán thành công! Chờ nhận phòng.";
@@ -237,9 +250,13 @@ public class PaymentController {
                 }
                 model.addAttribute("success", successMessage);
                 // Calculate prices for display
-                if (booking.getRoom() != null && booking.getRoom().getPrice() != null) {
+                if (booking.getRoom() != null && booking.getRoom().getPrice() != null
+                        && booking.getCheckInDate() != null && booking.getCheckOutDate() != null
+                        && booking.getRoomQuantity() != null) {
+                    long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
                     BigDecimal basePrice = booking.getRoom().getPrice()
-                            .multiply(BigDecimal.valueOf(booking.getRoomQuantity()));
+                            .multiply(BigDecimal.valueOf(booking.getRoomQuantity()))
+                            .multiply(BigDecimal.valueOf(nights));
                     BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1"));
                     BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1"));
                     BigDecimal total = basePrice.add(serviceFee).add(vat);
@@ -247,6 +264,9 @@ public class PaymentController {
                     model.addAttribute("serviceFee", serviceFee);
                     model.addAttribute("vat", vat);
                     model.addAttribute("total", total);
+                    model.addAttribute("nights", nights);
+                } else {
+                    model.addAttribute("error", "Không thể tính toán chi phí do thiếu thông tin phòng hoặc ngày");
                 }
             } else {
                 model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
@@ -279,13 +299,34 @@ public class PaymentController {
         BookingOrderEntity booking = new BookingOrderEntity();
         booking.setRoom(room);
         booking.setEmail(email);
-        booking.setCheckInDate(java.time.LocalDate.parse(checkInDate));
-        booking.setCheckOutDate(java.time.LocalDate.parse(checkOutDate));
+        booking.setCheckInDate(LocalDate.parse(checkInDate));
+        booking.setCheckOutDate(LocalDate.parse(checkOutDate));
         booking.setRoomQuantity(roomQuantity);
         booking.setSpecialRequests(specialRequests);
         booking.setPaymentStatus("PENDING");
         booking.setPaymentMethod("PENDING");
-        booking.setBookingDate(java.time.LocalDate.now());
+        booking.setBookingDate(LocalDate.now());
+
+        // Calculate total price
+        if (room.getPrice() != null && roomQuantity != null
+                && booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
+            long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+            if (nights <= 0) {
+                redirectAttributes.addFlashAttribute("error", "Ngày trả phòng phải sau ngày nhận phòng");
+                return "redirect:/bookings?roomId=" + roomId;
+            }
+            BigDecimal basePrice = room.getPrice()
+                    .multiply(BigDecimal.valueOf(roomQuantity))
+                    .multiply(BigDecimal.valueOf(nights));
+            BigDecimal serviceFee = basePrice.multiply(new BigDecimal("0.1")); // Phí dịch vụ 10%
+            BigDecimal vat = basePrice.add(serviceFee).multiply(new BigDecimal("0.1")); // VAT 10%
+            BigDecimal total = basePrice.add(serviceFee).add(vat);
+            booking.setTotalPrice(total);
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Không thể tính giá do thiếu thông tin phòng, số lượng hoặc ngày");
+            return "redirect:/bookings?roomId=" + roomId;
+        }
+
         // Tạo customer tạm thời
         CustomersEntity customer = customersService.findByEmail(email);
         if (customer == null) {
@@ -300,9 +341,20 @@ public class PaymentController {
         StatusEntity pendingStatus = statusRepository.findByStatusNameIgnoreCase("PENDING");
         if (pendingStatus != null) {
             booking.setStatus(pendingStatus);
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy trạng thái PENDING");
+            return "redirect:/bookings?roomId=" + roomId;
         }
+
+        // Lưu booking
         bookingOrderRepository.save(booking);
-        // Redirect sang GET /payment?bookingId=...
+
+        // Log để debug
+        System.out.println("===== HANDLE PAYMENT POST DEBUG ===");
+        System.out.println("Booking ID: " + booking.getBookingId());
+        System.out.println("Total Price: " + booking.getTotalPrice());
+        System.out.println("Nights: " + ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate()));
+
         return "redirect:/payment?bookingId=" + booking.getBookingId();
     }
 }

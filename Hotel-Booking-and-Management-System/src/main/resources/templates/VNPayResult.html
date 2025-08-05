@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả thanh toán VNPay</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-container {
+            background-color: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #16a34a;
+            margin-bottom: 15px;
+        }
+
+        .fail-icon {
+            font-size: 60px;
+            color: #dc2626;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        p {
+            font-size: 16px;
+            color: #4b5563;
+            margin: 8px 0;
+        }
+
+        .details {
+            text-align: left;
+            margin-top: 25px;
+            padding: 15px 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .details p {
+            margin: 6px 0;
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .status-success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .status-fail {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 24px;
+            background-color: #1d4ed8;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+<div class="result-container">
+    <!-- Biểu tượng trạng thái -->
+    <div th:if="${isSuccess}" class="success-icon">✔️</div>
+    <div th:unless="${isSuccess}" class="fail-icon">❌</div>
+
+    <!-- Thông báo -->
+    <h1 th:text="${message}">Kết quả thanh toán VNPay</h1>
+
+    <p th:if="${isSuccess}">Cảm ơn bạn! Giao dịch của bạn đã được xử lý thành công.</p>
+    <p th:unless="${isSuccess}">Rất tiếc, thanh toán không thành công. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
+
+    <!-- Chi tiết giao dịch -->
+    <div class="details">
+        <p><span class="highlight">Mã giao dịch:</span> <span th:text="${vnpTxnRef}">1234567890</span></p>
+        <p><span class="highlight">Mã đơn hàng:</span> <span th:text="${bookingId}">ABC123</span></p>
+        <p><span class="highlight">Số tiền:</span> <span th:text="${amount}">1.000.000 ₫</span></p>
+        <p><span class="highlight">Thời gian:</span> <span th:text="${paymentTime}">05/08/2025 14:30</span></p>
+        <p><span class="highlight">Trạng thái:</span>
+            <span th:if="${isSuccess}" class="status-success">Thành công</span>
+            <span th:unless="${isSuccess}" class="status-fail">Thất bại</span>
+        </p>
+    </div>
+
+    <a href="/">Quay về trang chủ</a>
+</div>
+</body>
+</html>

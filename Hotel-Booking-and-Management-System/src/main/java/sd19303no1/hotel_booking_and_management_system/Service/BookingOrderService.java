@@ -1073,4 +1073,10 @@ public class BookingOrderService {
             return false;
         }
     }
+    public BookingOrderEntity saveBooking(BookingOrderEntity booking) {
+    // bookingOrderRepository là JPA repository
+    return bookingOrderRepository.save(booking);
+}
+
+    
 }

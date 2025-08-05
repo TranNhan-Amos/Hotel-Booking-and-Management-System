@@ -487,7 +487,8 @@
                         </div>
                         <div class="info-content">
                             <h3>Trạng thái thanh toán</h3>
-                            <p th:text="${booking.paymentStatus}"></p>
+                        <p class="info-value" th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán tại khách sạn'}">Chờ thanh toán tại khách sạn</p>
+
                         </div>
                     </div>
                     

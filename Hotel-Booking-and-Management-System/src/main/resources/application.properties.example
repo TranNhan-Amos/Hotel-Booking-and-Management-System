@@ -1,0 +1,20 @@
+# VNPay Configuration
+# SECURITY WARNING: Never commit actual credentials to version control
+# Set these values through environment variables or a secure configuration management system
+
+# VNPay Secret Key - Set via environment variable: VNPAY_SECRET_KEY
+vnpay.secret-key=${VNPAY_SECRET_KEY:}
+
+# VNPay Merchant ID - Set via environment variable: VNPAY_MERCHANT_ID  
+vnpay.merchant-id=${VNPAY_MERCHANT_ID:}
+
+# Example of setting environment variables:
+# export VNPAY_SECRET_KEY=your_actual_secret_key_here
+# export VNPAY_MERCHANT_ID=your_actual_merchant_id_here
+
+# For production deployments, consider using:
+# - Kubernetes Secrets
+# - AWS Secrets Manager
+# - Azure Key Vault
+# - HashiCorp Vault
+# - Or your platform's secure configuration system

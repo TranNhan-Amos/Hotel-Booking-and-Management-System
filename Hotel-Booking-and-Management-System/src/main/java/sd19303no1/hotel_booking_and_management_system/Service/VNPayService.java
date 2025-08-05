@@ -2,6 +2,7 @@ package sd19303no1.hotel_booking_and_management_system.Service;
 
 import sd19303no1.hotel_booking_and_management_system.Model.VNPayRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,10 +14,22 @@ import java.util.stream.Collectors;
 @Service
 public class VNPayService {
     private final String vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    private final String secretKey = "4DME1Y016LDYETZCPDX3DW8PY9FRYRQJ"; // Đúng key sandbox
-    private final String merchantId = "GD8UNVD3"; // Đúng TMNCode sandbox
+    
+    @Value("${vnpay.secret-key:}")
+    private String secretKey;
+    
+    @Value("${vnpay.merchant-id:}")
+    private String merchantId;
 
     public String createPaymentRequest(VNPayRequest vnPayRequest) {
+        // Validate that credentials are configured
+        if (secretKey == null || secretKey.trim().isEmpty()) {
+            throw new RuntimeException("VNPay secret key not configured. Please set vnpay.secret-key property.");
+        }
+        if (merchantId == null || merchantId.trim().isEmpty()) {
+            throw new RuntimeException("VNPay merchant ID not configured. Please set vnpay.merchant-id property.");
+        }
+        
         Map<String, String> params = new HashMap<>();
         params.put("vnp_Version", "2.0.0");
         params.put("vnp_Command", "pay");
@@ -64,7 +77,8 @@ public class VNPayService {
             }
             data.deleteCharAt(data.length() - 1);
             System.out.println("Chuỗi để hash: " + data.toString());
-            System.out.println("SecretKey: " + secretKey);
+            // Don't log the secret key in production
+            // System.out.println("SecretKey: " + secretKey);
 
             SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
             Mac mac = Mac.getInstance("HmacSHA512");
@@ -90,7 +104,12 @@ public class VNPayService {
         return false;
     }
 
-    String secretKey = "4DME1Y016LDYETZCPDX3DW8PY9FRYRQJ"; // Đúng key sandbox
+    // Validate that secret key is configured
+    if (secretKey == null || secretKey.trim().isEmpty()) {
+        System.err.println("VNPay secret key not configured for validation");
+        return false;
+    }
+    
     String hashData = params.entrySet().stream()
         .filter(entry -> !entry.getKey().equals("vnp_SecureHash"))
         .sorted(Map.Entry.comparingByKey())

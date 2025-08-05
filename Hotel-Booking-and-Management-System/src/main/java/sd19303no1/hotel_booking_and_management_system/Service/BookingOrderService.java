@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import sd19303no1.hotel_booking_and_management_system.DTO.AdminBookingRequestDTO;
 import sd19303no1.hotel_booking_and_management_system.DTO.MonthlyRevenueReportPartnerDTO;
@@ -27,6 +29,7 @@ import sd19303no1.hotel_booking_and_management_system.Entity.PaymentMethod;
 import sd19303no1.hotel_booking_and_management_system.Entity.PaymentStatus;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.StatusEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
@@ -53,6 +56,57 @@ public class BookingOrderService {
     private VoucherRepository voucherRepository;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private SystemUserService systemUserService;
+
+    // --- AUTHORIZATION HELPER METHODS ---
+    
+    /**
+     * Verifies that the current authenticated user has authorization to access a booking.
+     * For ADMIN role, checks if the booking belongs to their partner organization.
+     * For other roles, allows access (assuming other authorization is handled elsewhere).
+     */
+    private void verifyBookingAuthorization(BookingOrderEntity booking, String userEmail) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Người dùng chưa được xác thực");
+        }
+
+        // Check if user is an admin
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            // For admin users, verify they belong to the same partner as the booking
+            SystemUserEntity systemUser = systemUserService.findByEmail(userEmail);
+            if (systemUser == null) {
+                throw new RuntimeException("Không tìm thấy thông tin người dùng hệ thống");
+            }
+
+            PartnerEntity userPartner = partnerRepository.findBySystemUser(systemUser);
+            if (userPartner == null) {
+                throw new RuntimeException("Admin không thuộc về bất kỳ đối tác nào");
+            }
+
+            // Get the partner associated with this booking through the room
+            PartnerEntity bookingPartner = null;
+            if (booking.getRoom() != null) {
+                bookingPartner = booking.getRoom().getPartner();
+            } else if (booking.getPartner() != null) {
+                bookingPartner = booking.getPartner();
+            }
+
+            if (bookingPartner == null) {
+                throw new RuntimeException("Không thể xác định đối tác của booking này");
+            }
+
+            if (!userPartner.getId().equals(bookingPartner.getId())) {
+                throw new RuntimeException("Bạn không có quyền truy cập booking này - booking thuộc về đối tác khác");
+            }
+        }
+        // For other roles (PARTNER, CUSTOMER), assume authorization is handled elsewhere
+        // or add specific checks here if needed
+    }
 
     // --- PHƯƠNG THỨC CHO KHÁCH HÀNG ĐẶT PHÒNG (Sử dụng bởi BookingController) ---
     @Transactional
@@ -239,11 +293,12 @@ public class BookingOrderService {
         return total;
     }
 
-    // Hủy đặt phòng
+    // Hủy đặt phòng - PERFORMANCE OPTIMIZED
     @Transactional
     public BookingOrderEntity cancelBooking(Integer bookingId, String reason) {
         System.out.println("=== DEBUG: cancelBooking called with bookingId: " + bookingId + ", reason: " + reason + " ===");
-        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+        // PERFORMANCE: Use optimized query to fetch all related entities in one query
+        BookingOrderEntity booking = bookingOrderRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
 
         // Kiểm tra xem có thể hủy không
@@ -357,11 +412,19 @@ public class BookingOrderService {
         return bookingOrderRepository.save(booking);
     }
 
-    // Xác nhận thanh toán thực tế (cho admin xác nhận thủ công)
+    // Xác nhận thanh toán thực tế (cho admin xác nhận thủ công) - WITH AUTHORIZATION CHECK & PERFORMANCE OPTIMIZATION
     @Transactional
     public BookingOrderEntity confirmPayment(Integer bookingId) {
-        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+        // PERFORMANCE: Use optimized query to fetch all related entities in one query
+        BookingOrderEntity booking = bookingOrderRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
+
+        // SECURITY: Verify authorization before allowing payment confirmation
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String userEmail = authentication.getName();
+            verifyBookingAuthorization(booking, userEmail);
+        }
 
         // Kiểm tra xem đã có giá booking chưa
         if (booking.getTotalPrice() == null || booking.getTotalPrice().compareTo(BigDecimal.ZERO) <= 0) {
@@ -390,11 +453,19 @@ public class BookingOrderService {
         return bookingOrderRepository.save(booking);
     }
 
-    // Xác nhận thanh toán tại khách sạn (cho trường hợp thanh toán tại khách sạn)
+    // Xác nhận thanh toán tại khách sạn (cho trường hợp thanh toán tại khách sạn) - WITH AUTHORIZATION CHECK & PERFORMANCE OPTIMIZATION
     @Transactional
     public BookingOrderEntity confirmPaymentAtHotel(Integer bookingId) {
-        BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
+        // PERFORMANCE: Use optimized query to fetch all related entities in one query
+        BookingOrderEntity booking = bookingOrderRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
+
+        // SECURITY: Verify authorization before allowing payment confirmation
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String userEmail = authentication.getName();
+            verifyBookingAuthorization(booking, userEmail);
+        }
 
         booking.setPaymentStatus("PAID");
         booking.setPaidDate(LocalDateTime.now());

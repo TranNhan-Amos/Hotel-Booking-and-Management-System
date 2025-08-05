@@ -103,6 +103,7 @@
                     </div>
                     <div class="price-item total">
                         <span>Tổng cộng:</span>
+                        <input type="hidden" name="amount" th:value="${#numbers.formatDecimal(total, 0, 'NONE', 0, 'NONE')}" />
                         <span class="total-amount" th:text="${total != null ? #numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">0 ₫</span>
                     </div>
                 </div>
@@ -115,6 +116,7 @@
                 </div>
                 <form th:action="@{/process-payment}" method="post" id="paymentForm">
                     <input type="hidden" name="bookingId" th:value="${bookingId}">
+                    <input type="hidden" name="amount" th:value="${#numbers.formatDecimal(total, 0, 'NONE', 0, 'NONE')}" />
                     <!-- Customer Information -->
                     <div class="customer-info">
                         <h3>Thông tin người đặt</h3>
@@ -149,16 +151,16 @@
                                     <span class="method-desc">Visa, Mastercard, JCB</span>
                                 </div>
                             </label>
-                            <label class="payment-method-card">
-                                <input type="radio" name="paymentMethod" value="momo">
-                                <div class="method-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div class="method-info">
-                                    <span class="method-name">MoMo</span>
-                                    <span class="method-desc">Ví điện tử MoMo</span>
-                                </div>
-                            </label>
+                               <label class="payment-method-card">
+    <input type="radio" name="paymentMethod" value="vnpay">
+    <div class="method-icon">
+        <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="" width="90%">
+    </div>
+    <div id="momoFields" class="method-info">
+        <span class="method-name">VN Pay</span>
+        <span class="method-desc">Ví điện tử VN Pay</span>
+    </div>
+</label>
                             <label class="payment-method-card">
                                 <input type="radio" name="paymentMethod" value="bankTransfer">
                                 <div class="method-icon">
@@ -296,12 +298,27 @@
                         </label>
                     </div>
                     <button type="submit" class="btn-pay" id="submitButton" disabled>Thanh toán ngay</button>
+<button type="button" class="btn-pay btn-vnpay" id="vnpayButton" style="display: none;">
+    Thanh toán với VNPay
+</button>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
+        
+         document.getElementById('paymentForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const method = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const paymentForm = document.getElementById('paymentForm');
+    if (method === 'vnpay') {
+        paymentForm.action = '/process-vnpay';
+    } else {
+        paymentForm.action = '/process-payment';
+    }
+    paymentForm.submit();
+});
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle payment fields based on selected method
         function togglePaymentFields() {
@@ -538,6 +555,7 @@
         // Initial call to set default fields
         togglePaymentFields();
     });
+   
     </script>
 </body>
 </html>

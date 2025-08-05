@@ -282,4 +282,9 @@ public class IndexController extends BaseController {
     public String testLogout() {
         return "test-logout";
     }
+    
+    @GetMapping("/test")
+    public String testCancelBooking() {
+        return "Page/test";
+    }
 }

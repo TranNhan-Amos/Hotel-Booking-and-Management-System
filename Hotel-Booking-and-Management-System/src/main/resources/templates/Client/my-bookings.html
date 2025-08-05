@@ -6,140 +6,15 @@
     <title>Lịch Sử Đặt Phòng - Khách Sạn Grand Ocean</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header */
-        .page-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            color: #666;
-            font-size: 16px;
-        }
-
-        /* Message Box */
-        .message-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .message-icon {
-            font-size: 64px;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .message-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .message-text {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a6fd8;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                justify-content: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/Css/Narbar.css}">
+    <link rel="stylesheet" th:href="@{/Css/footer.css}">
+    <link rel="stylesheet" th:href="@{/Css/my-bookings.css}">
 </head>
 <body>
     <!-- Include Navbar -->
     <div th:replace="~{Layout/narbar}"></div>
 
-    <div class="container">
+    <div class="my-bookings-container">
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">
@@ -149,25 +24,114 @@
             <p class="page-subtitle">Xem và quản lý các đặt phòng của bạn</p>
         </div>
 
-        <!-- Message Box -->
-        <div class="message-box">
-            <div class="message-icon">
-                <i class="fas fa-tools"></i>
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Bookings Container -->
+        <div class="bookings-container" id="bookingsContainer" th:if="${not #lists.isEmpty(bookings)}">
+            <div class="booking-card" th:each="booking : ${bookings}">
+                <div class="booking-header">
+                    <div class="booking-info">
+                        <div class="booking-id" th:text="'Mã đặt phòng: #' + ${booking.bookingId}">Mã đặt phòng: #123</div>
+                        <div class="room-name" th:text="${booking.room.type}">Tên phòng</div>
+                        <div class="booking-date" th:text="'Đặt ngày: ' + ${#temporals.format(booking.createdAt, 'dd/MM/yyyy HH:mm')}">Đặt ngày: 01/01/2024</div>
+                    </div>
+                    <div class="booking-status" 
+                         th:class="${booking.status.statusName == 'PENDING' ? 'status-pending' : 
+                                   booking.status.statusName == 'CONFIRMED' ? 'status-confirmed' : 
+                                   booking.status.statusName == 'CANCELLED' ? 'status-cancelled' : 
+                                   booking.status.statusName == 'COMPLETED' ? 'status-completed' : 
+                                   booking.status.statusName == 'REFUNDED' ? 'status-refunded' : 'status-pending'}"
+                         th:text="${booking.status.statusName == 'PENDING' ? 'Chờ xác nhận' : 
+                                  booking.status.statusName == 'CONFIRMED' ? 'Đã xác nhận' : 
+                                  booking.status.statusName == 'CANCELLED' ? 'Đã hủy' : 
+                                  booking.status.statusName == 'COMPLETED' ? 'Hoàn thành' : 
+                                  booking.status.statusName == 'REFUNDED' ? 'Đã hoàn tiền' : 'Chờ xác nhận'}">
+                        Chờ xác nhận
+                    </div>
+                </div>
+
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-plus"></i>
+                        <div>
+                            <div class="detail-label">Nhận phòng</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">01/01/2024</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-minus"></i>
+                        <div>
+                            <div class="detail-label">Trả phòng</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">03/01/2024</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-moon"></i>
+                        <div>
+                            <div class="detail-label">Số đêm</div>
+                            <div class="detail-value" th:text="${#numbers.formatDecimal(#temporals.between(booking.checkInDate, booking.checkOutDate, 'DAYS'), 0, 0)} + ' đêm'">2 đêm</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-door-open"></i>
+                        <div>
+                            <div class="detail-label">Số phòng</div>
+                            <div class="detail-value" th:text="${booking.roomQuantity != null ? booking.roomQuantity : 1} + ' phòng'">1 phòng</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-price">
+                    <div class="price-label">Tổng tiền</div>
+                    <div class="price-value" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">2,500,000 ₫</div>
+                </div>
+
+                <div class="booking-actions">
+                    <a th:href="@{/booking-detail/{id}(id=${booking.bookingId})}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i>
+                        Xem chi tiết
+                    </a>
+                    
+                    <button th:if="${booking.status.statusName != 'CANCELLED' and booking.status.statusName != 'COMPLETED' and booking.status.statusName != 'REFUNDED'}"
+                            th:onclick="'openCancelModal(' + ${booking.bookingId} + ')'"
+                            class="btn btn-danger">
+                        <i class="fas fa-times"></i>
+                        Hủy đặt phòng
+                    </button>
+                    
+                    <button th:if="${booking.status.statusName == 'CANCELLED' and booking.refundStatus == 'PENDING'}"
+                            th:onclick="'requestRefund(' + ${booking.bookingId} + ')'"
+                            class="btn btn-secondary">
+                        <i class="fas fa-undo"></i>
+                        Yêu cầu hoàn tiền
+                    </button>
+                </div>
+
+                <!-- Cancellation Info -->
+                <div th:if="${booking.cancellationReason != null}" style="margin-top: 16px; padding: 12px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #dc2626;">
+                    <div style="font-size: 14px; color: #991b1b; font-weight: 500; margin-bottom: 4px;">
+                        <i class="fas fa-info-circle"></i> Lý do hủy:
+                    </div>
+                    <div style="font-size: 14px; color: #7f1d1d;" th:text="${booking.cancellationReason}">Lý do hủy</div>
+                </div>
             </div>
-            <h2 class="message-title">Chức năng đang được phát triển</h2>
-            <p class="message-text" th:text="${message}">
-                Chức năng xem lịch sử đặt phòng sẽ được cập nhật sớm! 
-                Chúng tôi đang nỗ lực để mang đến trải nghiệm tốt nhất cho bạn.
-            </p>
-            
-            <div class="action-buttons">
-                <a href="/profile" class="btn btn-primary">
-                    <i class="fas fa-user"></i>
-                    Quay lại trang cá nhân
-                </a>
-                <a href="/search-rooms" class="btn btn-secondary">
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${#lists.isEmpty(bookings)}">
+            <div class="empty-icon">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h2 class="empty-title">Chưa có đặt phòng nào</h2>
+            <p class="empty-text">Bạn chưa có lịch sử đặt phòng nào. Hãy bắt đầu đặt phòng ngay!</p>
+            <div class="booking-actions">
+                <a href="/search-rooms" class="btn btn-primary">
                     <i class="fas fa-search"></i>
-                    Đặt phòng mới
+                    Tìm phòng
                 </a>
                 <a href="/" class="btn btn-secondary">
                     <i class="fas fa-home"></i>
@@ -176,5 +140,188 @@
             </div>
         </div>
     </div>
+
+    <!-- Cancel Booking Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Hủy đặt phòng</h3>
+                <span class="close" onclick="closeCancelModal()">&times;</span>
+            </div>
+            <form id="cancelForm">
+                <input type="hidden" id="bookingIdToCancel" name="bookingId">
+                <div class="form-group">
+                    <label for="cancelReason" class="form-label">Lý do hủy (tùy chọn)</label>
+                    <textarea id="cancelReason" name="reason" class="form-input form-textarea" 
+                              placeholder="Vui lòng cho chúng tôi biết lý do bạn muốn hủy đặt phòng..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">
+                        <i class="fas fa-times"></i>
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i>
+                        Xác nhận hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Include Footer -->
+    <div th:replace="~{Layout/footer}"></div>
+
+    <script>
+        // Global variables
+        let currentBookingId = null;
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('bookingsContainer').style.display = 'none';
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('bookingsContainer').style.display = 'grid';
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Open cancel modal
+        function openCancelModal(bookingId) {
+            currentBookingId = bookingId;
+            document.getElementById('bookingIdToCancel').value = bookingId;
+            document.getElementById('cancelModal').style.display = 'block';
+        }
+
+        // Close cancel modal
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+            document.getElementById('cancelForm').reset();
+            currentBookingId = null;
+        }
+
+        // Handle cancel form submission
+        document.getElementById('cancelForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const bookingId = document.getElementById('bookingIdToCancel').value;
+            const reason = document.getElementById('cancelReason').value;
+            
+            // Disable submit button
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            
+            // Send cancel request
+            fetch('/cancel-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `bookingId=${bookingId}&reason=${encodeURIComponent(reason)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    closeCancelModal();
+                    // Reload page to update booking status
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra khi hủy đặt phòng', 'error');
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+
+        // Request refund
+        function requestRefund(bookingId) {
+            if (confirm('Bạn có chắc chắn muốn yêu cầu hoàn tiền cho đặt phòng này?')) {
+                // Disable button to prevent double click
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                
+                // Send refund request
+                fetch('/request-refund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `bookingId=${bookingId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        // Reload page to update booking status
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Có lỗi xảy ra khi xử lý hoàn tiền', 'error');
+                })
+                .finally(() => {
+                    // Re-enable button
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('cancelModal');
+            if (event.target === modal) {
+                closeCancelModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCancelModal();
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            hideLoading();
+        });
+    </script>
 </body>
 </html> 

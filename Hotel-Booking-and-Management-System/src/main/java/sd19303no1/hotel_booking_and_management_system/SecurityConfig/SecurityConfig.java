@@ -40,7 +40,7 @@ public class SecurityConfig {
                     "/error", "/test-payment", "/test-data", "/booking-confirmation",
                     "/partner/register", "/partner", "/api/admin/bookings/**",
                     "/favicon.ico", "/robots.txt", "/test-csrf", "/test-logout",
-                    "/test-csrf", "/test/**"
+                    "/test-csrf", "/test/**", "/test"
                 ).permitAll()
                 
                 // Customer authenticated endpoints
@@ -50,7 +50,7 @@ public class SecurityConfig {
                     "/upload-avatar", "/upload-room-images", "/update-profile",
                     "/payment", "/process-payment", "/payment-success",
                     "/historybooking", "/feedbackuser", "/Waller",
-                    "/book-room", "/cancel-booking", "/delete-avatar", 
+                    "/book-room", "/cancel-booking", "/request-refund", "/delete-avatar", 
                     "/delete-room-image"
                 ).hasRole("CUSTOMER")
                 

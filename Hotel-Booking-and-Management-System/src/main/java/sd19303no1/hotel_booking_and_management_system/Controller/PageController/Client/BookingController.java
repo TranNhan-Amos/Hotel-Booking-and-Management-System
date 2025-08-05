@@ -423,23 +423,36 @@ public class BookingController {
                 response.put("message", "Vui lòng đăng nhập");
                 return response;
             }
+            
             Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
             if (bookingOpt.isPresent()) {
                 BookingOrderEntity booking = bookingOpt.get();
                 String currentUserEmail = authentication.getName();
-                if (currentUserEmail.equals(booking.getEmail())) {
-                    StatusEntity cancelledStatus = statusRepository.findByStatusNameIgnoreCase("CANCELLED");
-                    if (cancelledStatus != null) {
-                        booking.setStatus(cancelledStatus);
-                    }
-                    booking.setCancellationReason(reason);
-                    bookingOrderRepository.save(booking);
-                    response.put("success", true);
-                    response.put("message", "Hủy đặt phòng thành công!");
-                } else {
+                
+                // Kiểm tra quyền hủy phòng
+                if (!currentUserEmail.equals(booking.getEmail())) {
                     response.put("success", false);
                     response.put("message", "Bạn không có quyền hủy đặt phòng này");
+                    return response;
                 }
+                
+                // Kiểm tra trạng thái hiện tại
+                if ("CANCELLED".equals(booking.getStatus().getStatusName()) || 
+                    "COMPLETED".equals(booking.getStatus().getStatusName()) ||
+                    "REFUNDED".equals(booking.getStatus().getStatusName())) {
+                    response.put("success", false);
+                    response.put("message", "Không thể hủy đặt phòng ở trạng thái này");
+                    return response;
+                }
+                
+                // Sử dụng service để hủy phòng
+                BookingOrderEntity cancelledBooking = bookingOrderService.cancelBooking(bookingId, reason);
+                
+                response.put("success", true);
+                response.put("message", "Hủy đặt phòng thành công! Số tiền hoàn lại: " + 
+                            (cancelledBooking.getRefundAmount() != null ? 
+                             cancelledBooking.getRefundAmount().toString() + " ₫" : "0 ₫"));
+                
             } else {
                 response.put("success", false);
                 response.put("message", "Không tìm thấy thông tin đặt phòng");
@@ -447,6 +460,63 @@ public class BookingController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Có lỗi xảy ra khi hủy đặt phòng: " + e.getMessage());
+        }
+        return response;
+    }
+
+    // Yêu cầu hoàn tiền
+    @PostMapping("/request-refund")
+    @ResponseBody
+    public Map<String, Object> requestRefund(@RequestParam Integer bookingId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                response.put("success", false);
+                response.put("message", "Vui lòng đăng nhập");
+                return response;
+            }
+            
+            Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
+            if (bookingOpt.isPresent()) {
+                BookingOrderEntity booking = bookingOpt.get();
+                String currentUserEmail = authentication.getName();
+                
+                // Kiểm tra quyền
+                if (!currentUserEmail.equals(booking.getEmail())) {
+                    response.put("success", false);
+                    response.put("message", "Bạn không có quyền yêu cầu hoàn tiền cho đặt phòng này");
+                    return response;
+                }
+                
+                // Kiểm tra trạng thái
+                if (!"CANCELLED".equals(booking.getStatus().getStatusName())) {
+                    response.put("success", false);
+                    response.put("message", "Chỉ có thể yêu cầu hoàn tiền cho đặt phòng đã hủy");
+                    return response;
+                }
+                
+                if ("COMPLETED".equals(booking.getRefundStatus())) {
+                    response.put("success", false);
+                    response.put("message", "Đã hoàn tiền cho đặt phòng này");
+                    return response;
+                }
+                
+                // Xử lý hoàn tiền
+                BookingOrderEntity refundedBooking = bookingOrderService.processRefund(bookingId);
+                
+                response.put("success", true);
+                response.put("message", "Hoàn tiền thành công! Số tiền: " + 
+                            (refundedBooking.getRefundAmount() != null ? 
+                             refundedBooking.getRefundAmount().toString() + " ₫" : "0 ₫"));
+                
+            } else {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy thông tin đặt phòng");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra khi xử lý hoàn tiền: " + e.getMessage());
         }
         return response;
     }

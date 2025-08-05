@@ -128,9 +128,36 @@
               </div>
               <div class="mt-4 flex justify-between items-center">
                 <span class="text-lg font-bold text-blue-600" th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}"></span>
-                <a th:href="@{'/booking-detail/' + ${booking.bookingId}}" class="btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors duration-300">
-                  <i class="fas fa-eye mr-1"></i> Chi tiết
-                </a>
+                <div class="flex gap-2">
+                  <a th:href="@{'/booking-detail/' + ${booking.bookingId}}" class="btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors duration-300">
+                    <i class="fas fa-eye mr-1"></i> Chi tiết
+                  </a>
+                  
+                  <!-- Nút hủy phòng - chỉ hiển thị khi có thể hủy -->
+                  <button th:if="${booking.status.statusName != 'CANCELLED' and booking.status.statusName != 'COMPLETED' and booking.status.statusName != 'REFUNDED'}"
+                          th:onclick="'openCancelModal(' + ${booking.bookingId} + ')'"
+                          class="btn bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300">
+                    <i class="fas fa-times mr-1"></i> Hủy
+                  </button>
+                  
+                  <!-- Nút yêu cầu hoàn tiền - chỉ hiển thị khi đã hủy và chưa hoàn tiền -->
+                  <button th:if="${booking.status.statusName == 'CANCELLED' and booking.refundStatus == 'PENDING'}"
+                          th:onclick="'requestRefund(' + ${booking.bookingId} + ')'"
+                          class="btn bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors duration-300">
+                    <i class="fas fa-undo mr-1"></i> Hoàn tiền
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Hiển thị lý do hủy nếu có -->
+              <div th:if="${booking.cancellationReason != null}" class="mt-3 p-3 bg-red-50 border-l-4 border-red-400 rounded">
+                <div class="flex items-center">
+                  <i class="fas fa-info-circle text-red-500 mr-2"></i>
+                  <div>
+                    <div class="text-sm font-medium text-red-800">Lý do hủy:</div>
+                    <div class="text-sm text-red-700" th:text="${booking.cancellationReason}"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -148,6 +175,50 @@
       </th:block>
     </div>
   </main>
+
+  <!-- Cancel Booking Modal -->
+  <div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Hủy đặt phòng</h3>
+        <button onclick="closeCancelModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="cancelForm">
+        <input type="hidden" id="bookingIdToCancel" name="bookingId">
+        <div class="mb-4">
+          <label for="cancelReason" class="block text-sm font-medium text-gray-700 mb-2">
+            Lý do hủy (tùy chọn)
+          </label>
+          <textarea id="cancelReason" name="reason" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="4" 
+                    placeholder="Vui lòng cho chúng tôi biết lý do bạn muốn hủy đặt phòng..."></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" onclick="closeCancelModal()" 
+                  class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+            Hủy
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+            <i class="fas fa-check mr-1"></i> Xác nhận hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+    <div class="bg-white border-l-4 p-4 rounded shadow-lg">
+      <div class="flex items-center">
+        <div id="toastIcon" class="mr-3"></div>
+        <div id="toastMessage" class="text-sm font-medium"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- JavaScript -->
   <script>
@@ -287,6 +358,155 @@
     document.addEventListener('DOMContentLoaded', () => {
       //Duyệt tab all mặc định
       document.querySelector('.tab-button[data-tab="all"]').click();
+    });
+
+    // Cancel Booking Functions
+    function openCancelModal(bookingId) {
+      document.getElementById('bookingIdToCancel').value = bookingId;
+      document.getElementById('cancelModal').classList.remove('hidden');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.add('hidden');
+      document.getElementById('cancelForm').reset();
+    }
+
+    // Handle cancel form submission
+    document.getElementById('cancelForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const bookingId = document.getElementById('bookingIdToCancel').value;
+      const reason = document.getElementById('cancelReason').value;
+      
+      // Disable submit button
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý...';
+      
+      // Send cancel request
+      fetch('/cancel-booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bookingId=${bookingId}&reason=${encodeURIComponent(reason)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeCancelModal();
+          // Reload page to update booking status
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          showToast(data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Có lỗi xảy ra khi hủy đặt phòng', 'error');
+      })
+      .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      });
+    });
+
+    // Request refund function
+    function requestRefund(bookingId) {
+      if (confirm('Bạn có chắc chắn muốn yêu cầu hoàn tiền cho đặt phòng này?')) {
+        // Disable button to prevent double click
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Đang xử lý...';
+        
+        // Send refund request
+        fetch('/request-refund', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `bookingId=${bookingId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showToast(data.message, 'success');
+            // Reload page to update booking status
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          } else {
+            showToast(data.message, 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Có lỗi xảy ra khi xử lý hoàn tiền', 'error');
+        })
+        .finally(() => {
+          // Re-enable button
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        });
+      }
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastIcon = document.getElementById('toastIcon');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      // Set icon based on type
+      let iconClass = '';
+      let borderColor = '';
+      let iconColor = '';
+      
+      switch(type) {
+        case 'success':
+          iconClass = 'fas fa-check-circle';
+          borderColor = 'border-green-500';
+          iconColor = 'text-green-500';
+          break;
+        case 'error':
+          iconClass = 'fas fa-exclamation-circle';
+          borderColor = 'border-red-500';
+          iconColor = 'text-red-500';
+          break;
+        default:
+          iconClass = 'fas fa-info-circle';
+          borderColor = 'border-blue-500';
+          iconColor = 'text-blue-500';
+      }
+      
+      toastIcon.innerHTML = `<i class="${iconClass} ${iconColor}"></i>`;
+      toastMessage.textContent = message;
+      toast.className = `fixed top-4 right-4 z-50 ${borderColor}`;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeCancelModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeCancelModal();
+      }
     });
   </script>
 </body>

@@ -11,8 +11,20 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Integer> {
+    
+    // PERFORMANCE OPTIMIZATION: Find booking by ID with all related entities loaded to prevent N+1 queries
+    @Query("SELECT b FROM BookingOrderEntity b " +
+           "LEFT JOIN FETCH b.customer " +
+           "LEFT JOIN FETCH b.room r " +
+           "LEFT JOIN FETCH r.partner " +
+           "LEFT JOIN FETCH b.status " +
+           "LEFT JOIN FETCH b.voucher " +
+           "WHERE b.bookingId = :bookingId")
+    Optional<BookingOrderEntity> findByIdWithDetails(@Param("bookingId") Integer bookingId);
+    
     List<BookingOrderEntity> findByEmailOrderByCreatedAtDesc(String email);
 
     List<BookingOrderEntity> findAllByOrderByCreatedAtDesc();

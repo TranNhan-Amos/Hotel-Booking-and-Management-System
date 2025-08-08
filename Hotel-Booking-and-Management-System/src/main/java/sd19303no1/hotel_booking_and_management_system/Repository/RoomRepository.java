@@ -15,6 +15,7 @@ import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 @Repository
 public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
 
+
     @Query("SELECT DISTINCT r.type FROM RoomEntity r")
     List<RoomEntity.RoomType> findDistinctTypes();
 

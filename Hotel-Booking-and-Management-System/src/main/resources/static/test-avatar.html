@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Avatar</title>
+    <style>
+        .avatar-test {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+        .test-container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Avatar Display</h1>
+        
+        <div class="test-item">
+            <h3>Default Avatar (SVG)</h3>
+            <img src="/img/customers/default-avatar.svg" alt="Default Avatar" class="avatar-test">
+            <p>Path: /img/customers/default-avatar.svg</p>
+        </div>
+        
+        <div class="test-item">
+            <h3>Test with different sizes</h3>
+            <img src="/img/customers/default-avatar.svg" alt="Small" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+            <img src="/img/customers/default-avatar.svg" alt="Medium" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+            <img src="/img/customers/default-avatar.svg" alt="Large" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;">
+        </div>
+        
+        <div class="test-item">
+            <h3>Available Customer Images</h3>
+            <p>Check if any customer images exist in the directory</p>
+        </div>
+    </div>
+</body>
+</html>

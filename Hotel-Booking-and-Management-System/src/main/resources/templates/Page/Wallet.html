@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>HotelPay Pro - Hệ Thống Ví Điện Tử Khách Sạn</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -86,7 +88,7 @@
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Số dư khả dụng</div>
-                                    <div class="stat-value" id="balanceValue">2,450,000₫</div>
+                                    <div class="stat-value" id="balanceValue" th:text="${walletData != null ? #numbers.formatDecimal(walletData.balance, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">2,450,000₫</div>
                                     <div class="stat-change positive">
                                         <i class="fas fa-arrow-up"></i>
                                         <span>+12.5% tháng này</span>
@@ -102,7 +104,7 @@
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Chi tiêu tháng này</div>
-                                    <div class="stat-value">4,750,000₫</div>
+                                    <div class="stat-value" th:text="${walletData != null ? #numbers.formatDecimal(walletData.monthlySpending, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">4,750,000₫</div>
                                     <div class="stat-change negative">
                                         <i class="fas fa-arrow-down"></i>
                                         <span>-8.2% so với tháng trước</span>
@@ -118,7 +120,7 @@
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Đặt phòng thành công</div>
-                                    <div class="stat-value">24</div>
+                                    <div class="stat-value" th:text="${walletData != null ? walletData.totalTransactions : 0}">24</div>
                                     <div class="stat-change positive">
                                         <i class="fas fa-arrow-up"></i>
                                         <span>+6 đặt phòng mới</span>
@@ -134,7 +136,7 @@
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Điểm thưởng</div>
-                                    <div class="stat-value">3,250</div>
+                                    <div class="stat-value" th:text="${walletData != null ? walletData.rewardsPoints : 0}">3,250</div>
                                     <div class="stat-change positive">
                                         <i class="fas fa-arrow-up"></i>
                                         <span>+450 điểm tuần này</span>
@@ -158,7 +160,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                         </div>
-                        <div class="balance-amount" id="mainBalance">2,450,000₫</div>
+                        <div class="balance-amount" id="mainBalance" th:text="${walletData != null ? #numbers.formatDecimal(walletData.balance, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">2,450,000₫</div>
                         <div class="balance-details">
                             <div class="balance-change">
                                 <i class="fas fa-trending-up"></i>
@@ -280,35 +282,66 @@
                                         </div>
                                     </div>
 
-                                    <div class="transaction-item" data-type="topup" onclick="showTransactionDetails('TXN002')">
+                                    <!-- Dynamic wallet transactions from Thymeleaf -->
+                                    <div th:each="transaction : ${walletTransactions}" 
+                                         th:if="${transaction.transactionType == 'TOPUP'}" 
+                                         class="transaction-item" 
+                                         th:data-type="topup" 
+                                         th:onclick="'showTransactionDetails(' + ${transaction.id} + ')'">
                                         <div class="transaction-icon topup">
                                             <i class="fas fa-credit-card"></i>
-                                            <div class="transaction-status success"></div>
+                                            <div class="transaction-status" th:classappend="${transaction.status == 'SUCCESS' ? 'success' : (transaction.status == 'PENDING' ? 'pending' : 'failed')}"></div>
                                         </div>
                                         <div class="transaction-details">
-                                            <div class="transaction-title">Nạp tiền từ Visa Platinum</div>
-                                            <div class="transaction-meta">Hôm qua, 09:15 • **** 1234 • Tự động</div>
-                                            <div class="transaction-id">ID: TXN002</div>
+                                            <div class="transaction-title" th:text="${transaction.description}">Nạp tiền từ Visa Platinum</div>
+                                            <div class="transaction-meta" th:text="${#temporals.format(transaction.createdAt, 'dd/MM/yyyy HH:mm')} + ' • ' + ${transaction.paymentMethod != null ? transaction.paymentMethod : 'Ví HotelPay'}">Hôm qua, 09:15 • **** 1234 • Tự động</div>
+                                            <div class="transaction-id" th:text="'ID: ' + ${transaction.id}">ID: TXN002</div>
                                         </div>
                                         <div class="transaction-amount">
-                                            <div class="amount-value positive">+2,000,000₫</div>
-                                            <div class="amount-fee">Phí: 5,000₫</div>
+                                            <div class="amount-value positive" th:text="'+' + ${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">+2,000,000₫</div>
+                                            <div class="amount-fee" th:text="'Phí: ' + ${#numbers.formatDecimal(transaction.fee, 0, 'COMMA', 0, 'POINT')} + ' ₫'">Phí: 5,000₫</div>
                                         </div>
                                     </div>
 
-                                    <div class="transaction-item" data-type="refund" onclick="showTransactionDetails('TXN003')">
+                                    <!-- Dynamic refund transactions from Thymeleaf -->
+                                    <div th:each="booking : ${recentBookings}" 
+                                         th:if="${booking.refundStatus == 'COMPLETED'}" 
+                                         class="transaction-item" 
+                                         th:data-type="refund" 
+                                         th:onclick="'showRefundDetails(' + ${booking.bookingId} + ')'">
                                         <div class="transaction-icon refund">
                                             <i class="fas fa-undo"></i>
                                             <div class="transaction-status success"></div>
                                         </div>
                                         <div class="transaction-details">
-                                            <div class="transaction-title">Hoàn tiền hủy đặt phòng</div>
-                                            <div class="transaction-meta">2 ngày trước, 16:45 • InterContinental Hanoi</div>
-                                            <div class="transaction-id">ID: TXN003</div>
+                                            <div class="transaction-title" th:text="'Hoàn tiền hủy đặt phòng - ' + ${booking.room != null and booking.room.partner != null ? booking.room.partner.companyName : 'Khách sạn'}">Hoàn tiền hủy đặt phòng</div>
+                                            <div class="transaction-meta" th:text="${#temporals.format(booking.refundDate, 'dd/MM/yyyy HH:mm')} + ' • ' + ${booking.room != null and booking.room.partner != null ? booking.room.partner.companyName : 'Khách sạn'}">2 ngày trước, 16:45 • InterContinental Hanoi</div>
+                                            <div class="transaction-id" th:text="'ID: ' + ${booking.bookingId}">ID: TXN003</div>
                                         </div>
                                         <div class="transaction-amount">
-                                            <div class="amount-value positive">+850,000₫</div>
+                                            <div class="amount-value positive" th:text="'+' + ${#numbers.formatDecimal(booking.refundAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">+850,000₫</div>
                                             <div class="amount-fee">Phí: 0₫</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Pending refund transactions -->
+                                    <div th:each="booking : ${recentBookings}" 
+                                         th:if="${booking.refundStatus == 'PENDING'}" 
+                                         class="transaction-item" 
+                                         th:data-type="refund-pending" 
+                                         th:onclick="'showPendingRefund(' + ${booking.bookingId} + ')'">
+                                        <div class="transaction-icon refund">
+                                            <i class="fas fa-clock"></i>
+                                            <div class="transaction-status pending"></div>
+                                        </div>
+                                        <div class="transaction-details">
+                                            <div class="transaction-title" th:text="'Chờ hoàn tiền - ' + ${booking.room != null and booking.room.partner != null ? booking.room.partner.companyName : 'Khách sạn'}">Chờ hoàn tiền</div>
+                                            <div class="transaction-meta" th:text="${#temporals.format(booking.cancellationDate, 'dd/MM/yyyy HH:mm')} + ' • ' + ${booking.room != null and booking.room.partner != null ? booking.room.partner.companyName : 'Khách sạn'}">2 ngày trước, 16:45 • InterContinental Hanoi</div>
+                                            <div class="transaction-id" th:text="'ID: ' + ${booking.bookingId}">ID: TXN003</div>
+                                        </div>
+                                        <div class="transaction-amount">
+                                            <div class="amount-value pending" th:text="${#numbers.formatDecimal(booking.refundAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">850,000₫</div>
+                                            <div class="amount-fee">Chờ xử lý</div>
                                         </div>
                                     </div>
 
@@ -785,6 +818,101 @@
         </div>
     </div>
 
+    <!-- Refund Processing Modal -->
+    <div class="modal-overlay" id="refundModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-undo"></i>
+                    Xử lý hoàn tiền
+                </h2>
+                <button class="modal-close" onclick="closeModal('refundModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="refund-options">
+                    <h3>Chọn cách nhận hoàn tiền</h3>
+                    <p class="refund-subtitle">Số tiền hoàn: <span id="refundAmount" class="refund-amount">0₫</span></p>
+                    
+                    <div class="refund-option" onclick="selectRefundOption('wallet')">
+                        <div class="option-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="option-content">
+                            <h4>Chuyển vào ví</h4>
+                            <p>Nhận tiền ngay lập tức vào ví của bạn</p>
+                            <div class="option-benefits">
+                                <span class="benefit">✓ Miễn phí</span>
+                                <span class="benefit">✓ Ngay lập tức</span>
+                                <span class="benefit">✓ Có thể sử dụng ngay</span>
+                            </div>
+                        </div>
+                        <div class="option-radio">
+                            <input type="radio" name="refundOption" value="wallet" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="refund-option" onclick="selectRefundOption('bank')">
+                        <div class="option-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="option-content">
+                            <h4>Chuyển về ngân hàng</h4>
+                            <p>Chuyển tiền về tài khoản ngân hàng của bạn</p>
+                            <div class="option-benefits">
+                                <span class="benefit">✓ Miễn phí</span>
+                                <span class="benefit">✓ 1-3 ngày làm việc</span>
+                                <span class="benefit">✓ An toàn</span>
+                            </div>
+                        </div>
+                        <div class="option-radio">
+                            <input type="radio" name="refundOption" value="bank">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bank account form (hidden by default) -->
+                <div id="bankAccountForm" class="form-section hidden">
+                    <h4>Thông tin tài khoản ngân hàng</h4>
+                    <div class="form-group">
+                        <label class="form-label">Tên chủ tài khoản</label>
+                        <input type="text" class="form-input" id="accountName" placeholder="Nhập tên chủ tài khoản">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số tài khoản</label>
+                        <input type="text" class="form-input" id="bankAccount" placeholder="Nhập số tài khoản ngân hàng">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngân hàng</label>
+                        <select class="form-input" id="bankName">
+                            <option value="">Chọn ngân hàng</option>
+                            <option value="Vietcombank">Vietcombank</option>
+                            <option value="BIDV">BIDV</option>
+                            <option value="Agribank">Agribank</option>
+                            <option value="Techcombank">Techcombank</option>
+                            <option value="MB Bank">MB Bank</option>
+                            <option value="ACB">ACB</option>
+                            <option value="VPBank">VPBank</option>
+                            <option value="TPBank">TPBank</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="action-button secondary" onclick="closeModal('refundModal')">
+                        <i class="fas fa-times"></i>
+                        Hủy
+                    </button>
+                    <button class="action-button primary" onclick="processRefund()">
+                        <i class="fas fa-check"></i>
+                        Xác nhận hoàn tiền
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let currentBalance = 2450000;
@@ -1120,27 +1248,50 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>Đang xử lý...</span>';
             
-            // Simulate processing
-            setTimeout(() => {
-                // Update balance
-                currentBalance += selectedAmount;
-                animateBalance();
-                
-                // Add new transaction
-                addNewTransaction();
-                
-                // Show success
-                showToast('Nạp tiền thành công!', 
-                    `Đã nạp ${selectedAmount.toLocaleString('vi-VN')}₫ vào ví của bạn`, 'success');
-                
-                // Close modal
-                closeModal('topUpModal');
-                
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            
+            const formData = new FormData();
+            formData.append('amount', selectedAmount);
+            formData.append('paymentMethod', selectedPaymentMethod);
+            formData.append('_csrf', csrfToken);
+            
+            fetch('/wallet/topup', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update balance
+                    currentBalance = data.newBalance;
+                    animateBalance();
+                    
+                    // Show success
+                    showToast('Nạp tiền thành công!', 
+                        `Đã nạp ${selectedAmount.toLocaleString('vi-VN')}₫ vào ví của bạn`, 'success');
+                    
+                    // Close modal
+                    closeModal('topUpModal');
+                    
+                    // Reload page to update transaction list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast('Lỗi', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Lỗi', 'Có lỗi xảy ra khi nạp tiền', 'error');
+            })
+            .finally(() => {
                 // Reset button
                 submitBtn.classList.remove('loading');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-check"></i> Xác nhận nạp tiền';
-            }, 3000);
+            });
         }
 
         function addNewTransaction() {
@@ -1524,6 +1675,169 @@
 
         function contactSupport(transactionId) {
             showToast('Hỗ trợ', `Liên hệ hỗ trợ cho giao dịch ${transactionId}`, 'info');
+        }
+
+        // Refund processing functions
+        let currentRefundBookingId = null;
+        let currentRefundAmount = 0;
+
+        function showPendingRefund(bookingId) {
+            // Fetch booking details and show refund modal
+            fetch(`/api/booking/${bookingId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentRefundBookingId = bookingId;
+                        currentRefundAmount = data.booking.refundAmount;
+                        
+                        document.getElementById('refundAmount').textContent = 
+                            currentRefundAmount.toLocaleString('vi-VN') + '₫';
+                        
+                        openModal('refundModal');
+                    } else {
+                        showToast('Lỗi', 'Không thể tải thông tin đặt phòng', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Lỗi', 'Có lỗi xảy ra khi tải thông tin', 'error');
+                });
+        }
+
+        function showRefundDetails(bookingId) {
+            // Show detailed refund information
+            showTransactionDetails('REFUND_' + bookingId);
+        }
+
+        function selectRefundOption(option) {
+            // Update radio buttons
+            document.querySelectorAll('input[name="refundOption"]').forEach(radio => {
+                radio.checked = radio.value === option;
+            });
+            
+            // Update option styling
+            document.querySelectorAll('.refund-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show/hide bank account form
+            const bankForm = document.getElementById('bankAccountForm');
+            if (option === 'bank') {
+                bankForm.classList.remove('hidden');
+            } else {
+                bankForm.classList.add('hidden');
+            }
+        }
+
+        function processRefund() {
+            const selectedOption = document.querySelector('input[name="refundOption"]:checked').value;
+            const processBtn = document.querySelector('#refundModal .action-button.primary');
+            
+            // Validate form if bank option is selected
+            if (selectedOption === 'bank') {
+                const accountName = document.getElementById('accountName').value.trim();
+                const bankAccount = document.getElementById('bankAccount').value.trim();
+                const bankName = document.getElementById('bankName').value;
+                
+                if (!accountName || !bankAccount || !bankName) {
+                    showToast('Lỗi', 'Vui lòng điền đầy đủ thông tin tài khoản ngân hàng', 'error');
+                    return;
+                }
+            }
+            
+            // Disable button and show loading
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            
+            const endpoint = selectedOption === 'wallet' ? '/wallet/process-refund' : '/wallet/withdraw-refund';
+            const formData = new FormData();
+            formData.append('bookingId', currentRefundBookingId);
+            
+            if (selectedOption === 'bank') {
+                formData.append('bankAccount', document.getElementById('bankAccount').value);
+                formData.append('accountName', document.getElementById('accountName').value);
+            }
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            formData.append('_csrf', csrfToken);
+            
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Hoàn tiền thành công!', data.message, 'success');
+                    closeModal('refundModal');
+                    
+                    // Update balance if refunded to wallet
+                    if (selectedOption === 'wallet' && data.newBalance) {
+                        currentBalance = data.newBalance;
+                        animateBalance();
+                    }
+                    
+                    // Reload page to update transaction list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast('Lỗi', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Lỗi', 'Có lỗi xảy ra khi xử lý hoàn tiền', 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<i class="fas fa-check"></i> Xác nhận hoàn tiền';
+            });
+        }
+
+        // Update transaction filtering to include refund-pending
+        function filterTransactions(type, button) {
+            // Update active filter
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Filter transactions
+            const transactions = document.querySelectorAll('.transaction-item');
+            transactions.forEach((transaction, index) => {
+                const transactionType = transaction.getAttribute('data-type');
+                let shouldShow = false;
+                
+                if (type === 'all') {
+                    shouldShow = true;
+                } else if (type === 'refund') {
+                    shouldShow = transactionType === 'refund' || transactionType === 'refund-pending';
+                } else {
+                    shouldShow = transactionType === type;
+                }
+                
+                if (shouldShow) {
+                    setTimeout(() => {
+                        transaction.style.display = 'flex';
+                        transaction.style.opacity = '0';
+                        transaction.style.transform = 'translateX(-20px)';
+                        
+                        setTimeout(() => {
+                            transaction.style.transition = 'all 0.3s ease';
+                            transaction.style.opacity = '1';
+                            transaction.style.transform = 'translateX(0)';
+                        }, 50);
+                    }, index * 50);
+                } else {
+                    transaction.style.opacity = '0';
+                    transaction.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        transaction.style.display = 'none';
+                    }, 300);
+                }
+            });
         }
 
         // Auto-save form data

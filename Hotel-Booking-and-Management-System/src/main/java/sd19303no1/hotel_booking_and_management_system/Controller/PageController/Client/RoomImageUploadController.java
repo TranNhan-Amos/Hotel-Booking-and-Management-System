@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.core.io.ResourceLoader;
 
 @Controller
 public class RoomImageUploadController {
@@ -37,7 +38,17 @@ public class RoomImageUploadController {
     @Autowired
     private PartnerService partnerService;
 
-    private static final String ROOM_IMAGE_UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    private String getRoomImageUploadDir() {
+        try {
+            return resourceLoader.getResource("classpath:static/img/rooms").getFile().getAbsolutePath();
+        } catch (IOException e) {
+            // Fallback to system property if resource loader fails
+            return System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+        }
+    }
 
     @PostMapping("/upload-room-images")
     @ResponseBody
@@ -93,7 +104,7 @@ public class RoomImageUploadController {
             }
 
             // Tạo thư mục upload nếu chưa tồn tại
-            File uploadDir = new File(ROOM_IMAGE_UPLOAD_DIR);
+            File uploadDir = new File(getRoomImageUploadDir());
             System.out.println("Upload directory: " + uploadDir.getAbsolutePath());
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
@@ -135,7 +146,7 @@ public class RoomImageUploadController {
                     System.out.println("New filename: " + newFilename);
 
                     // Save file
-                    Path filePath = Paths.get(ROOM_IMAGE_UPLOAD_DIR, newFilename);
+                    Path filePath = Paths.get(getRoomImageUploadDir(), newFilename);
                     Files.copy(file.getInputStream(), filePath);
 
                     System.out.println("File saved to: " + filePath.toAbsolutePath());
@@ -224,7 +235,7 @@ public class RoomImageUploadController {
             }
 
             // Xóa file từ filesystem
-            File imageFile = new File(ROOM_IMAGE_UPLOAD_DIR, imageUrl);
+            File imageFile = new File(getRoomImageUploadDir(), imageUrl);
             if (imageFile.exists()) {
                 imageFile.delete();
             }

@@ -15,6 +15,14 @@ import java.util.Map;
 public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity, Integer> {
     List<BookingOrderEntity> findByEmailOrderByCreatedAtDesc(String email);
 
+    // Tìm booking theo customer ID (để tránh mất lịch sử khi thay đổi email)
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.customer.customerId = :customerId ORDER BY b.createdAt DESC")
+    List<BookingOrderEntity> findByCustomerIdOrderByCreatedAtDesc(@Param("customerId") Integer customerId);
+    
+    // Test query để debug - tìm theo customerId trực tiếp từ column
+    @Query(value = "SELECT * FROM bookingorder WHERE customer_id = :customerId ORDER BY created_at DESC", nativeQuery = true)
+    List<BookingOrderEntity> findByCustomerIdNative(@Param("customerId") Integer customerId);
+
     List<BookingOrderEntity> findAllByOrderByCreatedAtDesc();
 
     // Phương thức để lấy N booking gần nhất

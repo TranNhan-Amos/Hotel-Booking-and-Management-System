@@ -38,7 +38,7 @@ public class ImageUploadController {
     @Autowired
     private CustomersService customersService;
 
-    private static final String UPLOAD_DIR = "F:\\Githup\\DUANTOTNGHIEP\\Hotel-Booking-and-Management-System\\Hotel-Booking-and-Management-System\\src\\main\\resources\\static\\img\\customers\\";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/customers/";
 
     @PostMapping("/upload-avatar")
     @ResponseBody

@@ -31,15 +31,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("=== CUSTOM USER DETAILS DEBUG ===");
         System.out.println("Loading user by email: " + email + " (lowercase: " + lowerCaseEmail + ")");
 
-        // Tìm trong SystemUserEntity
-        return systemUserRepository.findByEmail(lowerCaseEmail)
+        // Tìm trong SystemUserEntity (sử dụng ignore-case)
+        return systemUserRepository.findByEmailIgnoreCase(lowerCaseEmail)
                 .map(user -> {
                     System.out.println("Found SystemUser: " + user.getEmail() + " with role: " + user.getRole());
                     return new CustomUserDetails(user);
                 })
                 .orElseGet(() -> {
                     System.out.println("SystemUser not found, searching in Customers...");
-                    return customersRepository.findByEmail(lowerCaseEmail)
+                    return customersRepository.findByEmailIgnoreCase(lowerCaseEmail)
                             .map(customer -> {
                                 System.out.println("Found Customer: " + customer.getEmail());
                                 return new CustomUserDetails(customer);

@@ -91,7 +91,7 @@ public class BookingOrderService {
         System.out.println("=== SERVICE DEBUG: Validation passed ===");
 
         // 1. Tìm hoặc tạo customer
-        CustomersEntity customer = customersRepository.findByEmail(email.toLowerCase())
+        CustomersEntity customer = customersRepository.findByEmailIgnoreCase(email.toLowerCase())
                 .orElseGet(() -> {
                     System.out.println("=== SERVICE DEBUG: Creating new customer ===");
                     CustomersEntity newCustomer = new CustomersEntity();
@@ -243,43 +243,79 @@ public class BookingOrderService {
     @Transactional
     public BookingOrderEntity cancelBooking(Integer bookingId, String reason) {
         System.out.println("=== DEBUG: cancelBooking called with bookingId: " + bookingId + ", reason: " + reason + " ===");
+        
+        // Kiểm tra lý do hủy phòng
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new RuntimeException("Vui lòng nhập lý do hủy phòng.");
+        }
+
         BookingOrderEntity booking = bookingOrderRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + bookingId));
 
         // Kiểm tra xem có thể hủy không
         System.out.println("=== DEBUG: Checking if booking can be cancelled ===");
-        // Tạm thời bỏ qua chính sách hủy phòng để test
-        /*
         if (!canCancelBooking(booking)) {
             System.out.println("=== DEBUG: Booking cannot be cancelled ===");
             throw new RuntimeException("Không thể hủy đặt phòng này. Vui lòng kiểm tra chính sách hủy phòng.");
         }
-        */
-        System.out.println("=== DEBUG: Booking can be cancelled (temporarily bypassed) ===");
+        System.out.println("=== DEBUG: Booking can be cancelled ===");
+
+        // Kiểm tra trạng thái thanh toán
+        boolean isPaid = "PAID".equalsIgnoreCase(booking.getPaymentStatus());
+        System.out.println("=== DEBUG: Payment status: " + booking.getPaymentStatus() + ", isPaid: " + isPaid + " ===");
 
         // Tính toán số tiền hoàn lại
         BigDecimal refundAmount = calculateRefundAmount(booking);
 
-        // Cập nhật trạng thái
-        StatusEntity cancelledStatus = statusRepository.findByStatusNameIgnoreCase("CANCELLED");
-        if (cancelledStatus == null) {
-            cancelledStatus = new StatusEntity();
-            cancelledStatus.setStatusName("CANCELLED");
-            cancelledStatus.setDescription("Đã hủy");
-            cancelledStatus = statusRepository.save(cancelledStatus);
+        // Xác định trạng thái mới dựa trên việc đã thanh toán hay chưa
+        StatusEntity newStatus;
+        String newBookingStatus;
+        String newRefundStatus;
+
+        if (isPaid) {
+            // Đã thanh toán -> chuyển thành "Đã hoàn tiền"
+            newStatus = statusRepository.findByStatusNameIgnoreCase("REFUNDED");
+            if (newStatus == null) {
+                newStatus = new StatusEntity();
+                newStatus.setStatusName("REFUNDED");
+                newStatus.setDescription("Đã hoàn tiền");
+                newStatus = statusRepository.save(newStatus);
+            }
+            newBookingStatus = "REFUNDED";
+            newRefundStatus = "COMPLETED";
+            System.out.println("=== DEBUG: Booking is paid, setting status to REFUNDED ===");
+        } else {
+            // Chưa thanh toán -> chuyển thành "Đã hủy phòng"
+            newStatus = statusRepository.findByStatusNameIgnoreCase("CANCELLED");
+            if (newStatus == null) {
+                newStatus = new StatusEntity();
+                newStatus.setStatusName("CANCELLED");
+                newStatus.setDescription("Đã hủy");
+                newStatus = statusRepository.save(newStatus);
+            }
+            newBookingStatus = "CANCELLED";
+            newRefundStatus = "NONE";
+            System.out.println("=== DEBUG: Booking is not paid, setting status to CANCELLED ===");
         }
 
-        booking.setStatus(cancelledStatus);
-        booking.setBookingStatus("CANCELLED");
+        // Cập nhật trạng thái booking
+        booking.setStatus(newStatus);
+        booking.setBookingStatus(newBookingStatus);
         booking.setCancellationDate(LocalDateTime.now());
         booking.setCancellationReason(reason);
         booking.setRefundAmount(refundAmount);
-        booking.setRefundStatus("PENDING");
+        booking.setRefundStatus(newRefundStatus);
+
+        // Nếu đã thanh toán và có tiền hoàn lại, cập nhật ngày hoàn tiền
+        if (isPaid && refundAmount.compareTo(BigDecimal.ZERO) > 0) {
+            booking.setRefundDate(LocalDateTime.now());
+        }
 
         System.out.println("=== DEBUG: About to save cancelled booking ===");
         BookingOrderEntity savedBooking = bookingOrderRepository.save(booking);
         System.out.println("=== DEBUG: Booking saved successfully with ID: " + savedBooking.getBookingId() + " ===");
         System.out.println("=== DEBUG: Booking status: " + savedBooking.getBookingStatus() + " ===");
+        System.out.println("=== DEBUG: Refund status: " + savedBooking.getRefundStatus() + " ===");
 
         // Không cần cộng lại totalRooms vì sẽ tính động theo booking
         // Số phòng có sẵn sẽ được tính trong RoomService.getAvailableRoomCount()
@@ -297,13 +333,12 @@ public class BookingOrderService {
 
         System.out.println("=== DEBUG: canCancelBooking - today: " + today + ", checkInDate: " + checkInDate + ", daysBeforeCheckIn: " + daysBeforeCheckIn + " ===");
 
-        // Chính sách hủy phòng:
-        // - Hủy trước 24h: hoàn 100%
-        // - Hủy trước 48h: hoàn 50%
+        // Luôn cho phép hủy, chính sách hoàn tiền được xử lý trong calculateRefundAmount:
+        // - Hủy trước 48h: hoàn 100% tiền
+        // - Hủy từ 24h đến 48h: hoàn 50% tiền
         // - Hủy trong vòng 24h: không hoàn tiền
-        boolean canCancel = daysBeforeCheckIn > 1; // Có thể hủy nếu còn hơn 1 ngày
-        System.out.println("=== DEBUG: canCancelBooking - canCancel: " + canCancel + " ===");
-        return canCancel;
+        System.out.println("=== DEBUG: canCancelBooking - Always allow cancellation ===");
+        return true;
     }
 
     // Tính toán số tiền hoàn lại
@@ -598,7 +633,7 @@ public class BookingOrderService {
                         .orElseThrow(() -> new RuntimeException(
                                 "Khách hàng với ID: " + dto.getCustomerId() + " không tồn tại."));
             } else {
-                customer = customersRepository.findByEmail(dto.getCustomerEmail().toLowerCase())
+                customer = customersRepository.findByEmailIgnoreCase(dto.getCustomerEmail().toLowerCase())
                         .orElseGet(() -> {
                             CustomersEntity newCust = new CustomersEntity();
                             newCust.setName(dto.getCustomerName());
@@ -695,11 +730,65 @@ public class BookingOrderService {
         return bookingOrderRepository.findTopNByOrderByCreatedAtDesc(PageRequest.of(0, limit));
     }
 
+    /**
+     * Lấy danh sách booking của khách hàng theo email
+     * @param email Email của khách hàng
+     * @return Danh sách booking của khách hàng, sắp xếp theo thời gian tạo giảm dần
+     * @throws IllegalArgumentException nếu email là null hoặc rỗng
+     */
     public List<BookingOrderEntity> getBookingsByCustomerEmailForCustomer(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email không được để trống.");
         }
-        return bookingOrderRepository.findByEmailOrderByCreatedAtDesc(email.toLowerCase());
+        List<BookingOrderEntity> bookings = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(email.toLowerCase());
+        return bookings != null ? bookings : new ArrayList<>();
+    }
+
+    /**
+     * Lấy danh sách booking của khách hàng theo customer ID
+     * @param customerId ID của khách hàng
+     * @return Danh sách booking của khách hàng, sắp xếp theo thời gian tạo giảm dần
+     * @throws IllegalArgumentException nếu customerId là null
+     */
+    public List<BookingOrderEntity> getBookingsByCustomerIdForCustomer(Integer customerId) {
+        if (customerId == null) {
+            throw new IllegalArgumentException("Customer ID không được để trống.");
+        }
+        System.out.println("=== SERVICE DEBUG: Searching bookings for customer ID: " + customerId + " ===");
+        
+        // Test query để debug
+        try {
+            List<BookingOrderEntity> allBookings = bookingOrderRepository.findAll();
+            System.out.println("=== SERVICE DEBUG: Total bookings in database: " + allBookings.size() + " ===");
+            
+            // Log một vài booking để xem cấu trúc
+            for (int i = 0; i < Math.min(3, allBookings.size()); i++) {
+                BookingOrderEntity booking = allBookings.get(i);
+                System.out.println("=== BOOKING " + i + ": ID=" + booking.getBookingId() + 
+                                 ", CustomerID=" + (booking.getCustomer() != null ? booking.getCustomer().getCustomerId() : "NULL") +
+                                 ", Email=" + booking.getEmail() + " ===");
+            }
+        } catch (Exception e) {
+            System.out.println("=== ERROR getting all bookings: " + e.getMessage() + " ===");
+        }
+        
+        List<BookingOrderEntity> bookings = bookingOrderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+        System.out.println("=== SERVICE DEBUG: JPA Query found " + (bookings != null ? bookings.size() : 0) + " bookings for customer ID " + customerId + " ===");
+        
+        // Test native query để so sánh
+        try {
+            List<BookingOrderEntity> nativeBookings = bookingOrderRepository.findByCustomerIdNative(customerId);
+            System.out.println("=== SERVICE DEBUG: Native Query found " + (nativeBookings != null ? nativeBookings.size() : 0) + " bookings for customer ID " + customerId + " ===");
+            
+            if (bookings.isEmpty() && !nativeBookings.isEmpty()) {
+                System.out.println("=== WARNING: JPA query returned empty but Native query found data! Using native results ===");
+                bookings = nativeBookings;
+            }
+        } catch (Exception e) {
+            System.out.println("=== ERROR in native query: " + e.getMessage() + " ===");
+        }
+        
+        return bookings != null ? bookings : new ArrayList<>();
     }
 
     public List<CustomersEntity> findAllCustomersForAdmin() {
@@ -913,7 +1002,7 @@ public class BookingOrderService {
         // Cập nhật tổng tiền
         if (updateData.containsKey("totalPrice")) {
             Object totalPriceObj = updateData.get("totalPrice");
-            System.out.println("=== DEBUG: totalPriceObj: " + totalPriceObj + " (type: " + (totalPriceObj != null ? totalPriceObj.getClass().getSimpleName() : "null") + ") ===");
+            System.out.println("=== DEBUG: totalPriceObj: " + totalPriceObj + " ===");
             if (totalPriceObj != null) {
                 try {
                     BigDecimal totalPrice;

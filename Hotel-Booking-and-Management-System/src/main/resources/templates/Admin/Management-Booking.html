@@ -454,6 +454,41 @@
             color: #721c24;
         }
 
+        /* Booking Status Styles */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-CONFIRMED {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-PENDING {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-CANCELLED {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-COMPLETED {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-REFUNDED {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
         /* Additional Stat Icon Styles */
         .stat-icon.paid {
             background: #d4edda;
@@ -558,7 +593,7 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                         </div>
-                        <div class="stat-value" th:text="${stats != null ? stats.pendingPaymentBookings : #lists.size(bookings.?[paymentStatus == 'PENDING'])}">0</div>
+                        <div class="stat-value"s th:text="${stats != null ? stats.pendingPaymentBookings : #lists.size(bookings.?[paymentStatus == 'PENDING'])}">0</div>
                     </div>
                 </div>
 
@@ -567,7 +602,11 @@
                         <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng..." oninput="filterBookings()">
                         <select id="statusFilter" onchange="filterBookings()">
                             <option value="all">Tất Cả Trạng Thái</option>
-                            <option value="confirmed">Đã Xác Nhận (CONFIRMED)</option>
+                            <option value="CONFIRMED">Đã Xác Nhận (CONFIRMED)</option>
+                            <option value="PENDING">Đang Chờ (PENDING)</option>
+                            <option value="CANCELLED">Đã Hủy (CANCELLED)</option>
+                            <option value="COMPLETED">Hoàn Thành (COMPLETED)</option>
+                            <option value="REFUNDED">Đã Hoàn Tiền (REFUNDED)</option>
                         </select>
                         <select id="paymentFilter" onchange="filterBookings()">
                             <option value="all">Tất Cả Thanh Toán</option>
@@ -596,7 +635,7 @@
                             </thead>
                             <tbody id="bookingTableBody">
                                 <tr th:each="booking : ${bookings}" 
-                                    th:data-status="${booking.bookingStatus != null ? booking.bookingStatus.toLowerCase() : 'pending'}"
+                                    th:data-status="${booking.status != null ? booking.status.statusName : 'PENDING'}"
                                     th:data-booking-id="${booking.bookingId}">
                                     <td class="booking-id" th:text="'#' + ${booking.bookingId}">#BK001</td>
                                     <td>
@@ -619,11 +658,15 @@
                                     </td>
                                     <td class="price" th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}">3,000,000 ₫</td>
                                     <td>
-                                        <span th:class="'status ' + ${booking.bookingStatus != null ? booking.bookingStatus.toLowerCase() : 'pending'}" 
-                                              th:text="${booking.bookingStatus == 'PENDING' ? 'Chờ Xác Nhận' : 
-                                                        booking.bookingStatus == 'CONFIRMED' ? 'Đã Xác Nhận' : 
-                                                        booking.bookingStatus == 'CANCELLED' ? 'Đã Hủy' : 
-                                                        booking.bookingStatus != null ? booking.bookingStatus : 'Chưa xác định'}">
+                                        <span th:class="'status-badge status-' + ${booking.status != null ? booking.status.statusName : 'PENDING'}"
+                                              th:text="${booking.status != null ? (
+                                                        booking.status.statusName == 'PENDING' ? 'Chờ Xác Nhận' :
+                                                        booking.status.statusName == 'CONFIRMED' ? 'Đã Xác Nhận' :
+                                                        booking.status.statusName == 'CANCELLED' ? 'Đã Hủy' :
+                                                        booking.status.statusName == 'COMPLETED' ? 'Hoàn Thành' :
+                                                        booking.status.statusName == 'REFUNDED' ? 'Đã Hoàn Tiền' :
+                                                        booking.status.statusName
+                                                    ) : 'Chưa xác định'}">
                                             Trạng thái
                                         </span>
                                     </td>
@@ -1005,12 +1048,8 @@
 
             const matchesSearch = customerName.includes(searchInput);
             
-            // Logic filter status - chỉ có booking CONFIRMED được hiển thị
-            let matchesStatus = statusFilter === 'all';
-            if (statusFilter === 'confirmed') {
-                matchesStatus = status === 'confirmed';
-            }
-            // Tất cả booking hiển thị đều là CONFIRMED, nên không cần filter pending/cancelled
+            // Logic filter status - kiểm tra theo trạng thái từ entity
+            let matchesStatus = statusFilter === 'all' || status === statusFilter;
             
             const matchesPayment = paymentFilter === 'all' || paymentStatus === paymentFilter;
             const matchesDate = !dateFilter || checkInDate.includes(dateFilter);

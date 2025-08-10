@@ -829,7 +829,7 @@
                              th:src="@{'/img/customers/' + ${currentUser.systemUser.img}}" alt="Avatar">
                         <img class="booking-thumb-fresh"
                              th:if="${(currentUser.avatar == null or currentUser.avatar == '') and (currentUser.systemUser == null or currentUser.systemUser.img == null or currentUser.systemUser.img == '')}"
-                             src="/img/customers/default-avatar.png" alt="Avatar">
+                             src="/img/customers/default-avatar.svg" alt="Avatar">
                     </div>
                     <div class="booking-avatar-guest" th:if="${currentUser == null}">
                         <div class="guest-avatar-icon">

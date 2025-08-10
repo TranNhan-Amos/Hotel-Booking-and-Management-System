@@ -12,19 +12,19 @@ public class SystemUserService {
     private SystemUserRepository systemUserRepository;
     
     public SystemUserEntity findByEmail(String email) {
-        return systemUserRepository.findByEmail(email).orElse(null);
+        return systemUserRepository.findByEmailIgnoreCase(email).orElse(null);
     }
     
     public SystemUserEntity findByUsername(String username) {
-        return systemUserRepository.findByUsername(username).orElse(null);
+        return systemUserRepository.findByUsernameIgnoreCase(username).orElse(null);
     }
     
     public boolean existsByEmail(String email) {
-        return systemUserRepository.existsByEmail(email);
+        return systemUserRepository.existsByEmailIgnoreCase(email);
     }
     
     public boolean existsByUsername(String username) {
-        return systemUserRepository.existsByUsername(username);
+        return systemUserRepository.existsByUsernameIgnoreCase(username);
     }
     
     public SystemUserEntity save(SystemUserEntity user) {

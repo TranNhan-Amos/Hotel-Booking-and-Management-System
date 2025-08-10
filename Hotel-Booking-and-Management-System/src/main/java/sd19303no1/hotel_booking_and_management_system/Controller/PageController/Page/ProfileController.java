@@ -1,16 +1,14 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Page;
 
-import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
-import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepository;
-import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
-import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,31 +16,37 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
+import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
+import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepository;
+import sd19303no1.hotel_booking_and_management_system.Service.BookingOrderService;
+import sd19303no1.hotel_booking_and_management_system.Service.CustomUserDetailsService.CustomUserDetails;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Controller
 public class ProfileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
-    private static final String UPLOAD_DIR = "F:\\Githup\\DUANTOTNGHIEP\\Hotel-Booking-and-Management-System\\Hotel-Booking-and-Management-System\\src\\main\\resources\\static\\img\\customers\\";
-    private static final String DEFAULT_AVATAR = "default-avatar.png"; // TODO: Đảm bảo file này tồn tại trong static/img/customers/
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/customers/";
+    private static final String DEFAULT_AVATAR = "default-avatar.svg";
     private static final String[] ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif"};
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     @Autowired
     private SystemUserRepository systemUserRepository;
-    
+
     @Autowired
     private CustomersRepository customersRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -50,9 +54,9 @@ public class ProfileController {
     private BookingOrderService bookingOrderService;
 
     @GetMapping("/profile")
-    public String showProfilePage(Model model) {
+    public String showProfilePage(Model model, HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         logger.debug("Accessing profile page. Authentication: {}, IsAuthenticated: {}", 
             authentication, authentication != null && authentication.isAuthenticated());
 
@@ -62,17 +66,72 @@ public class ProfileController {
         }
 
         String email = authentication.getName();
-        SystemUserEntity systemUser = systemUserRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalStateException("User not found for email: " + email));
+        logger.debug("Authenticated user email: {}", email);
+        
+        // Log all users in the database for debugging
+        List<SystemUserEntity> allUsers = systemUserRepository.findAll();
+        logger.debug("All users in database: {}", allUsers.stream()
+            .map(u -> u.getEmail() + " (ID: " + u.getId() + ")")
+            .collect(Collectors.joining(", ")));
 
+        // Tìm user bằng email hoặc username (ignore-case) - kiểm tra cả SystemUserEntity và CustomersEntity
+        SystemUserEntity systemUser = null;
         CustomersEntity customer = null;
-        if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
-            customer = customersRepository.findBySystemUser(systemUser)
-                .orElseGet(() -> customersRepository.findByEmail(email).orElse(null));
+        
+        // Thử tìm trong SystemUserEntity trước
+        systemUser = systemUserRepository.findByEmailIgnoreCase(email)
+            .orElseGet(() -> {
+                logger.warn("User not found with email: {}. Trying to find by username...", email);
+                return systemUserRepository.findByUsernameIgnoreCase(email).orElse(null);
+            });
+        
+        if (systemUser != null) {
+            logger.debug("Found SystemUser: {} (ID: {})", systemUser.getEmail(), systemUser.getId());
+            
+            // Nếu là CUSTOMER, tìm thông tin customer
+            if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+                customer = customersRepository.findBySystemUser(systemUser).orElse(null);
+                if (customer == null) {
+                    // Thử tìm customer bằng email
+                    customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+                }
+            }
+        } else {
+            // Nếu không tìm thấy trong SystemUserEntity, thử tìm trong CustomersEntity
+            logger.warn("SystemUser not found, searching in CustomersEntity...");
+            customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+            
+            if (customer != null) {
+                logger.debug("Found Customer: {} (ID: {})", customer.getEmail(), customer.getCustomerId());
+                // Tạo SystemUserEntity tạm thời từ customer
+                systemUser = customer.getSystemUser();
+                if (systemUser == null) {
+                    // Nếu customer không có systemUser, tạo một cái tạm thời
+                    systemUser = new SystemUserEntity();
+                    systemUser.setEmail(customer.getEmail());
+                    systemUser.setUsername(customer.getName());
+                    systemUser.setRole(SystemUserEntity.Role.CUSTOMER);
+                    systemUser.setId(customer.getCustomerId().longValue());
+                }
+            } else {
+                String errorMsg = "Không tìm thấy người dùng với email/username: " + email;
+                logger.error(errorMsg);
+                throw new IllegalStateException(errorMsg);
+            }
         }
+            
+        logger.debug("Final user: {} (ID: {})", systemUser.getEmail(), systemUser.getId());
 
-        // Lấy lịch sử đặt phòng
-        java.util.List<sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity> bookings = bookingOrderService.getBookingsByCustomerEmailForCustomer(email);
+        // Sử dụng email từ database thay vì từ authentication context
+        String currentEmail = systemUser.getEmail();
+        logger.debug("Using email from database: {}", currentEmail);
+
+        // Đồng bộ avatar lên session cho navbar
+        String navAvatarPath = getAvatarPath(systemUser, customer);
+        session.setAttribute("avatarPath", navAvatarPath);
+
+        // Lấy lịch sử đặt phòng sử dụng email từ database
+        java.util.List<sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity> bookings = bookingOrderService.getBookingsByCustomerEmailForCustomer(currentEmail);
         model.addAttribute("bookings", bookings);
 
         // Prepare model attributes
@@ -80,7 +139,7 @@ public class ProfileController {
         model.addAttribute("userType", systemUser.getRole().toString().toLowerCase());
         model.addAttribute("customer", customer);
         model.addAttribute("isLoggedIn", true);
-        
+
         // Set display attributes
         setupDisplayAttributes(model, systemUser, customer);
 
@@ -90,7 +149,8 @@ public class ProfileController {
     @PostMapping("/update-profile")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateProfile(
-            @RequestParam String name,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String cccd,
@@ -105,75 +165,247 @@ public class ProfileController {
             return createErrorResponse("Phiên đăng nhập đã hết hạn!", 401);
         }
 
-        String email = authentication.getName();
+        final String originalEmail = authentication.getName();
+        String currentEmail = originalEmail;
+        logger.info("Bắt đầu cập nhật thông tin cho email: {}", currentEmail);
+        
         try {
-            SystemUserEntity systemUser = systemUserRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found for email: " + email));
+            // Tìm người dùng hiện tại - kiểm tra cả SystemUserEntity và CustomersEntity
+            SystemUserEntity systemUser = null;
+            CustomersEntity customer = null;
+            
+            // Thử tìm trong SystemUserEntity trước
+            systemUser = systemUserRepository.findByEmailIgnoreCase(originalEmail)
+                .orElseGet(() -> systemUserRepository.findByUsernameIgnoreCase(originalEmail).orElse(null));
+            
+            if (systemUser != null) {
+                logger.debug("Found SystemUser: {} (ID: {})", systemUser.getEmail(), systemUser.getId());
+                
+                // Nếu là CUSTOMER, tìm thông tin customer
+                if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+                    customer = customersRepository.findBySystemUser(systemUser).orElse(null);
+                    if (customer == null) {
+                        // Thử tìm customer bằng email
+                        customer = customersRepository.findByEmailIgnoreCase(originalEmail).orElse(null);
+                    }
+                }
+            } else {
+                // Nếu không tìm thấy trong SystemUserEntity, thử tìm trong CustomersEntity
+                logger.warn("SystemUser not found, searching in CustomersEntity...");
+                customer = customersRepository.findByEmailIgnoreCase(originalEmail).orElse(null);
+                
+                if (customer != null) {
+                    logger.debug("Found Customer: {} (ID: {})", customer.getEmail(), customer.getCustomerId());
+                    // Tạo SystemUserEntity tạm thời từ customer
+                    systemUser = customer.getSystemUser();
+                    if (systemUser == null) {
+                        // Nếu customer không có systemUser, tạo một cái tạm thời
+                        systemUser = new SystemUserEntity();
+                        systemUser.setEmail(customer.getEmail());
+                        systemUser.setUsername(customer.getName());
+                        systemUser.setRole(SystemUserEntity.Role.CUSTOMER);
+                        systemUser.setId(customer.getCustomerId().longValue());
+                    }
+                } else {
+                    throw new IllegalStateException("Không tìm thấy người dùng với email/username: " + originalEmail);
+                }
+            }
 
-            CustomersEntity customer = systemUser.getRole() == SystemUserEntity.Role.CUSTOMER
-                ? customersRepository.findBySystemUser(systemUser).orElse(null)
-                : null;
+            // Sử dụng giá trị hiện tại nếu không có giá trị mới
+            String effectiveName = name != null && !name.trim().isEmpty() ? name.trim() : 
+                (customer != null && customer.getName() != null ? customer.getName() : systemUser.getUsername());
+                
+            String effectiveEmail = email != null && !email.trim().isEmpty() ? email.trim() : systemUser.getEmail();
+            
+            // Kiểm tra xem có thay đổi email không
+            boolean isEmailChanged = !effectiveEmail.equalsIgnoreCase(systemUser.getEmail());
+            logger.info("Email hiện tại: {}, Email mới: {}, Đã thay đổi: {}", 
+                systemUser.getEmail(), effectiveEmail, isEmailChanged);
 
-            // Validate inputs
-            String validationError = validateProfileInputs(name, phone, cccd, currentPassword, newPassword, confirmPassword, systemUser);
+            // Validate dữ liệu đầu vào
+            String validationError = validateProfileInputs(effectiveName, effectiveEmail, phone, address, cccd, 
+                currentPassword, newPassword, confirmPassword, systemUser);
+                
             if (validationError != null) {
+                logger.warn("Lỗi validate dữ liệu: {}", validationError);
                 return createErrorResponse(validationError, 400);
             }
 
-            // Update user information
-            updateUserInformation(systemUser, customer, name, phone, address, cccd, newPassword);
+            // Kiểm tra email đã tồn tại chưa (nếu thay đổi email)
+            if (isEmailChanged) {
+                if (systemUserRepository.findByEmailIgnoreCase(effectiveEmail).isPresent()) {
+                    logger.warn("Email mới đã được sử dụng bởi tài khoản khác: {}", effectiveEmail);
+                    return createErrorResponse("Email đã được sử dụng bởi tài khoản khác!", 400);
+                }
+                logger.info("Xác nhận thay đổi email từ {} thành {}", originalEmail, effectiveEmail);
+            }
+
+            // Cập nhật thông tin người dùng
+            logger.info("Đang cập nhật thông tin người dùng...");
+            updateUserInformation(systemUser, customer, effectiveName, effectiveEmail, phone, address, cccd, newPassword);
+            logger.info("Đã cập nhật thông tin người dùng thành công");
+
+            // Cập nhật authentication context nếu thay đổi email
+            if (isEmailChanged) {
+                logger.info("Đang cập nhật authentication context...");
+                updateAuthenticationContext(effectiveEmail, authentication);
+                logger.info("Đã cập nhật authentication context thành công");
+                
+                // Cập nhật lại currentEmail với email mới
+                currentEmail = effectiveEmail;
+            }
             
+            // Tạo phản hồi thành công
             response.put("success", true);
             response.put("message", "Cập nhật thông tin thành công!");
-            response.put("data", createUpdatedDataMap(systemUser, customer));
             
+            // Trả về dữ liệu cập nhật
+            Map<String, String> userData = createUpdatedDataMap(systemUser, customer);
+            response.put("data", userData);
+            
+            logger.info("Cập nhật thông tin thành công cho email: {}", currentEmail);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            logger.error("Error updating profile for email: {}", email, e);
-            return createErrorResponse("Có lỗi xảy ra khi cập nhật thông tin: " + e.getMessage(), 500);
+            logger.error("Lỗi khi cập nhật thông tin cho email: " + currentEmail, e);
+            return createErrorResponse("Có lỗi xảy ra khi cập nhật thông tin: " + 
+                (e.getMessage() != null ? e.getMessage() : "Vui lòng thử lại sau"), 500);
         }
     }
 
     @PostMapping("/profile/upload-avatar")
-    public String uploadAvatar(@RequestParam("avatar") MultipartFile file, RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> uploadAvatar(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (!isAuthenticated(authentication)) {
-            redirectAttributes.addFlashAttribute("error", "Bạn cần đăng nhập để cập nhật ảnh đại diện!");
-            return "redirect:/profile";
+            return createErrorResponse("Bạn cần đăng nhập để cập nhật ảnh đại diện!", 401);
         }
 
         String email = authentication.getName();
-        SystemUserEntity systemUser = systemUserRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalStateException("User not found for email: " + email));
-
-        if (systemUser.getRole() != SystemUserEntity.Role.CUSTOMER) {
-            redirectAttributes.addFlashAttribute("error", "Chỉ khách hàng có thể cập nhật ảnh đại diện!");
-            return "redirect:/profile";
+        
+        // Tìm người dùng - kiểm tra cả SystemUserEntity và CustomersEntity
+        SystemUserEntity systemUser = null;
+        CustomersEntity customer = null;
+        
+        // Thử tìm trong SystemUserEntity trước
+        systemUser = systemUserRepository.findByEmailIgnoreCase(email)
+            .orElseGet(() -> systemUserRepository.findByUsernameIgnoreCase(email).orElse(null));
+        
+        if (systemUser != null) {
+            if (systemUser.getRole() != SystemUserEntity.Role.CUSTOMER) {
+                return createErrorResponse("Chỉ khách hàng có thể cập nhật ảnh đại diện!", 403);
+            }
+            customer = customersRepository.findBySystemUser(systemUser).orElse(null);
+            if (customer == null) {
+                customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+            }
+        } else {
+            // Nếu không tìm thấy trong SystemUserEntity, thử tìm trong CustomersEntity
+            customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+            if (customer != null) {
+                systemUser = customer.getSystemUser();
+            }
         }
-
-        CustomersEntity customer = customersRepository.findBySystemUser(systemUser)
-            .orElseThrow(() -> new IllegalStateException("Customer not found for user: " + email));
+        
+        if (customer == null) {
+            return createErrorResponse("Không tìm thấy thông tin khách hàng!", 404);
+        }
 
         // Validate file
         String fileValidationError = validateAvatarFile(file);
         if (fileValidationError != null) {
-            redirectAttributes.addFlashAttribute("error", fileValidationError);
-            return "redirect:/profile";
+            return createErrorResponse(fileValidationError, 400);
         }
 
         try {
             String fileName = saveAvatarFile(file, customer.getAvatar());
             customer.setAvatar(fileName);
             customersRepository.save(customer);
-            redirectAttributes.addFlashAttribute("success", "Cập nhật ảnh đại diện thành công!");
+            
+            // Cập nhật session avatarPath
+            String avatarPath = "/img/customers/" + fileName;
+            
+            // Refresh session avatar
+            HttpSession session = request.getSession();
+            session.setAttribute("avatarPath", avatarPath);
+            
+            response.put("success", true);
+            response.put("message", "Cập nhật ảnh đại diện thành công!");
+            response.put("avatarPath", avatarPath);
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
             logger.error("Error uploading avatar for user: {}", email, e);
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi upload ảnh: " + e.getMessage());
+            return createErrorResponse("Lỗi khi upload ảnh: " + e.getMessage(), 500);
+        }
+    }
+
+    @PostMapping("/delete-avatar")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteAvatar(HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (!isAuthenticated(authentication)) {
+            return createErrorResponse("Bạn cần đăng nhập để xóa ảnh đại diện!", 401);
         }
 
-        return "redirect:/profile";
+        String email = authentication.getName();
+        
+        // Tìm người dùng - kiểm tra cả SystemUserEntity và CustomersEntity
+        SystemUserEntity systemUser = null;
+        CustomersEntity customer = null;
+        
+        // Thử tìm trong SystemUserEntity trước
+        systemUser = systemUserRepository.findByEmailIgnoreCase(email)
+            .orElseGet(() -> systemUserRepository.findByUsernameIgnoreCase(email).orElse(null));
+        
+        if (systemUser != null) {
+            if (systemUser.getRole() != SystemUserEntity.Role.CUSTOMER) {
+                return createErrorResponse("Chỉ khách hàng có thể xóa ảnh đại diện!", 403);
+            }
+            customer = customersRepository.findBySystemUser(systemUser).orElse(null);
+            if (customer == null) {
+                customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+            }
+        } else {
+            // Nếu không tìm thấy trong SystemUserEntity, thử tìm trong CustomersEntity
+            customer = customersRepository.findByEmailIgnoreCase(email).orElse(null);
+            if (customer != null) {
+                systemUser = customer.getSystemUser();
+            }
+        }
+        
+        if (customer == null) {
+            return createErrorResponse("Không tìm thấy thông tin khách hàng!", 404);
+        }
+
+        try {
+            if (customer.getAvatar() != null && !customer.getAvatar().equals(DEFAULT_AVATAR)) {
+                File oldFile = new File(UPLOAD_DIR, customer.getAvatar());
+                if (oldFile.exists()) {
+                    oldFile.delete();
+                }
+            }
+            customer.setAvatar(DEFAULT_AVATAR);
+            customersRepository.save(customer);
+            
+            // Cập nhật session avatarPath về default
+            String avatarPath = "/img/customers/" + DEFAULT_AVATAR;
+            
+            // Refresh session avatar
+            HttpSession session = request.getSession();
+            session.setAttribute("avatarPath", avatarPath);
+            
+            response.put("success", true);
+            response.put("message", "Xóa ảnh đại diện thành công!");
+            response.put("avatarPath", avatarPath);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error deleting avatar for user: {}", email, e);
+            return createErrorResponse("Lỗi khi xóa ảnh: " + e.getMessage(), 500);
+        }
     }
 
     private boolean isAuthenticated(Authentication authentication) {
@@ -210,12 +442,15 @@ public class ProfileController {
         return "/img/customers/" + avatarName;
     }
 
-    private String validateProfileInputs(String name, String phone, String cccd, 
-            String currentPassword, String newPassword, String confirmPassword,
-            SystemUserEntity systemUser) {
+    private String validateProfileInputs(String name, String email, String phone, String address, String cccd, 
+            String currentPassword, String newPassword, String confirmPassword, SystemUserEntity systemUser) {
         
         if (name == null || name.trim().isEmpty()) {
             return "Tên không được để trống!";
+        }
+        
+        if (email == null || email.trim().isEmpty() || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            return "Email không hợp lệ!";
         }
         
         if (phone != null && !phone.trim().isEmpty() && !phone.matches("^[0-9]{10,11}$")) {
@@ -226,9 +461,22 @@ public class ProfileController {
             return "Số CCCD không hợp lệ! (12 chữ số)";
         }
         
+        // Only require current password for email changes or password changes
+        boolean isEmailChanged = email != null && !email.trim().isEmpty() && 
+                               !email.trim().equalsIgnoreCase(systemUser.getEmail());
+        
+        if (isEmailChanged && (currentPassword == null || currentPassword.trim().isEmpty())) {
+            return "Vui lòng nhập mật khẩu hiện tại để thay đổi email!";
+        }
+
+        if (currentPassword != null && !currentPassword.trim().isEmpty() && 
+            !passwordEncoder.matches(currentPassword, systemUser.getPassword())) {
+            return "Mật khẩu hiện tại không đúng!";
+        }
+        
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
-                return "Vui lòng nhập mật khẩu hiện tại!";
+                return "Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu!";
             }
             
             if (!confirmPassword.equals(newPassword)) {
@@ -238,35 +486,115 @@ public class ProfileController {
             if (newPassword.length() < 6) {
                 return "Mật khẩu mới phải có ít nhất 6 ký tự!";
             }
-            
-            if (!passwordEncoder.matches(currentPassword, systemUser.getPassword())) {
-                return "Mật khẩu hiện tại không đúng!";
-            }
         }
         
         return null;
     }
 
     private void updateUserInformation(SystemUserEntity systemUser, CustomersEntity customer,
-            String name, String phone, String address, String cccd, String newPassword) {
+            String name, String email, String phone, String address, String cccd, String newPassword) {
         
-        systemUser.setUsername(name.trim());
-        if (newPassword != null && !newPassword.trim().isEmpty()) {
-            systemUser.setPassword(passwordEncoder.encode(newPassword));
-        }
-        systemUserRepository.save(systemUser);
-
-        if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
-            if (customer == null) {
-                customer = new CustomersEntity();
-                customer.setSystemUser(systemUser);
+        try {
+            logger.info("Bắt đầu cập nhật thông tin cho người dùng ID: {}", systemUser.getId());
+            
+            // Cập nhật thông tin cơ bản của người dùng
+            systemUser.setUsername(name);
+            systemUser.setEmail(email);
+            
+            // Cập nhật mật khẩu nếu có
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
+                logger.info("Đang cập nhật mật khẩu mới cho người dùng");
+                systemUser.setPassword(passwordEncoder.encode(newPassword));
             }
             
-            customer.setName(name.trim());
-            customer.setPhone(phone != null ? phone.trim() : null);
-            customer.setAddress(address != null ? address.trim() : null);
-            customer.setCccd(cccd != null ? cccd.trim() : null);
-            customersRepository.save(customer);
+            // Lưu thông tin người dùng
+            systemUser = systemUserRepository.save(systemUser);
+            logger.info("Đã cập nhật thông tin hệ thống cho người dùng: {}", systemUser.getEmail());
+
+            // Nếu là khách hàng, cập nhật thông tin khách hàng
+            if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
+                boolean isNewCustomer = false;
+                
+                if (customer == null) {
+                    logger.info("Tạo mới thông tin khách hàng cho người dùng ID: {}", systemUser.getId());
+                    customer = new CustomersEntity();
+                    customer.setSystemUser(systemUser);
+                    isNewCustomer = true;
+                } else {
+                    logger.info("Cập nhật thông tin khách hàng hiện có");
+                }
+                
+                // Cập nhật thông tin khách hàng
+                customer.setName(name);
+                customer.setEmail(email);
+                customer.setPhone(phone != null && !phone.trim().isEmpty() ? phone.trim() : null);
+                customer.setAddress(address != null && !address.trim().isEmpty() ? address.trim() : null);
+                customer.setCccd(cccd != null && !cccd.trim().isEmpty() ? cccd.trim() : null);
+                
+                // Lưu thông tin khách hàng
+                customer = customersRepository.save(customer);
+                
+                if (isNewCustomer) {
+                    logger.info("Đã tạo mới thông tin khách hàng thành công");
+                } else {
+                    logger.info("Đã cập nhật thông tin khách hàng thành công");
+                }
+            }
+            
+            logger.info("Hoàn thành cập nhật thông tin cho người dùng ID: {}", systemUser.getId());
+        } catch (Exception e) {
+            logger.error("Lỗi khi cập nhật thông tin người dùng: {}", e.getMessage(), e);
+            throw new RuntimeException("Không thể cập nhật thông tin người dùng: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateAuthenticationContext(String newEmail, Authentication currentAuthentication) {
+        try {
+            // Lấy thông tin xác thực hiện tại
+            Object principal = currentAuthentication.getPrincipal();
+            Object credentials = currentAuthentication.getCredentials();
+            
+            // Kiểm tra và cast đúng loại CustomUserDetails
+            if (!(principal instanceof CustomUserDetails)) {
+                logger.error("Principal is not an instance of CustomUserDetails: {}", principal.getClass().getName());
+                throw new RuntimeException("Invalid principal type");
+            }
+            
+            CustomUserDetails currentUser = (CustomUserDetails) principal;
+            
+            // Tạo CustomUserDetails mới với thông tin đã cập nhật từ database
+            CustomUserDetails newPrincipal;
+            if (currentUser.isSystemUser()) {
+                // Lấy SystemUserEntity mới từ database với email đã cập nhật
+                SystemUserEntity updatedSystemUser = systemUserRepository.findByEmailIgnoreCase(newEmail)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy SystemUser với email: " + newEmail));
+                newPrincipal = new CustomUserDetails(updatedSystemUser);
+            } else {
+                // Lấy CustomersEntity mới từ database với email đã cập nhật
+                CustomersEntity updatedCustomer = customersRepository.findByEmailIgnoreCase(newEmail)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Customer với email: " + newEmail));
+                newPrincipal = new CustomUserDetails(updatedCustomer);
+            }
+            
+            // Tạo authentication mới
+            Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                newPrincipal, 
+                credentials, 
+                currentAuthentication.getAuthorities()
+            );
+            
+            // Giữ nguyên thông tin chi tiết xác thực
+            ((UsernamePasswordAuthenticationToken) newAuthentication).setDetails(
+                currentAuthentication.getDetails()
+            );
+            
+            // Cập nhật SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(newAuthentication);
+            
+            logger.info("Đã cập nhật authentication context với email mới: {}", newEmail);
+        } catch (Exception e) {
+            logger.error("Lỗi khi cập nhật authentication context:", e);
+            throw new RuntimeException("Không thể cập nhật thông tin xác thực", e);
         }
     }
 
@@ -274,11 +602,13 @@ public class ProfileController {
         Map<String, String> updatedData = new HashMap<>();
         if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER && customer != null) {
             updatedData.put("name", customer.getName());
+            updatedData.put("email", systemUser.getEmail());
             updatedData.put("phone", customer.getPhone() != null ? customer.getPhone() : "Chưa cập nhật");
             updatedData.put("address", customer.getAddress() != null ? customer.getAddress() : "Chưa cập nhật");
             updatedData.put("cccd", customer.getCccd() != null ? customer.getCccd() : "Chưa cập nhật");
         } else {
             updatedData.put("name", systemUser.getUsername());
+            updatedData.put("email", systemUser.getEmail());
             updatedData.put("phone", "Chưa cập nhật");
             updatedData.put("address", "Chưa cập nhật");
             updatedData.put("cccd", "Chưa cập nhật");
@@ -327,7 +657,6 @@ public class ProfileController {
         String originalFileName = file.getOriginalFilename();
         String cleanFileName = System.currentTimeMillis() + "_" + originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_");
         File dest = new File(uploadPath, cleanFileName);
-        System.out.println("Upload path: " + dest.getAbsolutePath()); // Log đường dẫn thực tế
         file.transferTo(dest);
         return cleanFileName;
     }

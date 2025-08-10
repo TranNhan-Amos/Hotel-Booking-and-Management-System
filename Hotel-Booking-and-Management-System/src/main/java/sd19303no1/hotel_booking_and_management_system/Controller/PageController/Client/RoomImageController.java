@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 @Controller
 public class RoomImageController {
 
-    private static final String ROOM_IMAGE_UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
+    private static final String ROOM_IMAGE_UPLOAD_DIR = System.getProperty("user.dir") + "/Hotel-Booking-and-Management-System/src/main/resources/static/img/rooms";
 
     @GetMapping("/img/rooms/{filename:.+}")
     @ResponseBody
@@ -66,7 +66,21 @@ public class RoomImageController {
                         .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000")
                         .body(resource);
                 } else {
-                    System.out.println("Default image not found either");
+                    System.out.println("Default image not found, using embedded default image");
+                    // Sử dụng hình ảnh mặc định từ classpath
+                    Path embeddedDefaultPath = Paths.get(System.getProperty("user.dir"), 
+                        "Hotel-Booking-and-Management-System", "src", "main", "resources", "static", "img", "rooms", "default-room.jpg");
+                    File embeddedDefaultFile = embeddedDefaultPath.toFile();
+                    
+                    if (embeddedDefaultFile.exists()) {
+                        Resource resource = new FileSystemResource(embeddedDefaultFile);
+                        return ResponseEntity.ok()
+                            .contentType(MediaType.IMAGE_JPEG)
+                            .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000")
+                            .body(resource);
+                    }
+                    
+                    System.out.println("No default image found anywhere");
                     // Return 404 if no default image
                     return ResponseEntity.notFound().build();
                 }

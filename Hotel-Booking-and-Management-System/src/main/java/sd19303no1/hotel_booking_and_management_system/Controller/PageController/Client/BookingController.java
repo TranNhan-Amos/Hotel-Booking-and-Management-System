@@ -414,13 +414,13 @@ public class BookingController {
     @PostMapping("/cancel-booking")
     @ResponseBody
     public Map<String, Object> cancelBooking(@RequestParam Integer bookingId,
-                                            @RequestParam(required = false) String reason) {
+                                            @RequestParam(required = false) String reason,
+                                            @RequestParam(required = false) String _csrf) {
         Map<String, Object> response = new HashMap<>();
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 response.put("success", false);
-                response.put("message", "Vui lòng đăng nhập");
                 return response;
             }
             
@@ -432,7 +432,6 @@ public class BookingController {
                 // Kiểm tra quyền hủy phòng
                 if (!currentUserEmail.equals(booking.getEmail())) {
                     response.put("success", false);
-                    response.put("message", "Bạn không có quyền hủy đặt phòng này");
                     return response;
                 }
                 
@@ -441,25 +440,19 @@ public class BookingController {
                     "COMPLETED".equals(booking.getStatus().getStatusName()) ||
                     "REFUNDED".equals(booking.getStatus().getStatusName())) {
                     response.put("success", false);
-                    response.put("message", "Không thể hủy đặt phòng ở trạng thái này");
                     return response;
                 }
                 
                 // Sử dụng service để hủy phòng
-                BookingOrderEntity cancelledBooking = bookingOrderService.cancelBooking(bookingId, reason);
+                bookingOrderService.cancelBooking(bookingId, reason != null ? reason : "");
                 
                 response.put("success", true);
-                response.put("message", "Hủy đặt phòng thành công! Số tiền hoàn lại: " + 
-                            (cancelledBooking.getRefundAmount() != null ? 
-                             cancelledBooking.getRefundAmount().toString() + " ₫" : "0 ₫"));
                 
             } else {
                 response.put("success", false);
-                response.put("message", "Không tìm thấy thông tin đặt phòng");
             }
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Có lỗi xảy ra khi hủy đặt phòng: " + e.getMessage());
         }
         return response;
     }
@@ -467,13 +460,13 @@ public class BookingController {
     // Yêu cầu hoàn tiền
     @PostMapping("/request-refund")
     @ResponseBody
-    public Map<String, Object> requestRefund(@RequestParam Integer bookingId) {
+    public Map<String, Object> requestRefund(@RequestParam Integer bookingId,
+                                            @RequestParam(required = false) String _csrf) {
         Map<String, Object> response = new HashMap<>();
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 response.put("success", false);
-                response.put("message", "Vui lòng đăng nhập");
                 return response;
             }
             
@@ -485,38 +478,30 @@ public class BookingController {
                 // Kiểm tra quyền
                 if (!currentUserEmail.equals(booking.getEmail())) {
                     response.put("success", false);
-                    response.put("message", "Bạn không có quyền yêu cầu hoàn tiền cho đặt phòng này");
                     return response;
                 }
                 
                 // Kiểm tra trạng thái
                 if (!"CANCELLED".equals(booking.getStatus().getStatusName())) {
                     response.put("success", false);
-                    response.put("message", "Chỉ có thể yêu cầu hoàn tiền cho đặt phòng đã hủy");
                     return response;
                 }
                 
                 if ("COMPLETED".equals(booking.getRefundStatus())) {
                     response.put("success", false);
-                    response.put("message", "Đã hoàn tiền cho đặt phòng này");
                     return response;
                 }
                 
                 // Xử lý hoàn tiền
-                BookingOrderEntity refundedBooking = bookingOrderService.processRefund(bookingId);
+                bookingOrderService.processRefund(bookingId);
                 
                 response.put("success", true);
-                response.put("message", "Hoàn tiền thành công! Số tiền: " + 
-                            (refundedBooking.getRefundAmount() != null ? 
-                             refundedBooking.getRefundAmount().toString() + " ₫" : "0 ₫"));
                 
             } else {
                 response.put("success", false);
-                response.put("message", "Không tìm thấy thông tin đặt phòng");
             }
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Có lỗi xảy ra khi xử lý hoàn tiền: " + e.getMessage());
         }
         return response;
     }
@@ -524,15 +509,44 @@ public class BookingController {
     // Xem chi tiết đặt phòng theo ID
     @GetMapping("/booking-detail/{bookingId}")
     public String bookingDetail(@PathVariable Integer bookingId, Model model) {
+        System.out.println("=== BOOKING DETAIL DEBUG: Booking ID " + bookingId + " ===");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("=== DEBUG: User not authenticated ===");
             return "redirect:/login";
         }
+        
+        String currentUserEmail = authentication.getName();
+        System.out.println("=== DEBUG: Current user email: " + currentUserEmail + " ===");
+        
         Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
         if (bookingOpt.isPresent()) {
             BookingOrderEntity booking = bookingOpt.get();
-            String currentUserEmail = authentication.getName();
-            if (currentUserEmail.equals(booking.getEmail())) {
+            System.out.println("=== DEBUG: Booking found - ID: " + booking.getBookingId() + 
+                             ", Email: " + booking.getEmail() + 
+                             ", Customer: " + (booking.getCustomer() != null ? booking.getCustomer().getName() : "NULL") + " ===");
+            
+            // Lấy customer của user hiện tại
+            CustomersEntity currentCustomer = customersService.findByEmail(currentUserEmail);
+            System.out.println("=== DEBUG: Current customer - ID: " + (currentCustomer != null ? currentCustomer.getCustomerId() : "NULL") + 
+                             ", Email: " + currentUserEmail + " ===");
+            
+            // Kiểm tra theo customer_id thay vì email
+            boolean hasAccess = false;
+            if (currentCustomer != null && booking.getCustomer() != null) {
+                hasAccess = currentCustomer.getCustomerId().equals(booking.getCustomer().getCustomerId());
+                System.out.println("=== DEBUG: Customer ID comparison - Current: " + currentCustomer.getCustomerId() + 
+                                 ", Booking: " + booking.getCustomer().getCustomerId() + 
+                                 ", Has Access: " + hasAccess + " ===");
+            } else {
+                // Fallback: kiểm tra email nếu customer_id không khớp
+                hasAccess = currentUserEmail.equals(booking.getEmail());
+                System.out.println("=== DEBUG: Email fallback - Current: " + currentUserEmail + 
+                                 ", Booking: " + booking.getEmail() + 
+                                 ", Has Access: " + hasAccess + " ===");
+            }
+            
+            if (hasAccess) {
                 model.addAttribute("booking", booking);
                 model.addAttribute("room", booking.getRoom());
                 // Truyền avatarPath
@@ -540,7 +554,7 @@ public class BookingController {
                 if (booking.getCustomer() != null && booking.getCustomer().getAvatar() != null && !booking.getCustomer().getAvatar().isEmpty()) {
                     avatarPath = "/img/customers/" + booking.getCustomer().getAvatar();
                 } else {
-                    avatarPath = "/img/customers/default-avatar.png";
+                    avatarPath = "/img/customers/default-avatar.svg";
                 }
                 model.addAttribute("avatarPath", avatarPath);
                 if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
@@ -548,10 +562,31 @@ public class BookingController {
                         booking.getCheckInDate(), booking.getCheckOutDate());
                     model.addAttribute("nights", nights);
                 }
+
+                // Flags cho UI: có thể hủy và có thể yêu cầu hoàn tiền
+                String statusName = booking.getStatus() != null ? booking.getStatus().getStatusName() : null;
+                boolean canCancel = statusName != null
+                    && ("PENDING".equals(statusName) || "CONFIRMED".equals(statusName))
+                    && booking.getCheckInDate() != null
+                    && !java.time.LocalDate.now().isAfter(booking.getCheckInDate());
+
+                boolean canRequestRefund = "CANCELLED".equals(statusName)
+                    && (booking.getRefundStatus() == null || !"COMPLETED".equals(booking.getRefundStatus()));
+
+                model.addAttribute("canCancel", canCancel);
+                model.addAttribute("canRequestRefund", canRequestRefund);
+
+                // Dự kiến số tiền hoàn lại theo chính sách (hiển thị tham khảo)
+                try {
+                    java.math.BigDecimal refundPreview = bookingOrderService.calculateRefundAmount(booking);
+                    model.addAttribute("refundPreview", refundPreview);
+                } catch (Exception ignored) {}
             } else {
+                System.out.println("=== DEBUG: Access denied - Current: " + currentUserEmail + ", Booking: " + booking.getEmail() + " ===");
                 model.addAttribute("error", "Bạn không có quyền xem thông tin đặt phòng này");
             }
         } else {
+            System.out.println("=== DEBUG: Booking not found for ID: " + bookingId + " ===");
             model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
         }
         return "Client/booking-detail";

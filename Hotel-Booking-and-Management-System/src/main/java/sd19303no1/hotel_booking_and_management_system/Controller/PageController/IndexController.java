@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class IndexController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
-    private static final String DEFAULT_AVATAR = "/img/customers/default-avatar.png";
+    private static final String DEFAULT_AVATAR = "/img/customers/default-avatar.svg";
 
     @Autowired
     private RoomRepository roomRepository;
@@ -68,30 +68,37 @@ public class IndexController extends BaseController {
             String email = authentication.getName();
             String avatarPath = null;
             try {
-                SystemUserEntity systemUser = systemUserRepository.findByEmail(email)
+                SystemUserEntity systemUser = systemUserRepository.findByEmailIgnoreCase(email)
                     .orElseThrow(() -> new IllegalStateException("User not found for email: " + email));
+                
+                logger.debug("Found systemUser: {} with role: {}", systemUser.getEmail(), systemUser.getRole());
                 
                 // Ưu tiên lấy avatar từ CustomersEntity nếu là CUSTOMER
                 if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
                     CustomersEntity customer = customersRepository.findBySystemUser(systemUser)
-                        .orElseGet(() -> customersRepository.findByEmail(email).orElse(null));
+                        .orElseGet(() -> customersRepository.findByEmailIgnoreCase(email).orElse(null));
+                    logger.debug("Found customer: {}", customer != null ? customer.getEmail() : "null");
                     if (customer != null && customer.getAvatar() != null && !customer.getAvatar().isEmpty()) {
                         avatarPath = "/img/customers/" + customer.getAvatar();
+                        logger.debug("Using customer avatar: {}", avatarPath);
                     }
                 }
                 
                 // Fallback lấy từ SystemUserEntity
                 if (avatarPath == null && systemUser.getImg() != null && !systemUser.getImg().isEmpty()) {
                     avatarPath = "/img/customers/" + systemUser.getImg();
+                    logger.debug("Using systemUser avatar: {}", avatarPath);
                 }
                 
                 // Nếu không có avatar, sử dụng ảnh mặc định
                 if (avatarPath == null) {
                     avatarPath = DEFAULT_AVATAR;
+                    logger.debug("Using default avatar: {}", avatarPath);
                 }
                 
                 logger.debug("Avatar path for user {}: {}", email, avatarPath);
                 session.setAttribute("avatarPath", avatarPath);
+                logger.debug("Session avatarPath set to: {}", session.getAttribute("avatarPath"));
                 
             } catch (Exception e) {
                 logger.error("Error fetching avatar for user {}: {}", email, e.getMessage());

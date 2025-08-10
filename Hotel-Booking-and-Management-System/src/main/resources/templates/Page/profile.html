@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Trang Cá Nhân - Grand Ocean</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/Css/profile.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .form-control:invalid {
+            border-color: #dc2626;
+        }
+    </style>
 </head>
-<body>
+<body class="profile-page">
     <div th:replace="~{Layout/narbar}"></div>
     
     <div class="app-container">
         <!-- Left Panel -->
         <div class="left-panel">
             <div class="profile-sidebar">
-                <!-- Profile Section -->
                 <div class="profile-avatar-section">
                     <div class="avatar-wrapper">
                         <div class="main-avatar">
@@ -40,24 +46,23 @@
                         <span th:text="${displayRole}">VIP Member</span>
                     </div>
                 </div>
-
-                <!-- Quick Actions -->
-                <div class="quick-actions">
-                    <a th:href="@{/profile/edit}" class="action-btn">
-                        <i class="fas fa-edit"></i>
-                        <span>Chỉnh sửa hồ sơ</span>
-                    </a>
-                    <button class="action-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>Đặt phòng mới</span>
-                    </button>
-                    <button class="action-btn">
-                        <i class="fas fa-download"></i>
-                        <span>Tải xuống dữ liệu</span>
-                    </button>
+                <div class="navigation-menu">
+                    <div class="nav-section">
+                        <div class="nav-title">Tài khoản</div>
+                        <div class="nav-item active" onclick="showSection('info', this)">
+                            <i class="fas fa-user"></i>
+                            <span>Thông tin cá nhân</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('security', this)">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Bảo mật</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('settings', this)">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- Mini Stats -->
                 <div class="stats-mini">
                     <div class="stat-row">
                         <span class="stat-label">Tổng đặt phòng</span>
@@ -76,35 +81,10 @@
                         <span class="stat-value">2021</span>
                     </div>
                 </div>
-
-                <!-- Navigation -->
-                <div class="navigation-menu">
-                    <div class="nav-section">
-                        <div class="nav-title">Tài khoản</div>
-                        <div class="nav-item active" onclick="showSection('info', this)">
-                            <i class="fas fa-user"></i>
-                            <span>Thông tin cá nhân</span>
-                        </div>
-                        <div class="nav-item" onclick="showSection('bookings', this)">
-                            <i class="fas fa-calendar"></i>
-                            <span>Lịch sử đặt phòng</span>
-                        </div>
-                        <div class="nav-item" onclick="showSection('security', this)">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Bảo mật</span>
-                        </div>
-                        <div class="nav-item" onclick="showSection('settings', this)">
-                            <i class="fas fa-cog"></i>
-                            <span>Cài đặt</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-
         <!-- Right Panel -->
         <div class="right-panel">
-            <!-- Header -->
             <div class="content-header">
                 <div class="header-top">
                     <div>
@@ -120,29 +100,25 @@
                             <i class="fas fa-search"></i>
                             <span>Tìm kiếm</span>
                         </button>
-                        <a th:href="@{/profile/edit}" class="header-btn primary">
+                        <button class="header-btn primary" onclick="togglePersonalInfoEditMode()">
                             <i class="fas fa-edit"></i>
                             <span>Chỉnh sửa</span>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Content Body -->
             <div class="content-body">
-                <!-- Personal Info Section -->
                 <div id="info" class="content-section active">
-                    <div class="widget-grid">
-                        <div class="widget">
-                            <div class="widget-header">
-                                <div class="widget-title">
-                                    <div class="widget-icon">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    Thông tin cơ bản
+                    <div class="widget" id="personalInfoWidget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-icon">
+                                    <i class="fas fa-user"></i>
                                 </div>
-                                <span class="widget-action">Chỉnh sửa</span>
+                                Thông tin cá nhân
                             </div>
+                        </div>
+                        <div id="personalInfoViewMode">
                             <div class="info-list">
                                 <div class="info-item">
                                     <span class="info-label">Họ và tên</span>
@@ -156,74 +132,106 @@
                                     <span class="info-label">Số điện thoại</span>
                                     <span class="info-value" th:text="${displayPhone}">Chưa cập nhật</span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="widget">
-                            <div class="widget-header">
-                                <div class="widget-title">
-                                    <div class="widget-icon">
-                                        <i class="fas fa-id-card"></i>
-                                    </div>
-                                    Giấy tờ tùy thân
-                                </div>
-                                <span class="widget-action">Cập nhật</span>
-                            </div>
-                            <div class="info-list">
-                                <div class="info-item">
-                                    <span class="info-label">Số CCCD</span>
-                                    <span class="info-value" th:text="${displayCccd}">Chưa cập nhật</span>
-                                </div>
                                 <div class="info-item">
                                     <span class="info-label">Địa chỉ</span>
                                     <span class="info-value" th:text="${displayAddress}">Chưa cập nhật</span>
                                 </div>
+                                <div class="info-item">
+                                    <span class="info-label">Số CCCD</span>
+                                    <span class="info-value" th:text="${displayCccd}">Chưa cập nhật</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="personalInfoEditMode" style="display: none;">
+                            <form id="updateInfoForm" onsubmit="updatePersonalInfo(event)">
+                                <div class="form-group">
+                                    <label for="fullName" class="form-label">Họ tên</label>
+                                    <input type="text" class="form-control" id="fullName" name="name" 
+                                           th:value="${displayName}" 
+                                           placeholder="Nhập họ và tên của bạn" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           th:value="${displayEmail}" 
+                                           placeholder="example@email.com" required 
+                                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                           title="Vui lòng nhập đúng định dạng email">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Số điện thoại</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           th:value="${displayPhone}" 
+                                           placeholder="0123456789">
+                                </div>
+                                <div class="form-group">
+                                    <label for="address" class="form-label">Địa chỉ</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3" 
+                                              th:text="${displayAddress}" 
+                                              placeholder="Nhập địa chỉ của bạn"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cccd" class="form-label">Số CCCD</label>
+                                    <input type="text" class="form-control" id="cccd" name="cccd" 
+                                           th:value="${displayCccd}" 
+                                           placeholder="123456789012">
+                                </div>
+                                <div class="form-group" id="currentPasswordGroup" style="display: none;">
+                                    <label for="currentPasswordForInfo" class="form-label">
+                                        <i class="fas fa-shield-alt mr-2 text-orange-500"></i>
+                                        Mật khẩu hiện tại (yêu cầu để thay đổi email)
+                                    </label>
+                                    <input type="password" class="form-control" id="currentPasswordForInfo" name="currentPassword">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Chỉ cần nhập mật khẩu khi thay đổi email
+                                    </small>
+                                </div>
+                                <div style="text-align: right; display: flex; gap: 1rem; justify-content: flex-end;">
+                                    <button type="button" class="btn btn-secondary" onclick="togglePersonalInfoEditMode()">
+                                        <i class="fas fa-times"></i>
+                                        Hủy
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i>
+                                        Cập nhật thông tin
+                                    </button>
+                                </div>
+                            </form>
+                            <div class="widget" style="margin-top: 2rem;">
+                                <div class="widget-header">
+                                    <div class="widget-title">
+                                        <div class="widget-icon">
+                                            <i class="fas fa-key"></i>
+                                        </div>
+                                        Đổi mật khẩu
+                                    </div>
+                                </div>
+                                <form id="changePasswordForm" onsubmit="changePassword(event)">
+                                    <input type="hidden" name="name" th:value="${displayName}">
+                                    <div class="form-group">
+                                        <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmNewPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="confirmNewPassword" name="confirmPassword" required>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-lock"></i>
+                                            Đổi mật khẩu
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Bookings Section -->
-                <!-- <div id="bookings" class="content-section">
-                    <div class="booking-grid">
-                        <div th:if="${bookings != null and #lists.isEmpty(bookings)}" class="no-booking-msg">
-                            <p>Bạn chưa có lịch sử đặt phòng nào.</p>
-                        </div>
-                        <div th:each="booking : ${bookings}" class="booking-card">
-                            <div class="booking-header">
-                                <div class="booking-id">#BK<span th:text="${booking.bookingId}">0000</span></div>
-                                <div class="booking-dates">
-                                    <span th:text="${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">--/--/----</span>
-                                    -
-                                    <span th:text="${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">--/--/----</span>
-                                    •
-                                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate)}">0</span> đêm
-                                </div>
-                            </div>
-                            <div class="booking-body">
-                                <div class="booking-room">
-                                    <div class="room-thumbnail">
-                                        <i class="fas fa-bed"></i>
-                                    </div>
-                                    <div class="room-info">
-                                        <h4 th:text="${booking.room != null ? booking.room.type.description : 'N/A'}">Loại phòng</h4>
-                                        <p>
-                                            <span th:text="${booking.room != null ? booking.room.roomNumber : 'N/A'}">Phòng</span>
-                                            • <span th:text="${booking.roomQuantity}">1</span> phòng
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="booking-footer">
-                                    <span class="booking-status" th:text="${booking.status != null ? booking.status.statusName : 'N/A'}">Trạng thái</span>
-                                    <span class="booking-price" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
-                                    <a th:href="@{'/booking-detail/' + ${booking.bookingId}}" class="booking-detail-link" style="margin-left:10px; color:#2563eb; text-decoration:underline; font-weight:500;">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- Security Section -->
                 <div id="security" class="content-section">
                     <div class="security-grid">
                         <div class="security-card">
@@ -242,7 +250,6 @@
                                 </ul>
                             </div>
                         </div>
-
                         <div class="security-card">
                             <div class="security-header">
                                 <div class="security-icon">
@@ -259,7 +266,6 @@
                                 </ul>
                             </div>
                         </div>
-
                         <div class="security-card">
                             <div class="security-header">
                                 <div class="security-icon">
@@ -276,7 +282,6 @@
                                 </ul>
                             </div>
                         </div>
-
                         <div class="security-card">
                             <div class="security-header">
                                 <div class="security-icon">
@@ -296,8 +301,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Settings Section -->
                 <div id="settings" class="content-section">
                     <div class="settings-grid">
                         <div class="setting-card">
@@ -332,7 +335,6 @@
                                 <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
                             </div>
                         </div>
-
                         <div class="setting-card">
                             <div class="setting-header">
                                 <h3 class="setting-title">
@@ -364,7 +366,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="setting-card">
                             <div class="setting-header">
                                 <h3 class="setting-title">
@@ -388,8 +389,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Mobile Navigation -->
     <div class="mobile-nav">
         <div class="mobile-nav-items">
             <div class="mobile-nav-item active" onclick="showSection('info', this)">
@@ -410,76 +409,335 @@
             </div>
         </div>
     </div>
-
     <div id="toast" class="toast">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-check-circle" style="color: #10b981;"></i>
+            <i id="toast-icon" class="fas fa-check-circle" style="color: #10b981;"></i>
             <span id="toast-message">Cài đặt đã được cập nhật!</span>
         </div>
     </div>
-
     <script>
-        // Tab switching with animation - Giữ nguyên từ code gốc
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
         function showSection(sectionName, element) {
-            // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
-            
-            // Remove active class from all nav items
             document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
-            // Show selected section
             document.getElementById(sectionName).classList.add('active');
             element.classList.add('active');
-            
-            // Update page title and breadcrumb
             const titles = {
                 'info': 'Thông tin cá nhân',
                 'bookings': 'Lịch sử đặt phòng',
                 'security': 'Bảo mật',
                 'settings': 'Cài đặt'
             };
-            
             document.getElementById('pageTitle').textContent = titles[sectionName];
             document.getElementById('breadcrumbCurrent').textContent = titles[sectionName];
         }
 
-        // Avatar upload function - Giữ nguyên từ code gốc
+        function togglePersonalInfoEditMode() {
+            const viewMode = document.getElementById('personalInfoViewMode');
+            const editMode = document.getElementById('personalInfoEditMode');
+            const editButton = document.querySelector('.header-btn.primary');
+            
+            // Nếu đang ở chế độ chỉnh sửa và người dùng bấm hủy
+            if (viewMode.style.display === 'none') {
+                // Kiểm tra xem có thay đổi nào không
+                const form = document.getElementById('updateInfoForm');
+                const formData = new FormData(form);
+                let hasChanges = false;
+                
+                // Lấy giá trị hiện tại từ form
+                const currentValues = {
+                    name: document.querySelector('.info-list .info-item:nth-child(1) .info-value').textContent.trim(),
+                    email: document.querySelector('.info-list .info-item:nth-child(2) .info-value').textContent.trim(),
+                    phone: (document.querySelector('.info-list .info-item:nth-child(3) .info-value').textContent.trim() === 'Chưa cập nhật' ? '' : document.querySelector('.info-list .info-item:nth-child(3) .info-value').textContent.trim()),
+                    address: (document.querySelector('.info-list .info-item:nth-child(4) .info-value').textContent.trim() === 'Chưa cập nhật' ? '' : document.querySelector('.info-list .info-item:nth-child(4) .info-value').textContent.trim()),
+                    cccd: (document.querySelector('.info-list .info-item:nth-child(5) .info-value').textContent.trim() === 'Chưa cập nhật' ? '' : document.querySelector('.info-list .info-item:nth-child(5) .info-value').textContent.trim())
+                };
+                
+                // So sánh với giá trị trong form
+                if (formData.get('name') !== currentValues.name ||
+                    formData.get('email') !== currentValues.email ||
+                    formData.get('phone') !== currentValues.phone ||
+                    formData.get('address') !== currentValues.address ||
+                    formData.get('cccd') !== currentValues.cccd) {
+                    hasChanges = true;
+                }
+                
+                // Nếu có thay đổi, hiển thị xác nhận
+                if (hasChanges && !confirm('Bạn có chắc muốn hủy bỏ các thay đổi chưa lưu?')) {
+                    return false;
+                }
+                
+                // Chuyển về chế độ xem
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
+                editButton.innerHTML = '<i class="fas fa-edit"></i><span>Chỉnh sửa</span>';
+                editButton.classList.remove('editing');
+            } else {
+                // Switching to edit mode - Thêm hiệu ứng loading
+                const originalButtonHtml = editButton.innerHTML;
+                editButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Đang tải...</span>';
+                editButton.disabled = true;
+                
+                // Sử dụng setTimeout để đảm bảo UI được cập nhật trước khi thực hiện các tác vụ nặng
+                setTimeout(() => {
+                    try {
+                        // Pre-fill form with current values from display
+                        const currentName = document.querySelector('.info-list .info-item:nth-child(1) .info-value').textContent;
+                        const currentEmail = document.querySelector('.info-list .info-item:nth-child(2) .info-value').textContent;
+                        const currentPhone = document.querySelector('.info-list .info-item:nth-child(3) .info-value').textContent;
+                        const currentAddress = document.querySelector('.info-list .info-item:nth-child(4) .info-value').textContent;
+                        const currentCccd = document.querySelector('.info-list .info-item:nth-child(5) .info-value').textContent;
+                        
+                        // Update form fields
+                        document.getElementById('fullName').value = currentName !== 'Chưa cập nhật' ? currentName : '';
+                        document.getElementById('email').value = currentEmail !== 'Chưa cập nhật' ? currentEmail : '';
+                        document.getElementById('phone').value = currentPhone !== 'Chưa cập nhật' ? currentPhone : '';
+                        document.getElementById('address').value = currentAddress !== 'Chưa cập nhật' ? currentAddress : '';
+                        document.getElementById('cccd').value = currentCccd !== 'Chưa cập nhật' ? currentCccd : '';
+                        
+                        // Clear password field
+                        document.getElementById('currentPasswordForInfo').value = '';
+                        
+                        // Hiển thị form chỉnh sửa
+                        viewMode.style.display = 'none';
+                        editMode.style.display = 'block';
+                        editButton.innerHTML = '<i class="fas fa-times"></i><span>Hủy</span>';
+                        editButton.classList.add('editing');
+                        
+                        // Focus vào trường đầu tiên
+                        document.getElementById('fullName').focus();
+                    } catch (error) {
+                        console.error('Lỗi khi chuyển sang chế độ chỉnh sửa:', error);
+                        showToast('error', 'Có lỗi xảy ra khi tải dữ liệu');
+                    } finally {
+                        editButton.disabled = false;
+                    }
+                }, 50);
+            }
+        }
+
+        // Function to check if email is being changed and show/hide password field
+        function checkEmailChange() {
+            const emailInput = document.getElementById('email');
+            const passwordGroup = document.getElementById('currentPasswordGroup');
+            const passwordInput = document.getElementById('currentPasswordForInfo');
+            
+            if (!emailInput || !passwordGroup) return;
+            
+            const originalEmail = emailInput.getAttribute('th:value') || emailInput.defaultValue;
+            const newEmail = emailInput.value;
+            
+            if (newEmail !== originalEmail) {
+                passwordGroup.style.display = 'block';
+                passwordInput.required = true;
+            } else {
+                passwordGroup.style.display = 'none';
+                passwordInput.required = false;
+                passwordInput.value = '';
+            }
+        }
+
+        function updatePersonalInfo(event) {
+            event.preventDefault();
+            const form = document.getElementById('updateInfoForm');
+            const nameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const addressInput = document.getElementById('address');
+            const cccdInput = document.getElementById('cccd');
+            const currentPasswordInput = document.getElementById('currentPasswordForInfo');
+            
+            // Basic validation
+            if (!nameInput.value.trim()) {
+                showToast('error', 'Họ tên không được để trống!');
+                nameInput.focus();
+                return;
+            }
+            
+            // Validate name length
+            if (nameInput.value.trim().length < 2) {
+                showToast('error', 'Họ tên phải có ít nhất 2 ký tự!');
+                nameInput.focus();
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailInput.value.match(emailRegex)) {
+                showToast('error', 'Email không hợp lệ! Vui lòng nhập đúng định dạng email.');
+                emailInput.focus();
+                return;
+            }
+            
+            // Email validation is already done above, no need for additional confirmation
+            
+            // Validate phone number
+            if (phoneInput.value && !phoneInput.value.match(/^[0-9]{10,11}$/)) {
+                showToast('error', 'Số điện thoại không hợp lệ! (10-11 chữ số)');
+                phoneInput.focus();
+                return;
+            }
+            
+            // Validate CCCD
+            if (cccdInput.value && !cccdInput.value.match(/^[0-9]{12}$/)) {
+                showToast('error', 'Số CCCD không hợp lệ! (12 chữ số)');
+                cccdInput.focus();
+                return;
+            }
+            
+            // Check if email is being changed
+            const originalEmail = emailInput.getAttribute('th:value') || emailInput.defaultValue;
+            const isEmailChanged = emailInput.value !== originalEmail;
+            
+            // Only require password if email is being changed
+            if (isEmailChanged && !currentPasswordInput.value) {
+                showToast('error', 'Vui lòng nhập mật khẩu hiện tại để thay đổi email!');
+                currentPasswordInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang cập nhật...';
+            submitButton.disabled = true;
+
+            const formData = new FormData(form);
+            fetch('/update-profile', {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken },
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    showToast('error', 'Phiên đăng nhập đã hết hạn! Vui lòng đăng nhập lại.');
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    showToast(data.success ? 'success' : 'error', data.message || 'Cập nhật thông tin thành công!');
+                    if (data.success) {
+                        // Update display values
+                        document.querySelector('.profile-name').textContent = data.data.name;
+                        document.querySelector('.profile-email').textContent = data.data.email;
+                        document.querySelector('.info-list .info-item:nth-child(1) .info-value').textContent = data.data.name;
+                        document.querySelector('.info-list .info-item:nth-child(2) .info-value').textContent = data.data.email;
+                        document.querySelector('.info-list .info-item:nth-child(3) .info-value').textContent = data.data.phone || 'Chưa cập nhật';
+                        document.querySelector('.info-list .info-item:nth-child(4) .info-value').textContent = data.data.address || 'Chưa cập nhật';
+                        document.querySelector('.info-list .info-item:nth-child(5) .info-value').textContent = data.data.cccd || 'Chưa cập nhật';
+                        
+                        // Switch back to view mode
+                        togglePersonalInfoEditMode();
+                        
+                        // Clear password field for security
+                        document.getElementById('currentPasswordForInfo').value = '';
+                    }
+                }
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    showToast('error', 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.');
+                } else if (error.response) {
+                    // Lỗi từ phản hồi HTTP (như 4xx, 5xx)
+                    showToast('error', `Lỗi máy chủ: ${error.response.status} - ${error.response.statusText}`);
+                } else if (error.request) {
+                    // Yêu cầu đã được gửi nhưng không nhận được phản hồi
+                    showToast('error', 'Không nhận được phản hồi từ máy chủ. Vui lòng thử lại sau.');
+                } else {
+                    // Lỗi khác
+                    showToast('error', 'Có lỗi xảy ra khi cập nhật thông tin');
+                }
+            });
+        }
+
+        function changePassword(event) {
+            event.preventDefault();
+            const form = document.getElementById('changePasswordForm');
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            if (newPassword !== confirmPassword) {
+                showToast('error', 'Mật khẩu xác nhận không khớp!');
+                return;
+            }
+            if (newPassword.length < 6) {
+                showToast('error', 'Mật khẩu mới phải có ít nhất 6 ký tự!');
+                return;
+            }
+            const formData = new FormData(form);
+            fetch('/update-profile', {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken },
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    showToast('error', 'Phiên đăng nhập đã hết hạn! Vui lòng đăng nhập lại.');
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    showToast(data.success ? 'success' : 'error', data.message || 'Đổi mật khẩu thành công!');
+                    if (data.success) {
+                        form.reset();
+                    }
+                }
+            })
+            .catch(error => {
+                showToast('error', 'Có lỗi xảy ra khi đổi mật khẩu');
+                console.error('Error:', error);
+            });
+        }
+
         function uploadAvatar(input) {
             const file = input.files[0];
             if (!file) return;
-
-            // Validate file type
             if (!file.type.startsWith('image/')) {
                 showToast('error', 'Chỉ chấp nhận file ảnh (JPG, PNG, GIF)');
                 return;
             }
-
-            // Validate file size (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 showToast('error', 'Kích thước file không được vượt quá 5MB');
                 return;
             }
-
             const formData = new FormData();
             formData.append('file', file);
-
-            fetch('/upload-avatar', {
+            fetch('/profile/upload-avatar', {
                 method: 'POST',
+                headers: { [csrfHeader]: csrfToken },
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 401) {
+                    showToast('error', 'Phiên đăng nhập đã hết hạn! Vui lòng đăng nhập lại.');
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                    return;
+                }
+                return response.json();
+            })
             .then(data => {
-                showToast(data.success ? 'success' : 'error', data.message);
-                
-                if (data.success) {
-                    // Reload page to show new avatar
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                if (data) {
+                    showToast(data.success ? 'success' : 'error', data.message);
+                    if (data.success) {
+                        document.querySelector('.main-avatar img').src = data.avatarPath;
+                    }
                 }
             })
             .catch(error => {
@@ -488,24 +746,32 @@
             });
         }
 
-        // Delete avatar function - Giữ nguyên từ code gốc
         function deleteAvatar() {
             if (!confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?')) {
                 return;
             }
-
             fetch('/delete-avatar', {
-                method: 'DELETE'
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 401) {
+                    showToast('error', 'Phiên đăng nhập đã hết hạn! Vui lòng đăng nhập lại.');
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                    return;
+                }
+                return response.json();
+            })
             .then(data => {
-                showToast(data.success ? 'success' : 'error', data.message);
-                
-                if (data.success) {
-                    // Reload page to show default avatar
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                if (data) {
+                    showToast(data.success ? 'success' : 'error', data.message);
+                    if (data.success) {
+                        const avatarWrapper = document.querySelector('.main-avatar');
+                        avatarWrapper.querySelector('img')?.remove();
+                        const initialsDiv = document.createElement('div');
+                        initialsDiv.textContent = document.querySelector('.profile-name').textContent.substring(0, 2).toUpperCase();
+                        avatarWrapper.prepend(initialsDiv);
+                    }
                 }
             })
             .catch(error => {
@@ -514,68 +780,71 @@
             });
         }
 
-        // Toggle setting function - Giữ nguyên từ code gốc
         function toggleSetting(element) {
             element.classList.toggle('active');
             showToast('success', 'Cài đặt đã được cập nhật!');
         }
 
-        // Toast notification function - Giữ nguyên từ code gốc
         function showToast(type, message) {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
-            
+            const toastIcon = document.getElementById('toast-icon');
             toastMessage.textContent = message;
+            toastIcon.className = `fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`;
+            toastIcon.style.color = type === 'success' ? '#10b981' : '#ef4444';
             toast.className = `toast ${type} show`;
-            
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
 
-        // Theme toggle function
         function toggleTheme(element) {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
             document.documentElement.setAttribute('data-theme', newTheme);
             element.classList.toggle('active');
-            
-            // Save theme preference
             localStorage.setItem('theme', newTheme);
-            
             showToast('success', `Đã chuyển sang chế độ ${newTheme === 'dark' ? 'tối' : 'sáng'}!`);
         }
 
-        // Initialize theme on page load
         function initializeTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             const themeToggle = document.getElementById('theme-toggle');
-            
             document.documentElement.setAttribute('data-theme', savedTheme);
-            
             if (savedTheme === 'dark' && themeToggle) {
                 themeToggle.classList.add('active');
             }
         }
 
-        // Tự động chuyển tab nếu có ?tab=bookings trên URL
-        function getQueryParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
-        }
         document.addEventListener('DOMContentLoaded', function() {
             initializeTheme();
             const tab = getQueryParam('tab');
             if (tab && document.getElementById(tab)) {
-                // Tìm nav-item tương ứng
                 const nav = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent.trim().includes('Lịch sử đặt phòng'));
                 if (tab === 'bookings' && nav) {
                     showSection('bookings', nav);
                 }
             }
+            
+            // Add email input listener
+            const emailInput = document.getElementById('email');
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    // Check if email is being changed and show/hide password field
+                    checkEmailChange();
+                });
+                
+                // Also check on blur
+                emailInput.addEventListener('blur', checkEmailChange);
+            }
+            
             console.log('Grand Ocean Hotel Profile Page Loaded');
         });
+
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
     </script>
 </body>
 </html>

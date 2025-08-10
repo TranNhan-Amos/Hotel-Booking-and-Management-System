@@ -223,9 +223,9 @@
                              th:src="@{'/img/rooms/' + ${room.imageUrls[0]}}"
                              th:alt="${room.nameNumber}"
                              class="w-full h-48 object-cover image-hover"
-                             onerror="this.src='/img/rooms/default.jpg'"/>
-                        <img th:unless="${not #lists.isEmpty(room.imageUrls)}"
-                             src="/img/rooms/default.jpg"
+                             onerror="this.src='/img/rooms/default-room.jpg'"/>
+                        <img th:unless="${not #lists.isEmpty(room.imageUrls)}" 
+                             src="/img/rooms/default-room.jpg"
                              th:alt="${room.nameNumber}"
                              class="w-full h-48 object-cover image-hover"/>
                         

@@ -50,7 +50,7 @@ public class SecurityConfig {
                     "/upload-avatar", "/upload-room-images", "/update-profile",
                     "/payment", "/process-payment", "/payment-success",
                     "/historybooking", "/feedbackuser", "/Waller",
-                    "/book-room", "/cancel-booking", "/request-refund", "/delete-avatar", 
+                    "/book-room", "/cancel-booking", "/history/cancel-booking", "/request-refund", "/wallet/process-refund", "/wallet/withdraw-refund", "/wallet/topup", "/delete-avatar", 
                     "/delete-room-image"
                 ).hasRole("CUSTOMER")
                 
@@ -108,7 +108,7 @@ public class SecurityConfig {
                     "/admin/rooms/save", "/admin/rooms/update-status",
                     "/admin/reports/summary", "/admin/reports/daily", "/admin/reports/weekly", "/admin/reports/monthly", "/admin/reports/top-rooms", "/admin/reports/top-customers",
                     "/upload-avatar", "/upload-room-images", "/update-profile", "/profile/upload-avatar", "/profile/update",
-                    "/book-room", "/cancel-booking", "/process-booking",
+                    "/book-room", "/cancel-booking", "/history/cancel-booking", "/process-booking",
                     "/partner/rooms/add", "/partner/rooms/edit",
                     "/partner/settings/update",
                     "/payment", "/process-payment",

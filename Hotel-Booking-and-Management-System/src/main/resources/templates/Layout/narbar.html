@@ -75,7 +75,7 @@
                         <div class="dropdown-menu" id="dropdown-menu">
                             <div class="dropdown-header">
                                 <div class="dropdown-user-name" id="dropdown-user-name" th:text="${currentUser != null ? currentUser.name : #authentication.principal.username}">Nguyễn Văn An</div>
-                                <div class="dropdown-user-email" id="dropdown-user-email" th:text="${currentUser != null ? currentUser.email : #authentication.principal.email}">nguyenvanan@example.com</div>
+                                <div class="dropdown-user-email" id="dropdown-user-email" th:text="${displayEmail != null ? displayEmail : (currentUser != null ? currentUser.email : #authentication.principal.email)}">nguyenvanan@example.com</div>
                             </div>
 
                             <div class="dropdown-section">

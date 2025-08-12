@@ -1,6 +1,7 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController.Admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,8 @@ public class AdminManagementRoomController {
     @Autowired
     private RoomRepository roomRepository;
 
-    private static final String ROOM_IMAGE_UPLOAD_DIR = "F:/Githup/DUANTOTNGHIEP/Hotel-Booking-and-Management-System/Hotel-Booking-and-Management-System/src/main/resources/static/img/rooms";
+    @Value("${app.upload.room-images:${user.dir}/Hotel-Booking-and-Management-System/src/main/resources/static/img/rooms}")
+    private String roomImageUploadDir;
 
     @GetMapping("/admin/rooms")
     public String viewRoomManagementPage(
@@ -243,7 +245,7 @@ public class AdminManagementRoomController {
                         if (Integer.parseInt(idx) == i) {
                             isDeleted = true;
                             String fileName = existingImages.get(i);
-                            File file = new File(ROOM_IMAGE_UPLOAD_DIR, fileName);
+                            File file = new File(roomImageUploadDir, fileName);
                             if (file.exists()) {
                                 try {
                                     if (!file.delete()) {
@@ -270,10 +272,13 @@ public class AdminManagementRoomController {
             logger.info("Can add {} more images, current images: {}", canAdd, finalImages.size());
             
             if (roomImages != null && roomImages.length > 0 && canAdd > 0) {
-                File uploadDir = new File(ROOM_IMAGE_UPLOAD_DIR);
+                File uploadDir = new File(roomImageUploadDir);
+                logger.info("Upload directory path: {}", uploadDir.getAbsolutePath());
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                     logger.info("Created upload directory: {}", uploadDir.getAbsolutePath());
+                } else {
+                    logger.info("Upload directory already exists: {}", uploadDir.getAbsolutePath());
                 }
                 int added = 0;
                 for (MultipartFile file : roomImages) {
@@ -284,13 +289,20 @@ public class AdminManagementRoomController {
                                 : "";
                         String cleanFileName = UUID.randomUUID().toString() + extension;
                         File dest = new File(uploadDir, cleanFileName);
+                        logger.info("Attempting to save file to: {}", dest.getAbsolutePath());
                         try {
                             file.transferTo(dest);
-                            finalImages.add(cleanFileName);
-                            added++;
-                            logger.info("Uploaded image: {} -> {}", originalFileName, cleanFileName);
+                            if (dest.exists()) {
+                                finalImages.add(cleanFileName);
+                                added++;
+                                logger.info("Successfully uploaded image: {} -> {} (Size: {} bytes)", 
+                                           originalFileName, cleanFileName, dest.length());
+                            } else {
+                                logger.error("File was not created after transfer: {}", dest.getAbsolutePath());
+                            }
                         } catch (IOException e) {
                             logger.error("Error uploading image {}: {}", originalFileName, e.getMessage());
+                            logger.error("Destination path: {}", dest.getAbsolutePath());
                         }
                     }
                 }
@@ -375,7 +387,7 @@ public class AdminManagementRoomController {
                 List<String> images = room.getImageUrls();
                 if (images != null) {
                     for (String imageName : images) {
-                        File imageFile = new File(ROOM_IMAGE_UPLOAD_DIR, imageName);
+                        File imageFile = new File(roomImageUploadDir, imageName);
                         if (imageFile.exists()) {
                             imageFile.delete();
                         }

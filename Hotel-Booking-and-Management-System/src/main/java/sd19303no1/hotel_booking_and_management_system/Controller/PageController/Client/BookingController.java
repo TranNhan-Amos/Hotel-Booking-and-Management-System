@@ -506,12 +506,12 @@ public class BookingController {
         return response;
     }
 
-    // Xem chi tiết đặt phòng theo ID
+    // Xem chi tiết lịch sử đặt phòng theo ID (chỉ xem thông tin, không có chức năng đặt phòng)
     @GetMapping("/booking-detail/{bookingId}")
     public String bookingDetail(@PathVariable Integer bookingId, Model model) {
-        System.out.println("=== BOOKING DETAIL DEBUG: Booking ID " + bookingId + " ===");
+        System.out.println("=== BOOKING HISTORY DETAIL VIEW: Booking ID " + bookingId + " ===");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
             System.out.println("=== DEBUG: User not authenticated ===");
             return "redirect:/login";
         }
@@ -519,27 +519,34 @@ public class BookingController {
         String currentUserEmail = authentication.getName();
         System.out.println("=== DEBUG: Current user email: " + currentUserEmail + " ===");
         
+        // Lấy customer từ email để có customer ID (theo memory về booking history system)
+        CustomersEntity currentCustomer = customersService.findByEmail(currentUserEmail);
+        if (currentCustomer == null) {
+            System.out.println("=== DEBUG: Customer not found for email: " + currentUserEmail + " ===");
+            model.addAttribute("error", "Không tìm thấy thông tin khách hàng. Vui lòng kiểm tra tài khoản.");
+            return "Page/BookingDetail";
+        }
+        
+        Integer customerId = currentCustomer.getCustomerId();
+        System.out.println("=== DEBUG: Found customer ID: " + customerId + " ===");
+        
+        // Lấy thông tin booking từ lịch sử đặt phòng của customer
         Optional<BookingOrderEntity> bookingOpt = bookingOrderService.findBookingByIdForAdmin(bookingId);
         if (bookingOpt.isPresent()) {
             BookingOrderEntity booking = bookingOpt.get();
             System.out.println("=== DEBUG: Booking found - ID: " + booking.getBookingId() + 
-                             ", Email: " + booking.getEmail() + 
+                             ", Status: " + (booking.getStatus() != null ? booking.getStatus().getStatusName() : "NULL") + 
                              ", Customer: " + (booking.getCustomer() != null ? booking.getCustomer().getName() : "NULL") + " ===");
             
-            // Lấy customer của user hiện tại
-            CustomersEntity currentCustomer = customersService.findByEmail(currentUserEmail);
-            System.out.println("=== DEBUG: Current customer - ID: " + (currentCustomer != null ? currentCustomer.getCustomerId() : "NULL") + 
-                             ", Email: " + currentUserEmail + " ===");
-            
-            // Kiểm tra theo customer_id thay vì email
+            // Kiểm tra quyền truy cập theo customer_id (theo memory về fixing booking history)
             boolean hasAccess = false;
-            if (currentCustomer != null && booking.getCustomer() != null) {
-                hasAccess = currentCustomer.getCustomerId().equals(booking.getCustomer().getCustomerId());
-                System.out.println("=== DEBUG: Customer ID comparison - Current: " + currentCustomer.getCustomerId() + 
+            if (booking.getCustomer() != null) {
+                hasAccess = customerId.equals(booking.getCustomer().getCustomerId());
+                System.out.println("=== DEBUG: Customer ID comparison - Current: " + customerId + 
                                  ", Booking: " + booking.getCustomer().getCustomerId() + 
                                  ", Has Access: " + hasAccess + " ===");
             } else {
-                // Fallback: kiểm tra email nếu customer_id không khớp
+                // Fallback: kiểm tra email nếu customer không tồn tại
                 hasAccess = currentUserEmail.equals(booking.getEmail());
                 System.out.println("=== DEBUG: Email fallback - Current: " + currentUserEmail + 
                                  ", Booking: " + booking.getEmail() + 
@@ -547,49 +554,54 @@ public class BookingController {
             }
             
             if (hasAccess) {
+                // Chỉ truyền thông tin để hiển thị, không có logic đặt phòng
                 model.addAttribute("booking", booking);
                 model.addAttribute("room", booking.getRoom());
-                // Truyền avatarPath
-                String avatarPath = null;
-                if (booking.getCustomer() != null && booking.getCustomer().getAvatar() != null && !booking.getCustomer().getAvatar().isEmpty()) {
-                    avatarPath = "/img/customers/" + booking.getCustomer().getAvatar();
-                } else {
-                    avatarPath = "/img/customers/default-avatar.svg";
-                }
-                model.addAttribute("avatarPath", avatarPath);
+                model.addAttribute("customer", booking.getCustomer());
+                
+                // Tính số đêm để hiển thị
                 if (booking.getCheckInDate() != null && booking.getCheckOutDate() != null) {
                     long nights = java.time.temporal.ChronoUnit.DAYS.between(
                         booking.getCheckInDate(), booking.getCheckOutDate());
                     model.addAttribute("nights", nights);
                 }
 
-                // Flags cho UI: có thể hủy và có thể yêu cầu hoàn tiền
+                // Chỉ hiển thị các action phù hợp với trạng thái booking đã tồn tại
                 String statusName = booking.getStatus() != null ? booking.getStatus().getStatusName() : null;
+                
+                // Chỉ cho phép hủy nếu booking chưa bắt đầu và đang ở trạng thái có thể hủy
                 boolean canCancel = statusName != null
                     && ("PENDING".equals(statusName) || "CONFIRMED".equals(statusName))
                     && booking.getCheckInDate() != null
                     && !java.time.LocalDate.now().isAfter(booking.getCheckInDate());
 
+                // Chỉ cho phép yêu cầu hoàn tiền nếu đã hủy nhưng chưa hoàn tiền
                 boolean canRequestRefund = "CANCELLED".equals(statusName)
                     && (booking.getRefundStatus() == null || !"COMPLETED".equals(booking.getRefundStatus()));
 
                 model.addAttribute("canCancel", canCancel);
                 model.addAttribute("canRequestRefund", canRequestRefund);
 
-                // Dự kiến số tiền hoàn lại theo chính sách (hiển thị tham khảo)
-                try {
-                    java.math.BigDecimal refundPreview = bookingOrderService.calculateRefundAmount(booking);
-                    model.addAttribute("refundPreview", refundPreview);
-                } catch (Exception ignored) {}
+                // Hiển thị thông tin hoàn tiền dự kiến (chỉ để tham khảo)
+                if (canRequestRefund || "CANCELLED".equals(statusName)) {
+                    try {
+                        java.math.BigDecimal refundPreview = bookingOrderService.calculateRefundAmount(booking);
+                        model.addAttribute("refundPreview", refundPreview);
+                    } catch (Exception e) {
+                        System.out.println("=== DEBUG: Cannot calculate refund preview: " + e.getMessage() + " ===");
+                    }
+                }
+                
+                System.out.println("=== DEBUG: Successfully loaded booking detail for viewing ===");
             } else {
-                System.out.println("=== DEBUG: Access denied - Current: " + currentUserEmail + ", Booking: " + booking.getEmail() + " ===");
+                System.out.println("=== DEBUG: Access denied - User does not own this booking ===");
                 model.addAttribute("error", "Bạn không có quyền xem thông tin đặt phòng này");
             }
         } else {
             System.out.println("=== DEBUG: Booking not found for ID: " + bookingId + " ===");
             model.addAttribute("error", "Không tìm thấy thông tin đặt phòng");
         }
-        return "Client/booking-detail";
+        return "Page/BookingDetail";
     }
 
     // Chỉnh sửa thông tin cá nhân

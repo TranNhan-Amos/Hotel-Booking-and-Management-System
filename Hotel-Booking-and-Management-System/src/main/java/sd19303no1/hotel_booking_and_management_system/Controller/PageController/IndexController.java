@@ -12,12 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
 import sd19303no1.hotel_booking_and_management_system.Repository.BookingOrderRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.RoomRepository;
-import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepository;
-import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.VoucherRepository;
 import sd19303no1.hotel_booking_and_management_system.DTO.RoomTypeDTO;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
@@ -33,7 +29,6 @@ import org.slf4j.LoggerFactory;
 public class IndexController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
-    private static final String DEFAULT_AVATAR = "/img/customers/default-avatar.svg";
 
     @Autowired
     private RoomRepository roomRepository;
@@ -43,12 +38,6 @@ public class IndexController extends BaseController {
 
     @Autowired
     private BookingOrderRepository bookingOrderRepository;
-
-    @Autowired
-    private SystemUserRepository systemUserRepository;
-
-    @Autowired
-    private CustomersRepository customersRepository;
 
     @Autowired
     private RoomService roomService;
@@ -63,50 +52,6 @@ public class IndexController extends BaseController {
             // Tính số thông báo
             int notificationCount = calculateNotificationCount(authentication);
             model.addAttribute("notificationCount", notificationCount);
-
-            // Lấy avatarPath
-            String email = authentication.getName();
-            String avatarPath = null;
-            try {
-                SystemUserEntity systemUser = systemUserRepository.findByEmailIgnoreCase(email)
-                    .orElseThrow(() -> new IllegalStateException("User not found for email: " + email));
-                
-                logger.debug("Found systemUser: {} with role: {}", systemUser.getEmail(), systemUser.getRole());
-                
-                // Ưu tiên lấy avatar từ CustomersEntity nếu là CUSTOMER
-                if (systemUser.getRole() == SystemUserEntity.Role.CUSTOMER) {
-                    CustomersEntity customer = customersRepository.findBySystemUser(systemUser)
-                        .orElseGet(() -> customersRepository.findByEmailIgnoreCase(email).orElse(null));
-                    logger.debug("Found customer: {}", customer != null ? customer.getEmail() : "null");
-                    if (customer != null && customer.getAvatar() != null && !customer.getAvatar().isEmpty()) {
-                        avatarPath = "/img/customers/" + customer.getAvatar();
-                        logger.debug("Using customer avatar: {}", avatarPath);
-                    }
-                }
-                
-                // Fallback lấy từ SystemUserEntity
-                if (avatarPath == null && systemUser.getImg() != null && !systemUser.getImg().isEmpty()) {
-                    avatarPath = "/img/customers/" + systemUser.getImg();
-                    logger.debug("Using systemUser avatar: {}", avatarPath);
-                }
-                
-                // Nếu không có avatar, sử dụng ảnh mặc định
-                if (avatarPath == null) {
-                    avatarPath = DEFAULT_AVATAR;
-                    logger.debug("Using default avatar: {}", avatarPath);
-                }
-                
-                logger.debug("Avatar path for user {}: {}", email, avatarPath);
-                session.setAttribute("avatarPath", avatarPath);
-                logger.debug("Session avatarPath set to: {}", session.getAttribute("avatarPath"));
-                
-            } catch (Exception e) {
-                logger.error("Error fetching avatar for user {}: {}", email, e.getMessage());
-                session.setAttribute("avatarPath", DEFAULT_AVATAR);
-            }
-        } else {
-            // Đặt avatar mặc định cho người dùng chưa đăng nhập
-            session.setAttribute("avatarPath", DEFAULT_AVATAR);
         }
 
         // Tính toán thống kê phòng
@@ -184,8 +129,6 @@ public class IndexController extends BaseController {
 
     private int calculateNotificationCount(Authentication authentication) {
         // Demo logic - có thể thay bằng logic thực tế
-        String username = authentication.getName();
-        
         // Kiểm tra nếu là admin
         boolean isAdmin = authentication.getAuthorities().stream()
             .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
@@ -261,7 +204,8 @@ public class IndexController extends BaseController {
     // Tính tổng số khách hàng
     private long calculateTotalCustomers() {
         try {
-            return customersRepository.findAll().stream()
+            // Sử dụng customersService từ BaseController
+            return customersService.findAll().stream()
                 .filter(customer -> customer.getSystemUser() != null)
                 .count();
         } catch (Exception e) {

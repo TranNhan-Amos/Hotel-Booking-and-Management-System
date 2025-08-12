@@ -1,100 +1,154 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta th:if="${_csrf}" th:content="${_csrf.token}" name="_csrf" />
+  <meta th:if="${_csrf}" th:content="${_csrf.headerName}" name="_csrf_header" />
   <title>Lịch sử đặt phòng - DaNang Travel</title>
   <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .status-cho-xac-nhan { background-color: #f59e0b; }
-    .status-da-xac-nhan { background-color: #10b981; }
-    .status-hoan-thanh { background-color: #8b5cf6; }
-    .status-da-huy { background-color: #ef4444; }
-    .status-da-hoan-tien { background-color: #06b6d4; }
-    .status-unknown { background-color: #6b7280; }
-    
+    .status-cho-xac-nhan {
+      background-color: #f59e0b;
+    }
+
+    .status-da-xac-nhan {
+      background-color: #10b981;
+    }
+
+    .status-hoan-thanh {
+      background-color: #8b5cf6;
+    }
+
+    .status-da-huy {
+      background-color: #ef4444;
+    }
+
+    .status-da-hoan-tien {
+      background-color: #06b6d4;
+    }
+
+    .status-unknown {
+      background-color: #6b7280;
+    }
+
     .bookings-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
       gap: 2rem;
+      padding: 1rem 0;
     }
-    
+
+    @media (min-width: 1400px) {
+      .bookings-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1399px) and (min-width: 1024px) {
+      .bookings-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1023px) and (min-width: 768px) {
+      .bookings-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 767px) {
+      .bookings-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .bookings-grid>div {
+      width: 100%;
+    }
+
     .booking-card {
       transition: all 0.3s ease;
       border-radius: 16px;
       overflow: hidden;
       background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
       border: 1px solid #e2e8f0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
-    
+
     .booking-card:hover {
       transform: translateY(-8px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       border-color: #cbd5e1;
     }
-    
+
     .booking-card.cancellable {
       border: 2px solid #10b981;
       box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
     }
-    
+
     .booking-card.cancellable:hover {
       border-color: #059669;
       box-shadow: 0 8px 30px rgba(16, 185, 129, 0.25);
     }
-    
+
     .booking-card.expired {
       border: 2px solid #ef4444;
       box-shadow: 0 4px 20px rgba(239, 68, 68, 0.15);
       background: linear-gradient(145deg, #fef2f2 0%, #fff5f5 100%);
     }
-    
+
     .booking-card.expired:hover {
       border-color: #dc2626;
       box-shadow: 0 8px 30px rgba(239, 68, 68, 0.25);
     }
-    
+
     .cancel-button {
       transition: all 0.3s ease;
       font-weight: 600;
       letter-spacing: 0.025em;
     }
-    
+
     .cancel-button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
-    
+
     .cancel-button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
-    
+
     .info-badge {
       background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
       border: 1px solid #93c5fd;
     }
-    
+
     .warning-badge {
       background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
       border: 1px solid #f59e0b;
     }
-    
+
     .error-badge {
       background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
       border: 1px solid #ef4444;
     }
-    
+
     .success-badge {
       background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
       border: 1px solid #22c55e;
     }
-    
+
     .booking-status {
       font-weight: 700;
       font-size: 0.75rem;
@@ -104,17 +158,17 @@
       border-radius: 20px;
       backdrop-filter: blur(10px);
     }
-    
+
     .room-image {
       height: 200px;
       object-fit: cover;
       transition: transform 0.3s ease;
     }
-    
+
     .booking-card:hover .room-image {
       transform: scale(1.05);
     }
-    
+
     .price-tag {
       background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
       color: white;
@@ -124,7 +178,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-    
+
     .btn-modern {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
       border: none;
@@ -134,12 +188,12 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-    
+
     .btn-modern:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
     }
-    
+
     .btn-cancel {
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       border: none;
@@ -149,12 +203,12 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
-    
+
     .btn-cancel:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
     }
-    
+
     .btn-disabled {
       background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
       border: none;
@@ -166,6 +220,7 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-50 font-['Inter']">
   <!-- Header -->
   <header class="bg-white shadow-sm">
@@ -183,8 +238,8 @@
           <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
             <span id="totalBookingsCount" th:text="${bookings != null ? bookings.size() : 0}">0</span> chuyến đi
           </div>
-          <div th:if="${countCancellable != null && countCancellable > 0}" 
-               class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-semibold">
+          <div th:if="${countCancellable != null && countCancellable > 0}"
+            class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-semibold">
             <i class="fas fa-clock mr-1"></i>
             <span th:text="${countCancellable}">0</span> có thể hủy
           </div>
@@ -194,9 +249,9 @@
   </header>
 
   <!-- Main Content -->
-  <main class="container mx-auto px-4 py-8">
+  <main class="container mx-auto px-6 py-8 max-w-[1400px]">
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
       <div class="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
         <div>
           <h3 class="text-sm font-semibold text-gray-600">Tổng đặt phòng</h3>
@@ -221,7 +276,8 @@
       <div class="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
         <div>
           <h3 class="text-sm font-semibold text-gray-600">Tổng chi tiêu</h3>
-          <p class="text-xl font-bold text-gray-800" th:text="${#numbers.formatDecimal(totalSpent, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
+          <p class="text-xl font-bold text-gray-800"
+            th:text="${#numbers.formatDecimal(totalSpent, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
         </div>
         <i class="fas fa-credit-card text-orange-500 text-xl"></i>
       </div>
@@ -230,22 +286,28 @@
     <!-- Tabs -->
     <div class="tabs-container mb-6" role="tablist" aria-label="Trạng thái đặt phòng">
       <div class="flex flex-wrap gap-2">
-        <button id="tab-all" class="tab-button active px-4 py-2 bg-blue-600 text-white rounded-full font-semibold" data-tab="all" role="tab" aria-selected="true">
+        <button id="tab-all" class="tab-button active px-4 py-2 bg-blue-600 text-white rounded-full font-semibold"
+          data-tab="all" role="tab" aria-selected="true">
           Tất cả <span id="count-all" th:text="'(' + ${bookings != null ? bookings.size() : 0} + ')'">(0)</span>
         </button>
-        <button id="tab-confirmed" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold" data-tab="CONFIRMED" role="tab" aria-selected="false">
+        <button id="tab-confirmed" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold"
+          data-tab="CONFIRMED" role="tab" aria-selected="false">
           Đã xác nhận <span id="count-confirmed" th:text="'(' + ${countConfirmed} + ')'">(0)</span>
         </button>
-        <button id="tab-pending" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold" data-tab="PENDING" role="tab" aria-selected="false">
+        <button id="tab-pending" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold"
+          data-tab="PENDING" role="tab" aria-selected="false">
           Chờ xác nhận <span id="count-pending" th:text="'(' + ${countPending} + ')'">(0)</span>
         </button>
-        <button id="tab-completed" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold" data-tab="COMPLETED" role="tab" aria-selected="false">
+        <button id="tab-completed" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold"
+          data-tab="COMPLETED" role="tab" aria-selected="false">
           Hoàn thành <span id="count-completed" th:text="'(' + ${countCompleted} + ')'">(0)</span>
         </button>
-        <button id="tab-cancelled" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold" data-tab="CANCELLED" role="tab" aria-selected="false">
+        <button id="tab-cancelled" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold"
+          data-tab="CANCELLED" role="tab" aria-selected="false">
           Đã hủy <span id="count-cancelled" th:text="'(' + ${countCancelled} + ')'">(0)</span>
         </button>
-        <button id="tab-refunded" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold" data-tab="REFUNDED" role="tab" aria-selected="false">
+        <button id="tab-refunded" class="tab-button px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold"
+          data-tab="REFUNDED" role="tab" aria-selected="false">
           Đã hoàn tiền <span id="count-refunded" th:text="'(' + ${countRefunded} + ')'">(0)</span>
         </button>
       </div>
@@ -255,64 +317,70 @@
     <div id="bookingsGrid" class="bookings-grid" role="tabpanel" aria-labelledby="tab-all">
       <th:block th:switch="${bookings != null && !bookings.isEmpty()}">
         <th:block th:case="true">
-                     <div th:each="booking, bookingStat : ${bookings}" 
-                class="booking-card shadow-lg" 
-                th:classappend="${cancellableMap[booking.bookingId]} ? 'cancellable' : (${expiredMap[booking.bookingId]} ? 'expired' : '')"
-                th:data-booking-id="${booking.bookingId}" 
-                th:data-status="${booking.status != null ? booking.status.statusName : 'UNKNOWN'}">
+          <div th:each="booking, bookingStat : ${bookings}" class="booking-card shadow-lg"
+            th:classappend="${cancellableMap[booking.bookingId]} ? 'cancellable' : (${expiredMap[booking.bookingId]} ? 'expired' : '')"
+            th:data-booking-id="${booking.bookingId}"
+            th:data-status="${booking.status != null ? booking.status.statusName : 'UNKNOWN'}">
             <div class="relative overflow-hidden">
-              <img th:src="${booking.room != null && booking.room.imageUrls != null && !booking.room.imageUrls.isEmpty() ? '/img/rooms/' + booking.room.imageUrls[0] : '/img/placeholder.svg'}" 
-                   alt="Ảnh phòng" class="room-image w-full">
-              
+              <img
+                th:src="${booking.room != null && booking.room.imageUrls != null && !booking.room.imageUrls.isEmpty() ? '/img/rooms/' + booking.room.imageUrls[0] : '/img/placeholder.svg'}"
+                alt="Ảnh phòng" class="room-image w-full">
+
               <!-- Status Badge -->
-              <div class="booking-status absolute top-4 left-4 text-white" 
-                   th:classappend="${statusTexts != null && statusTexts.size() > bookingStat.index ? 'status-' + statusTexts[bookingStat.index].toLowerCase().replace(' ', '-').replace('ạ', 'a').replace('ã', 'a').replace('ủ', 'u').replace('ồ', 'o').replace('ế', 'e').replace('ậ', 'a').replace('ộ', 'o').replace('ề', 'e').replace('ị', 'i').replace('ự', 'u').replace('ộ', 'o').replace('ệ', 'e') : 'status-unknown'}"
-                   th:text="${statusTexts != null && statusTexts.size() > bookingStat.index ? statusTexts[bookingStat.index] : 'Không xác định'}"></div>
-              
+              <div class="booking-status absolute top-4 left-4 text-white"
+                th:classappend="${statusTexts != null && statusTexts.size() > bookingStat.index ? 'status-' + statusTexts[bookingStat.index].toLowerCase().replace(' ', '-').replace('ạ', 'a').replace('ã', 'a').replace('ủ', 'u').replace('ồ', 'o').replace('ế', 'e').replace('ậ', 'a').replace('ộ', 'o').replace('ề', 'e').replace('ị', 'i').replace('ự', 'u').replace('ộ', 'o').replace('ệ', 'e') : 'status-unknown'}"
+                th:text="${statusTexts != null && statusTexts.size() > bookingStat.index ? statusTexts[bookingStat.index] : 'Không xác định'}">
+              </div>
+
               <!-- Payment Status Badge -->
-              <div th:if="${booking.paymentStatus == 'PAID'}" 
-                   class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              <div th:if="${booking.paymentStatus == 'PAID'}"
+                class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 <i class="fas fa-credit-card mr-1"></i>Đã thanh toán
               </div>
-              
+
               <!-- Refund Status Badge -->
-              <div th:if="${booking.refundStatus == 'COMPLETED'}" 
-                   class="absolute top-12 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              <div th:if="${booking.refundStatus == 'COMPLETED'}"
+                class="absolute top-12 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 <i class="fas fa-undo mr-1"></i>Đã hoàn tiền
               </div>
-              
+
               <!-- Cancellable Badge -->
-              <div th:if="${cancellableMap[booking.bookingId]}" 
-                   class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              <div th:if="${cancellableMap[booking.bookingId]}"
+                class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 <i class="fas fa-check-circle mr-1"></i>Có thể hủy
               </div>
-              
+
               <!-- Expired Badge -->
-              <div th:if="${expiredMap[booking.bookingId]}" 
-                   class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              <div th:if="${expiredMap[booking.bookingId]}"
+                class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 <i class="fas fa-times-circle mr-1"></i>Đã quá hạn
               </div>
-              
+
               <!-- Booking ID -->
-              <div class="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-xs font-mono" 
-                   th:text="'#' + ${booking.bookingId}"></div>
+              <div
+                class="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-xs font-mono"
+                th:text="'#' + ${booking.bookingId}"></div>
             </div>
-            <div class="p-6">
+            <div class="p-6 flex-grow">
               <!-- Room Title -->
               <div class="mb-4">
-                <h3 class="text-xl font-bold text-gray-800 mb-2" th:text="${booking.room != null && booking.room.nameNumber != null ? booking.room.nameNumber : (booking.room != null && booking.room.partner != null && booking.room.partner.companyName != null ? booking.room.partner.companyName : 'Phòng')}"></h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-2"
+                  th:text="${booking.room != null && booking.room.nameNumber != null ? booking.room.nameNumber : (booking.room != null && booking.room.partner != null && booking.room.partner.companyName != null ? booking.room.partner.companyName : 'Phòng')}">
+                </h3>
                 <div class="flex items-center space-x-4 text-sm text-gray-600">
                   <span class="flex items-center">
                     <i class="fas fa-star mr-1 text-yellow-400"></i>
-                    <span th:text="${booking.room != null && booking.room.type != null ? booking.room.type.description : 'Loại phòng'}"></span>
+                    <span
+                      th:text="${booking.room != null && booking.room.type != null ? booking.room.type.description : 'Loại phòng'}"></span>
                   </span>
                   <span class="flex items-center">
                     <i class="fas fa-map-marker-alt mr-1 text-red-400"></i>
-                    <span th:text="${booking.room != null && booking.room.partner != null && booking.room.partner.address != null ? booking.room.partner.address : (booking.room != null && booking.room.roomNumber != null ? 'Phòng số ' + booking.room.roomNumber : '')}"></span>
+                    <span
+                      th:text="${booking.room != null && booking.room.partner != null && booking.room.partner.address != null ? booking.room.partner.address : (booking.room != null && booking.room.roomNumber != null ? 'Phòng số ' + booking.room.roomNumber : '')}"></span>
                   </span>
                 </div>
               </div>
-              
+
               <!-- Booking Details Grid -->
               <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="bg-gray-50 p-3 rounded-lg">
@@ -320,34 +388,37 @@
                     <i class="fas fa-calendar-check mr-2 text-green-500"></i>
                     <span class="font-medium">Nhận phòng</span>
                   </div>
-                  <span class="text-gray-800 font-semibold" th:text="${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : '-'}"></span>
+                  <span class="text-gray-800 font-semibold"
+                    th:text="${booking.checkInDate != null ? #temporals.format(booking.checkInDate, 'dd/MM/yyyy') : '-'}"></span>
                 </div>
                 <div class="bg-gray-50 p-3 rounded-lg">
                   <div class="flex items-center text-sm text-gray-600 mb-1">
                     <i class="fas fa-calendar-times mr-2 text-orange-500"></i>
                     <span class="font-medium">Trả phòng</span>
                   </div>
-                  <span class="text-gray-800 font-semibold" th:text="${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : '-'}"></span>
+                  <span class="text-gray-800 font-semibold"
+                    th:text="${booking.checkOutDate != null ? #temporals.format(booking.checkOutDate, 'dd/MM/yyyy') : '-'}"></span>
                 </div>
                 <div class="bg-gray-50 p-3 rounded-lg">
                   <div class="flex items-center text-sm text-gray-600 mb-1">
                     <i class="fas fa-moon mr-2 text-purple-500"></i>
                     <span class="font-medium">Số đêm</span>
                   </div>
-                  <span class="text-gray-800 font-semibold" th:text="${booking.checkInDate != null && booking.checkOutDate != null ? T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate) + ' đêm' : '-'}"></span>
+                  <span class="text-gray-800 font-semibold"
+                    th:text="${booking.checkInDate != null && booking.checkOutDate != null ? T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate) + ' đêm' : '-'}"></span>
                 </div>
                 <div class="bg-gray-50 p-3 rounded-lg">
                   <div class="flex items-center text-sm text-gray-600 mb-1">
                     <i class="fas fa-bed mr-2 text-blue-500"></i>
                     <span class="font-medium">Số phòng</span>
                   </div>
-                  <span class="text-gray-800 font-semibold" th:text="${booking.roomQuantity != null ? booking.roomQuantity : 1}"></span>
+                  <span class="text-gray-800 font-semibold"
+                    th:text="${booking.roomQuantity != null ? booking.roomQuantity : 1}"></span>
                 </div>
               </div>
-              
+
               <!-- Policy Information -->
-              <div th:if="${cancellableMap[booking.bookingId]}" 
-                   class="info-badge p-4 rounded-xl mb-4">
+              <div th:if="${cancellableMap[booking.bookingId]}" class="info-badge p-4 rounded-xl mb-4">
                 <div class="flex items-center text-blue-700">
                   <i class="fas fa-info-circle mr-2 text-lg"></i>
                   <div>
@@ -356,101 +427,91 @@
                   </div>
                 </div>
               </div>
-              
-              <!-- Expired Warning -->
-              <div th:if="${expiredMap[booking.bookingId]}"
-                   class="error-badge p-4 rounded-xl mb-4">
+
+              <!-- Expired Warning - Only show for non-cancelled bookings -->
+              <div
+                th:if="${expiredMap[booking.bookingId] && booking.status != null && booking.status.statusName != 'CANCELLED' && booking.status.statusName != 'REFUNDED'}"
+                class="error-badge p-4 rounded-xl mb-4">
                 <div class="flex items-center text-red-700">
                   <i class="fas fa-exclamation-triangle mr-2 text-lg"></i>
                   <div>
-                    <div class="font-semibold text-sm">Không thể hủy phòng</div>
-                    <div class="text-xs mt-1">Đã quá ngày nhận phòng - Không áp dụng chính sách hoàn tiền</div>
+                    <div class="font-semibold text-sm">Đã quá ngày nhận phòng</div>
                   </div>
                 </div>
               </div>
-              
-              <!-- Payment Success Info -->
-              <div th:if="${booking.paymentStatus == 'PAID'}" 
-                   class="success-badge p-4 rounded-xl mb-4">
-                <div class="flex items-center text-green-700">
-                  <i class="fas fa-check-circle mr-2 text-lg"></i>
+
+              <!-- Status Messages with Priority Order -->
+              <!-- 1. Cancelled/Refunded Status (Highest Priority) -->
+              <div
+                th:if="${booking.status != null && (booking.status.statusName == 'CANCELLED' || booking.status.statusName == 'REFUNDED')}"
+                class="p-4 rounded-xl mb-4"
+                th:class="${booking.status.statusName == 'REFUNDED'} ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'">
+                <div class="flex items-center"
+                  th:class="${booking.status.statusName == 'REFUNDED'} ? 'text-green-700' : 'text-red-700'">
+                  <i th:class="${booking.status.statusName == 'REFUNDED'} ? 'fas fa-undo mr-3' : 'fas fa-ban mr-3'"
+                    class="text-lg"></i>
                   <div>
-                    <div class="font-semibold text-sm">Đã thanh toán thành công</div>
-                    <div class="text-xs mt-1" th:text="${booking.paidDate != null ? 'Thanh toán ngày: ' + #temporals.format(booking.paidDate, 'dd/MM/yyyy HH:mm') : 'Thanh toán thành công'}"></div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Refund Success Info -->
-              <div th:if="${booking.refundStatus == 'COMPLETED'}" 
-                   class="info-badge p-4 rounded-xl mb-4" style="background: #e0f2fe; border-left: 4px solid #0284c7;">
-                <div class="flex items-center text-blue-700">
-                  <i class="fas fa-undo mr-2 text-lg"></i>
-                  <div>
-                    <div class="font-semibold text-sm">Đã hoàn tiền thành công</div>
-                    <div class="text-xs mt-1">
-                      <span th:text="${booking.refundAmount != null ? 'Số tiền: ' + #numbers.formatDecimal(booking.refundAmount, 0, 'COMMA', 0, 'POINT') + ' ₫' : ''}"></span>
-                      <span th:if="${booking.refundDate != null}">
-                        - Ngay: <span th:text="${#temporals.format(booking.refundDate, 'dd/MM/yyyy')}"></span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Cancellation Info -->
-              <div th:if="${booking.status != null && (booking.status.statusName == 'CANCELLED' || booking.status.statusName == 'REFUNDED')}" 
-                   class="error-badge p-4 rounded-xl mb-4"
-                   th:classappend="${booking.status.statusName == 'REFUNDED'} ? 'success-badge' : 'error-badge'">
-                <div class="flex items-center" th:classappend="${booking.status.statusName == 'REFUNDED'} ? 'text-green-700' : 'text-red-700'">
-                  <i th:class="${booking.status.statusName == 'REFUNDED'} ? 'fas fa-undo mr-2 text-lg' : 'fas fa-ban mr-2 text-lg'"></i>
-                  <div>
-                    <div class="font-semibold text-sm" th:text="${booking.status.statusName == 'REFUNDED'} ? 'Đã hoàn tiền' : 'Đã hủy phòng'"></div>
+                    <div class="font-semibold text-sm"
+                      th:text="${booking.status.statusName == 'REFUNDED'} ? 'Đã hoàn tiền' : 'Đã hủy phòng'"></div>
                     <div class="text-xs mt-1">
                       <span th:if="${booking.cancellationDate != null}">
-                        <span th:text="${booking.status.statusName == 'REFUNDED'} ? 'Hoàn tiền ngày: ' : 'Hủy ngày: '"></span>
                         <span th:text="${#temporals.format(booking.cancellationDate, 'dd/MM/yyyy HH:mm')}"></span>
-                      </span>
-                      <span th:if="${booking.cancellationReason != null && !booking.cancellationReason.isEmpty()}">
-                        - Lý do: <span th:text="${booking.cancellationReason}"></span>
-                      </span>
-                      <span th:if="${booking.status.statusName == 'REFUNDED' && booking.refundAmount != null && booking.refundAmount.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
-                        - Số tiền hoàn: <span th:text="${#numbers.formatDecimal(booking.refundAmount, 0, 'COMMA', 0, 'POINT') + ' ₫'}"></span>
+                        <span th:if="${booking.cancellationReason != null && !booking.cancellationReason.isEmpty()}">
+                          - Lý do: <span th:text="${booking.cancellationReason}"></span>
+                        </span>
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Paid Status (Medium Priority) -->
+              <div
+                th:if="${booking.paymentStatus == 'PAID' && (booking.status == null || (booking.status.statusName != 'CANCELLED' && booking.status.statusName != 'REFUNDED'))}"
+                class="bg-green-50 p-4 rounded-xl mb-4 border-l-4 border-green-500">
+                <div class="flex items-center text-green-700">
+                  <i class="fas fa-check-circle mr-3 text-lg"></i>
+                  <div>
+                    <div class="font-semibold text-sm">Đã thanh toán thành công</div>
+                    <div class="text-xs mt-1" th:if="${booking.paidDate != null}">
+                      Thanh toán ngày: <span
+                        th:text="${#temporals.format(booking.paidDate, 'dd/MM/yyyy HH:mm')}"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Pending/Other Status (Lowest Priority) -->
+              <div
+                th:if="${booking.status != null && booking.status.statusName != 'CANCELLED' && booking.status.statusName != 'REFUNDED' && booking.paymentStatus != 'PAID'}"
+                class="bg-blue-50 p-4 rounded-xl mb-4 border-l-4 border-blue-500">
+                <div class="flex items-center text-blue-700">
+                  <i class="fas fa-clock mr-3 text-lg"></i>
+                  <div>
+                    <div class="font-semibold text-sm">Chờ nhận phòng</div>
                   </div>
                 </div>
               </div>
             </div>
             <!-- Footer with Price and Actions -->
-            <div class="px-6 pb-6">
-              <div class="flex justify-between items-center">
+            <div class="px-6 pb-6 mt-auto">
+              <div class="flex flex-col space-y-3">
                 <!-- Price -->
-                <div class="price-tag">
-                  <span th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}"></span>
+                <div class="price-tag w-full text-center">
+                  <span class="text-lg font-bold"
+                    th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '0 ₫'}"></span>
                 </div>
-                
+
                 <!-- Action Buttons -->
-                <div class="flex space-x-3">
-                  <!-- View Details Button -->
-                  <a th:href="@{'/booking-detail/' + ${booking.bookingId}}" 
-                     class="btn-modern text-white px-4 py-2 text-sm">
-                    <i class="fas fa-eye mr-2"></i>Chi tiết
+                <div class="flex flex-col space-y-2">
+                  <a th:href="@{/booking-detail/{bookingId}(bookingId=${booking.bookingId})}"
+                    class="btn-modern text-white px-4 py-2 text-sm flex items-center justify-center">
+                    <i class="fas fa-eye mr-2"></i> Xem chi tiết
                   </a>
-                  
-                  <!-- Cancel Button (Active) -->
-                  <button th:if="${cancellableMap[booking.bookingId]}"
-                          class="btn-cancel text-white px-4 py-2 text-sm"
-                          th:attr="data-booking-id=${booking.bookingId}, data-room-name=${booking.room != null ? booking.room.nameNumber : 'Phòng'}, data-checkin-date=${booking.checkInDate}, data-total-price=${booking.totalPrice}"
-                          onclick="openCancelFromData(this)">
-                    <i class="fas fa-ban mr-2"></i>Hủy phòng
-                  </button>
-                  
-                  <!-- Cancel Button (Disabled) -->
                   <button th:if="${expiredMap[booking.bookingId]}"
-                          class="btn-disabled text-white px-4 py-2 text-sm"
-                          title="Không thể hủy: Đã quá ngày nhận phòng" disabled>
-                    <i class="fas fa-lock mr-2"></i>Đã khóa
+                    class="btn-disabled text-white px-4 py-2 text-sm flex items-center justify-center"
+                    title="Không thể hủy: Đã quá ngày nhận phòng" disabled>
+                    <i class="fas fa-lock mr-2"></i> Đã quá hạn
                   </button>
                 </div>
               </div>
@@ -462,7 +523,8 @@
             <i class="fas fa-calendar fa-4x text-blue-500 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-800 mb-2">Chưa có đặt phòng nào</h3>
             <p class="text-gray-600 mb-4">Hãy bắt đầu khám phá và đặt phòng đầu tiên của bạn!</p>
-            <a href="/search-rooms" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors duration-300">
+            <a href="/search-rooms"
+              class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors duration-300">
               <i class="fas fa-bolt mr-1"></i> Đặt phòng ngay
             </a>
           </div>
@@ -471,60 +533,17 @@
     </div>
   </main>
 
-  <!-- Cancel Booking Modal -->
-  <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-    <div class="relative top-10 mx-auto p-0 border-0 w-full max-w-2xl shadow-2xl rounded-2xl bg-white transform transition-all">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50 rounded-t-2xl">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-            <i class="fas fa-exclamation-triangle text-red-600 text-lg"></i>
-          </div>
-          <div>
-            <h3 id="cancelModalTitle" class="text-xl font-bold text-gray-900">Hủy đặt phòng</h3>
-            <p class="text-sm text-gray-600 mt-1">Xác nhận hủy đặt phòng này</p>
-          </div>
-        </div>
-        <button onclick="hideCancelModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 rounded-full hover:bg-gray-100">
-          <i class="fas fa-times text-lg"></i>
-        </button>
-      </div>
-      
-      <!-- Modal Body -->
-      <div id="cancelModalBody" class="p-6">
-        <!-- Modal content will be dynamically inserted here -->
-      </div>
-      
-      <!-- Modal Footer -->
-      <div class="flex justify-between items-center p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
-        <div class="text-sm text-gray-600">
-          <i class="fas fa-info-circle mr-1"></i>
-          Thông tin sẽ được gửi đến email của bạn
-        </div>
-        <div class="flex space-x-4">
-          <button onclick="hideCancelModal()" 
-                  class="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Quay lại
-          </button>
-          <button onclick="submitCancelBooking()" 
-                  class="px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium flex items-center shadow-lg hover:shadow-xl">
-            <i class="fas fa-ban mr-2"></i>
-            Xác nhận hủy
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Success/Error Messages -->
-  <div th:if="${successMessage}" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg z-50">
+  <div th:if="${successMessage}"
+    class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg z-50">
     <div class="flex items-center">
       <i class="fas fa-check-circle mr-2"></i>
       <span th:text="${successMessage}"></span>
     </div>
   </div>
-  
+
   <div th:if="${errorMessage}" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-md shadow-lg z-50">
     <div class="flex items-center">
       <i class="fas fa-exclamation-circle mr-2"></i>
@@ -558,7 +577,7 @@
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const tabId = button.getAttribute('data-tab');
-        
+
         // Update tab buttons
         tabButtons.forEach(btn => {
           btn.classList.remove('active', 'bg-blue-600', 'text-white');
@@ -568,10 +587,10 @@
         button.classList.add('active', 'bg-blue-600', 'text-white');
         button.classList.remove('bg-gray-200', 'text-gray-800');
         button.setAttribute('aria-selected', 'true');
-        
+
         // Update bookingsGrid aria-labelledby
         bookingsGrid.setAttribute('aria-labelledby', button.id);
-        
+
         // Filter bookings
         const bookingCards = document.querySelectorAll('.booking-card');
         bookingCards.forEach(card => {
@@ -582,7 +601,7 @@
             card.style.display = 'none';
           }
         });
-        
+
         // Show/hide empty state
         const visibleCards = Array.from(bookingCards).filter(card => card.style.display !== 'none');
         const emptyState = bookingsGrid.querySelector('.text-center');
@@ -622,20 +641,20 @@
 
     // Ripple effect for buttons
     document.querySelectorAll('.btn').forEach(button => {
-      button.addEventListener('click', function(e) {
+      button.addEventListener('click', function (e) {
         const ripple = document.createElement('span');
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
         const x = e.clientX - rect.left - size / 2;
         const y = e.clientY - rect.top - size / 2;
-        
+
         ripple.style.width = ripple.style.height = size + 'px';
         ripple.style.left = x + 'px';
         ripple.style.top = y + 'px';
         ripple.classList.add('ripple');
-        
+
         this.appendChild(ripple);
-        
+
         setTimeout(() => {
           ripple.remove();
         }, 600);
@@ -672,165 +691,20 @@
       document.querySelector('.tab-button[data-tab="all"]').click();
     });
 
-    // Cancel booking functionality
-    let currentBookingId = null;
-    let currentRoomName = null;
-    let currentCheckInDate = null;
-    let currentTotalPrice = null;
 
-    function showCancelModal(bookingId, roomName, checkInDate, totalPrice) {
-      currentBookingId = bookingId;
-      currentRoomName = roomName;
-      currentCheckInDate = checkInDate;
-      currentTotalPrice = totalPrice;
-      
-      // Update modal content
-      document.getElementById('cancelModalTitle').textContent = `Hủy đặt phòng - ${roomName}`;
-      
-      // Calculate days until check-in
-      const today = new Date();
-      const checkIn = new Date(checkInDate);
-      const daysUntilCheckIn = Math.ceil((checkIn - today) / (1000 * 60 * 60 * 24));
-      
-      // Calculate refund amount based on policy
-      let refundPercentage = 0;
-      let refundAmount = 0;
-      if (daysUntilCheckIn > 2) {
-        refundPercentage = 100;
-        refundAmount = parseFloat(totalPrice);
-      } else if (daysUntilCheckIn > 1) {
-        refundPercentage = 50;
-        refundAmount = parseFloat(totalPrice) * 0.5;
-      } else {
-        refundPercentage = 0;
-        refundAmount = 0;
-      }
-      
-      document.getElementById('cancelModalBody').innerHTML = `
-        <!-- Booking Information Card -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
-          <div class="flex items-start">
-            <div class="flex-shrink-0 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mr-6">
-              <i class="fas fa-hotel text-blue-600 text-2xl"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="text-2xl font-bold text-blue-900 mb-4">${roomName}</h4>
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div class="flex items-center">
-                  <i class="fas fa-calendar-check text-blue-500 w-5 mr-3"></i>
-                  <span class="text-blue-700">Check-in: <strong>${new Date(checkInDate).toLocaleDateString('vi-VN')}</strong></span>
-                </div>
-                <div class="flex items-center">
-                  <i class="fas fa-clock text-blue-500 w-5 mr-3"></i>
-                  <span class="text-blue-700">Còn lại: <strong>${daysUntilCheckIn} ngày</strong></span>
-                </div>
-                <div class="flex items-center">
-                  <i class="fas fa-money-bill-wave text-blue-500 w-5 mr-3"></i>
-                  <span class="text-blue-700">Tổng tiền: <strong>${parseFloat(totalPrice).toLocaleString('vi-VN')} ₫</strong></span>
-                </div>
-                <div class="flex items-center">
-                  <i class="fas fa-calendar-alt text-blue-500 w-5 mr-3"></i>
-                  <span class="text-blue-700">Ngày đặt: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <!-- Left Column: Warning and Reason -->
-          <div class="space-y-6">
-            <!-- Warning Message -->
-            <div class="bg-red-50 border border-red-200 rounded-xl p-5">
-              <div class="flex items-start">
-                <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                  <i class="fas fa-exclamation-triangle text-red-600 text-lg"></i>
-                </div>
-                <div>
-                  <h4 class="text-base font-bold text-red-800 mb-2">Xác nhận hủy phòng</h4>
-                  <p class="text-sm text-red-700">Hành động này sẽ hủy đặt phòng của bạn và không thể hoàn tác.</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Cancellation Reason -->
-            <div>
-              <label for="cancelReason" class="block text-base font-bold text-gray-700 mb-3">
-                <i class="fas fa-edit mr-2 text-gray-500"></i>Lý do hủy phòng:
-              </label>
-              <textarea id="cancelReason" name="reason" rows="6" 
-                        class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none text-sm" 
-                        placeholder="Vui lòng nhập lý do hủy phòng để chúng tôi có thể cải thiện dịch vụ..." required></textarea>
-            </div>
-          </div>
-          
-          <!-- Right Column: Refund Policy -->
-          <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-5">
-            <div class="flex items-start">
-              <div class="flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
-                <i class="fas fa-coins text-yellow-600 text-xl"></i>
-              </div>
-              <div class="flex-1">
-                <h4 class="text-base font-bold text-yellow-800 mb-4">Chính sách hoàn tiền</h4>
-                <div class="space-y-3 text-sm text-yellow-700 mb-4">
-                  <div class="flex items-center">
-                    <i class="fas fa-check-circle text-green-500 w-5 mr-3"></i>
-                    <span>Hủy trước 48h: <strong>hoàn 100% tiền</strong></span>
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-check-circle text-green-500 w-5 mr-3"></i>
-                    <span>Hủy từ 24h đến 48h: <strong>hoàn 50% tiền</strong></span>
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-times-circle text-red-500 w-5 mr-3"></i>
-                    <span>Hủy trong vòng 24h: <strong>không hoàn tiền</strong></span>
-                  </div>
-                </div>
-                
-                <!-- Refund Calculation -->
-                <div class="bg-white rounded-lg p-4 border border-yellow-300">
-                  <div class="text-center">
-                    <div class="text-2xl font-bold text-yellow-900 mb-1">${refundPercentage}%</div>
-                    <div class="text-sm text-yellow-700 mb-2">Tỷ lệ hoàn tiền</div>
-                    <div class="text-lg font-bold text-yellow-900">${refundAmount.toLocaleString('vi-VN')} ₫</div>
-                    <div class="text-xs text-yellow-600">Số tiền dự kiến hoàn</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Show modal
-      document.getElementById('cancelModal').classList.remove('hidden');
-    }
-
-    function openCancelFromData(buttonEl) {
-      if (!buttonEl) return;
-      const id = buttonEl.getAttribute('data-booking-id');
-      const name = buttonEl.getAttribute('data-room-name');
-      const checkIn = buttonEl.getAttribute('data-checkin-date');
-      const price = buttonEl.getAttribute('data-total-price');
-      showCancelModal(id, name, checkIn, price);
-    }
-
-    function hideCancelModal() {
-      document.getElementById('cancelModal').classList.add('hidden');
-      currentBookingId = null;
-      currentRoomName = null;
-    }
 
     function submitCancelBooking() {
+      const submitButton = document.querySelector('button[onclick="submitCancelBooking()"]');
+      if (submitButton.disabled) return; // Prevent multiple clicks
+
       const reason = document.getElementById('cancelReason').value.trim();
-      
+
       if (!reason) {
         // Show error message in modal
         const textarea = document.getElementById('cancelReason');
         textarea.classList.add('border-red-500', 'ring-2', 'ring-red-500');
         textarea.focus();
-        
+
         // Add error message below textarea
         let errorMsg = document.getElementById('reasonError');
         if (!errorMsg) {
@@ -840,19 +714,22 @@
           textarea.parentNode.appendChild(errorMsg);
         }
         errorMsg.innerHTML = '<i class="fas fa-exclamation-circle mr-1"></i>Vui lòng nhập lý do hủy phòng.';
-        
+
         // Remove error styling after 3 seconds
         setTimeout(() => {
           textarea.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
           if (errorMsg) errorMsg.remove();
         }, 3000);
-        
+
         return;
       }
 
       // Show confirmation dialog with better styling
       const confirmDialog = document.createElement('div');
       confirmDialog.className = 'fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center';
+
+      // Disable submit button to prevent multiple clicks
+      submitButton.disabled = true;
       confirmDialog.innerHTML = `
         <div class="bg-white rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
           <div class="flex items-center mb-4">
@@ -887,10 +764,17 @@
 
     function confirmCancelBooking() {
       // Remove confirmation dialog
-      document.querySelector('.fixed').remove();
-      
+      const confirmDialog = document.querySelector('.fixed');
+      if (confirmDialog) confirmDialog.remove();
+
       const reason = document.getElementById('cancelReason').value.trim();
-      
+      const bookingId = currentBookingId;
+
+      if (!bookingId) {
+        showToast('error', 'Không tìm thấy thông tin đặt phòng');
+        return;
+      }
+
       // Show loading state with better styling
       const submitButton = document.querySelector('button[onclick="submitCancelBooking()"]');
       const originalText = submitButton.innerHTML;
@@ -898,56 +782,78 @@
       submitButton.disabled = true;
       submitButton.classList.add('opacity-75', 'cursor-not-allowed');
 
-      // Create form and submit
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/history/cancel-booking';
-      
-      const bookingIdInput = document.createElement('input');
-      bookingIdInput.type = 'hidden';
-      bookingIdInput.name = 'bookingId';
-      bookingIdInput.value = currentBookingId;
-      
-      const reasonInput = document.createElement('input');
-      reasonInput.type = 'hidden';
-      reasonInput.name = 'reason';
-      reasonInput.value = reason;
-      
-      form.appendChild(bookingIdInput);
-      form.appendChild(reasonInput);
-      
-      // Add CSRF token if needed
-      const csrfToken = document.querySelector('meta[name="_csrf"]');
-      if (csrfToken) {
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = '_csrf';
-        csrfInput.value = csrfToken.getAttribute('content');
-        form.appendChild(csrfInput);
+      // Get CSRF token
+      const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+      const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+      if (!csrfToken || !csrfHeader) {
+        showToast('error', 'Lỗi bảo mật. Vui lòng tải lại trang và thử lại.');
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+        submitButton.classList.remove('opacity-75', 'cursor-not-allowed');
+        return;
       }
-      
-      // Show success message before submitting
-      const successMessage = document.createElement('div');
-      successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300';
-      successMessage.innerHTML = `
-        <div class="flex items-center">
-          <i class="fas fa-check-circle mr-2"></i>
-          <span>Đang xử lý hủy phòng...</span>
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('bookingId', bookingId);
+      formData.append('cancelReason', reason);
+      formData.append('_csrf', csrfToken);
+
+      // Show loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center';
+
+      loadingOverlay.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-xl">
+          <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-gray-700">Đang xử lý yêu cầu hủy phòng...</p>
+          </div>
         </div>
       `;
-      document.body.appendChild(successMessage);
-      
-      // Submit form
-      document.body.appendChild(form);
-      form.submit();
+      document.body.appendChild(loadingOverlay);
+
+      // Send request
+      fetch('/history/cancel-booking', {
+        method: 'POST',
+        headers: {
+          [csrfHeader]: csrfToken
+        },
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(text || 'Có lỗi xảy ra khi hủy phòng');
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          showToast('success', 'Hủy phòng thành công!');
+          // Reload page after 1.5 seconds
+          setTimeout(() => window.location.reload(), 1500);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('error', error.message || 'Có lỗi xảy ra khi hủy phòng');
+        })
+        .finally(() => {
+          // Remove loading overlay
+          if (loadingOverlay) loadingOverlay.remove();
+          // Reset button state
+          if (submitButton) {
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            submitButton.classList.remove('opacity-75', 'cursor-not-allowed');
+          }
+          // Hide modal
+          hideCancelModal();
+        });
     }
 
-    // Close modal when clicking outside
-    document.getElementById('cancelModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        hideCancelModal();
-      }
-    });
+
 
     // Auto-hide success/error messages after 5 seconds
     setTimeout(() => {
@@ -961,5 +867,46 @@
       });
     }, 5000);
   </script>
+  <script>
+    // Add toast notification function
+    function showToast(type, message) {
+      // Remove any existing toasts
+      document.querySelectorAll('.toast-notification').forEach(el => el.remove());
+
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transform transition-all duration-300 translate-x-0 opacity-100 toast-notification ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        }`;
+
+      // Set initial state for animation
+      toast.style.transform = 'translateX(120%)';
+      toast.style.opacity = '0';
+
+      // Add toast content
+      toast.innerHTML = `
+        <div class="flex items-center">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      // Add to document
+      document.body.appendChild(toast);
+
+      // Trigger animation
+      setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+      }, 10);
+
+      // Auto remove after delay
+      setTimeout(() => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+  </script>
 </body>
+
 </html>

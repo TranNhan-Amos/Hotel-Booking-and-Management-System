@@ -10,10 +10,225 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <link rel="stylesheet" th:href="@{Css/index.css}">
+    <link rel="stylesheet" th:href="@{/Css/index.css}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- CSS Fallback -->
+    <style>
+        /* Fallback styles in case main CSS fails to load */
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .hero-content {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 0 20px;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            margin-bottom: 40px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        .search-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .search-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .search-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+        .search-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-search {
+            height: 56px;
+            padding: 0 32px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .destinations-section, .hotels-section, .offers-section, .features-section, .bookings-section {
+            padding: 100px 0;
+        }
+        .destinations-grid, .hotels-grid, .offers-grid, .features-grid, .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .destination-card, .hotel-card, .offer-card, .feature-card, .booking-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .destination-image, .hotel-image, .offer-image {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+        .destination-image img, .hotel-image img, .offer-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .destination-content, .hotel-content, .offer-content {
+            padding: 24px;
+        }
+        .destination-title, .hotel-title, .offer-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .destination-description, .hotel-description, .offer-description {
+            color: #64748b;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .newsletter-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+        }
+        .newsletter-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .newsletter-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .newsletter-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        .newsletter-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .newsletter-input {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        /* Responsive fallback */
+        @media (max-width: 768px) {
+            .search-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            .newsletter-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+            .destinations-grid, .hotels-grid, .offers-grid, .features-grid, .bookings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -62,8 +277,17 @@
                         <i data-lucide="building"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">200+</div>
+                        <div class="stat-number" th:text="${totalHotels != null ? totalHotels + '+' : '0+'}">0+</div>
                         <div class="stat-label">Khách sạn</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i data-lucide="bed"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" th:text="${totalAvailableRooms != null ? totalAvailableRooms + '/' + totalRooms : '0/0'}">0/0</div>
+                        <div class="stat-label">Phòng khả dụng</div>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -71,7 +295,7 @@
                         <i data-lucide="users"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">50K+</div>
+                        <div class="stat-number" th:text="${totalCustomers != null ? totalCustomers + '+' : '0+'}">0+</div>
                         <div class="stat-label">Khách hàng</div>
                     </div>
                 </div>
@@ -80,7 +304,7 @@
                         <i data-lucide="star"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">4.9★</div>
+                        <div class="stat-number" th:text="${averageRating != null ? #numbers.formatDecimal(averageRating, 1, 1) + '★' : '0.0★'}">0.0★</div>
                         <div class="stat-label">Đánh giá</div>
                     </div>
                 </div>
@@ -283,6 +507,7 @@
                                 <i data-lucide="star"></i>
                                 <span th:text="${room.averageRating}">4.8</span>
                             </div>
+
                         </div>
                     </div>
                     <div class="hotel-content">
@@ -546,6 +771,34 @@
 
     <!-- Scripts -->
     <script th:inline="javascript">
+        // Check if CSS is loaded properly
+        function checkCSSLoaded() {
+            const styleSheets = document.styleSheets;
+            let cssLoaded = false;
+            
+            for (let i = 0; i < styleSheets.length; i++) {
+                try {
+                    const rules = styleSheets[i].cssRules || styleSheets[i].rules;
+                    if (rules && rules.length > 0) {
+                        cssLoaded = true;
+                        break;
+                    }
+                } catch (e) {
+                    // Cross-origin stylesheets will throw an error
+                    continue;
+                }
+            }
+            
+            if (!cssLoaded) {
+                console.warn('CSS may not be loaded properly, using fallback styles');
+                // Add a class to body to indicate fallback mode
+                document.body.classList.add('css-fallback');
+            }
+        }
+        
+        // Check CSS loading after page loads
+        window.addEventListener('load', checkCSSLoaded);
+        
         // Initialize Lucide icons
         lucide.createIcons();
 

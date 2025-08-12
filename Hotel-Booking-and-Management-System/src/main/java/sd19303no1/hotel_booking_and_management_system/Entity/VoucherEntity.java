@@ -22,9 +22,6 @@ public class VoucherEntity {
     @Column(name = "code", unique = true, length = 50)
     private String code;
 
-    @Column(name = "expiration_date")
-    private LocalDate expirationDate;
-
     @Column(name = "expiry_date")
     private LocalDate expiryDate;
 
@@ -82,13 +79,7 @@ public class VoucherEntity {
         this.code = code;
     }
 
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
 
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
-    }
 
     public LocalDate getExpiryDate() {
         return expiryDate;

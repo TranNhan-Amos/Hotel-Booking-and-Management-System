@@ -3,7 +3,7 @@
         <div class="logo-icon">
             <i class="fas fa-water"></i>
         </div>
-        <div class="logo-text">Dashboard</div>
+        <div class="logo-text">Grand Ocean</div>
     </div>
 
     <button class="hamburger">
@@ -40,10 +40,10 @@
                 <div class="user-info">
                     <div class="user-avatar">P</div>
                     <div class="user-details">
-                        <div class="user-name">Partner user</div>
+                        <div class="user-name">Partner User</div>
                         <div class="user-role">Đối tác</div>
                     </div>
-                    <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
                 
                 <div class="dropdown-menu">
@@ -60,10 +60,13 @@
                         <span>Thông Báo</span>
                     </a>
                     <div style="border-top: 1px solid var(--border-color); margin: 5px 0;"></div>
-                    <a href="/logout" class="dropdown-item danger">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Đăng Xuất</span>
-                    </a>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="dropdown-item danger" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Đăng Xuất</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -108,10 +111,13 @@
             </a>
         </div>
         <div class="mobile-nav-item">
-            <a href="/logout" class="mobile-nav-link" data-page="logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Đăng xuất</span>
-            </a>
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="mobile-nav-link" data-page="logout" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer; padding: 15px 20px;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </form>
         </div>
     </div>
 

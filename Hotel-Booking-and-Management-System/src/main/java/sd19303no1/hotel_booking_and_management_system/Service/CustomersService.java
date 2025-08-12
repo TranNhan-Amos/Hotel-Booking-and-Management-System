@@ -37,44 +37,38 @@ public class CustomersService {
 
     public void updateCustomer(CustomersEntity customer) {
         if (customer.getCustomerId() != null && customerRepository.existsById(customer.getCustomerId())) {
-            // Lấy thông tin cũ để so sánh
-            CustomersEntity oldCustomer = customerRepository.findById(customer.getCustomerId()).orElse(null);
-            if (oldCustomer != null) {
-                // Kiểm tra xem khách hàng có liên kết với SystemUserEntity không
-                SystemUserEntity systemUser = oldCustomer.getSystemUser();
-                if (systemUser != null) {
-                    // Trường hợp 1: Có liên kết với SystemUserEntity
-                    boolean hasChanges = false;
-                    
-                    // Cập nhật email nếu thay đổi
-                    if (!oldCustomer.getEmail().equals(customer.getEmail())) {
-                        systemUser.setEmail(customer.getEmail());
-                        hasChanges = true;
-                    }
-                    
-                    // Cập nhật username nếu tên thay đổi
-                    if (!oldCustomer.getName().equals(customer.getName())) {
-                        systemUser.setUsername(customer.getName());
-                        hasChanges = true;
-                    }
-                    
-                    if (hasChanges) {
-                        systemUserRepository.save(systemUser);
-                    }
-                } else {
-                    // Trường hợp 2: Không có liên kết với SystemUserEntity
-                    // Tìm SystemUserEntity theo email cũ
-                    SystemUserEntity existingSystemUser = systemUserRepository.findByEmail(oldCustomer.getEmail()).orElse(null);
-                    if (existingSystemUser != null) {
-                        // Cập nhật SystemUserEntity nếu email thay đổi
+            try {
+                // Lấy thông tin cũ để so sánh
+                CustomersEntity oldCustomer = customerRepository.findById(customer.getCustomerId()).orElse(null);
+                if (oldCustomer != null) {
+                    // Kiểm tra xem khách hàng có liên kết với SystemUserEntity không
+                    SystemUserEntity systemUser = oldCustomer.getSystemUser();
+                    if (systemUser != null) {
+                        // Cập nhật SystemUserEntity nếu có thay đổi
+                        boolean hasChanges = false;
+                        
                         if (!oldCustomer.getEmail().equals(customer.getEmail())) {
-                            existingSystemUser.setEmail(customer.getEmail());
-                            systemUserRepository.save(existingSystemUser);
+                            systemUser.setEmail(customer.getEmail());
+                            hasChanges = true;
+                        }
+                        
+                        if (!oldCustomer.getName().equals(customer.getName())) {
+                            systemUser.setUsername(customer.getName());
+                            hasChanges = true;
+                        }
+                        
+                        if (hasChanges) {
+                            systemUserRepository.save(systemUser);
                         }
                     }
                 }
+                
+                // Lưu thông tin customer
+                customerRepository.save(customer);
+                
+            } catch (Exception e) {
+                throw new RuntimeException("Lỗi khi cập nhật khách hàng: " + e.getMessage(), e);
             }
-            customerRepository.save(customer); 
         } else {
             throw new IllegalArgumentException("Không tìm thấy khách hàng để cập nhật!");
         }
@@ -104,24 +98,27 @@ public class CustomersService {
         List<CustomersEntity> customers = customerRepository.findAll();
         List<CustomerDTO> dtos = new java.util.ArrayList<>();
         for (CustomersEntity c : customers) {
-            CustomerDTO dto = new CustomerDTO();
-            dto.setCustomerId(c.getCustomerId());
-            dto.setName(c.getName());
-            dto.setEmail(c.getEmail());
-            dto.setPhone(c.getPhone());
-            dto.setAddress(c.getAddress());
-            dto.setCreatedDate(c.getCreatedDate());
-            dto.setStatus(c.getStatus());
-            // Booking count
-            int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail()).size();
-            dto.setBookingCount(bookingCount);
-            // Spending (tổng totalPrice các booking)
-            double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail())
-                .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
-            dto.setSpending(spending);
-            // Rating (nếu có logic rating theo customer, nếu không thì để 0)
-            dto.setRating(0);
-            dtos.add(dto);
+            // Chỉ lấy customers có SystemUserEntity với role CUSTOMER
+            if (c.getSystemUser() != null && c.getSystemUser().getRole() == sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.CUSTOMER) {
+                CustomerDTO dto = new CustomerDTO();
+                dto.setCustomerId(c.getCustomerId());
+                dto.setName(c.getName());
+                dto.setEmail(c.getEmail());
+                dto.setPhone(c.getPhone());
+                dto.setAddress(c.getAddress());
+                dto.setCreatedDate(c.getCreatedDate());
+                dto.setStatus(c.getStatus());
+                // Booking count
+                int bookingCount = (int) bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail()).size();
+                dto.setBookingCount(bookingCount);
+                // Spending (tổng totalPrice các booking)
+                double spending = bookingOrderRepository.findByEmailOrderByCreatedAtDesc(c.getEmail())
+                    .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
+                dto.setSpending(spending);
+                // Rating (nếu có logic rating theo customer, nếu không thì để 0)
+                dto.setRating(0);
+                dtos.add(dto);
+            }
         }
         return dtos;
     }
@@ -129,6 +126,11 @@ public class CustomersService {
     public CustomerDTO getCustomerDTOById(Integer customerId) {
         CustomersEntity customer = customerRepository.findById(customerId).orElse(null);
         if (customer == null) return null;
+        
+        // Chỉ trả về customer nếu có SystemUserEntity với role CUSTOMER
+        if (customer.getSystemUser() == null || customer.getSystemUser().getRole() != sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.CUSTOMER) {
+            return null;
+        }
         
         CustomerDTO dto = new CustomerDTO();
         dto.setCustomerId(customer.getCustomerId());

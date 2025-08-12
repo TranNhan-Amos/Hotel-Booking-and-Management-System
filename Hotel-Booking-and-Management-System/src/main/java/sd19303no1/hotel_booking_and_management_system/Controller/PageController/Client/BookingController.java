@@ -69,8 +69,9 @@ public class BookingController {
 
         try {
             if (roomId != null) {
-                RoomEntity room = roomService.findById(roomId);
-                if (room != null) {
+                Optional<RoomEntity> roomOpt = roomService.findById(roomId);
+                if (roomOpt.isPresent()) {
+                    RoomEntity room = roomOpt.get();
                     model.addAttribute("room", room);
                     if (checkInDate != null && checkOutDate != null) {
                         LocalDate checkIn = LocalDate.parse(checkInDate);
@@ -152,11 +153,12 @@ public class BookingController {
             }
 
             // Check room availability
-            RoomEntity room = roomService.findById(roomId);
-            if (room == null) {
+            Optional<RoomEntity> roomOpt = roomService.findById(roomId);
+            if (roomOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Không tìm thấy phòng");
                 return "redirect:/bookings?roomId=" + roomId;
             }
+            RoomEntity room = roomOpt.get();
             if (room.getTotalRooms() == null || room.getTotalRooms() < roomQuantity) {
                 redirectAttributes.addFlashAttribute("error", "Không đủ phòng trống. Còn lại: " + (room.getTotalRooms() != null ? room.getTotalRooms() : 0) + " phòng");
                 return "redirect:/bookings?roomId=" + roomId;
@@ -293,10 +295,19 @@ public class BookingController {
                 return response;
             }
 
-            RoomEntity room = roomService.findById(roomId);
-            if (room == null || room.getTotalRooms() == null || room.getTotalRooms() < roomQuantity) {
+            Optional<RoomEntity> roomOpt = roomService.findById(roomId);
+            if (roomOpt.isEmpty()) {
                 response.put("success", false);
-                response.put("message", "Không đủ phòng trống");
+                response.put("message", "Không tìm thấy phòng");
+                return response;
+            }
+            RoomEntity room = roomOpt.get();
+            
+            // Kiểm tra số phòng khả dụng sử dụng logic tính toán động
+            int availableRooms = roomService.getAvailableRoomCount(roomId, checkIn, checkOut);
+            if (availableRooms < roomQuantity) {
+                response.put("success", false);
+                response.put("message", "Không đủ phòng trống. Số phòng còn lại: " + availableRooms);
                 return response;
             }
 

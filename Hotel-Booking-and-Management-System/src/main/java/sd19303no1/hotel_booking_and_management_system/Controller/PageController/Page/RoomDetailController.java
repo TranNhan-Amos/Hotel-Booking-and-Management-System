@@ -2,33 +2,40 @@ package sd19303no1.hotel_booking_and_management_system.Controller.PageController
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
+
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
-import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
+
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.ReviewEntity;
-import sd19303no1.hotel_booking_and_management_system.Service.CustomersService;
+
 import sd19303no1.hotel_booking_and_management_system.Service.ReviewService;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
-import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
+
 import sd19303no1.hotel_booking_and_management_system.Service.VoucherService;
+import sd19303no1.hotel_booking_and_management_system.Controller.PageController.BaseController;
 
 @Controller
-public class RoomDetailController {
+public class RoomDetailController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(RoomDetailController.class);
 
@@ -41,11 +48,7 @@ public class RoomDetailController {
     @Autowired
     private VoucherService voucherService;
 
-    @Autowired
-    private CustomersService customersService;
-
-    @Autowired
-    private SystemUserService systemUserService;
+    // CustomersService và SystemUserService đã được kế thừa từ BaseController
 
     // Mapping cụ thể cho /room/partner để redirect đến /partner/rooms
     @GetMapping("/room/partner")
@@ -59,10 +62,17 @@ public class RoomDetailController {
             logger.info("Fetching room details for id: {}", id);
 
             // Lấy thông tin phòng
-            RoomEntity room = roomService.findById(id);
-            if (room == null || !room.getStatus().equals(RoomEntity.RoomStatus.AVAILABLE)) {
-                logger.warn("Room not found or not available for id: {}", id);
-                redirectAttributes.addFlashAttribute("error", "Phòng không tồn tại hoặc không khả dụng.");
+            Optional<RoomEntity> roomOpt = roomService.findById(id);
+            if (roomOpt.isEmpty()) {
+                logger.warn("Room not found for id: {}", id);
+                redirectAttributes.addFlashAttribute("error", "Phòng không tồn tại.");
+                return "redirect:/";
+            }
+            
+            RoomEntity room = roomOpt.get();
+            if (!room.getStatus().equals(RoomEntity.RoomStatus.AVAILABLE)) {
+                logger.warn("Room not available for id: {}", id);
+                redirectAttributes.addFlashAttribute("error", "Phòng không khả dụng.");
                 return "redirect:/";
             }
 
@@ -85,7 +95,8 @@ public class RoomDetailController {
             model.addAttribute("reviews", reviews);
 
             // Lấy các phòng liên quan
-            List<RoomEntity> relatedRooms = roomService.getRelatedRooms(room.getType(), id, 4)
+            Page<RoomEntity> relatedRoomsPage = roomService.findRelatedRooms(room.getType(), id, PageRequest.of(0, 4));
+            List<RoomEntity> relatedRooms = relatedRoomsPage.getContent()
                     .stream()
                     .filter(r -> r.getStatus().equals(RoomEntity.RoomStatus.AVAILABLE))
                     .peek(r -> {
@@ -113,42 +124,16 @@ public class RoomDetailController {
             // Tính số phòng còn trống (mặc định: hôm nay đến hôm nay+1)
             LocalDate checkIn = LocalDate.now();
             LocalDate checkOut = checkIn.plusDays(1);
-            int roomAvailableCount = roomService.getAvailableRoomCount(id, checkIn, checkOut);
+            // Sử dụng logic tính toán động dựa trên booking thay vì totalRooms
+            int roomAvailableCount = roomService.getAvailableRoomCount(room.getRoomId(), checkIn, checkOut);
             model.addAttribute("roomAvailableCount", roomAvailableCount);
-
-            // Thêm thông tin người dùng đã đăng nhập nếu có
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            logger.info("Authentication: {}", authentication);
             
-            if (authentication != null && authentication.isAuthenticated() && 
-                !"anonymousUser".equals(authentication.getName())) {
-                String email = authentication.getName();
-                logger.info("User email: {}", email);
-                
-                // Thử tìm trong CustomersEntity trước
-                CustomersEntity customer = customersService.findByEmail(email);
-                if (customer != null) {
-                    logger.info("Found customer: {}", customer.getName());
-                    model.addAttribute("currentUser", customer);
-                } else {
-                    // Nếu không tìm thấy trong CustomersEntity, thử tìm trong SystemUserEntity
-                    SystemUserEntity systemUser = systemUserService.findByEmail(email);
-                    if (systemUser != null) {
-                        logger.info("Found system user: {}", systemUser.getUsername());
-                        // Tạo một CustomersEntity tạm thời từ SystemUserEntity
-                        CustomersEntity tempCustomer = new CustomersEntity();
-                        tempCustomer.setName(systemUser.getUsername());
-                        tempCustomer.setEmail(systemUser.getEmail());
-                        tempCustomer.setPhone("Chưa cập nhật"); // SystemUserEntity không có phone
-                        tempCustomer.setSystemUser(systemUser);
-                        model.addAttribute("currentUser", tempCustomer);
-                    } else {
-                        logger.warn("No user found for email: {}", email);
-                    }
-                }
-            } else {
-                logger.info("No authenticated user or anonymous user");
-            }
+            // Thêm thông tin chi tiết về tính toán số phòng
+            model.addAttribute("totalRooms", room.getTotalRooms());
+            model.addAttribute("checkInDate", checkIn);
+            model.addAttribute("checkOutDate", checkOut);
+
+            // Thông tin người dùng hiện tại đã được xử lý bởi BaseController
 
             return "Page/Details";
 
@@ -157,5 +142,52 @@ public class RoomDetailController {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi tải thông tin phòng.");
             return "redirect:/";
         }
+    }
+    
+    // API endpoint để kiểm tra số phòng còn trống
+    @GetMapping("/api/room/{id}/availability")
+    @ResponseBody
+    public Map<String, Object> checkRoomAvailability(
+            @PathVariable Integer id,
+            @RequestParam(required = false) String checkInDate,
+            @RequestParam(required = false) String checkOutDate) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Parse dates
+            LocalDate checkIn = checkInDate != null ? LocalDate.parse(checkInDate) : LocalDate.now();
+            LocalDate checkOut = checkOutDate != null ? LocalDate.parse(checkOutDate) : checkIn.plusDays(1);
+            
+            // Validate dates
+            if (checkIn.isAfter(checkOut)) {
+                response.put("error", "Ngày check-in không thể sau ngày check-out");
+                return response;
+            }
+            
+            // Get room info
+            Optional<RoomEntity> roomOpt = roomService.findById(id);
+            if (roomOpt.isEmpty()) {
+                response.put("error", "Không tìm thấy phòng");
+                return response;
+            }
+            
+            RoomEntity room = roomOpt.get();
+            int availableCount = roomService.getAvailableRoomCountForDateRange(id, checkIn, checkOut);
+            
+            response.put("roomId", id);
+            response.put("roomName", room.getNameNumber());
+            response.put("totalRooms", room.getTotalRooms());
+            response.put("availableRooms", availableCount);
+            response.put("checkInDate", checkIn.toString());
+            response.put("checkOutDate", checkOut.toString());
+            response.put("isAvailable", availableCount > 0);
+            
+        } catch (Exception e) {
+            logger.error("Error checking room availability for id: {}", id, e);
+            response.put("error", "Có lỗi xảy ra khi kiểm tra tính khả dụng của phòng");
+        }
+        
+        return response;
     }
 }

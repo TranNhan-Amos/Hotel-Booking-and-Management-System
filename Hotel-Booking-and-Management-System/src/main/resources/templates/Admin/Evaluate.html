@@ -3,353 +3,1335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bình Luận & Đánh Giá - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/Evaluate.css}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Quản Lý Đánh Giá - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+
+
+        /* Main Container */
+        .main-container {
+            margin-top: 70px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Header Section */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .stat-icon.overall { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stat-icon.positive { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.negative { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .stat-icon.neutral { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Content Sections */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        /* Chart Canvas */
+        #ratingChart {
+            max-height: 300px !important;
+            width: 100% !important;
+            height: auto !important;
+            display: block !important;
+        }
+
+        .chart-section canvas {
+            max-height: 300px !important;
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .chart-container {
+            height: 300px !important;
+            width: 100% !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        /* Rating Breakdown */
+        .rating-breakdown {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .star-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .star-item:last-child {
+            border-bottom: none;
+        }
+
+        .star-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .star-count {
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 20px;
+        }
+
+        .star-icons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star-icons i {
+            color: #fbbf24;
+            font-size: 0.875rem;
+        }
+
+        .star-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .star-number {
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .star-progress {
+            width: 100px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 1s ease;
+        }
+
+        .star-percentage {
+            font-size: 0.75rem;
+            color: #64748b;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input, .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-input {
+            min-width: 200px;
+        }
+
+        .filter-select {
+            min-width: 120px;
+        }
+
+        .view-toggle-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-toggle-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Review Cards */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-card.positive { border-left: 4px solid #10b981; }
+        .review-card.negative { border-left: 4px solid #ef4444; }
+        .review-card.neutral { border-left: 4px solid #f59e0b; }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .customer-details h4 {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .review-date {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stars .star {
+            color: #fbbf24;
+            font-size: 0.875rem;
+        }
+
+        .stars .star.empty {
+            color: #e2e8f0;
+        }
+
+        .rating-text {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+        }
+
+        .room-info {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+        }
+
+        .review-id {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .review-content {
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .review-response {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            border-left: 3px solid #667eea;
+        }
+
+        .response-header {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .response-text {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+
+        .response-date {
+            color: #64748b;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .review-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .reply-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reply-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #64748b;
+            grid-column: 1 / -1;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .no-reviews i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .no-reviews h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-reviews p {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-refresh {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-refresh:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            background: white;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 36px;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .pagination-btn:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+        }
+
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-size-selector select {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #667eea;
+            color: white;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .modal-body textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            min-height: 120px;
+            resize: vertical;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .modal-body textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .modal-footer {
+            padding: 1.25rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #f8fafc;
+        }
+
+        .btn-cancel, .btn-submit {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: white;
+            color: #64748b;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-cancel:hover {
+            background: #f8fafc;
+        }
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            border: none;
+        }
+
+        .btn-submit:hover {
+            background: #5a67d8;
+        }
+
+        /* Loading */
+        .chart-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #64748b;
+        }
+
+        .chart-loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .chart-loading p {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reviews-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                width: 100%;
+            }
+
+            .search-input, .filter-select {
+                width: 100%;
+            }
+
+            .reviews-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .chart-loading {
+                height: 200px;
+            }
+
+            .chart-section {
+                height: 350px;
+            }
+
+            .chart-container {
+                height: 250px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0 1rem;
+            }
+
+            .main-container {
+                padding: 0.75rem;
+            }
+
+            .page-header {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .review-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .room-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div th:replace="~{/Layout/NavbarAdmin}"></div>
+    <!-- Navbar -->
+    <div th:replace="~{/Layout/NavbarAdmin}"></div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="management-section">
-            <div class="section-header">
-                <h2><i class="fas fa-star"></i> Quản Lý Bình Luận & Đánh Giá</h2>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-star"></i>
+                Quản Lý Đánh Giá
+            </h1>
+            <p class="page-subtitle">Thống kê và quản lý đánh giá từ khách hàng</p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Điểm Trung Bình</div>
+                    <div class="stat-icon overall">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="stat-value" th:text="${websiteStats.overallAverageRating}">4.5</div>
+                <div class="stat-subtitle">Tất cả đánh giá</div>
             </div>
             
-            <div class="section-body">
-                <!-- Stats Overview -->
-                <div class="stats-overview">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Tổng Đánh Giá</div>
-                            <div class="stat-icon total">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                        </div>
-                        <div class="stat-value">342</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Đánh Giá Tích Cực</div>
-                            <div class="stat-icon positive">
-                                <i class="fas fa-thumbs-up"></i>
-                            </div>
-                        </div>
-                        <div class="stat-value">289</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Đánh Giá Tiêu Cực</div>
-                            <div class="stat-icon negative">
-                                <i class="fas fa-thumbs-down"></i>
-                            </div>
-                        </div>
-                        <div class="stat-value">28</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Chờ Duyệt</div>
-                            <div class="stat-icon pending">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                        </div>
-                        <div class="stat-value">25</div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Tích Cực (4-5 sao)</div>
+                    <div class="stat-icon positive">
+                        <i class="fas fa-thumbs-up"></i>
                     </div>
                 </div>
-
-                <div class="management-header">
-                    <div class="search-filter">
-                        <input type="text" id="searchInput" placeholder="Tìm kiếm đánh giá..." oninput="filterReviews()">
-                        <select id="statusFilter" onchange="filterReviews()">
-                            <option value="all">Tất Cả Trạng Thái</option>
-                            <option value="approved">Đã Duyệt</option>
-                            <option value="pending">Chờ Duyệt</option>
-                            <option value="rejected">Đã Từ Chối</option>
-                        </select>
-                        <select id="ratingFilter" onchange="filterReviews()">
-                            <option value="all">Tất Cả Đánh Giá</option>
-                            <option value="5">5 Sao</option>
-                            <option value="4">4 Sao</option>
-                            <option value="3">3 Sao</option>
-                            <option value="2">2 Sao</option>
-                            <option value="1">1 Sao</option>
-                        </select>
+                <div class="stat-value" th:text="${websiteStats.positiveReviews}">92</div>
+                <div class="stat-subtitle" th:text="${websiteStats.ratingPercentages.get(5) + '%'}">72%</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Tiêu Cực (1-2 sao)</div>
+                    <div class="stat-icon negative">
+                        <i class="fas fa-thumbs-down"></i>
                     </div>
                 </div>
+                <div class="stat-value" th:text="${websiteStats.negativeReviews}">16</div>
+                <div class="stat-subtitle" th:text="${websiteStats.ratingPercentages.get(1) + '%'}">12.5%</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Trung Bình (3 sao)</div>
+                    <div class="stat-icon neutral">
+                        <i class="fas fa-minus-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value" th:text="${websiteStats.ratingDistribution.get(3)}">20</div>
+                <div class="stat-subtitle" th:text="${websiteStats.ratingPercentages.get(3) + '%'}">15.6%</div>
+            </div>
+        </div>
 
-                <div class="review-cards" id="reviewCards">
-                    <div class="review-card pending" data-status="pending" data-rating="5">
-                        <div class="review-header">
-                            <div class="customer-info">
-                                <div class="customer-avatar">N</div>
-                                <div class="customer-details">
-                                    <div class="customer-name">Nguyễn Văn A</div>
-                                    <div class="review-date">25/05/2025</div>
-                                </div>
-                            </div>
-                            <div class="review-status pending">Chờ Duyệt</div>
-                        </div>
-                        
-                        <div class="rating-section">
-                            <div class="stars">
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                            </div>
-                            <div class="rating-text">5.0/5</div>
-                        </div>
-                        
-                        <div class="room-info">
-                            <div class="room-name">Phòng Deluxe 101</div>
-                            <div class="booking-id">Mã đặt phòng: #BK001</div>
-                        </div>
-                        
-                        <div class="review-content">
-                            <div class="review-text">
-                                Phòng rất sạch sẽ và thoải mái. Nhân viên phục vụ rất chu đáo và nhiệt tình. 
-                                View từ phòng rất đẹp, có thể nhìn ra biển. Tôi sẽ quay lại lần sau.
-                            </div>
-                            <div class="review-images">
-                                <div class="review-image">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                                <div class="review-image">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="review-actions">
-                            <button class="approve-btn" onclick="approveReview(this)">
-                                <i class="fas fa-check"></i> Duyệt
-                            </button>
-                            <button class="reject-btn" onclick="rejectReview(this)">
-                                <i class="fas fa-times"></i> Từ Chối
-                            </button>
-                            <button class="reply-btn" onclick="replyReview(this)">
-                                <i class="fas fa-reply"></i> Trả Lời
-                            </button>
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Phân Bố Đánh Giá
+                </h3>
+                <div class="chart-loading" id="chartLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải biểu đồ...</p>
+                </div>
+                <div class="chart-container" style="height: 300px; width: 100%; position: relative;">
+                    <canvas id="ratingChart" width="400" height="300" style="display: none; max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Rating Breakdown -->
+            <div class="rating-breakdown">
+                <h3 class="section-title">
+                    <i class="fas fa-star-half-alt"></i>
+                    Chi Tiết Theo Sao
+                </h3>
+                <div class="star-item" th:each="i : ${#numbers.sequence(5, 1, -1)}">
+                    <div class="star-info">
+                        <div class="star-count" th:text="${i}">5</div>
+                        <div class="star-icons">
+                            <i th:each="j : ${#numbers.sequence(1, i)}" class="fas fa-star"></i>
                         </div>
                     </div>
-
-                    <div class="review-card positive" data-status="approved" data-rating="4">
-                        <div class="review-header">
-                            <div class="customer-info">
-                                <div class="customer-avatar">T</div>
-                                <div class="customer-details">
-                                    <div class="customer-name">Trần Thị B</div>
-                                    <div class="review-date">23/05/2025</div>
-                                </div>
-                            </div>
-                            <div class="review-status approved">Đã Duyệt</div>
+                    <div class="star-stats">
+                        <div class="star-number" th:text="${websiteStats.ratingDistribution.get(i)}">68</div>
+                        <div class="star-progress">
+                            <div class="progress-bar" th:style="'width: ' + ${websiteStats.ratingPercentages.get(i)} + '%'"></div>
                         </div>
-                        
-                        <div class="rating-section">
-                            <div class="stars">
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star empty"></i>
-                            </div>
-                            <div class="rating-text">4.0/5</div>
-                        </div>
-                        
-                        <div class="room-info">
-                            <div class="room-name">Phòng Suite 201</div>
-                            <div class="booking-id">Mã đặt phòng: #BK002</div>
-                        </div>
-                        
-                        <div class="review-content">
-                            <div class="review-text">
-                                Khách sạn tốt, phòng rộng rãi. Dịch vụ ăn uống ngon. 
-                                Chỉ có điều wifi hơi chậm một chút. Nhìn chung rất hài lòng.
-                            </div>
-                        </div>
-                        
-                        <div class="review-actions">
-                            <button class="reply-btn" onclick="replyReview(this)">
-                                <i class="fas fa-reply"></i> Trả Lời
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="review-card negative" data-status="approved" data-rating="2">
-                        <div class="review-header">
-                            <div class="customer-info">
-                                <div class="customer-avatar">L</div>
-                                <div class="customer-details">
-                                    <div class="customer-name">Lê Văn C</div>
-                                    <div class="review-date">20/05/2025</div>
-                                </div>
-                            </div>
-                            <div class="review-status approved">Đã Duyệt</div>
-                        </div>
-                        
-                        <div class="rating-section">
-                            <div class="stars">
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star"></i>
-                                <i class="fas fa-star star empty"></i>
-                                <i class="fas fa-star star empty"></i>
-                                <i class="fas fa-star star empty"></i>
-                            </div>
-                            <div class="rating-text">2.0/5</div>
-                        </div>
-                        
-                        <div class="room-info">
-                            <div class="room-name">Phòng Superior 102</div>
-                            <div class="booking-id">Mã đặt phòng: #BK003</div>
-                        </div>
-                        
-                        <div class="review-content">
-                            <div class="review-text">
-                                Phòng không được sạch sẽ lắm. Điều hòa không hoạt động tốt. 
-                                Nhân viên phục vụ chưa được nhiệt tình. Cần cải thiện chất lượng dịch vụ.
-                            </div>
-                        </div>
-                        
-                        <div class="review-actions">
-                            <button class="reply-btn" onclick="replyReview(this)">
-                                <i class="fas fa-reply"></i> Trả Lời
-                            </button>
-                        </div>
+                        <div class="star-percentage" th:text="${websiteStats.ratingPercentages.get(i) + '%'}">53.1%</div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+            <div class="reviews-header">
+                <h3 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Quản Lý Đánh Giá
+                </h3>
+                <div class="controls">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Tìm kiếm đánh giá..." th:value="${search}" oninput="filterReviews()"
+                           aria-label="Tìm kiếm đánh giá">
+                    <select class="filter-select" id="ratingFilter" onchange="filterReviews()" th:value="${rating}"
+                            aria-label="Lọc theo số sao">
+                        <option value="0">Tất Cả Đánh Giá</option>
+                        <option value="5">5 Sao</option>
+                        <option value="4">4 Sao</option>
+                        <option value="3">3 Sao</option>
+                        <option value="2">2 Sao</option>
+                        <option value="1">1 Sao</option>
+                    </select>
+                    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleViewMode()">
+                        <i class="fas fa-th-large"></i>
+                        Chế độ xem gọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="reviews-grid" id="reviewCards">
+                <div th:each="review : ${reviews}" class="review-card" 
+                     th:classappend="${review.rating >= 4 ? 'positive' : (review.rating <= 2 ? 'negative' : 'neutral')}"
+                     th:attr="data-rating=${review.rating}, data-review-id=${review.reviewId}">
+                    <div class="review-header">
+                        <div class="customer-info">
+                            <div class="customer-avatar" th:text="${review.customer.name != null ? review.customer.name.substring(0, 1).toUpperCase() : 'U'}">U</div>
+                            <div class="customer-details">
+                                <h4 th:text="${review.customer.name}">Khách hàng</h4>
+                                <div class="review-date" th:text="${#temporals.format(review.reviewDate, 'dd/MM/yyyy')}">01/01/2025</div>
+                            </div>
+                        </div>
+                        <div class="rating-display">
+                            <div class="stars">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                   th:class="${i <= review.rating ? 'fas fa-star star' : 'fas fa-star star empty'}"></i>
+                            </div>
+                            <div class="rating-text" th:text="${review.rating + '.0/5'}">5.0/5</div>
+                        </div>
+                    </div>
+                    
+                    <div class="room-info">
+                        <div class="room-name" th:text="${review.room.nameNumber}">Phòng Deluxe 301</div>
+                        <div class="review-id" th:text="'Mã đánh giá: #' + ${review.reviewId}">Mã đánh giá: #128</div>
+                    </div>
+                    
+                    <div class="review-content">
+                        <div class="review-text" th:text="${review.comment}">
+                            Trải nghiệm tuyệt vời! Nhân viên phục vụ rất chu đáo, phòng ốc sạch sẽ và hiện đại.
+                        </div>
+                        
+                        <div class="review-response" th:if="${review.response != null}">
+                            <div class="response-header">
+                                <i class="fas fa-reply"></i>
+                                Phản hồi từ admin
+                            </div>
+                            <div class="response-text" th:text="${review.response}">
+                                Cảm ơn bạn đã đánh giá! Chúng tôi rất vui khi bạn hài lòng với dịch vụ.
+                            </div>
+                            <div class="response-date" th:if="${review.responseDate != null}" 
+                                 th:text="'Ngày: ' + ${#temporals.format(review.responseDate, 'dd/MM/yyyy')}">
+                                Ngày: 12/07/2025
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-actions">
+                        <button class="reply-btn" th:onclick="'replyReview(' + ${review.reviewId} + ')'">
+                            <i class="fas fa-reply"></i>
+                            Trả Lời
+                        </button>
+                    </div>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Không có đánh giá nào</h3>
+                    <p>Chưa có đánh giá nào được gửi đến hệ thống</p>
+                    <button class="btn-refresh" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i>
+                        Làm mới
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-container" th:if="${totalPages > 1}">
+                <div class="pagination-info">
+                    <span th:text="'Hiển thị ' + ${startIndex} + ' - ' + ${endIndex} + ' của ' + ${totalReviews} + ' đánh giá'">
+                        Hiển thị 1-12 của 128 đánh giá
+                    </span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" th:if="${currentPage > 1}" 
+                            th:onclick="'goToPage(' + (${currentPage} - 1) + ')'" title="Trang trước">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn" th:each="page : ${#numbers.sequence(1, totalPages)}"
+                            th:classappend="${page == currentPage} ? 'active'" 
+                            th:onclick="'goToPage(' + ${page} + ')'" 
+                            th:text="${page}"></button>
+                    <button class="pagination-btn" th:if="${currentPage < totalPages}" 
+                            th:onclick="'goToPage(' + (${currentPage} + 1) + ')'" title="Trang sau">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="page-size-selector">
+                    <label for="pageSizeSelect">Hiển thị:</label>
+                    <select id="pageSizeSelect" th:value="${pageSize}" onchange="changePageSize(this.value)">
+                        <option value="6">6</option>
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="48">48</option>
+                    </select>
+                    <span>đánh giá/trang</span>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-    <script>
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const toggleBtn = document.querySelector('.mobile-toggle i');
+
+    <!-- Reply Modal -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Trả lời đánh giá</h3>
+                <span class="close" onclick="closeReplyModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="replyText" placeholder="Nhập nội dung trả lời..." rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeReplyModal()">Hủy</button>
+                <button class="btn-submit" onclick="submitReply()">Gửi trả lời</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // Rating data for chart
+        const ratingData = /*[[${websiteStats.ratingDistribution}]]*/ {};
+        const ratingPercentages = /*[[${websiteStats.ratingPercentages}]]*/ {};
+        
+        // Initialize chart
+        setTimeout(() => {
+            const chartLoading = document.getElementById('chartLoading');
+            const chartCanvas = document.getElementById('ratingChart');
             
-            mobileMenu.classList.toggle('active');
-            
-            if (mobileMenu.classList.contains('active')) {
-                toggleBtn.className = 'fas fa-times';
-            } else {
-                toggleBtn.className = 'fas fa-bars';
+            if (chartLoading && chartCanvas) {
+                chartLoading.style.display = 'none';
+                chartCanvas.style.display = 'block';
+                
+                // Set fixed dimensions for canvas
+                chartCanvas.style.height = '300px';
+                chartCanvas.style.width = '100%';
+                chartCanvas.style.maxHeight = '300px';
             }
+            
+            const ctx = chartCanvas.getContext('2d');
+            const ratingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['5 sao', '4 sao', '3 sao', '2 sao', '1 sao'],
+                    datasets: [{
+                        label: 'Số lượng đánh giá',
+                        data: [
+                            ratingData[5] || 0,
+                            ratingData[4] || 0,
+                            ratingData[3] || 0,
+                            ratingData[2] || 0,
+                            ratingData[1] || 0
+                        ],
+                        backgroundColor: [
+                            '#10b981', // 5 sao - xanh lá
+                            '#34d399', // 4 sao - xanh lá nhạt
+                            '#fbbf24', // 3 sao - vàng
+                            '#f59e0b', // 2 sao - cam
+                            '#ef4444'  // 1 sao - đỏ
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Số lượng đánh giá',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                stepSize: 10
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Số sao',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 14
+                            },
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y} đánh giá`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }, 1000);
+        
+        // JavaScript functions
+        let currentReviewId = null;
+        
+        function filterReviews() {
+            const searchInput = document.getElementById('searchInput').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            
+            const currentUrl = new URL(window.location);
+            
+            if (searchInput) {
+                currentUrl.searchParams.set('search', searchInput);
+            } else {
+                currentUrl.searchParams.delete('search');
+            }
+            
+            if (ratingFilter && ratingFilter !== '0') {
+                currentUrl.searchParams.set('rating', ratingFilter);
+            } else {
+                currentUrl.searchParams.delete('rating');
+            }
+            
+            currentUrl.searchParams.set('page', '1');
+            
+            window.location.href = currentUrl.toString();
         }
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const toggleBtn = document.querySelector('.mobile-toggle');
-            
-            if (!mobileMenu.contains(event.target) && !toggleBtn.contains(event.target)) {
-                mobileMenu.classList.remove('active');
-                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
-            }
-        });
+        function goToPage(page) {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('page', page);
+            window.location.href = currentUrl.toString();
+        }
 
-        // Filter Reviews
-        function filterReviews() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const ratingFilter = document.getElementById('ratingFilter').value;
+        function changePageSize(size) {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('size', size);
+            currentUrl.searchParams.set('page', '1');
+            window.location.href = currentUrl.toString();
+        }
+
+        function toggleViewMode() {
             const reviewCards = document.querySelectorAll('.review-card');
-
+            const toggleBtn = document.getElementById('viewToggleBtn');
+            const isCompact = reviewCards[0]?.classList.contains('compact-view');
+            
             reviewCards.forEach(card => {
-                const customerName = card.querySelector('.customer-name').textContent.toLowerCase();
-                const reviewText = card.querySelector('.review-text').textContent.toLowerCase();
-                const status = card.getAttribute('data-status');
-                const rating = card.getAttribute('data-rating');
-
-                const matchesSearch = customerName.includes(searchInput) || reviewText.includes(searchInput);
-                const matchesStatus = statusFilter === 'all' || status === statusFilter;
-                const matchesRating = ratingFilter === 'all' || rating === ratingFilter;
-
-                if (matchesSearch && matchesStatus && matchesRating) {
-                    card.style.display = 'block';
+                if (isCompact) {
+                    card.classList.remove('compact-view');
+                    toggleBtn.innerHTML = '<i class="fas fa-th-large"></i> Chế độ xem gọn';
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('compact-view');
+                    toggleBtn.innerHTML = '<i class="fas fa-list"></i> Chế độ xem đầy đủ';
                 }
             });
         }
 
-        // Review Actions
-        function approveReview(button) {
-            const card = button.closest('.review-card');
-            const customerName = card.querySelector('.customer-name').textContent;
-            
-            if (confirm(`Duyệt đánh giá của ${customerName}?`)) {
-                const statusSpan = card.querySelector('.review-status');
-                statusSpan.className = 'review-status approved';
-                statusSpan.textContent = 'Đã Duyệt';
-                card.setAttribute('data-status', 'approved');
-                card.className = 'review-card positive';
-                
-                // Update actions
-                const actions = card.querySelector('.review-actions');
-                actions.innerHTML = `
-                    <button class="reply-btn" onclick="replyReview(this)">
-                        <i class="fas fa-reply"></i> Trả Lời
-                    </button>
-                `;
-                
-                alert(`Đã duyệt đánh giá của ${customerName}`);
-            }
+        function replyReview(reviewId) {
+            currentReviewId = reviewId;
+            const modal = document.getElementById('replyModal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('replyText').focus();
         }
 
-        function rejectReview(button) {
-            const card = button.closest('.review-card');
-            const customerName = card.querySelector('.customer-name').textContent;
-            
-            if (confirm(`Từ chối đánh giá của ${customerName}?`)) {
-                const statusSpan = card.querySelector('.review-status');
-                statusSpan.className = 'review-status rejected';
-                statusSpan.textContent = 'Đã Từ Chối';
-                card.setAttribute('data-status', 'rejected');
-                card.className = 'review-card negative';
-                
-                // Update actions
-                const actions = card.querySelector('.review-actions');
-                actions.innerHTML = `
-                    <button class="reply-btn" onclick="replyReview(this)">
-                        <i class="fas fa-reply"></i> Trả Lời
-                    </button>
-                `;
-                
-                alert(`Đã từ chối đánh giá của ${customerName}`);
-            }
+        function closeReplyModal() {
+            const modal = document.getElementById('replyModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('replyText').value = '';
+            currentReviewId = null;
         }
 
-        function replyReview(button) {
-            const card = button.closest('.review-card');
-            const customerName = card.querySelector('.customer-name').textContent;
-            alert(`Trả lời đánh giá của ${customerName}`);
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            if (window.innerWidth > 992) {
-                mobileMenu.classList.remove('active');
-                document.querySelector('.mobile-toggle i').className = 'fas fa-bars';
+        function submitReply() {
+            const replyText = document.getElementById('replyText').value.trim();
+            if (!replyText) {
+                alert('Vui lòng nhập nội dung trả lời');
+                return;
             }
-        });
 
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const mobileMenu = document.getElementById('mobileMenu');
-                if (mobileMenu.classList.contains('active')) {
-                    toggleMobileMenu();
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+
+            fetch('/admin/reviews/reply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `reviewId=${currentReviewId}&response=${encodeURIComponent(replyText)}&_csrf=${csrfToken}`
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result);
+                if (result.includes('thành công')) {
+                    closeReplyModal();
+                    location.reload();
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gửi trả lời');
+            });
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('replyModal');
+            if (event.target === modal) {
+                closeReplyModal();
             }
+        }
+
+        // Animation effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500 + (index * 200));
+            });
+
+            // Animate stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+
+            // Animate review cards
+            const reviewCards = document.querySelectorAll('.review-card');
+            reviewCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(-20px)';
+                card.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateX(0)';
+                }, 800 + (index * 100));
+            });
         });
     </script>
 </body>

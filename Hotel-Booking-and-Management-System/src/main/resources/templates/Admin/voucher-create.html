@@ -335,8 +335,23 @@
 
         function createVoucher() {
             const discountType = document.getElementById('discountType').value;
+            const code = document.getElementById('code').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const usageLimit = document.getElementById('usageLimit').value;
             
             // Validation
+            if (!code) {
+                alert('Vui lòng nhập mã voucher!');
+                return;
+            }
+            
+            if (!description) {
+                alert('Vui lòng nhập mô tả voucher!');
+                return;
+            }
+            
             if (!discountType) {
                 alert('Vui lòng chọn loại giảm giá!');
                 return;
@@ -349,6 +364,21 @@
             
             if (discountType === 'FIXED' && !document.getElementById('discountAmount').value) {
                 alert('Vui lòng nhập số tiền giảm giá!');
+                return;
+            }
+            
+            if (!startDate || !endDate) {
+                alert('Vui lòng chọn ngày bắt đầu và kết thúc!');
+                return;
+            }
+            
+            if (new Date(startDate) >= new Date(endDate)) {
+                alert('Ngày bắt đầu phải trước ngày kết thúc!');
+                return;
+            }
+            
+            if (!usageLimit || usageLimit <= 0) {
+                alert('Vui lòng nhập giới hạn sử dụng hợp lệ!');
                 return;
             }
             

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa phòng - Grand Ocean</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-content {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .form-wrapper {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #4c51bf 0%, #667eea 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .form-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .amenities-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .amenity-item:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .amenity-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .amenity-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .amenity-item i {
+            color: #667eea;
+            width: 16px;
+        }
+
+        .image-section {
+            grid-column: 1 / -1;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 198, 207, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 2px solid rgba(0, 198, 207, 0.1);
+        }
+
+        .image-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 198, 207, 0.25);
+            border-color: rgba(0, 198, 207, 0.3);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .image-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .image-number {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 198, 207, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 198, 207, 0.8) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
+        }
+
+        .image-item:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 12px;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .image-item:hover .image-actions {
+            transform: translateY(0);
+        }
+
+        .image-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .remove-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(0, 198, 207, 0.3);
+            border-radius: 16px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, rgba(0, 198, 207, 0.05) 0%, rgba(6, 132, 136, 0.05) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 198, 207, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #00c6cf;
+            background: linear-gradient(135deg, rgba(0, 198, 207, 0.1) 0%, rgba(6, 132, 136, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 198, 207, 0.2);
+        }
+
+        .upload-area i {
+            font-size: 3.5rem;
+            color: #00c6cf;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover i {
+            transform: scale(1.1);
+            color: #068488;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #324b4c;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-hint {
+            font-size: 0.95rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .upload-text {
+            color: #068488;
+        }
+
+        .upload-area:hover .upload-hint {
+            color: #00c6cf;
+        }
+
+        .new-images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .new-image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .new-image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .new-image-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #00c6cf 0%, #068488 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 198, 207, 0.3);
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 198, 207, 0.4);
+            background: linear-gradient(135deg, #068488 0%, #324b4c 100%);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-sections {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .amenities-list {
+                grid-template-columns: 1fr;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .form-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{/Layout/NavbarPartner}"></div>
+    
+    <div class="container">
+        <div class="header-content">
+            <div class="page-title">
+                <i class="fas fa-edit"></i>
+                Chỉnh sửa phòng
+            </div>
+            <div class="page-subtitle">
+                Cập nhật thông tin và hình ảnh phòng của bạn
+            </div>
+            <a href="/partner/rooms" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại
+            </a>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="form-header">
+                <h2><i class="fas fa-bed"></i> Thông tin phòng</h2>
+                <p>Điền đầy đủ thông tin để cập nhật phòng</p>
+            </div>
+
+            <form th:action="@{/partner/rooms/edit}" method="post" enctype="multipart/form-data" class="form-content" id="editRoomForm">
+                <input type="hidden" th:name="roomId" th:value="${room.roomId}">
+                
+                <div class="form-sections">
+                    <!-- Cột trái: Thông tin cơ bản và Chi tiết phòng -->
+                    <div>
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Thông tin cơ bản
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="roomNumber">Mã phòng</label>
+                                <input class="form-input" id="roomNumber" name="roomNumber" th:value="${room.roomNumber}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="nameNumber">Tên phòng</label>
+                                <input class="form-input" id="nameNumber" name="nameNumber" th:value="${room.nameNumber}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="price">Giá (VNĐ)</label>
+                                <input class="form-input" id="price" name="price" type="number" min="0" th:value="${room.price}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="capacity">Sức chứa</label>
+                                <input class="form-input" id="capacity" name="capacity" type="number" min="1" max="10" th:value="${room.capacity}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="totalRooms">Tổng số phòng</label>
+                                <input class="form-input" id="totalRooms" name="totalRooms" type="number" min="1" th:value="${room.totalRooms}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-cogs"></i>
+                                Chi tiết phòng
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="type">Loại phòng</label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="">-- Chọn loại phòng --</option>
+                                    <option th:each="roomType : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.RoomType).values()}"
+                                            th:value="${roomType}"
+                                            th:text="${roomType.description}"
+                                            th:selected="${room.type != null and room.type.name() == roomType.name()}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required" for="status">Trạng thái</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="">-- Chọn trạng thái --</option>
+                                    <option th:each="status : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.RoomStatus).values()}"
+                                            th:value="${status}"
+                                            th:text="${status.description}"
+                                            th:selected="${room.status != null and room.status.name() == status.name()}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="bedType">Loại giường</label>
+                                <select class="form-select" id="bedType" name="bedType">
+                                    <option value="">-- Chọn loại giường --</option>
+                                    <option th:each="bedType : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.BedType).values()}"
+                                            th:value="${bedType}"
+                                            th:text="${bedType.description}"
+                                            th:selected="${room.bedType != null and room.bedType.name() == bedType.name()}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="bathroomType">Loại phòng tắm</label>
+                                <select class="form-select" id="bathroomType" name="bathroomType">
+                                    <option value="">-- Chọn loại phòng tắm --</option>
+                                    <option th:each="bathroomType : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.BathroomType).values()}"
+                                            th:value="${bathroomType}"
+                                            th:text="${bathroomType.description}"
+                                            th:selected="${room.bathroomType != null and room.bathroomType.name() == bathroomType.name()}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="view">Hướng nhìn</label>
+                                <select class="form-select" id="view" name="view">
+                                    <option value="">-- Chọn hướng nhìn --</option>
+                                    <option th:each="viewType : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.ViewType).values()}"
+                                            th:value="${viewType}"
+                                            th:text="${viewType.description}"
+                                            th:selected="${room.view != null and room.view.name() == viewType.name()}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="isSmoking">Cho phép hút thuốc</label>
+                                <select class="form-select" id="isSmoking" name="isSmoking">
+                                    <option value="false" th:selected="${room == null || room.isSmoking == false}">Không</option>
+                                    <option value="true" th:selected="${room != null && room.isSmoking == true}">Có</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="isPetFriendly">Cho phép thú cưng</label>
+                                <select class="form-select" id="isPetFriendly" name="isPetFriendly">
+                                    <option value="false" th:selected="${room == null || room.isPetFriendly == false}">Không</option>
+                                    <option value="true" th:selected="${room != null && room.isPetFriendly == true}">Có</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cột phải: Tiện nghi và Mô tả -->
+                    <div>
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-list-check"></i>
+                                Tiện nghi
+                            </div>
+                            
+                            <div class="amenities-list">
+                                <div th:each="amenity : ${T(sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity.Amenity).values()}" class="amenity-item">
+                                    <input type="checkbox" th:id="'amenity-' + ${amenity.name()}" th:name="amenities" th:value="${amenity.name()}" th:checked="${room != null and room.amenities != null and room.amenities.contains(amenity.name())}">
+                                    <label th:for="'amenity-' + ${amenity.name()}">
+                                        <i th:class="${amenity.iconClass}"></i>
+                                        <span th:text="${amenity.description}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-align-left"></i>
+                                Mô tả & Dịch vụ
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="service">Dịch vụ</label>
+                                <textarea class="form-input" id="service" name="service" rows="3" th:text="${room.service}" placeholder="Mô tả các dịch vụ có sẵn..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="description">Mô tả chi tiết</label>
+                                <textarea class="form-input" id="description" name="description" rows="4" th:text="${room.description}" placeholder="Mô tả chi tiết về phòng..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phần ảnh phòng -->
+                <div class="form-section image-section">
+                    <div class="section-title">
+                        <i class="fas fa-images"></i>
+                        Quản lý ảnh phòng
+                    </div>
+
+                    <!-- Hiển thị ảnh hiện tại -->
+                    <div class="image-grid" th:if="${room != null and room.imageUrls != null and not #lists.isEmpty(room.imageUrls)}">
+                        <div class="image-item" th:each="img, iter : ${room.imageUrls}">
+                            <div class="image-number" th:text="${iter.count}"></div>
+                            <img th:src="@{'/img/rooms/' + ${img}}"
+                                 alt="Room Image">
+                            <div class="image-overlay">
+                                <div class="image-actions">
+                                    <button type="button" class="image-btn remove-btn" 
+                                            th:data-room-id="${room.roomId}" 
+                                            th:data-image-url="${img}"
+                                            onclick="removeImage(this)">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Debug info -->
+                    
+
+                    <!-- Khu vực upload -->
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        <div class="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</div>
+                        <div class="upload-hint">Hỗ trợ JPG, PNG (tối đa 10MB/ảnh)</div>
+                        <input type="file" id="images" name="roomImages" multiple accept="image/*" style="display: none;">
+                    </div>
+
+                    <!-- Preview ảnh mới -->
+                    <div id="newImagesPreview" class="new-images-preview" style="display: none;"></div>
+
+                    <!-- Hidden input cho ảnh bị xóa -->
+                    <input type="hidden" id="deletedImages" name="deletedImages" value="" />
+                </div>
+
+                <div class="form-actions">
+                    <a href="/partner/rooms" class="btn btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Hủy
+                    </a>
+                    <button type="submit" class="btn btn-save" id="saveBtn">
+                        <i class="fas fa-save"></i>
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let newImages = [];
+        let deletedImages = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFileUpload();
+            initializeFormValidation();
+        });
+
+        function initializeFileUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('images');
+            const previewArea = document.getElementById('newImagesPreview');
+
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFiles(e.dataTransfer.files);
+                }
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    handleFiles(this.files);
+                }
+            });
+        }
+
+        function handleFiles(files) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['image/jpeg', 'image/png'];
+
+            Array.from(files).forEach(file => {
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`File ${file.name} không hợp lệ. Chỉ chấp nhận JPG, PNG.`);
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    alert(`File ${file.name} quá lớn. Kích thước tối đa là 10MB.`);
+                    return;
+                }
+
+                newImages.push(file);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    createImagePreview(e.target.result, file.name);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            if (newImages.length > 0) {
+                document.getElementById('newImagesPreview').style.display = 'grid';
+            }
+        }
+
+        function createImagePreview(src, fileName) {
+            const previewArea = document.getElementById('newImagesPreview');
+            const previewItem = document.createElement('div');
+            previewItem.className = 'new-image-item';
+            previewItem.innerHTML = `
+                <img src="${src}" alt="${fileName}">
+                <button type="button" class="new-image-remove" onclick="removeNewImage(this, '${fileName}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            previewArea.appendChild(previewItem);
+        }
+
+        function removeNewImage(button, fileName) {
+            if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+                newImages = newImages.filter(file => file.name !== fileName);
+                button.closest('.new-image-item').remove();
+
+                if (newImages.length === 0) {
+                    document.getElementById('newImagesPreview').style.display = 'none';
+                }
+            }
+        }
+
+        function removeImage(button) {
+            const roomId = button.getAttribute('data-room-id');
+            const imageUrl = button.getAttribute('data-image-url');
+            
+            if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+                deletedImages.push(imageUrl);
+                document.getElementById('deletedImages').value = deletedImages.join(',');
+                button.closest('.image-item').remove();
+                console.log('DEBUG: Image marked for deletion:', imageUrl);
+                console.log('DEBUG: Current deletedImages array:', deletedImages);
+                console.log('DEBUG: Hidden input value:', document.getElementById('deletedImages').value);
+            }
+        }
+
+        function initializeFormValidation() {
+            const form = document.getElementById('editRoomForm');
+            const saveBtn = document.getElementById('saveBtn');
+
+            form.addEventListener('submit', function(e) {
+                console.log('DEBUG: Form submitting...');
+                console.log('DEBUG: deletedImages value:', document.getElementById('deletedImages').value);
+                console.log('DEBUG: deletedImages array:', deletedImages);
+                
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            });
+        }
+    </script>
+</body>
+</html> 

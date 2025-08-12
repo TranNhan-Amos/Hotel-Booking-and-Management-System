@@ -24,5 +24,5 @@ public interface CustomersRepository extends JpaRepository<CustomersEntity, Inte
     long countByCreatedDate(@Param("date") Date date);
     
     @Query("SELECT COUNT(c) FROM CustomersEntity c WHERE c.createdDate BETWEEN :startDate AND :endDate")
-    long countByCreatedDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    Long countByCreatedDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }

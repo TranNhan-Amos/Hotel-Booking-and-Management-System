@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -49,6 +50,10 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
     @Query("SELECT b FROM BookingOrderEntity b WHERE b.status.statusName = :statusName")
     List<BookingOrderEntity> findByStatusName(@Param("statusName") String statusName);
 
+    // Tìm booking theo booking_status field
+    @Query("SELECT b FROM BookingOrderEntity b WHERE b.bookingStatus = :bookingStatus")
+    List<BookingOrderEntity> findByBookingStatus(@Param("bookingStatus") String bookingStatus);
+
     // Tìm booking theo khoảng thời gian
     @Query("SELECT b FROM BookingOrderEntity b WHERE b.checkInDate >= :startDate AND b.checkInDate <= :endDate")
     List<BookingOrderEntity> findByCheckInDateBetween(@Param("startDate") LocalDate startDate,
@@ -76,10 +81,10 @@ public interface BookingOrderRepository extends JpaRepository<BookingOrderEntity
             FROM BookingOrderEntity b
             JOIN FETCH b.room r
             JOIN FETCH b.customer c
-            WHERE r.partner.id = :partnerId
+            WHERE (r.partner.id = :partnerId OR b.partner.id = :partnerId OR b.email = :partnerEmail)
 
                              """)
-    List<BookingOrderEntity> findAllBookingsByPartner(@Param("partnerId") Long partnerId);
+    List<BookingOrderEntity> findAllBookingsByPartner(@Param("partnerId") Long partnerId, @Param("partnerEmail") String partnerEmail);
 
     @Query("""
                 SELECT FUNCTION('DATE', b.createdAt), COUNT(b), SUM(b.totalPrice)
@@ -143,22 +148,37 @@ List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId
   List<BookingOrderEntity> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
       @Param("endDate") LocalDateTime endDate);
 
-  @Query(value = """
+  // Định nghĩa projection cho phòng
+  public interface TopRoomProjection {
+      Integer getRoomId();
+      String getRoomName();
+      Long getBookingCount();
+      java.math.BigDecimal getTotalRevenue();
+  }
+  // Định nghĩa projection cho khách hàng
+  public interface TopCustomerProjection {
+      Integer getCustomerId();
+      String getCustomerName();
+      String getCustomerEmail();
+      Long getBookingCount();
+      java.math.BigDecimal getTotalSpent();
+  }
+
+@Query(value = """
       SELECT 
           r.room_id as roomId,
-          r.room_name as roomName,
+          r.name_number as roomName,
           COUNT(b.booking_id) as bookingCount,
           SUM(b.total_price) as totalRevenue
       FROM rooms r
       LEFT JOIN bookingorder b ON r.room_id = b.room_id
       WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
-      GROUP BY r.room_id, r.room_name
+      GROUP BY r.room_id, r.name_number
       ORDER BY bookingCount DESC
-      LIMIT :limit
       """, nativeQuery = true)
-  List<Map<String, Object>> findTopRoomsByBookingCount(@Param("limit") int limit);
+  List<Map<String, Object>> findTopRoomsByBookingCount();
 
-  @Query(value = """
+   @Query(value = """
       SELECT 
           c.customer_id as customerId,
           c.name as customerName,
@@ -170,7 +190,80 @@ List<Object[]> getMonthlyRevenueReportPartner(@Param("partnerId") Long partnerId
       WHERE b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
       GROUP BY c.customer_id, c.name, c.email
       ORDER BY bookingCount DESC
-      LIMIT :limit
       """, nativeQuery = true)
-  List<Map<String, Object>> findTopCustomersByBookingCount(@Param("limit") int limit);
+  List<Map<String, Object>> findTopCustomersByBookingCount();
+
+  // Methods for Reports
+  @Query("SELECT COALESCE(SUM(b.totalPrice), 0) FROM BookingOrderEntity b " +
+         "WHERE DATE(b.createdAt) BETWEEN :startDate AND :endDate " +
+         "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED')")
+  BigDecimal calculateTotalRevenueInDateRange(@Param("startDate") LocalDate startDate,
+                                            @Param("endDate") LocalDate endDate);
+
+  @Query("SELECT COUNT(b) FROM BookingOrderEntity b " +
+         "WHERE DATE(b.createdAt) BETWEEN :startDate AND :endDate " +
+         "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED')")
+  Long countBookingsInDateRange(@Param("startDate") LocalDate startDate,
+                                @Param("endDate") LocalDate endDate);
+
+  @Query("SELECT COUNT(DISTINCT b.customer.customerId) FROM BookingOrderEntity b " +
+         "WHERE DATE(b.createdAt) BETWEEN :startDate AND :endDate " +
+         "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED')")
+  Long countNewCustomersInDateRange(@Param("startDate") LocalDate startDate,
+                                   @Param("endDate") LocalDate endDate);
+
+  @Query("SELECT COALESCE(SUM(b.roomQuantity), 0) FROM BookingOrderEntity b " +
+         "WHERE DATE(b.createdAt) BETWEEN :startDate AND :endDate " +
+         "AND b.status.statusName NOT IN ('CANCELLED', 'REFUNDED')")
+  Long countBookedRoomsInDateRangeForReports(@Param("startDate") LocalDate startDate,
+                                             @Param("endDate") LocalDate endDate);
+
+  @Query(value = """
+      SELECT 
+          DATE(b.created_at) as date,
+          COUNT(b.booking_id) as totalBookings,
+          COALESCE(SUM(b.total_price), 0) as totalRevenue,
+          0.0 as occupancyRate,
+          COUNT(DISTINCT b.customer_id) as newCustomers
+      FROM bookingorder b
+      WHERE DATE(b.created_at) BETWEEN :startDate AND :endDate
+        AND b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED'))
+      GROUP BY DATE(b.created_at)
+      ORDER BY date
+      """, nativeQuery = true)
+  List<Map<String, Object>> getDailyReports(@Param("startDate") LocalDate startDate,
+                                            @Param("endDate") LocalDate endDate);
+
+    @Query(value = """
+       SELECT 
+           r.room_id as roomId,
+           r.name_number as roomName,
+           COUNT(b.booking_id) as bookingCount,
+           COALESCE(SUM(b.total_price), 0) as totalRevenue
+       FROM rooms r
+       LEFT JOIN bookingorder b ON r.room_id = b.room_id
+       WHERE (b.created_at BETWEEN :startDate AND :endDate OR b.created_at IS NULL)
+         AND (b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED')) OR b.status_id IS NULL)
+       GROUP BY r.room_id, r.name_number
+       ORDER BY bookingCount DESC, totalRevenue DESC
+       """, nativeQuery = true)
+  List<Map<String, Object>> getTopRooms(@Param("startDate") LocalDate startDate,
+                                         @Param("endDate") LocalDate endDate);
+
+  @Query(value = """
+      SELECT 
+          c.customer_id as customerId,
+          c.name as customerName,
+          c.email as customerEmail,
+          COUNT(b.booking_id) as bookingCount,
+          COALESCE(SUM(b.total_price), 0) as totalSpent
+      FROM customers c
+      LEFT JOIN bookingorder b ON c.customer_id = b.customer_id
+      WHERE (b.created_at BETWEEN :startDate AND :endDate OR b.created_at IS NULL)
+        AND (b.status_id NOT IN (SELECT status_id FROM status WHERE status_name IN ('CANCELLED', 'REFUNDED')) OR b.status_id IS NULL)
+      GROUP BY c.customer_id, c.name, c.email
+      ORDER BY bookingCount DESC, totalSpent DESC
+      """, nativeQuery = true)
+  List<Map<String, Object>> getTopCustomers(@Param("startDate") LocalDate startDate,
+                                            @Param("endDate") LocalDate endDate);
 }

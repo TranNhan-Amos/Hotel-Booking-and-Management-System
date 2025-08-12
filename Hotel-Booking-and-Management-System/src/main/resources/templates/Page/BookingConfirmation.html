@@ -517,7 +517,7 @@
                     <h3><i class="fas fa-bed"></i> Thông Tin Phòng</h3>
                     <div class="detail-row">
                         <span class="detail-label">Loại phòng:</span>
-                        <span class="detail-value" th:text="${booking.room.type}">Superior</span>
+                        <span class="detail-value" th:text="${booking.room.type != null ? booking.room.type.description : 'Chưa có'}">Superior</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Số phòng:</span>

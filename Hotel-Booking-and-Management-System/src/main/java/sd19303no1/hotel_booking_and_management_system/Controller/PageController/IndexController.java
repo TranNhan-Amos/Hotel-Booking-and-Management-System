@@ -1,12 +1,14 @@
 package sd19303no1.hotel_booking_and_management_system.Controller.PageController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.VoucherEntity;
@@ -18,6 +20,7 @@ import sd19303no1.hotel_booking_and_management_system.Repository.SystemUserRepos
 import sd19303no1.hotel_booking_and_management_system.Repository.CustomersRepository;
 import sd19303no1.hotel_booking_and_management_system.Repository.VoucherRepository;
 import sd19303no1.hotel_booking_and_management_system.DTO.RoomTypeDTO;
+import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class IndexController {
+public class IndexController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
     private static final String DEFAULT_AVATAR = "/img/customers/default-avatar.png";
@@ -47,15 +50,15 @@ public class IndexController {
     @Autowired
     private CustomersRepository customersRepository;
 
+    @Autowired
+    private RoomService roomService;
+
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
         // Lấy thông tin người dùng hiện tại
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && 
             !authentication.getName().equals("anonymousUser")) {
-            
-            // Thêm thông tin người dùng vào model
-            model.addAttribute("currentUser", authentication.getPrincipal());
             
             // Tính số thông báo
             int notificationCount = calculateNotificationCount(authentication);
@@ -99,12 +102,26 @@ public class IndexController {
             session.setAttribute("avatarPath", DEFAULT_AVATAR);
         }
 
+        // Tính toán thống kê phòng
+        long totalAvailableRooms = calculateTotalAvailableRooms();
+        long totalRooms = calculateTotalRooms();
+        long totalHotels = calculateTotalHotels();
+        double websiteAverageRating = calculateAverageRating();
+        long totalCustomers = calculateTotalCustomers();
+        
+        model.addAttribute("totalAvailableRooms", totalAvailableRooms);
+        model.addAttribute("totalRooms", totalRooms);
+        model.addAttribute("totalHotels", totalHotels);
+        model.addAttribute("averageRating", websiteAverageRating);
+        model.addAttribute("totalCustomers", totalCustomers);
+
         // Lấy danh sách loại phòng
         List<RoomTypeDTO> roomTypes = getRoomTypes();
         model.addAttribute("roomTypes", roomTypes);
 
         // Lấy danh sách phòng nổi bật (6 phòng mới nhất)
-        List<RoomEntity> featuredRooms = roomRepository.findFeaturedRooms(PageRequest.of(0, 6));
+        Page<RoomEntity> featuredRoomsPage = roomRepository.findFeaturedRooms(PageRequest.of(0, 6));
+        List<RoomEntity> featuredRooms = featuredRoomsPage.getContent();
         
         // Tính đánh giá trung bình và load amenities cho từng phòng
         for (RoomEntity room : featuredRooms) {
@@ -175,8 +192,94 @@ public class IndexController {
         }
     }
 
+    // Tính tổng số phòng khả dụng
+    private long calculateTotalAvailableRooms() {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate nextMonth = today.plusMonths(1);
+            
+            return roomRepository.findAll().stream()
+                .filter(room -> room.getStatus() == RoomEntity.RoomStatus.AVAILABLE)
+                .mapToLong(room -> {
+                    // Sử dụng RoomService để tính toán chính xác số phòng khả dụng
+                    return roomService.getAvailableRoomCount(room.getRoomId(), today, nextMonth);
+                })
+                .sum();
+        } catch (Exception e) {
+            logger.error("Error calculating total available rooms: {}", e.getMessage());
+            return 0;
+        }
+    }
+
+    // Tính tổng số phòng
+    private long calculateTotalRooms() {
+        try {
+            return roomRepository.findAll().stream()
+                .mapToLong(RoomEntity::getTotalRooms)
+                .sum();
+        } catch (Exception e) {
+            logger.error("Error calculating total rooms: {}", e.getMessage());
+            return 0;
+        }
+    }
+
+    // Tính tổng số khách sạn (partners)
+    private long calculateTotalHotels() {
+        try {
+            return roomRepository.findAll().stream()
+                .filter(room -> room.getPartner() != null)
+                .map(room -> room.getPartner().getId())
+                .distinct()
+                .count();
+        } catch (Exception e) {
+            logger.error("Error calculating total hotels: {}", e.getMessage());
+            return 0;
+        }
+    }
+
+    // Tính đánh giá trung bình
+    private double calculateAverageRating() {
+        try {
+            return roomRepository.findAll().stream()
+                .flatMap(room -> room.getReviews() != null ? room.getReviews().stream() : java.util.stream.Stream.empty())
+                .mapToDouble(review -> review.getRating())
+                .average()
+                .orElse(0.0);
+        } catch (Exception e) {
+            logger.error("Error calculating average rating: {}", e.getMessage());
+            return 0.0;
+        }
+    }
+
+    // Tính tổng số khách hàng
+    private long calculateTotalCustomers() {
+        try {
+            return customersRepository.findAll().stream()
+                .filter(customer -> customer.getSystemUser() != null)
+                .count();
+        } catch (Exception e) {
+            logger.error("Error calculating total customers: {}", e.getMessage());
+            return 0;
+        }
+    }
+
     @GetMapping("/test-payment")
     public String testPayment() {
         return "Page/test-payment";
+    }
+    
+    @GetMapping("/test-csrf")
+    public String testCsrf() {
+        return "test-csrf";
+    }
+    
+    @PostMapping("/test-csrf")
+    public String testCsrfPost() {
+        return "redirect:/?csrf-success=true";
+    }
+
+    @GetMapping("/test-logout")
+    public String testLogout() {
+        return "test-logout";
     }
 }

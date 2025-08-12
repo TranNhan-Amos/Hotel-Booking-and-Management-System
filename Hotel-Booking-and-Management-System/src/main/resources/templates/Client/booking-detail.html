@@ -374,7 +374,7 @@
                         </div>
                         <div class="info-content">
                             <h3>Loại phòng</h3>
-                            <p th:text="${booking.room != null && booking.room.type != null ? booking.room.type : '---'}"></p>
+                            <p th:text="${booking.room != null && booking.room.type != null ? booking.room.type.description : '---'}"></p>
                         </div>
                     </div>
                     
@@ -434,7 +434,8 @@
                         </div>
                         <div class="info-content">
                             <h3>Trạng thái thanh toán</h3>
-                            <p th:text="${booking.paymentStatus}"></p>
+                        <p class="info-value" th:text="${booking.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán tại khách sạn'}">Chờ thanh toán tại khách sạn</p>
+
                         </div>
                     </div>
                     
@@ -483,7 +484,7 @@
                 <h2><i class="fas fa-receipt"></i> Tóm tắt thanh toán</h2>
                 
                 <div class="summary-item">
-                    <span th:text="${booking.room != null && booking.room.type != null ? 'Phòng ' + booking.room.type + ' (' + T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate) + ' đêm)' : 'Phòng'}"></span>
+                    <span th:text="${booking.room != null && booking.room.type != null ? 'Phòng ' + booking.room.type.description + ' (' + T(java.time.temporal.ChronoUnit).DAYS.between(booking.checkInDate, booking.checkOutDate) + ' đêm)' : 'Phòng'}"></span>
                     <span th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                 </div>
                 

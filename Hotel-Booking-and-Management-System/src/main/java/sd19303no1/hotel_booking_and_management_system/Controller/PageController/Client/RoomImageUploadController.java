@@ -7,8 +7,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sd19303no1.hotel_booking_and_management_system.Entity.PartnerEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.RoomEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity;
+import sd19303no1.hotel_booking_and_management_system.Service.PartnerService;
 import sd19303no1.hotel_booking_and_management_system.Service.RoomService;
 import sd19303no1.hotel_booking_and_management_system.Service.SystemUserService;
 
@@ -32,7 +34,10 @@ public class RoomImageUploadController {
     @Autowired
     private SystemUserService systemUserService;
 
-    private static final String ROOM_IMAGE_UPLOAD_DIR = "src/main/resources/static/img/rooms";
+    @Autowired
+    private PartnerService partnerService;
+
+    private static final String ROOM_IMAGE_UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/img/rooms";
 
     @PostMapping("/upload-room-images")
     @ResponseBody
@@ -41,6 +46,10 @@ public class RoomImageUploadController {
             @RequestParam("files") MultipartFile[] files) {
         
         Map<String, Object> response = new HashMap<>();
+        
+        System.out.println("=== UPLOAD ROOM IMAGES ===");
+        System.out.println("Room ID: " + roomId);
+        System.out.println("Files count: " + (files != null ? files.length : 0));
         
         try {
             // Kiểm tra quyền truy cập
@@ -68,8 +77,12 @@ public class RoomImageUploadController {
                 hasPermission = true;
             } else if (systemUser.getRole() == SystemUserEntity.Role.PARTNER) {
                 // Kiểm tra xem partner có sở hữu phòng này không
-                if (room.getPartner() != null && room.getPartner().getSystemUser().getId().equals(systemUser.getId())) {
-                    hasPermission = true;
+                if (room.getPartner() != null && room.getPartner().getId() != null) {
+                    // Tìm partner từ systemUser
+                    PartnerEntity partner = partnerService.findBySystemUser(systemUser);
+                    if (partner != null && partner.getId().equals(room.getPartner().getId())) {
+                        hasPermission = true;
+                    }
                 }
             }
 
@@ -81,8 +94,10 @@ public class RoomImageUploadController {
 
             // Tạo thư mục upload nếu chưa tồn tại
             File uploadDir = new File(ROOM_IMAGE_UPLOAD_DIR);
+            System.out.println("Upload directory: " + uploadDir.getAbsolutePath());
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
+                System.out.println("Created upload directory");
             }
 
             List<String> uploadedImages = new ArrayList<>();
@@ -116,14 +131,20 @@ public class RoomImageUploadController {
                     }
                     String newFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9._-]", "_");
 
+                    System.out.println("Processing file: " + originalFilename);
+                    System.out.println("New filename: " + newFilename);
+
                     // Save file
                     Path filePath = Paths.get(ROOM_IMAGE_UPLOAD_DIR, newFilename);
                     Files.copy(file.getInputStream(), filePath);
+
+                    System.out.println("File saved to: " + filePath.toAbsolutePath());
 
                     // Add to uploaded images list
                     uploadedImages.add(newFilename);
 
                 } catch (IOException e) {
+                    System.err.println("Error saving file " + file.getOriginalFilename() + ": " + e.getMessage());
                     errors.add("Lỗi khi lưu file " + file.getOriginalFilename() + ": " + e.getMessage());
                 }
             }
@@ -140,6 +161,9 @@ public class RoomImageUploadController {
             }
 
             // Trả về kết quả
+            System.out.println("Upload completed. Success: " + uploadedImages.size() + ", Errors: " + errors.size());
+            System.out.println("Uploaded images: " + uploadedImages);
+            
             response.put("success", true);
             response.put("message", "Upload thành công " + uploadedImages.size() + " ảnh");
             response.put("uploadedImages", uploadedImages);

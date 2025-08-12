@@ -45,33 +45,36 @@ public class PartnerService {
         List<PartnerEntity> partners = partnerRepository.findAll();
         List<PartnerDTO> dtos = new java.util.ArrayList<>();
         for (PartnerEntity p : partners) {
-            PartnerDTO dto = new PartnerDTO();
-            dto.setPartnerId(p.getId());
-            dto.setCompanyName(p.getCompanyName());
-            dto.setEmail(p.getEmail());
-            dto.setPhone(p.getPhone());
-            dto.setAddress(p.getAddress());
-            dto.setContactPerson(p.getContactPerson());
-            dto.setTaxId(p.getTaxId());
-            dto.setBusinessLicense(p.getBusinessLicense());
-            dto.setBusinessmodel(p.getBusinessmodel());
-            dto.setHotelamenities(p.getHotelamenities());
-            dto.setStatus("ACTIVE"); // Mặc định
-            dto.setCreatedDate(new java.util.Date()); // Mặc định
-            
-            // Room count
-            int roomCount = roomRepository.findByPartner_Id(p.getId()).size();
-            dto.setRoomCount(roomCount);
-            
-            // Total revenue
-            double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(p.getId())
-                .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
-            dto.setTotalRevenue(totalRevenue);
-            
-            // Average rating (tạm để 0)
-            dto.setAverageRating(0);
-            
-            dtos.add(dto);
+            // Chỉ lấy partners có SystemUserEntity với role PARTNER
+            if (p.getSystemUser() != null && p.getSystemUser().getRole() == sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.PARTNER) {
+                PartnerDTO dto = new PartnerDTO();
+                dto.setPartnerId(p.getId());
+                dto.setCompanyName(p.getCompanyName());
+                dto.setEmail(p.getEmail());
+                dto.setPhone(p.getPhone());
+                dto.setAddress(p.getAddress());
+                dto.setContactPerson(p.getContactPerson());
+                dto.setTaxId(p.getTaxId());
+                dto.setBusinessLicense(p.getBusinessLicense());
+                dto.setBusinessmodel(p.getBusinessmodel());
+                dto.setHotelamenities(p.getHotelamenities());
+                dto.setStatus("ACTIVE"); // Mặc định
+                dto.setCreatedDate(new java.util.Date()); // Mặc định
+                
+                // Room count
+                int roomCount = roomRepository.findByPartner_Id(p.getId()).size();
+                dto.setRoomCount(roomCount);
+                
+                // Total revenue
+                double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(p.getId(), p.getEmail())
+                    .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
+                dto.setTotalRevenue(totalRevenue);
+                
+                // Average rating (tạm để 0)
+                dto.setAverageRating(0);
+                
+                dtos.add(dto);
+            }
         }
         return dtos;
     }
@@ -79,6 +82,11 @@ public class PartnerService {
     public PartnerDTO getPartnerDTOById(Long partnerId) {
         PartnerEntity partner = partnerRepository.findById(partnerId).orElse(null);
         if (partner == null) return null;
+        
+        // Chỉ trả về partner nếu có SystemUserEntity với role PARTNER
+        if (partner.getSystemUser() == null || partner.getSystemUser().getRole() != sd19303no1.hotel_booking_and_management_system.Entity.SystemUserEntity.Role.PARTNER) {
+            return null;
+        }
         
         PartnerDTO dto = new PartnerDTO();
         dto.setPartnerId(partner.getId());
@@ -99,7 +107,7 @@ public class PartnerService {
         dto.setRoomCount(roomCount);
         
         // Total revenue
-        double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(partner.getId())
+        double totalRevenue = bookingOrderRepository.findAllBookingsByPartner(partner.getId(), partner.getEmail())
             .stream().mapToDouble(b -> b.getTotalPrice() != null ? b.getTotalPrice().doubleValue() : 0).sum();
         dto.setTotalRevenue(totalRevenue);
         

@@ -274,11 +274,8 @@ public class PartnerController {
         return bookingOrderService.getMonthlyRevenueReportPartner(partnerId, year);
     }
 
-    @GetMapping("/partner/reviews")
-    public String viewPartnerReviews() {
-        // Logic to retrieve and display partner reviews information can be added here
-        return "Partner/ReviewsPartner"; // Path to your Thymeleaf template for partner reviews
-    }
+    // Removed this method as it conflicts with ReviewPartnerController
+    // The reviews functionality is now handled by ReviewPartnerController
 
     @GetMapping("/partner/payments")
     public String viewPartnerPayments() {

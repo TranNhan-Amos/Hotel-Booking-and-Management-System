@@ -3,6 +3,8 @@ package sd19303no1.hotel_booking_and_management_system.Controller.PageController
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -10,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sd19303no1.hotel_booking_and_management_system.Entity.BookingOrderEntity;
 import sd19303no1.hotel_booking_and_management_system.Entity.CustomersEntity;
@@ -193,49 +196,63 @@ public class Historybooking {
     }
 
     @PostMapping("/history/cancel-booking")
-    public String cancelBooking(@RequestParam("bookingId") Integer bookingId,
-                               @RequestParam("reason") String reason,
-                               RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> cancelBooking(
+            @RequestParam("bookingId") Integer bookingId,
+            @RequestParam("reason") String reason) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
         try {
+            logger.info("Attempting to cancel booking {} with reason: {}", bookingId, reason);
+            
             // Kiểm tra xác thực người dùng
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng đăng nhập để thực hiện thao tác này.");
-                return "redirect:/login";
+                response.put("success", false);
+                response.put("message", "Vui lòng đăng nhập để thực hiện thao tác này.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
             // Lấy thông tin khách hàng
             String email = authentication.getName();
             CustomersEntity customer = customersService.findByEmail(email);
             if (customer == null) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy thông tin khách hàng.");
-                return "redirect:/historybooking";
+                response.put("success", false);
+                response.put("message", "Không tìm thấy thông tin khách hàng.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // Kiểm tra xem booking có thuộc về khách hàng này không
+            // Kiểm tra xem booking có tồn tại không
             BookingOrderEntity booking = bookingOrderService.findBookingByIdForAdmin(bookingId)
                     .orElse(null);
             
             if (booking == null) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy đặt phòng.");
-                return "redirect:/historybooking";
+                response.put("success", false);
+                response.put("message", "Không tìm thấy đặt phòng.");
+                return ResponseEntity.badRequest().body(response);
             }
 
+            // Kiểm tra quyền sở hữu
             if (!booking.getCustomer().getCustomerId().equals(customer.getCustomerId())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền hủy đặt phòng này.");
-                return "redirect:/historybooking";
+                response.put("success", false);
+                response.put("message", "Bạn không có quyền hủy đặt phòng này.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
 
-            // Kiểm tra xem booking có thể hủy không
-            if (!bookingOrderService.canCancelBooking(booking)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đặt phòng này. Vui lòng kiểm tra chính sách hủy phòng.");
-                return "redirect:/historybooking";
+            // Kiểm tra trạng thái booking
+            String currentStatus = booking.getStatus() != null ? booking.getStatus().getStatusName() : "";
+            if (!"PENDING".equals(currentStatus) && !"CONFIRMED".equals(currentStatus)) {
+                response.put("success", false);
+                response.put("message", "Chỉ có thể hủy đặt phòng đang chờ xác nhận hoặc đã xác nhận.");
+                return ResponseEntity.badRequest().body(response);
             }
 
             // Kiểm tra ngày check-in
             if (booking.getCheckInDate() != null && booking.getCheckInDate().isBefore(LocalDate.now())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đặt phòng đã qua ngày check-in.");
-                return "redirect:/historybooking";
+                response.put("success", false);
+                response.put("message", "Không thể hủy đặt phòng đã qua ngày check-in.");
+                return ResponseEntity.badRequest().body(response);
             }
 
             // Thực hiện hủy booking
@@ -244,22 +261,29 @@ public class Historybooking {
             // Tính toán số tiền hoàn lại
             BigDecimal refundAmount = bookingOrderService.calculateRefundAmount(cancelledBooking);
             
-            String successMessage = "Đã hủy đặt phòng thành công.";
+            // Tạo thông báo thành công
+            String successMessage = "Đã hủy đặt phòng thành công!";
             if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
-                successMessage += " Số tiền hoàn lại: " + refundAmount.toString() + " ₫";
+                successMessage += " Số tiền hoàn lại: " + String.format("%,.0f", refundAmount) + " VNĐ";
             } else {
                 successMessage += " Không có tiền hoàn lại theo chính sách.";
             }
             
-            redirectAttributes.addFlashAttribute("successMessage", successMessage);
+            response.put("success", true);
+            response.put("message", successMessage);
+            response.put("bookingId", bookingId);
+            response.put("refundAmount", refundAmount);
+            response.put("newStatus", "CANCELLED");
+            
             logger.info("Booking {} cancelled successfully by customer {}", bookingId, customer.getCustomerId());
+            return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            logger.error("Error cancelling booking {}: {}", bookingId, e.getMessage());
-            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi hủy đặt phòng: " + e.getMessage());
+            logger.error("Error cancelling booking {}: {}", bookingId, e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra khi hủy đặt phòng: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        
-        return "redirect:/historybooking";
     }
     
     // Debug endpoint để test

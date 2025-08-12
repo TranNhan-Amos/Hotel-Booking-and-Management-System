@@ -760,15 +760,12 @@
                         Thông tin của bạn được bảo mật an toàn
                     </div>
                     <div class="flex space-x-4">
-                        <button type="button" onclick="closeCancelModal()" 
-                                class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium flex items-center">
-                            <i class="fas fa-arrow-left mr-2"></i>
+                        <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                             Quay lại
                         </button>
-                        <button type="button" onclick="submitCancelBooking()" 
-                                class="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium flex items-center shadow-lg hover:shadow-xl">
-                            <i class="fas fa-ban mr-2"></i>
-                            Xác nhận hủy
+                        <button type="button" id="confirmCancelBtn" onclick="submitCancelBooking()" class="px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            Xác nhận hủy phòng
                         </button>
                     </div>
                 </div>
@@ -794,40 +791,53 @@
 
         // Toast notification functions
         function showToast(type, message) {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toastIcon');
-            const messageEl = document.getElementById('toastMessage');
-            const iconContainer = icon.parentElement;
-            
-            messageEl.textContent = message;
-            
-            // Reset classes
-            toast.querySelector('.border-l-4').className = 'bg-white rounded-xl shadow-2xl border-l-4 p-4 max-w-sm min-w-[300px] backdrop-blur-sm';
-            iconContainer.className = 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center';
-            
-            if (type === 'success') {
-                icon.className = 'fas fa-check-circle text-white';
-                iconContainer.classList.add('bg-green-500');
-                toast.querySelector('.border-l-4').classList.add('border-green-500');
-            } else if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle text-white';
-                iconContainer.classList.add('bg-red-500');
-                toast.querySelector('.border-l-4').classList.add('border-red-500');
-            } else if (type === 'info') {
-                icon.className = 'fas fa-info-circle text-white';
-                iconContainer.classList.add('bg-blue-500');
-                toast.querySelector('.border-l-4').classList.add('border-blue-500');
+            try {
+                // Tạo toast element động
+                const toastContainer = document.createElement('div');
+                toastContainer.className = 'fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out translate-x-full';
+                toastContainer.style.minWidth = '300px';
+                toastContainer.style.maxWidth = '400px';
+                
+                const toastContent = document.createElement('div');
+                toastContent.className = 'p-4 rounded-lg shadow-lg flex items-center space-x-3';
+                
+                // Thiết lập màu sắc theo loại
+                if (type === 'success') {
+                    toastContent.className += ' bg-green-500 text-white';
+                    toastContent.innerHTML = '<i class="fas fa-check-circle text-xl"></i><span class="flex-1 font-medium">' + message + '</span><button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-green-200"><i class="fas fa-times"></i></button>';
+                } else if (type === 'error') {
+                    toastContent.className += ' bg-red-500 text-white';
+                    toastContent.innerHTML = '<i class="fas fa-exclamation-circle text-xl"></i><span class="flex-1 font-medium">' + message + '</span><button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-red-200"><i class="fas fa-times"></i></button>';
+                } else {
+                    toastContent.className += ' bg-blue-500 text-white';
+                    toastContent.innerHTML = '<i class="fas fa-info-circle text-xl"></i><span class="flex-1 font-medium">' + message + '</span><button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-blue-200"><i class="fas fa-times"></i></button>';
+                }
+                
+                toastContainer.appendChild(toastContent);
+                document.body.appendChild(toastContainer);
+                
+                // Hiệu ứng xuất hiện
+                setTimeout(() => {
+                    toastContainer.style.transform = 'translateX(0)';
+                }, 10);
+                
+                // Tự động ẩn sau 5 giây
+                setTimeout(() => {
+                    toastContainer.style.opacity = '0';
+                    toastContainer.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (toastContainer.parentNode) {
+                            toastContainer.parentNode.removeChild(toastContainer);
+                        }
+                    }, 300);
+                }, 5000);
+                
+                console.log('Toast hiển thị: ' + type + ' - ' + message);
+            } catch (error) {
+                console.error('Lỗi khi hiển thị toast:', error);
+                // Fallback sử dụng alert
+                alert(type.toUpperCase() + ': ' + message);
             }
-            
-            // Show with animation
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.remove('translate-x-full');
-                toast.classList.add('translate-x-0');
-            }, 10);
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => hideToast(), 5000);
         }
 
         function hideToast() {
@@ -840,13 +850,20 @@
         }
 
         function openCancelModal() {
-            document.getElementById('cancelModal').classList.remove('hidden');
+            const modal = document.getElementById('cancelModal');
+            modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            calculateRefundEstimate();
+            document.getElementById('cancelReason').addEventListener('input', validateCancelForm);
+            validateCancelForm();
         }
 
         function closeCancelModal() {
-            document.getElementById('cancelModal').classList.add('hidden');
+            const modal = document.getElementById('cancelModal');
+            modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('confirmCancelBtn').disabled = true;
         }
 
         function showLoading() {
@@ -867,36 +884,202 @@
             }, 300);
         }
 
+        function calculateRefundEstimate() {
+            try {
+                const checkInDate = new Date(/*[[${booking.checkInDate}]]*/);
+                const today = new Date();
+                const timeDiff = checkInDate - today;
+                const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                
+                const totalPrice = /*[[${booking.totalPrice}]]*/ 0;
+                let refundAmount = 0;
+                let feePercentage = 0;
+                
+                if (daysDiff > 2) {
+                    refundAmount = totalPrice;
+                    feePercentage = 0;
+                } else if (daysDiff > 1) {
+                    refundAmount = totalPrice * 0.5;
+                    feePercentage = 50;
+                } else {
+                    refundAmount = 0;
+                    feePercentage = 100;
+                }
+                
+                // Kiểm tra phần tử tồn tại trước khi cập nhật
+                const feeElement = document.getElementById('cancellationFee');
+                const refundElement = document.getElementById('refundAmount');
+                
+                if (feeElement) {
+                    feeElement.textContent = feePercentage > 0 ? 
+                        `${feePercentage}% (${(totalPrice * feePercentage / 100).toLocaleString()} ₫)` : 'Miễn phí';
+                }
+                
+                if (refundElement) {
+                    refundElement.textContent = `${refundAmount.toLocaleString()} ₫`;
+                }
+                
+                return refundAmount;
+            } catch (error) {
+                console.error('Lỗi khi tính toán hoàn tiền:', error);
+                return 0;
+            }
+        }
+        
+        function validateCancelForm() {
+            const reason = document.getElementById('cancelReason');
+            const confirmBtn = document.getElementById('confirmCancelBtn');
+            
+            if (reason && confirmBtn) {
+                const reasonText = reason.value.trim();
+                
+                if (reasonText.length >= 10) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    confirmBtn.classList.add('hover:bg-red-700');
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    confirmBtn.classList.remove('hover:bg-red-700');
+                }
+            }
+        }
+        
+        // Thêm event listener cho textarea khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cancelReason = document.getElementById('cancelReason');
+            if (cancelReason) {
+                cancelReason.addEventListener('input', validateCancelForm);
+                cancelReason.addEventListener('keyup', validateCancelForm);
+                // Validate ngay khi load trang
+                validateCancelForm();
+            }
+        });
+
         function submitCancelBooking() {
             const bookingId = /*[[${booking.bookingId}]]*/ 0;
-            const reason = document.getElementById('cancelReason').value;
+            const reason = document.getElementById('cancelReason')?.value?.trim();
+            
+            if (!reason) {
+                showToast('error', 'Vui lòng nhập lý do hủy phòng');
+                return;
+            }
+            
+            if (reason.length < 10) {
+                showToast('error', 'Lý do hủy phòng phải có ít nhất 10 ký tự');
+                return;
+            }
             
             showLoading();
+            const confirmBtn = document.getElementById('confirmCancelBtn');
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang xử lý...';
+            }
             
-            fetch(`/historybooking/cancel/${bookingId}`, {
+            console.log('Đang gửi yêu cầu hủy phòng...', { bookingId, reason });
+            
+            // LẤY CSRF TOKEN VÀ HEADER NAME TỪ META TAG
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeaderName = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('/history/cancel-booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    [csrfHeaderName]: csrfToken  // SỬ DỤNG GIÁ TRỊ THỰC TẾ
                 },
-                body: `reason=${encodeURIComponent(reason)}`
+                body: `bookingId=${bookingId}&reason=${encodeURIComponent(reason)}`
             })
-            .then(response => {
-                hideLoading();
-                if (response.ok) {
-                    showToast('success', 'Đặt phòng đã được hủy thành công!');
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    showToast('error', 'Có lỗi xảy ra khi hủy đặt phòng');
+            .then(async response => {
+                console.log('Nhận được response từ server:', response.status, response.statusText);
+                
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Lỗi parse JSON:', e);
+                    throw new Error('Phản hồi từ server không hợp lệ');
                 }
+                
+                console.log('Dữ liệu nhận được:', data);
+                
+                if (!response.ok) {
+                    throw new Error(data.message || `Lỗi HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return data;
+            })
+            .then(data => {
+                console.log('Xử lý thành công:', data);
+                hideLoading();
                 closeCancelModal();
+                
+                if (data.success) {
+                    showToast('success', data.message || 'Đã hủy đặt phòng thành công!');
+                    
+                    // Cập nhật giao diện ngay lập tức
+                    updateBookingStatusUI('CANCELLED');
+                    
+                    // Làm mới trang sau 2 giây để đảm bảo người dùng đọc được thông báo
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast('error', data.message || 'Có lỗi xảy ra khi xử lý yêu cầu');
+                    resetCancelButton();
+                }
             })
             .catch(error => {
+                console.error('Lỗi khi hủy đặt phòng:', error);
                 hideLoading();
-                console.error('Error:', error);
-                showToast('error', 'Có lỗi xảy ra khi hủy đặt phòng');
                 closeCancelModal();
+                showToast('error', error.message || 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+                resetCancelButton();
             });
+        }
+        
+        function resetCancelButton() {
+            const confirmBtn = document.getElementById('confirmCancelBtn');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Xác nhận hủy phòng';
+            }
+        }
+        
+        function updateBookingStatusUI(newStatus) {
+            try {
+                // Cập nhật badge trạng thái
+                const statusBadge = document.querySelector('.status-badge');
+                if (statusBadge) {
+                    statusBadge.textContent = 'Đã hủy';
+                    statusBadge.className = 'status-badge bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium';
+                }
+                
+                // Ẩn nút hủy phòng
+                const cancelButton = document.querySelector('button[onclick="openCancelModal()"]');
+                if (cancelButton) {
+                    cancelButton.style.display = 'none';
+                }
+                
+                // Hiển thị thông báo đã hủy
+                const actionSection = document.querySelector('.booking-actions');
+                if (actionSection) {
+                    const cancelledNotice = document.createElement('div');
+                    cancelledNotice.className = 'bg-red-50 border border-red-200 rounded-lg p-4 text-center';
+                    cancelledNotice.innerHTML = `
+                        <i class="fas fa-times-circle text-red-500 text-2xl mb-2"></i>
+                        <p class="text-red-800 font-medium">Đặt phòng đã được hủy</p>
+                        <p class="text-red-600 text-sm mt-1">Thông tin hoàn tiền sẽ được gửi qua email</p>
+                    `;
+                    actionSection.appendChild(cancelledNotice);
+                }
+                
+                console.log('Đã cập nhật giao diện với trạng thái:', newStatus);
+            } catch (error) {
+                console.error('Lỗi khi cập nhật giao diện:', error);
+            }
         }
 
         function requestRefund() {

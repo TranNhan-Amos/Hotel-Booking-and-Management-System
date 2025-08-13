@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #ff6f91, #ff9671);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        width: 320px;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #ff6f91;
+    }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #ff6f91;
+        border: none;
+        color: white;
+        font-size: 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #e65c7a;
+    }
+    .switch {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+    .switch a {
+        color: #ff6f91;
+        text-decoration: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Đăng nhập</h2>
+    <form>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Mật khẩu" required>
+        <button type="submit">Đăng nhập</button>
+    </form>
+    <div class="switch">
+        Chưa có tài khoản? <a href="#">Đăng ký ngay</a>
+    </div>
+</div>
+
+</body>
+</html>

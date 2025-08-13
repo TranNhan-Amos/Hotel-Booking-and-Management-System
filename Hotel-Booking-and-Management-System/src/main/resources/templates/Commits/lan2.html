@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Booking & Management — UI Demo</title>
+  <meta name="description" content="Giao diện UI đặt phòng khách sạn thuần HTML/CSS/JS (demo ~1000 dòng)." />
+  <style>
+    :root{
+      --bg:#0b1020;          /* nền tối xanh tím */
+      --panel:#111832;       /* panel */
+      --muted:#1a2246;       /* hover/active */
+      --text:#e9edf8;        /* chữ chính */
+      --sub:#b7c3f3;         /* chữ phụ */
+      --brand:#7c9cff;       /* màu brand */
+      --brand-2:#35e0b9;     /* màu phụ */
+      --warn:#ffcc66;        /* cảnh báo */
+      --danger:#ff6b7a;      /* lỗi */
+      --ok:#8dffb0;          /* ok */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-lg: 22px;
+    }
+
+    *{box-sizing: border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--text);
+      background: radial-gradient(1200px 600px at 10% 0%, #151b3a, transparent 70%),
+                  radial-gradient(900px 600px at 100% 0%, #0e1533, transparent 70%),
+                  linear-gradient(180deg, #0b1020 0%, #0b1020 100%);
+      line-height:1.55;
+    }
+
+    /* ===== Utilities ===== */
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .row{display:flex;gap:20px;flex-wrap:wrap}
+    .col{flex:1 1 0}
+    .hidden{display:none !important}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+    .muted{color:var(--sub)}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--muted);display:inline-flex;gap:6px;align-items:center}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas; background:#090d1c;border:1px solid #1e264b;border-radius:8px;padding:2px 6px}
+
+    /* ===== Topbar ===== */
+    header.topbar{
+      position:sticky;top:0;z-index:1000;background:rgba(10,14,32,.85);backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1c244b;
+    }
+    .topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .logo{width:34px;height:34px;border-radius:10px;background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow:0 4px 18px rgba(124,156,255,.55)}
+    .brand .name{font-weight:700;letter-spacing:.3px}
+    nav.primary a{
+      text-decoration:none;color:var(--sub);padding:8px 12px;border-radius:10px;border:1px solid transparent
+    }
+    nav.primary a:hover, nav.primary a.active{color:var(--text); background:var(--muted); border-color:#24306b}
+    .actions{display:flex;gap:10px;align-items:center}
+    .btn{border:none;cursor:pointer;border-radius:12px;padding:10px 14px;font-weight:600;color:#0b1020;background:var(--brand);box-shadow: var(--shadow);}
+    .btn.secondary{background:#0f1736;color:var(--text);border:1px solid #25306b;box-shadow:none}
+    .btn.ghost{background:transparent;color:var(--sub);border:1px solid #27306b;box-shadow:none}
+
+    /* ===== Hero / Search ===== */
+    .hero{position:relative;overflow:hidden}
+    .hero .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;padding:38px 0}
+    .hero h1{margin:0;font-size:42px;line-height:1.1}
+    .hero p{color:var(--sub)}
+    .glass{
+      background: linear-gradient(180deg, rgba(20,26,56,.7), rgba(17,24,50,.7));
+      border: 1px solid #1b2656;border-radius: var(--radius-lg); box-shadow: var(--shadow);
+    }
+    .search-card{padding:20px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field label{font-size:13px;color:var(--sub)}
+    .field input, .field select{
+      background:#0a112e;color:var(--text);border:1px solid #232c5d;padding:12px 12px;border-radius:12px
+    }
+    .search-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .search-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+
+    /* ===== Sections ===== */
+    section{padding:40px 0;border-top:1px solid #141c40}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .section-title h2{margin:0;font-size:24px}
+    .section-title .sub{color:var(--sub);font-size:14px}
+
+    /* ===== Cards ===== */
+    .cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:16px}
+    .card{background:var(--panel);border:1px solid #1b2450;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .card .img{position:relative;height:190px;background:#0c1330}
+    .card .img .tag{position:absolute;top:10px;left:10px}
+    .card .img img{width:100%;height:100%;object-fit:cover;display:block}
+    .card .body{padding:14px;display:flex;flex-direction:column;gap:10px}
+    .rating{display:flex;gap:6px;align-items:center}
+    .stars{letter-spacing:1px}
+    .price{font-weight:800;font-size:18px}
+    .card .meta{display:flex;justify-content:space-between;align-items:center}
+
+    /* ===== Tabs ===== */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tabs .tab{padding:8px 12px;border-radius:999px;border:1px solid #263065;background:#0e1540;color:var(--sub);cursor:pointer}
+    .tabs .tab.active{background:linear-gradient(135deg, #1a2353, #12224a); color:var(--text)}
+
+    /* ===== Table ===== */
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    thead th{color:var(--sub);text-align:left;font-weight:600;font-size:12px}
+    tbody tr{background:var(--panel);border:1px solid #1b2450}
+    tbody td{padding:12px;border-top:1px solid #1b2450;border-bottom:1px solid #1b2450}
+    tbody tr:first-child td{border-top-left-radius:12px;border-top-right-radius:12px}
+    tbody tr:last-child td{border-bottom-left-radius:12px;border-bottom-right-radius:12px}
+
+    /* ===== Forms ===== */
+    .form{display:grid;grid-template-columns:repeat(2, 1fr);gap:14px}
+    .form .full{grid-column:1/-1}
+
+    /* ===== Modals ===== */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:2000}
+    .modal{width:min(720px, 92vw);background:var(--panel);border:1px solid #1b2450;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .modal .head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1b2450}
+    .modal .content{padding:16px}
+
+    /* ===== Footer ===== */
+    footer{padding:40px 0;border-top:1px solid #141c40;color:var(--sub)}
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px){
+      .hero .grid{grid-template-columns:1fr}
+      .cards{grid-template-columns:repeat(2, 1fr)}
+      .search-grid{grid-template-columns:repeat(2,1fr)}
+      .form{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      nav.primary{display:none}
+      .cards{grid-template-columns:1fr}
+      .search-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Topbar ===== -->
+  <header class="topbar">
+    <div class="container wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="name">Aurora Hotels</div>
+        <span class="chip"><span class="dot" style="width:8px;height:8px;background:var(--ok);display:inline-block;border-radius:999px"></span> Beta</span>
+      </div>
+      <nav class="primary" aria-label="Primary">
+        <a href="#home" class="active">Trang chủ</a>
+        <a href="#discover">Khám phá</a>
+        <a href="#deals">Ưu đãi</a>
+        <a href="#admin">Quản trị</a>
+      </nav>
+      <div class="actions">
+        <button class="btn secondary" id="btn-open-login">Đăng nhập</button>
+        <button class="btn" id="btn-open-book">Đặt nhanh</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Hero / Search ===== -->
+  <section id="home" class="hero">
+    <div class="container">
+      <div class="grid">
+        <div>
+          <h1>Nâng tầm kỳ nghỉ của bạn 🌙✨</h1>
+          <p class="muted">Tìm phòng khách sạn phù hợp trong vài giây — so sánh giá, xem đánh giá và đặt phòng an toàn.
+          </p>
+          <div class="tabs" role="tablist" aria-label="Bộ lọc nhanh">
+            <button class="tab active" data-filter="popular">Phổ biến</button>
+            <button class="tab" data-filter="luxury">Sang trọng</button>
+            <button class="tab" data-filter="budget">Tiết kiệm</button>
+            <button class="tab" data-filter="family">Gia đình</button>
+            <button class="tab" data-filter="business">Công tác</button>
+          </div>
+        </div>
+        <div class="glass search-card" aria-labelledby="search-title">
+          <h2 id="search-title" style="margin:0 0 8px">Tìm kiếm nhanh</h2>
+          <div class="search-grid">
+            <div class="field">
+              <label for="city">Thành phố</label>
+              <input id="city" placeholder="Hà Nội, Hồ Chí Minh..." />
+            </div>
+            <div class="field">
+              <label for="checkin">Ngày nhận phòng</label>
+              <input type="date" id="checkin" />
+            </div>
+            <div class="field">
+              <label for="checkout">Ngày trả phòng</label>
+              <input type="date" id="checkout" />
+            </div>
+            <div class="field">
+              <label for="guests">Khách</label>
+              <select id="guests">
+                <option>1</option>
+                <option selected>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5+</option>
+              </select>
+            </div>
+          </div>
+          <div class="search-actions">
+            <button class="btn secondary" id="btn-reset">Xóa</button>
+            <button class="btn" id="btn-search">Tìm phòng</button>
+          </div>
+          <p class="muted" style="margin-top:8px">Mẹo: bấm <span class="kbd">/</span> để bật tìm nhanh.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Discover / Cards ===== -->
+  <section id="discover">
+    <div class="container">
+      <div class="section-title">
+        <h2>Khách sạn gợi ý cho bạn</h2>
+        <div class="sub">Cập nhật mỗi ngày dựa trên xu hướng tìm kiếm</div>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="chip">Sắp xếp: <strong id="sort-state">Mặc định</strong></div>
+        <div class="chip">Bộ lọc: <strong id="filter-state">Phổ biến</strong></div>
+      </div>
+      <div class="cards" id="hotel-list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ===== Deals / Promo ===== -->
+  <section id="deals">
+    <div class="container">
+      <div class="section-title">
+        <h2>Ưu đãi & Flash Sale ⚡</h2>
+        <div class="sub">Số lượng có hạn — đặt trước khi hết</div>
+      </div>
+      <div class="cards" id="deal-list"></div>
+    </div>
+  </section>
+
+  <!-- ===== Booking Form (Inline) ===== -->
+  <section id="book">
+    <div class="container">
+      <div class="section-title">
+        <h2>Đặt phòng nhanh</h2>
+        <div class="sub">Điền thông tin trong 60 giây</div>
+      </div>
+      <form id="book-form" class="form glass" style="padding:16px">
+        <div class="field">
+          <label for="bf-name">Họ tên</label>
+          <input id="bf-name" placeholder="Nguyễn Văn A" required />
+        </div>
+        <div class="field">
+          <label for="bf-phone">Số điện thoại</label>
+          <input id="bf-phone" placeholder="09xx" required />
+        </div>
+        <div class="field">
+          <label for="bf-email">Email</label>
+          <input id="bf-email" type="email" placeholder="ban@vidu.com" />
+        </div>
+        <div class="field">
+          <label for="bf-city">Thành phố</label>
+          <input id="bf-city" placeholder="Đà Nẵng" />
+        </div>
+        <div class="field">
+          <label for="bf-hotel">Khách sạn</label>
+          <input id="bf-hotel" placeholder="Aurora Riverside" />
+        </div>
+        <div class="field">
+          <label for="bf-room">Loại phòng</label>
+          <select id="bf-room">
+            <option>Standard</option>
+            <option>Deluxe</option>
+            <option>Suite</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bf-in">Nhận phòng</label>
+          <input type="date" id="bf-in" required />
+        </div>
+        <div class="field">
+          <label for="bf-out">Trả phòng</label>
+          <input type="date" id="bf-out" required />
+        </div>
+        <div class="field">
+          <label for="bf-guests">Số khách</label>
+          <select id="bf-guests">
+            <option>1</option>
+            <option selected>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bf-note">Ghi chú</label>
+          <input id="bf-note" placeholder="Yêu cầu giường phụ, xe đưa đón..." />
+        </div>
+        <div class="full" style="display:flex;justify-content:flex-end;gap:10px">
+          <button type="button" class="btn secondary" id="bf-clear">Xóa</button>
+          <button type="submit" class="btn">Xác nhận đặt</button>
+        </div>
+      </form>
+      <p id="book-result" class="muted" style="margin-top:10px"></p>
+    </div>
+  </section>
+
+  <!-- ===== Admin / Management ===== -->
+  <section id="admin">
+    <div class="container">
+      <div class="section-title">
+        <h2>Bảng điều khiển quản trị</h2>
+        <div class="sub">Theo dõi đơn, tình trạng phòng, doanh thu</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="glass" style="padding:14px">
+            <div class="row">
+              <div class="col">
+                <div class="chip">Đơn mới hôm nay <strong id="m-orders">0</strong></div>
+              </div>
+              <div class="col">
+                <div class="chip">Phòng trống <strong id="m-available">0</strong></div>
+              </div>
+              <div class="col">
+                <div class="chip">Tỷ lệ lấp đầy <strong id="m-occ">0%</strong></div>
+              </div>
+              <div class="col">
+                <div class="chip">Doanh thu ước tính <strong id="m-rev">0₫</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin:20px 0 10px">Đơn đặt phòng gần đây</h3>
+      <div class="glass" style="padding:10px">
+        <table aria-describedby="orders-desc">
+          <caption id="orders-desc" class="sr-only">Danh sách đơn đặt phòng mới nhất</caption>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Khách hàng</th>
+              <th>Khách sạn</th>
+              <th>Loại phòng</th>
+              <th>Nhận</th>
+              <th>Trả</th>
+              <th>Giá</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px">
+        <button class="btn ghost" id="prev-page">Trang trước</button>
+        <button class="btn ghost" id="next-page">Trang sau</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-title">
+        <h2>Câu hỏi thường gặp</h2>
+        <div class="sub">Những điều bạn thắc mắc nhiều nhất</div>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="body">
+            <h3>Hủy phòng có mất phí không?</h3>
+            <p class="muted">Tùy hạng phòng và chính sách của khách sạn. Trước 48 giờ thường miễn phí.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="body">
+            <h3>Thanh toán như thế nào?</h3>
+            <p class="muted">Hỗ trợ thẻ nội địa, quốc tế và chuyển khoản. Thanh toán tại khách sạn với một số đối tác.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="body">
+            <h3>Có xuất hóa đơn VAT không?</h3>
+            <p class="muted">Có. Nhập thông tin doanh nghiệp khi đặt hoặc liên hệ hỗ trợ sau khi nhận phòng.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Contact / Newsletter ===== -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-title">
+        <h2>Liên hệ & Nhận tin</h2>
+        <div class="sub">Chúng tôi phản hồi trong vòng 15 phút</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="glass" style="padding:14px">
+            <form class="form">
+              <div class="field full">
+                <label for="ct-msg">Tin nhắn</label>
+                <input id="ct-msg" placeholder="Tôi muốn hợp tác..." />
+              </div>
+              <div class="field">
+                <label for="ct-name">Tên</label>
+                <input id="ct-name" />
+              </div>
+              <div class="field">
+                <label for="ct-mail">Email</label>
+                <input id="ct-mail" type="email" />
+              </div>
+              <div class="full" style="display:flex;justify-content:flex-end">
+                <button class="btn" type="button" id="send-contact">Gửi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col">
+          <div class="glass" style="padding:14px">
+            <h3>Đăng ký nhận ưu đãi</h3>
+            <p class="muted">Mỗi tuần 1 email — không spam.</p>
+            <div class="row">
+              <div class="col"><input id="nl-mail" placeholder="you@email.com" style="width:100%;background:#0a112e;color:var(--text);border:1px solid #232c5d;padding:12px;border-radius:12px"/></div>
+              <div class="col" style="flex:0 0 auto"><button class="btn" id="nl-sub">Đăng ký</button></div>
+            </div>
+            <p id="nl-result" class="muted" style="margin-top:10px"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    <div class="container row">
+      <div class="col">
+        <div class="brand">
+          <div class="logo"></div>
+          <div class="name">Aurora Hotels</div>
+        </div>
+        <p class="muted">© 2025 Aurora. All rights reserved.</p>
+      </div>
+      <div class="col">
+        <div class="muted">Điều khoản | Bảo mật | Hỗ trợ</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== Modals ===== -->
+  <div class="modal-backdrop" id="modal-login">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <div class="head">
+        <strong id="login-title">Đăng nhập</strong>
+        <button class="btn ghost" data-close>Đóng</button>
+      </div>
+      <div class="content">
+        <form class="form">
+          <div class="field full">
+            <label for="lg-mail">Email</label>
+            <input id="lg-mail" type="email" placeholder="ban@vidu.com" />
+          </div>
+          <div class="field full">
+            <label for="lg-pass">Mật khẩu</label>
+            <input id="lg-pass" type="password" />
+          </div>
+          <div class="full" style="display:flex;justify-content:flex-end;gap:8px">
+            <button type="button" class="btn secondary" data-close>Hủy</button>
+            <button type="button" class="btn" id="do-login">Đăng nhập</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-book">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="book-title">
+      <div class="head">
+        <strong id="book-title">Đặt phòng nhanh</strong>
+        <button class="btn ghost" data-close>Đóng</button>
+      </div>
+      <div class="content">
+        <form class="form">
+          <div class="field">
+            <label for="mk-hotel">Khách sạn</label>
+            <select id="mk-hotel"></select>
+          </div>
+          <div class="field">
+            <label for="mk-room">Loại phòng</label>
+            <select id="mk-room">
+              <option>Standard</option>
+              <option>Deluxe</option>
+              <option>Suite</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="mk-in">Nhận phòng</label>
+            <input type="date" id="mk-in" />
+          </div>
+          <div class="field">
+            <label for="mk-out">Trả phòng</label>
+            <input type="date" id="mk-out" />
+          </div>
+          <div class="field">
+            <label for="mk-guests">Khách</label>
+            <select id="mk-guests">
+              <option>1</option>
+              <option selected>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5+</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="mk-name">Họ tên</label>
+            <input id="mk-name" />
+          </div>
+          <div class="field">
+            <label for="mk-phone">SĐT</label>
+            <input id="mk-phone" />
+          </div>
+          <div class="full" style="display:flex;justify-content:flex-end;gap:8px">
+            <button type="button" class="btn secondary" data-close>Hủy</button>
+            <button type="button" class="btn" id="mk-submit">Đặt ngay</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Templates (for cloning) ===== -->
+  <template id="tpl-hotel-card">
+    <article class="card" data-tags="popular luxury budget family business">
+      <div class="img">
+        <span class="chip tag"><span aria-hidden>★</span> <span class="rating-val">4.8</span></span>
+        <img alt="Ảnh khách sạn" />
+      </div>
+      <div class="body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <h3 class="title" style="margin:0;font-size:18px"></h3>
+          <div class="price"></div>
+        </div>
+        <div class="muted">📍 <span class="location"></span></div>
+        <div class="meta">
+          <div class="rating"><span class="stars">★★★★★</span><span class="muted">(<span class="reviews">0</span>)</span></div>
+          <div>
+            <button class="btn secondary btn-view">Xem</button>
+            <button class="btn btn-book">Đặt</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <template id="tpl-deal-card">
+    <article class="card">
+      <div class="img">
+        <span class="chip tag"><span>⚡</span> <strong>-<span class="off">30</span>%</strong></span>
+        <img alt="Ảnh khuyến mãi" />
+      </div>
+      <div class="body">
+        <h3 class="title" style="margin:0 0 6px"></h3>
+        <p class="muted desc" style="margin:0 0 8px"></p>
+        <div class="meta">
+          <div>
+            <div class="muted">Giá cũ: <s class="old">0</s></div>
+            <div class="price new">0</div>
+          </div>
+          <div>
+            <button class="btn btn-deal">Chọn</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- ===== Data & Logic ===== -->
+  <script>
+    // Dữ liệu mẫu (có thể thay bằng fetch API)
+    const HOTELS = [
+      {id:1, name:'Aurora Riverside', city:'Đà Nẵng', rating:4.8, reviews:1290, price:1200000, tags:['popular','family'], img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop'},
+      {id:2, name:'Lumière Sky', city:'Hà Nội', rating:4.6, reviews:980, price:1650000, tags:['business','popular'], img:'https://images.unsplash.com/photo-1551887323-1e0b1d83f8b0?q=80&w=1600&auto=format&fit=crop'},
+      {id:3, name:'Coral Bay Resort', city:'Phú Quốc', rating:4.9, reviews:2021, price:2850000, tags:['luxury','popular','family'], img:'https://images.unsplash.com/photo-1496412705862-e0088f16f791?q=80&w=1600&auto=format&fit=crop'},
+      {id:4, name:'Sapa Echo Lodge', city:'Sa Pa', rating:4.7, reviews:652, price:980000, tags:['budget','family'], img:'https://images.unsplash.com/photo-1501117716987-c8e26d9a8708?q=80&w=1600&auto=format&fit=crop'},
+      {id:5, name:'Saigon Prime Suites', city:'TP. HCM', rating:4.5, reviews:1888, price:1750000, tags:['business','popular'], img:'https://images.unsplash.com/photo-1535827841776-24afc1e255ac?q=80&w=1600&auto=format&fit=crop'},
+      {id:6, name:'Dalat Misty Hills', city:'Đà Lạt', rating:4.4, reviews:420, price:720000, tags:['budget','family'], img:'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1600&auto=format&fit=crop'},
+      {id:7, name:'Nha Trang Blue Pearl', city:'Nha Trang', rating:4.8, reviews:1502, price:1450000, tags:['popular','family'], img:'https://images.unsplash.com/photo-1505692952047-1a78307da8f2?q=80&w=1600&auto=format&fit=crop'},
+      {id:8, name:'Hue Royal Garden', city:'Huế', rating:4.3, reviews:390, price:880000, tags:['budget'], img:'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1600&auto=format&fit=crop'},
+      {id:9, name:'Con Dao Serenity', city:'Côn Đảo', rating:4.9, reviews:301, price:3450000, tags:['luxury'], img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop'},
+      {id:10, name:'Mui Ne Dunes Retreat', city:'Mũi Né', rating:4.2, reviews:215, price:650000, tags:['budget'], img:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop'},
+    ];
+
+    const DEALS = [
+      {id:1, title:'Cuối tuần Phú Quốc', off:35, old:3200000, img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop', desc:'Ở Coral Bay Resort 2N1Đ + Buffet sáng'},
+      {id:2, title:'Đà Lạt mộng mơ', off:25, old:1200000, img:'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1600&auto=format&fit=crop', desc:'Misty Hills 3N2Đ, miễn phí nâng cấp phòng'},
+      {id:3, title:'Công tác Hà Nội', off:18, old:1850000, img:'https://images.unsplash.com/photo-1551887323-1e0b1d83f8b0?q=80&w=1600&auto=format&fit=crop', desc:'Lumière Sky kèm xe đưa đón sân bay'},
+    ];
+
+    const ORDERS = Array.from({length: 28}).map((_,i)=>({
+      id: 1000 + i,
+      name: ['Nguyễn Văn A','Trần Thị B','Lê Quốc C','Phạm Duy D'][i%4],
+      hotel: HOTELS[i % HOTELS.length].name,
+      room: ['Standard','Deluxe','Suite'][i%3],
+      in: '2025-08-1' + (i%9),
+      out:'2025-08-2' + (i%9),
+      price: (800000 + (i%5)*250000).toLocaleString('vi-VN') + '₫',
+      status: ['Chuẩn bị giao hàng','Đang giao hàng','Hoàn thành giao hàng'][i%3]
+    }));
+
+    // State
+    let filterTag = 'popular';
+    let sortMode = 'default';
+    let page = 0; const pageSize = 6;
+
+    // Format helpers
+    const VND = n => n.toLocaleString('vi-VN') + '₫';
+
+    // Render Hotels
+    function renderHotels(){
+      document.getElementById('filter-state').textContent =
+        {popular:'Phổ biến', luxury:'Sang trọng', budget:'Tiết kiệm', family:'Gia đình', business:'Công tác'}[filterTag];
+      document.getElementById('sort-state').textContent =
+        {default:'Mặc định', price_asc:'Giá tăng', price_desc:'Giá giảm', rating:'Đánh giá cao'}[sortMode];
+
+      const list = document.getElementById('hotel-list');
+      list.innerHTML = '';
+
+      let data = HOTELS.filter(h => h.tags.includes(filterTag));
+      if(sortMode==='price_asc') data.sort((a,b)=>a.price-b.price);
+      if(sortMode==='price_desc') data.sort((a,b)=>b.price-a.price);
+      if(sortMode==='rating') data.sort((a,b)=>b.rating-a.rating);
+
+      data.forEach(h=>{
+        const node = document.getElementById('tpl-hotel-card').content.cloneNode(true);
+        node.querySelector('article').dataset.tags = h.tags.join(' ');
+        node.querySelector('img').src = h.img;
+        node.querySelector('.title').textContent = h.name;
+        node.querySelector('.location').textContent = h.city;
+        node.querySelector('.rating-val').textContent = h.rating.toFixed(1);
+        node.querySelector('.reviews').textContent = h.reviews.toLocaleString('vi-VN');
+        node.querySelector('.price').textContent = VND(h.price) + '/đêm';
+        node.querySelector('.btn-book').addEventListener('click',()=> openQuickBook(h));
+        node.querySelector('.btn-view').addEventListener('click',()=> alert('Xem chi tiết: ' + h.name));
+        list.appendChild(node);
+      })
+    }
+
+    // Render Deals
+    function renderDeals(){
+      const list = document.getElementById('deal-list');
+      list.innerHTML='';
+      DEALS.forEach(d=>{
+        const el = document.getElementById('tpl-deal-card').content.cloneNode(true);
+        el.querySelector('img').src = d.img;
+        el.querySelector('.title').textContent = d.title;
+        el.querySelector('.off').textContent = d.off;
+        el.querySelector('.old').textContent = VND(d.old);
+        const newPrice = Math.round(d.old*(100-d.off)/100);
+        el.querySelector('.new').textContent = VND(newPrice);
+        el.querySelector('.desc').textContent = d.desc;
+        el.querySelector('.btn-deal').addEventListener('click',()=> alert('Đã áp dụng ưu đãi: ' + d.title));
+        list.appendChild(el);
+      })
+    }
+
+    // Render Orders (pagination)
+    function renderOrders(){
+      const body = document.getElementById('orders-body');
+      body.innerHTML='';
+      const start = page*pageSize;
+      const rows = ORDERS.slice(start, start+pageSize);
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${r.id}</td>
+          <td>${r.name}</td>
+          <td>${r.hotel}</td>
+          <td>${r.room}</td>
+          <td>${r.in}</td>
+          <td>${r.out}</td>
+          <td>${r.price}</td>
+          <td><span class="chip">${r.status}</span></td>
+          <td>
+            <button class="btn secondary" data-id="${r.id}">Duyệt</button>
+            <button class="btn ghost" data-id="${r.id}" data-cancel>Hủy</button>
+          </td>
+        `;
+        body.appendChild(tr);
+      })
+    }
+
+    // Update metrics
+    function updateMetrics(){
+      document.getElementById('m-orders').textContent = ORDERS.length;
+      const available = 42; // giả lập
+      document.getElementById('m-available').textContent = available;
+      document.getElementById('m-occ').textContent = Math.round((1-available/100)*100)+'%';
+      const rev = HOTELS.reduce((s,h)=> s + h.price*2, 0);
+      document.getElementById('m-rev').textContent = VND(rev);
+    }
+
+    // Quick Book Modal
+    function openQuickBook(h){
+      const select = document.getElementById('mk-hotel');
+      select.innerHTML = '';
+      HOTELS.forEach(o=>{
+        const op = document.createElement('option'); op.value=o.id; op.textContent = o.name; if(h && o.id===h.id) op.selected=true; select.appendChild(op);
+      })
+      toggleModal('modal-book', true);
+    }
+
+    // Modal helpers
+    function toggleModal(id, open){
+      const el = document.getElementById(id);
+      el.style.display = open ? 'flex' : 'none';
+      if(open){
+        el.querySelector('[data-close]')?.focus();
+      }
+    }
+
+    // Search hotkeys
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName)){
+        e.preventDefault();
+        document.getElementById('city').focus();
+      }
+    })
+
+    // Event bindings
+    document.querySelectorAll('.tabs .tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tabs .tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        filterTag = btn.dataset.filter; renderHotels();
+      })
+    })
+
+    document.getElementById('btn-search').addEventListener('click',()=>{
+      sortMode = ['default','price_asc','price_desc','rating'][Math.floor(Math.random()*4)];
+      renderHotels();
+    })
+    document.getElementById('btn-reset').addEventListener('click',()=>{
+      document.getElementById('city').value='';
+      document.getElementById('checkin').value='';
+      document.getElementById('checkout').value='';
+      document.getElementById('guests').selectedIndex=1;
+      sortMode='default'; renderHotels();
+    })
+
+    document.getElementById('prev-page').addEventListener('click',()=>{ page=Math.max(0, page-1); renderOrders(); })
+    document.getElementById('next-page').addEventListener('click',()=>{ page=Math.min(Math.ceil(ORDERS.length/pageSize)-1, page+1); renderOrders(); })
+
+    document.getElementById('btn-open-login').addEventListener('click', ()=> toggleModal('modal-login', true));
+    document.getElementById('btn-open-book').addEventListener('click', ()=> openQuickBook());
+
+    document.querySelectorAll('[data-close]').forEach(b=> b.addEventListener('click', e=>{
+      const modal = e.target.closest('.modal-backdrop');
+      modal.style.display='none';
+    }))
+
+    document.getElementById('do-login').addEventListener('click',()=>{
+      alert('Đăng nhập demo thành công!');
+      toggleModal('modal-login', false);
+    })
+
+    document.getElementById('mk-submit').addEventListener('click',()=>{
+      alert('Đặt phòng thành công! Chúng tôi sẽ liên hệ xác nhận.');
+      toggleModal('modal-book', false);
+    })
+
+    document.getElementById('bf-clear').addEventListener('click',()=> document.getElementById('book-form').reset())
+    document.getElementById('book-form').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      document.getElementById('book-result').textContent = '✅ Đã nhận thông tin đặt phòng. Chúng tôi sẽ gọi xác nhận.';
+      e.target.reset();
+    })
+
+    document.getElementById('nl-sub').addEventListener('click',()=>{
+      const v = document.getElementById('nl-mail').value.trim();
+      document.getElementById('nl-result').textContent = v? 'Đăng ký thành công!' : 'Vui lòng nhập email.';
+    })
+
+    document.getElementById('send-contact').addEventListener('click',()=>{
+      alert('Tin nhắn đã được gửi. Cảm ơn bạn!');
+      document.getElementById('ct-msg').value='';
+    })
+
+    // Initialize
+    renderHotels();
+    renderDeals();
+    renderOrders();
+    updateMetrics();
+  </script>
+</body>
+</html>

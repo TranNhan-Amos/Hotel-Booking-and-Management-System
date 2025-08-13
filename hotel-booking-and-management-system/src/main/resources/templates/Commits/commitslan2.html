@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đơn hàng</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f8;
+        }
+        .container {
+            display: flex;
+        }
+        /* Sidebar */
+        .sidebar {
+            background-color: #2f3e46;
+            color: white;
+            width: 220px;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            background-color: #354f52;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            border-left: 4px solid transparent;
+        }
+        .sidebar a:hover {
+            background-color: #52796f;
+            border-left: 4px solid #84a98c;
+        }
+        /* Main content */
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+            flex: 1;
+        }
+        header {
+            background-color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        .search-filter {
+            background: white;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .search-filter input, .search-filter select, .search-filter button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-filter button {
+            background-color: #84a98c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .search-filter button:hover {
+            background-color: #52796f;
+        }
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin-top: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        table th {
+            background-color: #f8f9fa;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.shipping {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .status.delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        @media(max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <a href="#">📦 Quản lý đơn hàng</a>
+        <a href="#">🛍 Quản lý sản phẩm</a>
+        <a href="#">👥 Quản lý khách hàng</a>
+        <a href="#">⚙ Cài đặt</a>
+        <a href="#">🚪 Đăng xuất</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <header>
+            <h1>Danh sách đơn hàng</h1>
+            <div>Xin chào, Admin</div>
+        </header>
+
+        <!-- Search & Filter -->
+        <div class="search-filter">
+            <input type="text" placeholder="Tìm theo mã đơn...">
+            <select>
+                <option value="">Trạng thái</option>
+                <option value="pending">Chuẩn bị giao hàng</option>
+                <option value="shipping">Đang giao hàng</option>
+                <option value="delivered">Hoàn thành</option>
+            </select>
+            <button>Tìm kiếm</button>
+        </div>
+
+        <!-- Order Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#1001</td>
+                    <td>Nguyễn Văn A</td>
+                    <td>12/08/2025</td>
+                    <td>1.200.000đ</td>
+                    <td><span class="status pending">Chuẩn bị giao hàng</span></td>
+                </tr>
+                <tr>
+                    <td>#1002</td>
+                    <td>Trần Thị B</td>
+                    <td>11/08/2025</td>
+                    <td>850.000đ</td>
+                    <td><span class="status shipping">Đang giao hàng</span></td>
+                </tr>
+                <tr>
+                    <td>#1003</td>
+                    <td>Lê Văn C</td>
+                    <td>10/08/2025</td>
+                    <td>450.000đ</td>
+                    <td><span class="status delivered">Hoàn thành</span></td>
+                </tr>
+                <tr>
+                    <td>#1004</td>
+                    <td>Phạm Thị D</td>
+                    <td>09/08/2025</td>
+                    <td>2.300.000đ</td>
+                    <td><span class="status pending">Chuẩn bị giao hàng</span></td>
+                </tr>
+                <tr>
+                    <td>#1005</td>
+                    <td>Đỗ Văn E</td>
+                    <td>08/08/2025</td>
+                    <td>1.050.000đ</td>
+                    <td><span class="status delivered">Hoàn thành</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

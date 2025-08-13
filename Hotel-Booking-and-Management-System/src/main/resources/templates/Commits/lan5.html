@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxuryStay - Đặt Phòng Khách Sạn Cao Cấp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2a6df4;
+            --secondary: #ff6b35;
+            --dark: #1a2a4a;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #28a745;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-left: 10px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .logo i {
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        .auth-buttons button {
+            background: none;
+            border: none;
+            padding: 8px 20px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .login-btn {
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .login-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .register-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .register-btn:hover {
+            background-color: #1a5ad9;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Booking Form */
+        .booking-form {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: -80px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .form-title h3 {
+            font-size: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+
+        .form-group {
+            flex: 1 0 200px;
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #e05a2a;
+        }
+
+        /* Room Types Section */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .room-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .room-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-image {
+            height: 220px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .room-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .room-card:hover .room-image img {
+            transform: scale(1.05);
+        }
+
+        .room-content {
+            padding: 25px;
+        }
+
+        .room-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .room-features {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .room-features li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .room-features li i {
+            color: var(--primary);
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .room-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .price span {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--gray);
+        }
+
+        .book-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .book-btn:hover {
+            background-color: #1a5ad9;
+        }
+
+        /* Hotel Features */
+        .features {
+            background-color: var(--light);
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            background: linear-gradient(135deg, var(--primary), #1a4fc9);
+            color: white;
+        }
+
+        .testimonial-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .author-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .rating {
+            color: gold;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 70px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h4 {
+            font-size: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .contact-info {
+            list-style: none;
+        }
+
+        .contact-info li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .contact-info i {
+            color: var(--secondary);
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 25px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 40px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                flex-direction: column;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .auth-buttons {
+                margin-top: 15px;
+            }
+            
+            .hero {
+                height: 500px;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                height: 450px;
+            }
+            
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .testimonial-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="top-header">
+                <div class="logo">
+                    <i class="fas fa-hotel"></i>
+                    <h1>Luxury<span>Stay</span></h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Trang chủ</a></li>
+                        <li><a href="#">Khách sạn</a></li>
+                        <li><a href="#">Phòng</a></li>
+                        <li><a href="#">Dịch vụ</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn">Đăng nhập</button>
+                    <button class="register-btn">Đăng ký</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Kỳ nghỉ hoàn hảo bắt đầu từ đây</h2>
+            <p>Khám phá những khách sạn tuyệt vời với mức giá tốt nhất tại LuxuryStay</p>
+        </div>
+    </section>
+
+    <!-- Booking Form -->
+    <div class="container">
+        <div class="booking-form">
+            <div class="form-title">
+                <h3>Tìm phòng hoàn hảo cho bạn</h3>
+            </div>
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checkin">Ngày nhận phòng</label>
+                        <input type="date" id="checkin" class="form-control" value="2023-10-15">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout">Ngày trả phòng</label>
+                        <input type="date" id="checkout" class="form-control" value="2023-10-20">
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Số khách</label>
+                        <select id="guests" class="form-control">
+                            <option>1 khách</option>
+                            <option selected>2 khách</option>
+                            <option>3 khách</option>
+                            <option>4 khách</option>
+                            <option>5+ khách</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-type">Loại phòng</label>
+                        <select id="room-type" class="form-control">
+                            <option>Tất cả loại phòng</option>
+                            <option>Phòng tiêu chuẩn</option>
+                            <option>Phòng deluxe</option>
+                            <option>Phòng gia đình</option>
+                            <option>Suite</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="search-btn">Tìm kiếm phòng</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Room Types Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Loại phòng của chúng tôi</h2>
+                <p class="section-subtitle">Khám phá các loại phòng đa dạng được thiết kế để mang lại sự thoải mái và tiện nghi tối đa cho bạn</p>
+            </div>
+            <div class="room-cards">
+                <!-- Room 1 -->
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Phòng Tiêu Chuẩn">
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Phòng Tiêu Chuẩn</h3>
+                        <ul class="room-features">
+                            <li><i class="fas fa-bed"></i> 1 giường đôi hoặc 2 giường đơn</li>
+                            <li><i class="fas fa-user-friends"></i> Tối đa 2 khách</li>
+                            <li><i class="fas fa-wifi"></i> Wifi tốc độ cao</li>
+                            <li><i class="fas fa-tv"></i> TV màn hình phẳng</li>
+                        </ul>
+                        <div class="room-price">
+                            <div class="price">1.200.000₫ <span>/đêm</span></div>
+                            <button class="book-btn">Đặt phòng</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 2 -->
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Phòng Deluxe">
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Phòng Deluxe</h3>
+                        <ul class="room-features">
+                            <li><i class="fas fa-bed"></i> 1 giường king size</li>
+                            <li><i class="fas fa-user-friends"></i> Tối đa 3 khách</li>
+                            <li><i class="fas fa-bath"></i> Bồn tắm sang trọng</li>
+                            <li><i class="fas fa-coffee"></i> Khu vực thư giãn</li>
+                        </ul>
+                        <div class="room-price">
+                            <div class="price">2.500.000₫ <span>/đêm</span></div>
+                            <button class="book-btn">Đặt phòng</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 3 -->
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Phòng Gia Đình">
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Phòng Gia Đình</h3>
+                        <ul class="room-features">
+                            <li><i class="fas fa-bed"></i> 2 giường đôi</li>
+                            <li><i class="fas fa-user-friends"></i> Tối đa 4 khách</li>
+                            <li><i class="fas fa-utensils"></i> Khu vực bếp nhỏ</li>
+                            <li><i class="fas fa-gamepad"></i> Khu vui chơi trẻ em</li>
+                        </ul>
+                        <div class="room-price">
+                            <div class="price">3.200.000₫ <span>/đêm</span></div>
+                            <button class="book-btn">Đặt phòng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Tiện nghi của khách sạn</h2>
+                <p class="section-subtitle">Chúng tôi mang đến những tiện nghi hàng đầu để đảm bảo trải nghiệm tuyệt vời cho khách hàng</p>
+            </div>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-swimming-pool"></i>
+                    </div>
+                    <h4 class="feature-title">Hồ bơi ngoài trời</h4>
+                    <p>Hồ bơi rộng với view đẹp, khu vực thư giãn tiện nghi</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h4 class="feature-title">Nhà hàng đa ẩm thực</h4>
+                    <p>Phục vụ các món ăn Việt Nam, Á, Âu đa dạng</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h4 class="feature-title">Spa & Wellness</h4>
+                    <p>Dịch vụ spa cao cấp, phòng gym hiện đại</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h4 class="feature-title">Wifi tốc độ cao</h4>
+                    <p>Kết nối internet tốc độ cao toàn khuôn viên</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Đánh giá của khách hàng</h2>
+                <p class="section-subtitle">Khách hàng nói gì về trải nghiệm tại LuxuryStay</p>
+            </div>
+            <div class="testimonial-cards">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Tôi đã có một trải nghiệm tuyệt vời tại LuxuryStay. Phòng ốc sạch sẽ, nhân viên thân thiện và dịch vụ hoàn hảo. Chắc chắn sẽ quay lại vào lần tới!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Nguyễn Thị Hoa">
+                        </div>
+                        <div class="author-info">
+                            <h4>Nguyễn Thị Hoa</h4>
+                            <p>Khách hàng thường xuyên</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">"Khách sạn có vị trí tuyệt vời, gần trung tâm nhưng vẫn yên tĩnh. Phòng gia đình rộng rãi, tiện nghi đầy đủ. Bữa sáng buffet rất đa dạng và ngon miệng."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/54.jpg" alt="Trần Văn Minh">
+                        </div>
+                        <div class="author-info">
+                            <h4>Trần Văn Minh</h4>
+                            <p>Khách du lịch</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Dịch vụ spa của khách sạn thật tuyệt vời! Sau một ngày dài họp hành, được thư giãn tại spa giúp tôi lấy lại năng lượng. Nhân viên rất chuyên nghiệp và nhiệt tình."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Lê Thị Lan">
+                        </div>
+                        <div class="author-info">
+                            <h4>Lê Thị Lan</h4>
+                            <p>Khách công tác</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>Về LuxuryStay</h4>
+                    <p style="color: #b0b0b0; margin-top: 20px;">LuxuryStay là hệ thống khách sạn cao cấp với tiêu chuẩn 5 sao, mang đến những trải nghiệm nghỉ dưỡng tuyệt vời với dịch vụ đẳng cấp thế giới.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Liên kết nhanh</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Về chúng tôi</a></li>
+                        <li><a href="#">Dịch vụ</a></li>
+                        <li><a href="#">Phòng & Suites</a></li>
+                        <li><a href="#">Ưu đãi đặc biệt</a></li>
+                        <li><a href="#">Đặt phòng</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Dịch vụ</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Đặt phòng trực tuyến</a></li>
+                        <li><a href="#">Dịch vụ phòng</a></li>
+                        <li><a href="#">Dịch vụ spa</a></li>
+                        <li><a href="#">Hội nghị & Sự kiện</a></li>
+                        <li><a href="#">Nhà hàng & Quầy bar</a></li>
+                        <li><a href="#">Tour du lịch</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Liên hệ</h4>
+                    <ul class="contact-info">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Đường Nguyễn Huệ, Quận 1, TP.HCM</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>+84 28 3823 4567</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@luxurystay.com</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-globe"></i>
+                            <span>www.luxurystay.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <div class="container">
+                &copy; 2023 LuxuryStay. Tất cả quyền được bảo lưu.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set min date for checkin to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkin').min = today;
+            
+            // Set checkout to be at least 1 day after checkin
+            document.getElementById('checkin').addEventListener('change', function() {
+                const checkinDate = new Date(this.value);
+                checkinDate.setDate(checkinDate.getDate() + 1);
+                const minCheckout = checkinDate.toISOString().split('T')[0];
+                document.getElementById('checkout').min = minCheckout;
+                
+                // If current checkout is before new min, set to min
+                if (document.getElementById('checkout').value < minCheckout) {
+                    document.getElementById('checkout').value = minCheckout;
+                }
+            });
+            
+            // Book room buttons
+            const bookButtons = document.querySelectorAll('.book-btn');
+            bookButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const roomTitle = this.closest('.room-card').querySelector('.room-title').textContent;
+                    alert(`Bạn đã chọn đặt phòng: ${roomTitle}\nChúng tôi sẽ chuyển hướng bạn đến trang thanh toán.`);
+                });
+            });
+            
+            // Search button
+            document.querySelector('.search-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const checkin = document.getElementById('checkin').value;
+                const checkout = document.getElementById('checkout').value;
+                const guests = document.getElementById('guests').value;
+                const roomType = document.getElementById('room-type').value;
+                
+                alert(`Tìm kiếm phòng với thông tin:\nNgày nhận: ${checkin}\nNgày trả: ${checkout}\nSố khách: ${guests}\nLoại phòng: ${roomType}`);
+            });
+        });
+    </script>
+</body>
+</html>

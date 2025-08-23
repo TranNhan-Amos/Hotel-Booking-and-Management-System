@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Test Hủy Phòng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+body {
+            font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+  background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 10px 20px;
+  border: none;
+            border-radius: 5px;
+  cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+    <h1>Test Chức Năng Hủy Phòng</h1>
+    
+    <div class="test-card">
+        <h3>1. Test Hủy Phòng</h3>
+        <p>Nhập ID đặt phòng để test chức năng hủy:</p>
+        <input type="number" id="bookingId" placeholder="Nhập Booking ID" style="padding: 8px; margin: 5px;">
+        <input type="text" id="cancelReason" placeholder="Lý do hủy (tùy chọn)" style="padding: 8px; margin: 5px; width: 200px;">
+        <br>
+        <button class="btn btn-danger" onclick="testCancelBooking()">
+            <i class="fas fa-times"></i> Test Hủy Phòng
+        </button>
+        <div id="cancelResult" class="result" style="display: none;"></div>
+        </div>
+
+    <div class="test-card">
+        <h3>2. Test Hoàn Tiền</h3>
+        <p>Nhập ID đặt phòng đã hủy để test hoàn tiền:</p>
+        <input type="number" id="refundBookingId" placeholder="Nhập Booking ID" style="padding: 8px; margin: 5px;">
+        <br>
+        <button class="btn btn-success" onclick="testRefund()">
+            <i class="fas fa-undo"></i> Test Hoàn Tiền
+                    </button>
+        <div id="refundResult" class="result" style="display: none;"></div>
+                </div>
+                
+    <div class="test-card">
+        <h3>3. Test Xem Danh Sách Đặt Phòng</h3>
+        <button class="btn btn-primary" onclick="window.location.href='/historybooking'">
+            <i class="fas fa-list"></i> Xem Lịch Sử Đặt Phòng
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='/my-bookings'">
+            <i class="fas fa-list"></i> Xem My Bookings
+                    </button>
+                </div>
+
+    <script>
+        function testCancelBooking() {
+            const bookingId = document.getElementById('bookingId').value;
+            const reason = document.getElementById('cancelReason').value;
+            const resultDiv = document.getElementById('cancelResult');
+            
+            if (!bookingId) {
+                showResult(resultDiv, 'Vui lòng nhập Booking ID', 'error');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Đang xử lý...';
+            resultDiv.className = 'result';
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            
+            fetch('/cancel-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `bookingId=${bookingId}&reason=${encodeURIComponent(reason)}&_csrf=${csrfToken}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResult(resultDiv, data.message, 'success');
+  } else {
+                    showResult(resultDiv, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResult(resultDiv, 'Có lỗi xảy ra: ' + error.message, 'error');
+            });
+        }
+        
+        function testRefund() {
+            const bookingId = document.getElementById('refundBookingId').value;
+            const resultDiv = document.getElementById('refundResult');
+            
+            if (!bookingId) {
+                showResult(resultDiv, 'Vui lòng nhập Booking ID', 'error');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Đang xử lý...';
+            resultDiv.className = 'result';
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            
+            fetch('/request-refund', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `bookingId=${bookingId}&_csrf=${csrfToken}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showResult(resultDiv, data.message, 'success');
+  } else {
+                    showResult(resultDiv, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResult(resultDiv, 'Có lỗi xảy ra: ' + error.message, 'error');
+            });
+        }
+        
+        function showResult(element, message, type) {
+            element.style.display = 'block';
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+  </script>
+</body>
+</html>
